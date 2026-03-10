@@ -1,6 +1,6 @@
 [build]
-command = "npm install && npm run build"
-publish = "dist"
+  command = "npm ci && npx vite build"
+  publish = "dist"
 
 [build.environment]
-NODE_VERSION = "20"
+  NODE_VERSION = "18"
