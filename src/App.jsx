@@ -213,58 +213,36 @@ export default function KundliApp() {
     setLoading(true);
     setResult(null);
 
-    const prompt = `You are a master Vedic and Western astrologer with 40+ years of experience. Generate a HIGHLY DETAILED and DEEPLY PERSONALIZED Kundli (birth chart analysis) for the following person:
-
+    const prompt = `You are an expert Vedic astrologer. Generate a detailed Kundli reading for:
 Name: ${form.name}
 Date of Birth: ${form.dob}
 Place of Birth: ${form.pob}
-Time of Birth: ${form.tob || "Unknown (use noon as default)"}
+Time of Birth: ${form.tob || "12:00"}
 
-Return a JSON object with EXACTLY these keys. Each value must be a richly detailed paragraph or multi-paragraph text (not bullet points — flowing prose). Be specific, mystical, and genuinely astrologically grounded:
-
+Return ONLY a JSON object with these keys, each value being 2-3 sentences:
 {
-  "overview": "A 200-word grand cosmic overview of this person's chart — their life theme, soul purpose, dominant energies, rising sign, moon sign, sun sign, and general cosmic blueprint. Make it feel personal and profound.",
-
-  "planets": "Describe the position and influence of all 9 Vedic planets (Sun/Surya, Moon/Chandra, Mars/Mangal, Mercury/Budha, Jupiter/Guru, Venus/Shukra, Saturn/Shani, Rahu, Ketu) and their house placements based on the birth details. Explain what each planet's position means for this specific person. Also mention their Lagna (Ascendant), Rashi (Moon Sign), and Nakshatra.",
-
-  "health": "Detailed analysis of health tendencies, body constitution (Prakriti/dosha), vulnerable organs and body parts, likely health challenges at different life stages, mental health tendencies, and recommended health practices specific to their planetary positions. Mention which planets affect their 6th house (disease) and 8th house.",
-
-  "wealth": "Deep analysis of wealth potential, financial ups and downs, best periods for financial growth (Dasha periods), sources of income, attitudes toward money, investment tendencies, wealth yoga if any, and specific advice for financial prosperity. Reference 2nd, 11th house and their lords.",
-
-  "education": "Analysis of educational aptitude, fields of study they'd excel in, their learning style, memory and concentration, higher education prospects, foreign education possibilities, and periods most favorable for studies. Reference Mercury, Jupiter, 4th and 5th houses.",
-
-  "career": "Detailed career analysis — suitable professions, career timeline with highs and lows, entrepreneurship potential, leadership ability, best career fields aligned with their chart, peak career years, workplace personality, and how they relate to authority. Reference 10th house, its lord, and career-related planets.",
-
-  "marriage": "Marriage timing (approximate age range), nature of spouse (appearance, personality), compatibility tendencies (which signs make best partners), marital harmony prospects, challenges in relationships, love vs arranged marriage inclination, and advice for relationship harmony. Reference 7th house, Venus, Jupiter.",
-
-  "children": "Prospects for children, likely number, relationship with children, parenting style, and any special considerations from the 5th house analysis.",
-
-  "predictions": "Major life event predictions decade by decade from birth to 80 years old. Cover 0-10, 10-20, 20-30, 30-40, 40-50, 50-60, 60-70, 70-80 years. Mention key Mahadasha and Antardasha periods and what events they may bring. Be specific about transformative moments.",
-
-  "lifestyle_adopt": "What lifestyle habits, behaviors, routines, mindsets, spiritual practices, dietary habits, and daily rituals should this person ADOPT to live a peaceful, prosperous, and happy life? Ground this in their planetary placements.",
-
-  "lifestyle_avoid": "What lifestyle habits, behaviors, relationships, foods, environments, and tendencies should this person AVOID or be cautious about, based on malefic planetary influences and karmic patterns?",
-
-  "favourable_colours": "Their 3-4 most auspicious colors with astrological reasoning for each — which planets they strengthen and how they bring luck.",
-
-  "favourable_numbers": "Their 3-5 lucky numbers (including life path and destiny numbers from name and DOB), with explanation of why each is significant.",
-
-  "favourable_days": "Most auspicious days of the week for important activities, fasting, and spiritual practices — with planetary rulers explained.",
-
-  "gemstones": "Recommended gemstones (Navratna context) — primary gemstone with carat, which finger, which metal, which day to wear it. Secondary gemstones too. Explain planetary lords each stone strengthens.",
-
-  "rudraksha": "Specific Rudraksha recommendations (1 mukhi through 14 mukhi) — which ones are most beneficial for this person, why, how to wear them, and which mantras to chant with them.",
-
-  "mantras": "Specific Vedic mantras for their chart — planetary mantras for their strongest and most challenging planets, how many times to chant, and best time to chant.",
-
-  "longevity": "Based on Vedic longevity calculations (Ayurdaya), Balarishta (childhood risks), and 8th house analysis — provide an honest assessment of life expectancy range (e.g., 75-85 years), vitality periods, and what planetary combinations support a long life or suggest caution.",
-
-  "spiritual_path": "Their dharmic path, spiritual inclinations, past life karma (Rahu/Ketu axis), soul lessons, deity recommendations for worship, and how they can fulfill their highest potential in this lifetime.",
-
-  "summary_verdict": "A powerful, uplifting 150-word closing cosmic verdict — their unique gifts, life mission, and the single most important advice the stars have for them."
+  "overview": "Sun sign, Moon sign, Rising sign and overall cosmic personality",
+  "planets": "Key planetary positions and their main influences",
+  "health": "Health tendencies and recommendations",
+  "wealth": "Wealth potential and financial guidance",
+  "education": "Educational aptitude and best fields",
+  "career": "Best career paths and peak years",
+  "marriage": "Marriage timing and spouse nature",
+  "children": "Children prospects",
+  "predictions": "Key life predictions by decade 0-10, 10-20, 20-30, 30-40, 40-50, 50+",
+  "lifestyle_adopt": "Habits and practices to adopt",
+  "lifestyle_avoid": "Things to avoid",
+  "favourable_colours": "Lucky colours with reasons",
+  "favourable_numbers": "Lucky numbers with reasons",
+  "favourable_days": "Auspicious days of week",
+  "gemstones": "Recommended gemstones and how to wear",
+  "rudraksha": "Recommended Rudraksha beads",
+  "mantras": "Key mantras to chant",
+  "longevity": "Life expectancy and vitality assessment",
+  "spiritual_path": "Dharmic path and soul purpose",
+  "summary_verdict": "Final cosmic advice and life mission"
 }
-
-IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JSON. Make every section feel personal, specific to ${form.name}, and astrologically substantive.`;
+Return ONLY valid JSON, no markdown, no backticks.`;
 
     try {
       const response = await fetch("/.netlify/functions/claude-proxy", {
@@ -272,7 +250,7 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation out
         headers: { "Content-Type": "application/json",},
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 4000,
+          max_tokens: 2000,
           system: "You are an expert Vedic and Western astrologer. Return only valid JSON with no markdown formatting, no backticks, no code blocks. Just raw JSON.",
           messages: [{ role: "user", content: prompt }],
         }),
