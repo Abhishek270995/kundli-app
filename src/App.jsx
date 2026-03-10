@@ -245,9 +245,11 @@ Return ONLY a JSON object with these keys, each value being 2-3 sentences:
 Return ONLY valid JSON, no markdown, no backticks.`;
 
     try {
-      const response = await fetch("/.netlify/functions/claude-proxy", {
+      const response = await fetch("/api/claude-proxy", {
         method: "POST",
-        headers: { "Content-Type": "application/json",},
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 2000,
