@@ -272,7 +272,7 @@ IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation out
         headers: { "Content-Type": "application/json",},
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 8000,
+          max_tokens: 4000,
           system: "You are an expert Vedic and Western astrologer. Return only valid JSON with no markdown formatting, no backticks, no code blocks. Just raw JSON.",
           messages: [{ role: "user", content: prompt }],
         }),
