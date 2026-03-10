@@ -1,6 +1,7 @@
 [build]
   command = "npm ci && npx vite build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"

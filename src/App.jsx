@@ -267,12 +267,9 @@ Return a JSON object with EXACTLY these keys. Each value must be a richly detail
 IMPORTANT: Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JSON. Make every section feel personal, specific to ${form.name}, and astrologically substantive.`;
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/.netlify/functions/claude-proxy", {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-  "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-  "anthropic-version": "2023-06-01",
-  "anthropic-dangerous-direct-browser-calls": "true", },
+        headers: { "Content-Type": "application/json",},
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 8000,
