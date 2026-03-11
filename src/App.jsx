@@ -1,4 +1,6 @@
 import { useState, useRef } from "react";
+import { calculatePlanets, calculateAscendant, assignHouses } from "./kundliEngine";
+import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
   { name:"Aries",symbol:"♈",sanskrit:"Mesh" },{ name:"Taurus",symbol:"♉",sanskrit:"Vrishabh" },
@@ -474,21 +476,55 @@ export default function App() {
     setErr("");setStep(1);setResult(null);
     const L=hi?"All descriptive text in fluent Hindi (Devanagari). Keep JSON keys in English.":"All text in English.";
     try {
-      // ── CALL 1: Chart + planets + houses (compact) ────────────
-      const p1=`Vedic astrologer. Compact birth chart for: Name:${form.name}, DOB:${form.dob}, Place:${form.pob}, Time:${form.tob||"12:00"}. ${L}
-Return ONLY this JSON structure (no markdown):
-{"lagna":"","rashi":"","nakshatra":"","tithi":"","yoga":"",
-"pl":{"Sun":{"s":"Leo","h":5,"d":"15°20'","st":"Own Sign","e":"${hi?"प्रभाव":"1 line effect"}"},"Moon":{"s":"","h":0,"d":"","st":"","e":""},"Mars":{"s":"","h":0,"d":"","st":"","e":""},"Mercury":{"s":"","h":0,"d":"","st":"","e":""},"Jupiter":{"s":"","h":0,"d":"","st":"","e":""},"Venus":{"s":"","h":0,"d":"","st":"","e":""},"Saturn":{"s":"","h":0,"d":"","st":"","e":""},"Rahu":{"s":"","h":0,"d":"","st":"","e":""},"Ketu":{"s":"","h":0,"d":"","st":"","e":""}},
-"hs":{"1":{"sg":"Aries","pl":["Mars"],"i":"${hi?"हिंदी में":"1 sentence"}"},"2":{"sg":"","pl":[],"i":""},"3":{"sg":"","pl":[],"i":""},"4":{"sg":"","pl":[],"i":""},"5":{"sg":"","pl":[],"i":""},"6":{"sg":"","pl":[],"i":""},"7":{"sg":"","pl":[],"i":""},"8":{"sg":"","pl":[],"i":""},"9":{"sg":"","pl":[],"i":""},"10":{"sg":"","pl":[],"i":""},"11":{"sg":"","pl":[],"i":""},"12":{"sg":"","pl":[],"i":""}},
-"yogas":"${hi?"योग हिंदी में":"yogas 2 sentences"}","dasha":"${hi?"दशा हिंदी में":"dasha 2 sentences"}"}`;
+      // --- Real astronomy calculation ---
+const date = new Date(`${form.dob}T${form.tob || "12:00"}`);
 
-      const r1=await callAPI(p1,1400);
+let lat, lon;
 
-      // remap compact keys to full keys for chart rendering
-      const houses={};
-      if(r1.hs){Object.entries(r1.hs).forEach(([k,v])=>{houses[k]={sign:v.sg||v.sign,planets:v.pl||v.planets||[],interpretation:v.i||v.interpretation||""};});}
-      const planetData={};
-      if(r1.pl){Object.entries(r1.pl).forEach(([k,v])=>{planetData[k]={sign:v.s||v.sign,house:v.h||v.house,degree:v.d||v.degree,status:v.st||v.status,effect:v.e||v.effect};});}
+try {
+
+  const coords = await getCoordinates(form.pob);
+
+  lat = coords.lat;
+  lon = coords.lon;
+
+} catch (err) {
+
+  console.warn("Geocoding failed, using fallback location");
+
+  lat = 28.6139;   // Delhi fallback
+  lon = 77.2090;
+
+}
+
+const planets = calculatePlanets(date);
+
+const asc = calculateAscendant(date, lat, lon);
+
+const planetData = assignHouses(planets, asc);
+
+
+// ── CALL 1: Interpretation ────────────
+const p1 = `
+Interpret the following Vedic birth chart.
+
+Planet positions:
+${JSON.stringify(planetData)}
+
+Return ONLY this JSON:
+
+{
+"lagna":"",
+"rashi":"",
+"nakshatra":"",
+"tithi":"",
+"yoga":"",
+"yogas":"",
+"dasha":""
+}
+`;
+
+const r1 = await callAPI(p1,800);
 
       setStep(2);
 
@@ -498,6 +534,21 @@ Return ONLY this JSON (no markdown), each value max 4 sentences:
 {"overview":"${hi?"अवलोकन":"overview"}","pa":"${hi?"ग्रह विश्लेषण":"planetary analysis"}","ha":"${hi?"भाव विश्लेषण":"house analysis"}","health":"${hi?"स्वास्थ्य":"health"}","wealth":"${hi?"धन":"wealth"}","education":"${hi?"शिक्षा":"education"}","career":"${hi?"करियर":"career"}","marriage":"${hi?"विवाह":"marriage"}","pred":"${hi?"दशक भविष्यवाणी 0-10,10-20,20-30,30-40,40-50,50+":"decade predictions 0-10,10-20,20-30,30-40,40-50,50+"}","colours":"${hi?"रंग":"colours"}","numbers":"${hi?"अंक":"numbers"}","days":"${hi?"दिन":"days"}","gems":"${hi?"रत्न":"gemstones"}","rudraksha":"${hi?"रुद्राक्ष":"rudraksha"}","longevity":"${hi?"आयु":"longevity"}","verdict":"${hi?"अंतिम संदेश":"final verdict 3 sentences"}"}`;
 
       const r2=await callAPI(p2,1400);
+
+      // build houses from planet data
+      const houses = {};
+
+      Object.entries(planetData).forEach(([planet, data]) => {
+
+        const h = data.house;
+
+        if (!houses[h]) {
+          houses[h] = { sign: data.sign, planets: [] };
+        }
+
+        houses[h].planets.push(planet);
+
+      });
 
       setResult({...r1, houses, planetData, ...r2});
       setTimeout(()=>ref.current?.scrollIntoView({behavior:"smooth"}),100);
