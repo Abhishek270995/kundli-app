@@ -99,105 +99,141 @@ async function callAPI(prompt, max = 1500) {
 // Structure: outer rect + horizontal + vertical + 4 corner diagonals = 9 regions
 // Exactly like reference image — pure straight lines only
 const Chart = ({ houses }) => {
-  const W=500, H=410;
-  // The 4 key points of the chart grid
-  const L=16, T=16, R=W-16, B=H-16; // outer rect
-  const cx=(L+R)/2, cy=(T+B)/2;      // center point
+  const W = 500;
+  const H = 500;
+  const P = 20;
 
-  // All lines meet at center (cx,cy)
-  // 4 corners → center, plus full H and V lines = 12 triangular/rectangular regions
+  const lc = "rgba(212,175,55,0.7)";
+  const lw = 1.6;
+  const bg = "rgba(8,4,20,0.97)";
 
-  const lc = "rgba(212,175,55,0.7)";  // gold — matches app theme
-  const lw = 1.5;
-  const bg  = "rgba(8,4,20,0.97)";    // dark — matches app background
-  const cellBg = "rgba(20,10,45,0.0)"; // transparent, bg shows through
-
-  const getHouse = n => {
+  const getHouse = (n) => {
     const d = houses?.[n] || houses?.[String(n)] || {};
-    const sg = ZODIAC_SIGNS.find(z=>z.name===d.sign||z.sanskrit===d.sign) || ZODIAC_SIGNS[(n-1)%12];
-    const pl = (d.planets||[]).map(p => PLANETS.find(x=>x.name===p||x.symbol===p) || {symbol:p.slice(0,2),color:"#d4af37"});
+    const sg =
+      ZODIAC_SIGNS.find((z) => z.name === d.sign || z.sanskrit === d.sign) ||
+      ZODIAC_SIGNS[(n - 1) % 12];
+
+    const pl = (d.planets || []).map(
+      (p) =>
+        PLANETS.find((x) => x.name === p || x.symbol === p) || {
+          symbol: p.slice(0, 2),
+          color: "#d4af37",
+        }
+    );
+
     return { sg, pl };
   };
 
-  // Each house cell: house number, sign symbol, sign name, planet symbols
   const Cell = ({ n, x, y }) => {
     const { sg, pl } = getHouse(n);
+
     return (
       <g>
-        {/* House number */}
-        <text x={x} y={y-22} textAnchor="middle"
-          fill="rgba(212,175,55,0.35)" fontSize="9" fontWeight="bold">{n}</text>
-        {/* Zodiac symbol */}
-        <text x={x} y={y-8} textAnchor="middle"
-          fill="#d4af37" fontSize="16" fontFamily="serif">{sg.symbol}</text>
-        {/* Sign name */}
-        <text x={x} y={y+7} textAnchor="middle"
-          fill="rgba(212,175,55,0.55)" fontSize="8">{sg.sanskrit}</text>
-        {/* Planets — each in their own color, stacked */}
-        {pl.map((p,i) => (
-          <text key={i}
-            x={x + (i - (pl.length-1)/2) * 16}
-            y={y + 21}
+        <text
+          x={x}
+          y={y - 20}
+          textAnchor="middle"
+          fill="rgba(212,175,55,0.35)"
+          fontSize="10"
+          fontWeight="bold"
+        >
+          {n}
+        </text>
+
+        <text
+          x={x}
+          y={y - 4}
+          textAnchor="middle"
+          fill="#d4af37"
+          fontSize="18"
+          fontFamily="serif"
+        >
+          {sg.symbol}
+        </text>
+
+        <text
+          x={x}
+          y={y + 12}
+          textAnchor="middle"
+          fill="rgba(212,175,55,0.55)"
+          fontSize="9"
+        >
+          {sg.sanskrit}
+        </text>
+
+        {pl.map((p, i) => (
+          <text
+            key={i}
+            x={x + (i - (pl.length - 1) / 2) * 16}
+            y={y + 28}
             textAnchor="middle"
-            fill={p.color} fontSize="9" fontWeight="bold">{p.symbol}
+            fill={p.color}
+            fontSize="10"
+            fontWeight="bold"
+          >
+            {p.symbol}
           </text>
         ))}
       </g>
     );
   };
 
+  const c = W / 2;
+
   return (
-    <div style={{display:"flex",justifyContent:"center",marginBottom:26}}>
-      <svg width={W} height={H} style={{maxWidth:"100%",borderRadius:6,
-        boxShadow:"0 0 0 1px rgba(212,175,55,0.4), 0 8px 40px rgba(0,0,0,0.7)"}}>
+    <div style={{ display: "flex", justifyContent: "center", marginBottom: 26 }}>
+      <svg
+        width={W}
+        height={H}
+        style={{
+          maxWidth: "100%",
+          borderRadius: 6,
+          boxShadow: "0 0 0 1px rgba(212,175,55,0.4)",
+        }}
+      >
+        <rect width={W} height={H} fill={bg} rx="6" />
 
-        {/* Dark background matching app */}
-        <rect width={W} height={H} fill={bg} rx="6"/>
+        {/* outer diamond */}
+        <polygon
+          points={`${c},${P} ${W - P},${c} ${c},${H - P} ${P},${c}`}
+          fill="none"
+          stroke={lc}
+          strokeWidth={lw}
+        />
 
-        {/* Outer border — double line in gold */}
-        <rect x={L-5} y={T-5} width={R-L+10} height={B-T+10}
-          fill="none" stroke="rgba(212,175,55,0.5)" strokeWidth="2" rx="2"/>
-        <rect x={L} y={T} width={R-L} height={B-T}
-          fill="none" stroke={lc} strokeWidth={lw}/>
+        {/* inner diamond */}
+        <polygon
+          points={`${c},${P + 120} ${W - P - 120},${c} ${c},${H - P - 120} ${
+            P + 120
+          },${c}`}
+          fill="none"
+          stroke={lc}
+          strokeWidth={lw}
+        />
 
-        {/* ── 9 STRUCTURAL LINES — ALL STRAIGHT ── */}
-        {/* Horizontal center line */}
-        <line x1={L} y1={cy} x2={R} y2={cy} stroke={lc} strokeWidth={lw}/>
-        {/* Vertical center line */}
-        <line x1={cx} y1={T} x2={cx} y2={B} stroke={lc} strokeWidth={lw}/>
-        {/* 4 corner-to-center diagonals */}
-        <line x1={L} y1={T} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-        <line x1={R} y1={T} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-        <line x1={L} y1={B} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-        <line x1={R} y1={B} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
+        {/* cross lines */}
+        <line x1={c} y1={P} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
+        <line x1={P} y1={c} x2={W - P} y2={c} stroke={lc} strokeWidth={lw} />
 
-        {/* ── CENTER LABEL ── */}
-        <text x={cx} y={cy-6} textAnchor="middle"
-          fill="rgba(212,175,55,0.6)" fontSize="10" fontWeight="bold"
-          fontFamily="'Noto Sans Devanagari',serif">लग्न कुंडली</text>
-        <text x={cx} y={cy+14} textAnchor="middle"
-          fill="rgba(212,175,55,0.5)" fontSize="20" fontFamily="serif">ॐ</text>
+        {/* diagonals */}
+        <line x1={P} y1={c} x2={c} y2={P} stroke={lc} strokeWidth={lw} />
+        <line x1={W - P} y1={c} x2={c} y2={P} stroke={lc} strokeWidth={lw} />
+        <line x1={P} y1={c} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
+        <line x1={W - P} y1={c} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
 
-        {/* ── 12 HOUSE CELLS ──
-            Layout (North Indian):
-            H1=top-center △, H2=top-left □, H3=left-top △,
-            H4=left-center □, H5=left-bottom △, H6=bottom-left □,
-            H7=bottom-center △, H8=bottom-right □, H9=right-bottom △,
-            H10=right-center □, H11=right-top △, H12=top-right □
-        */}
-        <Cell n={1}  x={cx}             y={T+(cy-T)*0.45}     /> {/* top △     */}
-        <Cell n={2}  x={L+(cx-L)*0.42}  y={T+(cy-T)*0.42}     /> {/* top-L □   */}
-        <Cell n={3}  x={L+(cx-L)*0.2}   y={cy-(cy-T)*0.38}    /> {/* left-T △  */}
-        <Cell n={4}  x={L+(cx-L)*0.42}  y={cy}                 /> {/* left □    */}
-        <Cell n={5}  x={L+(cx-L)*0.2}   y={cy+(B-cy)*0.38}    /> {/* left-B △  */}
-        <Cell n={6}  x={L+(cx-L)*0.42}  y={B-(B-cy)*0.42}     /> {/* bot-L □   */}
-        <Cell n={7}  x={cx}             y={B-(B-cy)*0.45}     /> {/* bot △     */}
-        <Cell n={8}  x={R-(R-cx)*0.42}  y={B-(B-cy)*0.42}     /> {/* bot-R □   */}
-        <Cell n={9}  x={R-(R-cx)*0.2}   y={cy+(B-cy)*0.38}    /> {/* right-B △ */}
-        <Cell n={10} x={R-(R-cx)*0.42}  y={cy}                 /> {/* right □   */}
-        <Cell n={11} x={R-(R-cx)*0.2}   y={cy-(cy-T)*0.38}    /> {/* right-T △ */}
-        <Cell n={12} x={R-(R-cx)*0.42}  y={T+(cy-T)*0.42}     /> {/* top-R □   */}
-
+        {/* house placements */}
+        <Cell n={1} x={c} y={70} />
+        <Cell n={2} x={130} y={130} />
+        <Cell n={3} x={70} y={250} />
+        <Cell n={4} x={130} y={370} />
+        <Cell n={5} x={250} y={430} />
+        <Cell n={6} x={370} y={370} />
+        <Cell n={7} x={430} y={250} />
+        <Cell n={8} x={370} y={130} />
+        <Cell n={9} x={250} y={250} />
+        <Cell n={10} x={310} y={250} />
+        <Cell n={11} x={250} y={190} />
+        <Cell n={12} x={190} y={250} />
       </svg>
     </div>
   );
