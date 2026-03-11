@@ -95,46 +95,179 @@ async function callAPI(prompt, max = 1500) {
   return JSON.parse(raw.replace(/```json|```/g,"").trim());
 }
 
-// ── CHART ─────────────────────────────────────────────────────────
+// ── AUTHENTIC NORTH INDIAN KUNDLI CHART ───────────────────────────
 const Chart = ({ houses }) => {
-  const S=380, c=S/2, q=S/4;
-  const Cell = ({ n, cx, cy }) => {
+  const W = 500, H = 420;
+  const pad = 18;
+  // Outer rectangle corners
+  const x0=pad, y0=pad, x1=W-pad, y1=H-pad;
+  const cx=(x0+x1)/2, cy=(y0+y1)/2;
+
+  // The 4 corner points of inner diamond (where curves meet)
+  const dTop    = { x: cx,  y: y0 + (y1-y0)*0.28 };
+  const dRight  = { x: x1 - (x1-x0)*0.18, y: cy };
+  const dBottom = { x: cx,  y: y1 - (y1-y0)*0.28 };
+  const dLeft   = { x: x0 + (x1-x0)*0.18, y: cy };
+
+  // Curved petal paths - each curve bows outward from diamond center
+  const bow = 52; // how much each arc bows outward
+  const bowS = 38; // smaller bow for side arcs
+
+  // 4 inner curved arcs forming the petal diamond
+  // Top-left arc: dTop -> dLeft (curves toward top-left corner)
+  const arcTL = `M ${dTop.x} ${dTop.y} Q ${x0+bow} ${y0+bow} ${dLeft.x} ${dLeft.y}`;
+  // Top-right arc: dTop -> dRight
+  const arcTR = `M ${dTop.x} ${dTop.y} Q ${x1-bow} ${y0+bow} ${dRight.x} ${dRight.y}`;
+  // Bottom-left arc: dBottom -> dLeft
+  const arcBL = `M ${dBottom.x} ${dBottom.y} Q ${x0+bow} ${y1-bow} ${dLeft.x} ${dLeft.y}`;
+  // Bottom-right arc: dBottom -> dRight
+  const arcBR = `M ${dBottom.x} ${dBottom.y} Q ${x1-bow} ${y1-bow} ${dRight.x} ${dRight.y}`;
+
+  // House cell center positions
+  // H1=top-center, H2=top-left, H3=left-top, H4=left-center,
+  // H5=left-bottom, H6=bottom-left, H7=bottom-center, H8=bottom-right,
+  // H9=right-bottom, H10=right-center, H11=right-top, H12=top-right
+  const cells = [
+    { n:1,  cx: cx,                   cy: y0 + (dTop.y-y0)*0.52 },
+    { n:2,  cx: x0 + (dLeft.x-x0)*0.52, cy: y0 + (dTop.y-y0)*0.52 },
+    { n:3,  cx: x0 + (dLeft.x-x0)*0.22, cy: cy - (cy-y0)*0.38 },
+    { n:4,  cx: x0 + (dLeft.x-x0)*0.52, cy: cy },
+    { n:5,  cx: x0 + (dLeft.x-x0)*0.22, cy: cy + (y1-cy)*0.38 },
+    { n:6,  cx: x0 + (dLeft.x-x0)*0.52, cy: y1 - (y1-dBottom.y)*0.52 },
+    { n:7,  cx: cx,                   cy: y1 - (y1-dBottom.y)*0.52 },
+    { n:8,  cx: x1 - (x1-dRight.x)*0.52, cy: y1 - (y1-dBottom.y)*0.52 },
+    { n:9,  cx: x1 - (x1-dRight.x)*0.22, cy: cy + (y1-cy)*0.38 },
+    { n:10, cx: x1 - (x1-dRight.x)*0.52, cy: cy },
+    { n:11, cx: x1 - (x1-dRight.x)*0.22, cy: cy - (cy-y0)*0.38 },
+    { n:12, cx: x1 - (x1-dRight.x)*0.52, cy: y0 + (dTop.y-y0)*0.52 },
+  ];
+
+  const getHouseData = (n) => {
     const d = houses?.[n] || houses?.[String(n)] || {};
     const sg = ZODIAC_SIGNS.find(z=>z.name===d.sign||z.sanskrit===d.sign) || ZODIAC_SIGNS[(n-1)%12];
-    const pl = (d.planets||[]).map(p=>PLANETS.find(x=>x.name===p||x.symbol===p)||{symbol:p.slice(0,2),color:"#d4af37"});
+    const pl = (d.planets||[]).map(p=>PLANETS.find(x=>x.name===p||x.symbol===p)||{symbol:p.slice(0,2),color:"#e6d4b0"});
+    return { sg, pl };
+  };
+
+  const CellContent = ({ n, cx, cy }) => {
+    const { sg, pl } = getHouseData(n);
+    const lineH = 14;
+    const totalLines = 1 + 1 + (pl.length > 0 ? 1 : 0);
+    const startY = cy - (totalLines * lineH) / 2 + 6;
     return (
       <g>
-        <text x={cx} y={cy-15} textAnchor="middle" fill="rgba(212,175,55,0.38)" fontSize="9">{n}</text>
-        <text x={cx} y={cy+1} textAnchor="middle" fill="#d4af37" fontSize="14">{sg.symbol}</text>
-        <text x={cx} y={cy+13} textAnchor="middle" fill="rgba(212,175,55,0.48)" fontSize="7">{sg.sanskrit}</text>
-        {pl.map((p,i)=><text key={i} x={cx+(i-(pl.length-1)/2)*13} y={cy+24} textAnchor="middle" fill={p.color} fontSize="8" fontWeight="bold">{p.symbol}</text>)}
+        {/* House number - small, subtle */}
+        <text x={cx} y={startY - 8} textAnchor="middle"
+          fill="#8B7355" fontSize="9" fontFamily="Georgia,serif">{n}</text>
+        {/* Zodiac symbol - large, gold */}
+        <text x={cx} y={startY + 6} textAnchor="middle"
+          fill="#d4af37" fontSize="16" fontFamily="serif">{sg.symbol}</text>
+        {/* Sanskrit name */}
+        <text x={cx} y={startY + 19} textAnchor="middle"
+          fill="#a08050" fontSize="8" fontFamily="Georgia,serif">{sg.sanskrit}</text>
+        {/* Planets spread horizontally */}
+        {pl.map((p, i) => (
+          <text key={i}
+            x={cx + (i - (pl.length-1)/2) * 15}
+            y={startY + 32}
+            textAnchor="middle"
+            fill={p.color} fontSize="9" fontWeight="bold" fontFamily="Georgia,serif">
+            {p.symbol}
+          </text>
+        ))}
       </g>
     );
   };
+
+  // Corner decorative squares (like the image)
+  const cornerSize = 10;
+  const corners = [
+    {x: x0, y: y0}, {x: x1-cornerSize, y: y0},
+    {x: x0, y: y1-cornerSize}, {x: x1-cornerSize, y: y1-cornerSize},
+    // mid-edge squares
+    {x: cx-cornerSize/2, y: y0}, {x: cx-cornerSize/2, y: y1-cornerSize},
+    {x: x0, y: cy-cornerSize/2}, {x: x1-cornerSize, y: cy-cornerSize/2},
+  ];
+
   return (
-    <div style={{display:"flex",justifyContent:"center",marginBottom:26}}>
-      <svg width={S} height={S} style={{maxWidth:"100%",filter:"drop-shadow(0 0 20px rgba(212,175,55,0.1))"}}>
-        <rect x="1" y="1" width={S-2} height={S-2} fill="rgba(8,4,20,0.97)" stroke="#d4af37" strokeWidth="2" rx="3"/>
-        <line x1={c} y1="1" x2={c} y2={S-1} stroke="rgba(212,175,55,0.4)" strokeWidth="1"/>
-        <line x1="1" y1={c} x2={S-1} y2={c} stroke="rgba(212,175,55,0.4)" strokeWidth="1"/>
-        <line x1="1" y1="1" x2={S-1} y2={S-1} stroke="rgba(212,175,55,0.32)" strokeWidth="1"/>
-        <line x1={S-1} y1="1" x2="1" y2={S-1} stroke="rgba(212,175,55,0.32)" strokeWidth="1"/>
-        <polygon points={`${c},${q} ${S-q},${c} ${c},${S-q} ${q},${c}`} fill="rgba(15,8,40,0.95)" stroke="#d4af37" strokeWidth="1.5"/>
-        {[[c,q,q,c],[c,q,S-q,c],[c,S-q,q,c],[c,S-q,S-q,c]].map(([x1,y1,x2,y2],i)=><line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(212,175,55,0.22)" strokeWidth="1"/>)}
-        <text x={c} y={c+11} textAnchor="middle" fill="#d4af37" fontSize="26" fontFamily="serif" opacity="0.8">ॐ</text>
-        <Cell n={1}  cx={c}         cy={q*0.6}      />
-        <Cell n={2}  cx={q*0.6}     cy={q*0.6}      />
-        <Cell n={3}  cx={q*0.22}    cy={c-q*0.36}   />
-        <Cell n={4}  cx={q*0.6}     cy={c}          />
-        <Cell n={5}  cx={q*0.22}    cy={c+q*0.36}   />
-        <Cell n={6}  cx={q*0.6}     cy={S-q*0.6}    />
-        <Cell n={7}  cx={c}         cy={S-q*0.6}    />
-        <Cell n={8}  cx={S-q*0.6}   cy={S-q*0.6}    />
-        <Cell n={9}  cx={S-q*0.22}  cy={c+q*0.36}   />
-        <Cell n={10} cx={S-q*0.6}   cy={c}          />
-        <Cell n={11} cx={S-q*0.22}  cy={c-q*0.36}   />
-        <Cell n={12} cx={S-q*0.6}   cy={q*0.6}      />
-      </svg>
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",marginBottom:26}}>
+      <div style={{
+        background:"#f5f0e8",
+        borderRadius:8,
+        padding:4,
+        boxShadow:"0 4px 30px rgba(0,0,0,0.5), 0 0 0 1px #8B7355",
+        maxWidth:"100%",
+      }}>
+        <svg width={W} height={H} style={{display:"block",maxWidth:"100%"}}>
+          {/* Cream background */}
+          <rect x={0} y={0} width={W} height={H} fill="#f8f3ea"/>
+
+          {/* Outer border - double line */}
+          <rect x={x0-4} y={y0-4} width={W-pad*2+8} height={H-pad*2+8}
+            fill="none" stroke="#8B6914" strokeWidth="2"/>
+          <rect x={x0} y={y0} width={W-pad*2} height={H-pad*2}
+            fill="none" stroke="#8B6914" strokeWidth="1.5"/>
+
+          {/* Corner decorative squares */}
+          {corners.map((c,i)=>(
+            <rect key={i} x={c.x} y={c.y} width={cornerSize} height={cornerSize}
+              fill="#8B6914" opacity="0.7"/>
+          ))}
+
+          {/* Straight dividing lines */}
+          {/* Top-left corner to diamond-top */}
+          <line x1={x0} y1={y0} x2={dTop.x} y2={dTop.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Top-right corner to diamond-top */}
+          <line x1={x1} y1={y0} x2={dTop.x} y2={dTop.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Bottom-left corner to diamond-bottom */}
+          <line x1={x0} y1={y1} x2={dBottom.x} y2={dBottom.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Bottom-right corner to diamond-bottom */}
+          <line x1={x1} y1={y1} x2={dBottom.x} y2={dBottom.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Left-top corner to diamond-left */}
+          <line x1={x0} y1={y0} x2={dLeft.x} y2={dLeft.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Left-bottom corner to diamond-left */}
+          <line x1={x0} y1={y1} x2={dLeft.x} y2={dLeft.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Right-top corner to diamond-right */}
+          <line x1={x1} y1={y0} x2={dRight.x} y2={dRight.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Right-bottom corner to diamond-right */}
+          <line x1={x1} y1={y1} x2={dRight.x} y2={dRight.y} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Vertical center line */}
+          <line x1={cx} y1={y0} x2={cx} y2={dTop.y} stroke="#8B6914" strokeWidth="1.2"/>
+          <line x1={cx} y1={dBottom.y} x2={cx} y2={y1} stroke="#8B6914" strokeWidth="1.2"/>
+          {/* Horizontal center line */}
+          <line x1={x0} y1={cy} x2={dLeft.x} y2={cy} stroke="#8B6914" strokeWidth="1.2"/>
+          <line x1={dRight.x} y1={cy} x2={x1} y2={cy} stroke="#8B6914" strokeWidth="1.2"/>
+
+          {/* Inner petal arcs - cream fill */}
+          <path d={`${arcTL} L ${dTop.x} ${dTop.y}`}
+            fill="#ede6d6" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={`M ${dTop.x} ${dTop.y} Q ${x1-bow} ${y0+bow} ${dRight.x} ${dRight.y} L ${dTop.x} ${dTop.y}`}
+            fill="#ede6d6" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={`M ${dLeft.x} ${dLeft.y} Q ${x0+bow} ${y1-bow} ${dBottom.x} ${dBottom.y} L ${dLeft.x} ${dLeft.y}`}
+            fill="#ede6d6" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={`M ${dRight.x} ${dRight.y} Q ${x1-bow} ${y1-bow} ${dBottom.x} ${dBottom.y} L ${dRight.x} ${dRight.y}`}
+            fill="#ede6d6" stroke="#8B6914" strokeWidth="1.3"/>
+
+          {/* Full curved arcs drawn on top */}
+          <path d={arcTL} fill="none" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={arcTR} fill="none" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={arcBL} fill="none" stroke="#8B6914" strokeWidth="1.3"/>
+          <path d={arcBR} fill="none" stroke="#8B6914" strokeWidth="1.3"/>
+
+          {/* Center diamond label */}
+          <text x={cx} y={cy-8} textAnchor="middle"
+            fill="#8B2500" fontSize="11" fontFamily="'Noto Sans Devanagari',serif" fontWeight="bold">
+            लग्न कुंडली
+          </text>
+          <text x={cx} y={cy+10} textAnchor="middle"
+            fill="#8B4500" fontSize="18" fontFamily="serif">ॐ</text>
+
+          {/* House cell content */}
+          {cells.map(cell => (
+            <CellContent key={cell.n} n={cell.n} cx={cell.cx} cy={cell.cy}/>
+          ))}
+        </svg>
+      </div>
     </div>
   );
 };
