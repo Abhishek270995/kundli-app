@@ -96,202 +96,109 @@ async function callAPI(prompt, max = 1500) {
 }
 
 // ── NORTH INDIAN KUNDLI CHART ─────────────────────────────────────
+// Structure: outer rect + horizontal + vertical + 4 corner diagonals = 9 regions
+// Exactly like reference image — pure straight lines only
 const Chart = ({ houses }) => {
-  /*
-    Exact structure (all straight lines):
-    ┌──────┬────┬──────┐
-    │  \   │ 1  │  /   │
-    │ 2  \ │    │ / 12 │
-    ├─────\┼────┼/─────┤
-    │  3   │    │  11  │
-    ├──────┤ OM ├──────┤
-    │  4   │    │  10  │
-    ├─────/┼────┼\─────┤
-    │ 5  / │    │ \ 9  │
-    │  /   │ 7  │  \   │
-    ├──────┼────┼──────┤
-    │  6   │    │  8   │  ← bottom row has NO diagonals
-    └──────┴────┴──────┘
+  const W=500, H=410;
+  // The 4 key points of the chart grid
+  const L=16, T=16, R=W-16, B=H-16; // outer rect
+  const cx=(L+R)/2, cy=(T+B)/2;      // center point
 
-    Actually correct layout:
-    Corner cells (2,12,6,8): square boxes in 4 corners
-    Top/Bottom center (1,7): triangles with diagonals from nearby corners
-    Left/Right center (4,10): rectangles (middle of left/right edge)
-    Side triangles (3,5,9,11): triangles between corners and center diamond
+  // All lines meet at center (cx,cy)
+  // 4 corners → center, plus full H and V lines = 12 triangular/rectangular regions
 
-    Diamond center points:
-    - Top:    (cx, gy0)          — top edge midpoint
-    - Bottom: (cx, gy1)          — bottom edge midpoint
-    - Left:   (gx0, cy)          — left edge midpoint
-    - Right:  (gx1, cy)          — right edge midpoint
-
-    Lines:
-    - Outer rect border
-    - Horizontal line at cy (full width)
-    - Vertical line at cx (full height)
-    - 4 diagonals from each corner to center (cx,cy)
-  */
-
-  const W=500, H=420;
-  const pad=22;
-  const gx0=pad, gy0=pad, gx1=W-pad, gy1=H-pad;
-  const gw=gx1-gx0, gh=gy1-gy0;
-  const cx=gx0+gw/2, cy=gy0+gh/2;
-
-  // The 4 points where the inner diamond touches the outer border midpoints
-  const mTop   ={x:cx,   y:gy0};  // top edge midpoint
-  const mBot   ={x:cx,   y:gy1};  // bottom edge midpoint
-  const mLeft  ={x:gx0,  y:cy};   // left edge midpoint
-  const mRight ={x:gx1,  y:cy};   // right edge midpoint
-
-  // The 4 corner cells: top-left, top-right, bottom-left, bottom-right
-  // divided by vertical (cx) and horizontal (cy) lines
-  // House layout (North Indian, H1 at top):
-  //   Top-left corner=H2, Top-right corner=H12
-  //   Left-mid=H3(top),H4(center),H5(bottom)  Right-mid=H11,H10,H9
-  //   Bottom-left=H6, Bottom-right=H8, Bottom-center=H7, Top-center=H1
-
-  const lc="#7A5C14";
-  const lw=1.4;
-
-  // Curve bow for center petal arcs (inward curves)
-  const bow=62;
+  const lc = "rgba(212,175,55,0.7)";  // gold — matches app theme
+  const lw = 1.5;
+  const bg  = "rgba(8,4,20,0.97)";    // dark — matches app background
+  const cellBg = "rgba(20,10,45,0.0)"; // transparent, bg shows through
 
   const getHouse = n => {
-    const d=houses?.[n]||houses?.[String(n)]||{};
-    const sg=ZODIAC_SIGNS.find(z=>z.name===d.sign||z.sanskrit===d.sign)||ZODIAC_SIGNS[(n-1)%12];
-    const pl=(d.planets||[]).map(p=>PLANETS.find(x=>x.name===p||x.symbol===p)||{symbol:p.slice(0,2),color:"#333"});
-    return {sg,pl};
+    const d = houses?.[n] || houses?.[String(n)] || {};
+    const sg = ZODIAC_SIGNS.find(z=>z.name===d.sign||z.sanskrit===d.sign) || ZODIAC_SIGNS[(n-1)%12];
+    const pl = (d.planets||[]).map(p => PLANETS.find(x=>x.name===p||x.symbol===p) || {symbol:p.slice(0,2),color:"#d4af37"});
+    return { sg, pl };
   };
 
-  const PlanetColors = {
-    Sun:"#CC8800",Moon:"#555599",Mars:"#CC2200",Mercury:"#006644",
-    Jupiter:"#CC6600",Venus:"#AA0066",Saturn:"#6644AA",Rahu:"#555555",Ketu:"#774422"
-  };
-
-  const Cell = ({n,x,y,fs=9}) => {
-    const {sg,pl}=getHouse(n);
+  // Each house cell: house number, sign symbol, sign name, planet symbols
+  const Cell = ({ n, x, y }) => {
+    const { sg, pl } = getHouse(n);
     return (
       <g>
-        <text x={x} y={y-20} textAnchor="middle" fill="#888050" fontSize="8" fontWeight="bold">{n}</text>
-        <text x={x} y={y-7}  textAnchor="middle" fill="#880000" fontSize={fs+4} fontFamily="serif">{sg.symbol}</text>
-        <text x={x} y={y+8}  textAnchor="middle" fill="#554400" fontSize="8">{sg.sanskrit}</text>
-        <g>
-          {pl.map((p,i)=>{
-            const pc=PlanetColors[p.name]||p.color||"#333";
-            return <text key={i} x={x+(i-(pl.length-1)/2)*15} y={y+21}
-              textAnchor="middle" fill={pc} fontSize="9" fontWeight="bold">{p.symbol}</text>;
-          })}
-        </g>
+        {/* House number */}
+        <text x={x} y={y-22} textAnchor="middle"
+          fill="rgba(212,175,55,0.35)" fontSize="9" fontWeight="bold">{n}</text>
+        {/* Zodiac symbol */}
+        <text x={x} y={y-8} textAnchor="middle"
+          fill="#d4af37" fontSize="16" fontFamily="serif">{sg.symbol}</text>
+        {/* Sign name */}
+        <text x={x} y={y+7} textAnchor="middle"
+          fill="rgba(212,175,55,0.55)" fontSize="8">{sg.sanskrit}</text>
+        {/* Planets — each in their own color, stacked */}
+        {pl.map((p,i) => (
+          <text key={i}
+            x={x + (i - (pl.length-1)/2) * 16}
+            y={y + 21}
+            textAnchor="middle"
+            fill={p.color} fontSize="9" fontWeight="bold">{p.symbol}
+          </text>
+        ))}
       </g>
     );
   };
 
-  // Decorative border squares
-  const sq=10;
-  const deco=[
-    // outer corners
-    {x:gx0-sq/2,y:gy0-sq/2},{x:gx1-sq/2,y:gy0-sq/2},
-    {x:gx0-sq/2,y:gy1-sq/2},{x:gx1-sq/2,y:gy1-sq/2},
-    // edge midpoints
-    {x:cx-sq/2,y:gy0-sq/2},{x:cx-sq/2,y:gy1-sq/2},
-    {x:gx0-sq/2,y:cy-sq/2},{x:gx1-sq/2,y:cy-sq/2},
-  ];
-
   return (
     <div style={{display:"flex",justifyContent:"center",marginBottom:26}}>
-      <div style={{background:"#f5eedc",borderRadius:5,padding:3,
-        boxShadow:"0 8px 40px rgba(0,0,0,0.6),0 0 0 2px #8B6914",maxWidth:"100%"}}>
-        <svg width={W} height={H} style={{display:"block",maxWidth:"100%",fontFamily:"'Noto Sans Devanagari',Georgia,serif"}}>
+      <svg width={W} height={H} style={{maxWidth:"100%",borderRadius:6,
+        boxShadow:"0 0 0 1px rgba(212,175,55,0.4), 0 8px 40px rgba(0,0,0,0.7)"}}>
 
-          {/* Background */}
-          <rect width={W} height={H} fill="#f5eedc"/>
+        {/* Dark background matching app */}
+        <rect width={W} height={H} fill={bg} rx="6"/>
 
-          {/* Outer double border */}
-          <rect x={gx0-7} y={gy0-7} width={gw+14} height={gh+14} fill="none" stroke={lc} strokeWidth="2.5"/>
-          <rect x={gx0}   y={gy0}   width={gw}     height={gh}    fill="none" stroke={lc} strokeWidth="1.5"/>
+        {/* Outer border — double line in gold */}
+        <rect x={L-5} y={T-5} width={R-L+10} height={B-T+10}
+          fill="none" stroke="rgba(212,175,55,0.5)" strokeWidth="2" rx="2"/>
+        <rect x={L} y={T} width={R-L} height={B-T}
+          fill="none" stroke={lc} strokeWidth={lw}/>
 
-          {/* Decorative squares at border intersections */}
-          {deco.map((d,i)=><rect key={i} x={d.x} y={d.y} width={sq} height={sq} fill={lc}/>)}
+        {/* ── 9 STRUCTURAL LINES — ALL STRAIGHT ── */}
+        {/* Horizontal center line */}
+        <line x1={L} y1={cy} x2={R} y2={cy} stroke={lc} strokeWidth={lw}/>
+        {/* Vertical center line */}
+        <line x1={cx} y1={T} x2={cx} y2={B} stroke={lc} strokeWidth={lw}/>
+        {/* 4 corner-to-center diagonals */}
+        <line x1={L} y1={T} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
+        <line x1={R} y1={T} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
+        <line x1={L} y1={B} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
+        <line x1={R} y1={B} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
 
-          {/* ── THE 5 STRAIGHT STRUCTURAL LINES ── */}
-          {/* Horizontal center line: full width */}
-          <line x1={gx0} y1={cy} x2={gx1} y2={cy} stroke={lc} strokeWidth={lw}/>
-          {/* Vertical center line: full height */}
-          <line x1={cx} y1={gy0} x2={cx} y2={gy1} stroke={lc} strokeWidth={lw}/>
-          {/* 4 corner-to-center diagonals */}
-          <line x1={gx0} y1={gy0} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-          <line x1={gx1} y1={gy0} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-          <line x1={gx0} y1={gy1} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
-          <line x1={gx1} y1={gy1} x2={cx} y2={cy} stroke={lc} strokeWidth={lw}/>
+        {/* ── CENTER LABEL ── */}
+        <text x={cx} y={cy-6} textAnchor="middle"
+          fill="rgba(212,175,55,0.6)" fontSize="10" fontWeight="bold"
+          fontFamily="'Noto Sans Devanagari',serif">लग्न कुंडली</text>
+        <text x={cx} y={cy+14} textAnchor="middle"
+          fill="rgba(212,175,55,0.5)" fontSize="20" fontFamily="serif">ॐ</text>
 
-          {/* ── CENTER DIAMOND PETAL (4 inward-bowing curves) ── */}
-          {/* The 4 diamond tips are: mTop, mBot, mLeft, mRight */}
-          {/* Each pair of adjacent tips is connected by TWO curves bowing INWARD */}
-          {/* creating the classic "petal" / "eye" shapes */}
+        {/* ── 12 HOUSE CELLS ──
+            Layout (North Indian):
+            H1=top-center △, H2=top-left □, H3=left-top △,
+            H4=left-center □, H5=left-bottom △, H6=bottom-left □,
+            H7=bottom-center △, H8=bottom-right □, H9=right-bottom △,
+            H10=right-center □, H11=right-top △, H12=top-right □
+        */}
+        <Cell n={1}  x={cx}             y={T+(cy-T)*0.45}     /> {/* top △     */}
+        <Cell n={2}  x={L+(cx-L)*0.42}  y={T+(cy-T)*0.42}     /> {/* top-L □   */}
+        <Cell n={3}  x={L+(cx-L)*0.2}   y={cy-(cy-T)*0.38}    /> {/* left-T △  */}
+        <Cell n={4}  x={L+(cx-L)*0.42}  y={cy}                 /> {/* left □    */}
+        <Cell n={5}  x={L+(cx-L)*0.2}   y={cy+(B-cy)*0.38}    /> {/* left-B △  */}
+        <Cell n={6}  x={L+(cx-L)*0.42}  y={B-(B-cy)*0.42}     /> {/* bot-L □   */}
+        <Cell n={7}  x={cx}             y={B-(B-cy)*0.45}     /> {/* bot △     */}
+        <Cell n={8}  x={R-(R-cx)*0.42}  y={B-(B-cy)*0.42}     /> {/* bot-R □   */}
+        <Cell n={9}  x={R-(R-cx)*0.2}   y={cy+(B-cy)*0.38}    /> {/* right-B △ */}
+        <Cell n={10} x={R-(R-cx)*0.42}  y={cy}                 /> {/* right □   */}
+        <Cell n={11} x={R-(R-cx)*0.2}   y={cy-(cy-T)*0.38}    /> {/* right-T △ */}
+        <Cell n={12} x={R-(R-cx)*0.42}  y={T+(cy-T)*0.42}     /> {/* top-R □   */}
 
-          {/* Top petal: mLeft ↔ mTop, curving inward (downward) */}
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy-bow*0.5} ${mTop.x} ${mTop.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx+bow*0.5} ${cy-bow*0.5} ${mRight.x} ${mRight.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-
-          {/* Bottom petal: mLeft ↔ mBot */}
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy+bow*0.5} ${mBot.x} ${mBot.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mBot.x} ${mBot.y} Q ${cx+bow*0.5} ${cy+bow*0.5} ${mRight.x} ${mRight.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-
-          {/* Left petal: mTop ↔ mBot curving left */}
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx-bow} ${cy} ${mBot.x} ${mBot.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-
-          {/* Right petal: mTop ↔ mBot curving right */}
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx+bow} ${cy} ${mBot.x} ${mBot.y}`}
-            fill="none" stroke={lc} strokeWidth="1.5"/>
-
-          {/* Fill the 4 petal shapes with slightly darker cream */}
-          {/* Left petal fill */}
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx-bow} ${cy} ${mBot.x} ${mBot.y} Q ${cx-bow*0.5} ${cy+bow*0.5} ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy-bow*0.5} ${mTop.x} ${mTop.y} Z`}
-            fill="#e6dcc8" stroke="none"/>
-          {/* Right petal fill */}
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx+bow*0.5} ${cy-bow*0.5} ${mRight.x} ${mRight.y} Q ${cx+bow*0.5} ${cy+bow*0.5} ${mBot.x} ${mBot.y} Q ${cx+bow} ${cy} ${mTop.x} ${mTop.y} Z`}
-            fill="#e6dcc8" stroke="none"/>
-          {/* Top petal fill */}
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy-bow*0.5} ${mTop.x} ${mTop.y} Q ${cx+bow*0.5} ${cy-bow*0.5} ${mRight.x} ${mRight.y} Q ${cx} ${cy-bow*1.1} ${mLeft.x} ${mLeft.y} Z`}
-            fill="#e6dcc8" stroke="none"/>
-          {/* Bottom petal fill */}
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx} ${cy+bow*1.1} ${mRight.x} ${mRight.y} Q ${cx+bow*0.5} ${cy+bow*0.5} ${mBot.x} ${mBot.y} Q ${cx-bow*0.5} ${cy+bow*0.5} ${mLeft.x} ${mLeft.y} Z`}
-            fill="#e6dcc8" stroke="none"/>
-
-          {/* Redraw curves on top */}
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy-bow*0.5} ${mTop.x} ${mTop.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx+bow*0.5} ${cy-bow*0.5} ${mRight.x} ${mRight.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mLeft.x} ${mLeft.y} Q ${cx-bow*0.5} ${cy+bow*0.5} ${mBot.x} ${mBot.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mBot.x} ${mBot.y} Q ${cx+bow*0.5} ${cy+bow*0.5} ${mRight.x} ${mRight.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx-bow} ${cy} ${mBot.x} ${mBot.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-          <path d={`M ${mTop.x} ${mTop.y} Q ${cx+bow} ${cy} ${mBot.x} ${mBot.y}`} fill="none" stroke={lc} strokeWidth="1.5"/>
-
-          {/* Center label */}
-          <text x={cx} y={cy-8} textAnchor="middle" fill="#880000" fontSize="12" fontWeight="bold">लग्न कुंडली</text>
-          <text x={cx} y={cy+14} textAnchor="middle" fill="#AA4400" fontSize="22" fontFamily="serif">ॐ</text>
-
-          {/* ── 12 HOUSE CONTENT ── */}
-          {/* H1  — top center triangle     */} <Cell n={1}  x={cx}              y={gy0+gh*0.17}  />
-          {/* H2  — top-left corner box     */} <Cell n={2}  x={gx0+gw*0.17}    y={gy0+gh*0.17}  />
-          {/* H3  — left-top triangle       */} <Cell n={3}  x={gx0+gw*0.1}     y={cy-gh*0.22}   />
-          {/* H4  — left center rect        */} <Cell n={4}  x={gx0+gw*0.17}    y={cy}            />
-          {/* H5  — left-bottom triangle    */} <Cell n={5}  x={gx0+gw*0.1}     y={cy+gh*0.22}   />
-          {/* H6  — bottom-left corner box  */} <Cell n={6}  x={gx0+gw*0.17}    y={gy0+gh*0.83}  />
-          {/* H7  — bottom center triangle  */} <Cell n={7}  x={cx}              y={gy0+gh*0.83}  />
-          {/* H8  — bottom-right corner box */} <Cell n={8}  x={gx0+gw*0.83}    y={gy0+gh*0.83}  />
-          {/* H9  — right-bottom triangle   */} <Cell n={9}  x={gx0+gw*0.9}     y={cy+gh*0.22}   />
-          {/* H10 — right center rect       */} <Cell n={10} x={gx0+gw*0.83}    y={cy}            />
-          {/* H11 — right-top triangle      */} <Cell n={11} x={gx0+gw*0.9}     y={cy-gh*0.22}   />
-          {/* H12 — top-right corner box    */} <Cell n={12} x={gx0+gw*0.83}    y={gy0+gh*0.17}  />
-
-        </svg>
-      </div>
+      </svg>
     </div>
   );
 };
