@@ -99,39 +99,60 @@ async function callAPI(prompt, max = 1500) {
 // Structure: outer rect + horizontal + vertical + 4 corner diagonals = 9 regions
 // Exactly like reference image — pure straight lines only
 const Chart = ({ houses }) => {
-  const W = 500;
-  const H = 500;
-  const P = 20;
 
-  const lc = "rgba(212,175,55,0.7)";
-  const lw = 1.6;
+  const SIZE = 520;
+  const PAD = 18;
+
+  const center = SIZE / 2;
+
+  const gold = "#d4af37";
+  const line = "rgba(212,175,55,0.75)";
   const bg = "rgba(8,4,20,0.97)";
 
   const getHouse = (n) => {
     const d = houses?.[n] || houses?.[String(n)] || {};
-    const sg =
-      ZODIAC_SIGNS.find((z) => z.name === d.sign || z.sanskrit === d.sign) ||
-      ZODIAC_SIGNS[(n - 1) % 12];
 
-    const pl = (d.planets || []).map(
+    const sign =
+      ZODIAC_SIGNS.find(
+        (z) => z.name === d.sign || z.sanskrit === d.sign
+      ) || ZODIAC_SIGNS[(n - 1) % 12];
+
+    const planets = (d.planets || []).map(
       (p) =>
         PLANETS.find((x) => x.name === p || x.symbol === p) || {
           symbol: p.slice(0, 2),
-          color: "#d4af37",
+          color: gold,
         }
     );
 
-    return { sg, pl };
+    return { sign, planets };
   };
 
   const Cell = ({ n, x, y }) => {
-    const { sg, pl } = getHouse(n);
+
+    const { sign, planets } = getHouse(n);
+
+    const isLagna = n === 1;
 
     return (
       <g>
+
+        {isLagna && (
+          <rect
+            x={x - 30}
+            y={y - 36}
+            width="60"
+            height="70"
+            rx="6"
+            fill="rgba(212,175,55,0.08)"
+            stroke={gold}
+            strokeWidth="1"
+          />
+        )}
+
         <text
           x={x}
-          y={y - 20}
+          y={y - 22}
           textAnchor="middle"
           fill="rgba(212,175,55,0.35)"
           fontSize="10"
@@ -144,11 +165,11 @@ const Chart = ({ houses }) => {
           x={x}
           y={y - 4}
           textAnchor="middle"
-          fill="#d4af37"
-          fontSize="18"
+          fill={gold}
+          fontSize="20"
           fontFamily="serif"
         >
-          {sg.symbol}
+          {sign.symbol}
         </text>
 
         <text
@@ -158,17 +179,17 @@ const Chart = ({ houses }) => {
           fill="rgba(212,175,55,0.55)"
           fontSize="9"
         >
-          {sg.sanskrit}
+          {sign.sanskrit}
         </text>
 
-        {pl.map((p, i) => (
+        {planets.map((p, i) => (
           <text
             key={i}
-            x={x + (i - (pl.length - 1) / 2) * 16}
-            y={y + 28}
+            x={x}
+            y={y + 26 + i * 14}
             textAnchor="middle"
             fill={p.color}
-            fontSize="10"
+            fontSize="13"
             fontWeight="bold"
           >
             {p.symbol}
@@ -178,62 +199,160 @@ const Chart = ({ houses }) => {
     );
   };
 
-  const c = W / 2;
-
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginBottom: 26 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        marginBottom: 30,
+      }}
+    >
       <svg
-        width={W}
-        height={H}
+        width={SIZE}
+        height={SIZE}
         style={{
           maxWidth: "100%",
-          borderRadius: 6,
-          boxShadow: "0 0 0 1px rgba(212,175,55,0.4)",
+          borderRadius: 8,
+          boxShadow:
+            "0 0 0 1px rgba(212,175,55,0.4), 0 10px 40px rgba(0,0,0,0.8)",
         }}
       >
-        <rect width={W} height={H} fill={bg} rx="6" />
+        <rect width={SIZE} height={SIZE} fill={bg} rx="6" />
 
-        {/* outer diamond */}
+        {/* Outer Diamond */}
+
         <polygon
-          points={`${c},${P} ${W - P},${c} ${c},${H - P} ${P},${c}`}
+          points={`
+            ${center},${PAD}
+            ${SIZE - PAD},${center}
+            ${center},${SIZE - PAD}
+            ${PAD},${center}
+          `}
           fill="none"
-          stroke={lc}
-          strokeWidth={lw}
+          stroke={line}
+          strokeWidth="2"
         />
 
-        {/* inner diamond */}
+        {/* Inner Diamond */}
+
         <polygon
-          points={`${c},${P + 120} ${W - P - 120},${c} ${c},${H - P - 120} ${
-            P + 120
-          },${c}`}
+          points={`
+            ${center},${PAD + 140}
+            ${SIZE - PAD - 140},${center}
+            ${center},${SIZE - PAD - 140}
+            ${PAD + 140},${center}
+          `}
           fill="none"
-          stroke={lc}
-          strokeWidth={lw}
+          stroke={line}
+          strokeWidth="1.6"
         />
 
-        {/* cross lines */}
-        <line x1={c} y1={P} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
-        <line x1={P} y1={c} x2={W - P} y2={c} stroke={lc} strokeWidth={lw} />
+        {/* Cross Lines */}
 
-        {/* diagonals */}
-        <line x1={P} y1={c} x2={c} y2={P} stroke={lc} strokeWidth={lw} />
-        <line x1={W - P} y1={c} x2={c} y2={P} stroke={lc} strokeWidth={lw} />
-        <line x1={P} y1={c} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
-        <line x1={W - P} y1={c} x2={c} y2={H - P} stroke={lc} strokeWidth={lw} />
+        <line
+          x1={center}
+          y1={PAD}
+          x2={center}
+          y2={SIZE - PAD}
+          stroke={line}
+          strokeWidth="1.6"
+        />
 
-        {/* house placements */}
-        <Cell n={1} x={c} y={70} />
-        <Cell n={2} x={130} y={130} />
-        <Cell n={3} x={70} y={250} />
-        <Cell n={4} x={130} y={370} />
-        <Cell n={5} x={250} y={430} />
-        <Cell n={6} x={370} y={370} />
-        <Cell n={7} x={430} y={250} />
-        <Cell n={8} x={370} y={130} />
-        <Cell n={9} x={250} y={250} />
-        <Cell n={10} x={310} y={250} />
-        <Cell n={11} x={250} y={190} />
-        <Cell n={12} x={190} y={250} />
+        <line
+          x1={PAD}
+          y1={center}
+          x2={SIZE - PAD}
+          y2={center}
+          stroke={line}
+          strokeWidth="1.6"
+        />
+
+        {/* Diagonals */}
+
+        <line
+          x1={PAD}
+          y1={center}
+          x2={center}
+          y2={PAD}
+          stroke={line}
+          strokeWidth="1.6"
+        />
+
+        <line
+          x1={SIZE - PAD}
+          y1={center}
+          x2={center}
+          y2={PAD}
+          stroke={line}
+          strokeWidth="1.6"
+        />
+
+        <line
+          x1={PAD}
+          y1={center}
+          x2={center}
+          y2={SIZE - PAD}
+          stroke={line}
+          strokeWidth="1.6"
+        />
+
+        <line
+          x1={SIZE - PAD}
+          y1={center}
+          x2={center}
+          y2={SIZE - PAD}
+          stroke={line}
+          strokeWidth="1.6"
+        />
+
+        {/* Center Symbol */}
+
+        <text
+          x={center}
+          y={center - 6}
+          textAnchor="middle"
+          fill="rgba(212,175,55,0.5)"
+          fontSize="11"
+          fontWeight="bold"
+        >
+          Lagna Kundli
+        </text>
+
+        <text
+          x={center}
+          y={center + 16}
+          textAnchor="middle"
+          fill="rgba(212,175,55,0.6)"
+          fontSize="22"
+        >
+          ॐ
+        </text>
+
+        {/* House placements */}
+
+        <Cell n={1} x={center} y={70} />
+
+        <Cell n={2} x={140} y={140} />
+
+        <Cell n={3} x={70} y={center} />
+
+        <Cell n={4} x={140} y={SIZE - 140} />
+
+        <Cell n={5} x={center} y={SIZE - 70} />
+
+        <Cell n={6} x={SIZE - 140} y={SIZE - 140} />
+
+        <Cell n={7} x={SIZE - 70} y={center} />
+
+        <Cell n={8} x={SIZE - 140} y={140} />
+
+        <Cell n={9} x={center} y={center - 90} />
+
+        <Cell n={10} x={center + 90} y={center} />
+
+        <Cell n={11} x={center} y={center + 90} />
+
+        <Cell n={12} x={center - 90} y={center} />
       </svg>
     </div>
   );
