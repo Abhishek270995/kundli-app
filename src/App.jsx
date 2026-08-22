@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { generateVedicKundliData, calculateGunMilan, SIGNS } from "./jyotishEngine";
+import { useState, useRef, useEffect } from "react";
+import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, SIGNS } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
@@ -32,6 +32,7 @@ const PLANETS = [
 const TABS = [
   { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "चार्ट" },
   { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "daily", icon: "☀️", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
   { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
   { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
   { id: "consult", icon: "🔮", labelEn: "Talk to Astrologer", labelHi: "ज्योतिषी परामर्श" },
@@ -371,6 +372,8 @@ const PRODUCT_PRICES = {
   deluxeReport: { INR: "₹199", USD: "$2.99", EUR: "€2.99", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 14" },
   annualReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   matchmakingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+  dailyMonthly: { INR: "₹49", USD: "$0.99", EUR: "€0.99", GBP: "£0.79", CAD: "CA$1.29", AUD: "AU$1.49", AED: "AED 4" },
+  dailyYearly: { INR: "₹299", USD: "$4.99", EUR: "€4.99", GBP: "£3.99", CAD: "CA$6.99", AUD: "AU$7.99", AED: "AED 22" },
 };
 
 const detectDefaultCurrency = () => {
@@ -722,6 +725,19 @@ export default function App() {
   const [partnerForm, setPartnerForm] = useState({ name: "", dob: "", pob: "", tob: "" });
   const [milanResult, setMilanResult] = useState(null);
 
+  // Daily Horoscope State
+  const [dailySign, setDailySign] = useState("Aries");
+  const [dailyChannel, setDailyChannel] = useState("whatsapp");
+  const [dailyPlan, setDailyPlan] = useState("yearly");
+  const [dailyTime, setDailyTime] = useState("07:00 AM");
+  const [isDailySubscribed, setIsDailySubscribed] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_daily_sub");
+    } catch {
+      return false;
+    }
+  });
+
   // Monetization Modal State
   const [activeCheckout, setActiveCheckout] = useState(null);
   const [unlockedProReport, setUnlockedProReport] = useState(false);
@@ -729,6 +745,13 @@ export default function App() {
   const resultRef = useRef(null);
   const t = UI[lang];
   const hi = lang === "hi";
+
+  // Sync daily horoscope sign when Kundli result loads
+  useEffect(() => {
+    if (result?.rashiSign) {
+      setDailySign(result.rashiSign);
+    }
+  }, [result]);
 
   const run = async () => {
     if (!form.name.trim() || !form.dob || !form.pob.trim()) {
@@ -927,7 +950,23 @@ export default function App() {
         <CheckoutModal
           item={activeCheckout}
           onClose={() => setActiveCheckout(null)}
-          onPaid={() => setUnlockedProReport(true)}
+          onPaid={() => {
+            setUnlockedProReport(true);
+            if (activeCheckout?.isDailySub) {
+              try {
+                localStorage.setItem("jyotish_daily_sub", JSON.stringify({
+                  sign: dailySign,
+                  channel: dailyChannel,
+                  plan: dailyPlan,
+                  time: dailyTime,
+                  date: new Date().toISOString()
+                }));
+                setIsDailySubscribed(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+          }}
           lang={lang}
           currency={currency}
           setCurrency={setCurrency}
@@ -1092,6 +1131,42 @@ export default function App() {
           <button onClick={run} disabled={step > 0} className="gold-cta-btn" style={{ marginTop: 22 }}>
             {step > 0 ? t.btnWait : t.btnGo}
           </button>
+
+          {/* Quick Daily Horoscope Access */}
+          {!result && (
+            <div style={{ marginTop: 18, textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 14 }}>
+              <span style={{ fontSize: 12, color: "rgba(241,231,208,0.7)" }}>
+                {hi ? "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:"}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!result) {
+                    const fallback = generateVedicKundliData({ name: form.name || "Guest", dob: form.dob || "2000-01-01", tob: form.tob || "12:00", lat: 26.8467, lon: 80.9462, lang });
+                    setResult(fallback);
+                  }
+                  setTab("daily");
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "rgba(245,158,11,0.15)",
+                  border: "1px solid rgba(245,158,11,0.35)",
+                  borderRadius: 20,
+                  padding: "6px 16px",
+                  color: "#FDE68A",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  marginLeft: 10,
+                  marginTop: 6
+                }}
+              >
+                <span>☀️</span> {hi ? "दैनिक राशिफल (Daily Horoscope)" : "Daily Horoscope"} →
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading Progress */}
@@ -1270,6 +1345,341 @@ export default function App() {
                 <SectionCard icon="✨" title={t.sec.verdict} content={result.verdict} highlight />
               </div>
             )}
+
+            {/* ── TAB: DAILY HOROSCOPE & RECURRING MESSENGER SUBSCRIPTION ── */}
+            {tab === "daily" && (() => {
+              const daily = generateDailyHoroscope(dailySign, lang);
+              const stars = (num) => "★".repeat(num) + "☆".repeat(5 - num);
+              const activePrice = dailyPlan === "yearly" ? PRODUCT_PRICES.dailyYearly[currency] : PRODUCT_PRICES.dailyMonthly[currency];
+              const activePriceKey = dailyPlan === "yearly" ? "dailyYearly" : "dailyMonthly";
+
+              return (
+                <div>
+                  {/* Zodiac Sign Carousel / Pills */}
+                  <div className="glass-card" style={{ padding: "14px 18px", marginBottom: 20, overflowX: "auto" }}>
+                    <div style={{ display: "flex", gap: 8, minWidth: "max-content" }}>
+                      {SIGNS.map(s => {
+                        const isSelected = dailySign.toLowerCase() === s.name.toLowerCase();
+                        return (
+                          <button
+                            key={s.name}
+                            onClick={() => setDailySign(s.name)}
+                            style={{
+                              background: isSelected ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(15,10,32,0.6)",
+                              border: `1px solid ${isSelected ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
+                              color: isSelected ? "#0F0A1E" : "#FDE68A",
+                              padding: "8px 14px",
+                              borderRadius: 10,
+                              fontSize: 12,
+                              fontWeight: isSelected ? 800 : 600,
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 6,
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <span style={{ fontSize: 16 }}>{s.symbol}</span>
+                            <span>{hi ? s.sanskrit : s.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Main Daily Horoscope Card */}
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                    {/* Header with Alignment Score */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 16, marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 12, padding: "3px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
+                          <span>📅</span> {daily.dateStr}
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, marginTop: 2 }}>
+                          {daily.symbol} {daily.sign} ({daily.signSanskrit}) — {hi ? "आज का विस्तृत राशिफल" : "Today's Vedic Transit Reading"}
+                        </h3>
+                      </div>
+
+                      <div style={{ textAlign: "right", background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "8px 16px" }}>
+                        <div style={{ fontSize: 10, color: "rgba(243,211,122,0.7)" }}>{hi ? "दैनिक ग्रहीय अनुकूलता" : "Cosmic Harmony Score"}</div>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: "#34D399" }}>{daily.overallScore}%</div>
+                      </div>
+                    </div>
+
+                    {/* 4 Category Ratings Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10, marginBottom: 22 }}>
+                      {[
+                        { name: hi ? "करियर व व्यवसाय" : "Career & Work", score: daily.careerScore, icon: "💼", color: "#60A5FA" },
+                        { name: hi ? "प्रेम व दांपत्य" : "Love & Family", score: daily.loveScore, icon: "❤️", color: "#F472B6" },
+                        { name: hi ? "धन व समृद्धि" : "Wealth & Gains", score: daily.wealthScore, icon: "💰", color: "#FBBF24" },
+                        { name: hi ? "स्वास्थ्य व ऊर्जा" : "Health & Vitality", score: daily.healthScore, icon: "🌿", color: "#34D399" },
+                      ].map((cat, idx) => (
+                        <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                          <div style={{ fontSize: 14 }}>{cat.icon}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#FDE68A", marginTop: 2 }}>{cat.name}</div>
+                          <div style={{ fontSize: 13, color: cat.color, marginTop: 3 }}>{stars(cat.score)}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* What Will Go Good & What to be Cautious About (2 Column Split) */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 20 }}>
+                      {/* 🟢 Positive / Opportunities */}
+                      <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+                          <span>🟢</span> {hi ? "आज क्या शुभ रहेगा (Opportunities & Wins)" : "What Will Go Good Today"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 12.5, lineHeight: 1.7, margin: 0 }}>
+                          {daily.good}
+                        </p>
+                      </div>
+
+                      {/* 🔴 Cautionary Advice / Pitfalls */}
+                      <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#F87171", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+                          <span>🔴</span> {hi ? "सावधानियां व चेतावनी (Alerts & Caution)" : "What to Watch Out For & Avoid"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 12.5, lineHeight: 1.7, margin: 0 }}>
+                          {daily.caution}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 🛡️ Daily Vedic Remedy & Sacred Mantra */}
+                    <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 12, padding: "16px 18px", marginBottom: 20 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 6 }}>
+                        <span>🛡️</span> {hi ? "आज का अचूक वैदिक उपाय व बीज मंत्र (Daily Upay)" : "Prescribed Vedic Remedy & Mantra of the Day"}
+                      </div>
+                      <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 12.5, lineHeight: 1.7, margin: 0 }}>
+                        {daily.remedy}
+                      </p>
+                    </div>
+
+                    {/* 🎨 Daily Micro-Muhurat Card */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "14px 16px" }}>
+                      <div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.65)" }}>🎨 {hi ? "भाग्यशाली रंग" : "Lucky Color"}</div>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginTop: 2 }}>{daily.luckyColor}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.65)" }}>🔢 {hi ? "भाग्यशाली अंक" : "Lucky Number"}</div>
+                        <div style={{ color: "#34D399", fontSize: 13, fontWeight: 800, marginTop: 2 }}>{daily.luckyNumber}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.65)" }}>⏳ {hi ? "शुभ अभिजीत मुहूर्त" : "Auspicious Muhurat Window"}</div>
+                        <div style={{ color: "#F3D37A", fontSize: 12.5, fontWeight: 700, marginTop: 2 }}>{daily.auspiciousWindow}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── HIGH-CONVERTING WHATSAPP / EMAIL SUBSCRIPTION CARD ── */}
+                  <div className="glass-card" style={{ padding: "26px 28px", background: "linear-gradient(135deg, rgba(26,18,48,0.95), rgba(11,8,25,0.98))", border: "1.5px solid rgba(245,158,11,0.5)", position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, background: "radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+                    {isDailySubscribed ? (
+                      <div style={{ textAlign: "center", padding: "10px 0" }}>
+                        <span style={{ fontSize: 40 }}>👑</span>
+                        <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 800, marginTop: 6 }}>
+                          {hi ? "आपकी दैनिक राशिफल सदस्यता सक्रिय है!" : "VIP Daily Horoscope Subscription Active!"}
+                        </h3>
+                        <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13, marginTop: 4, maxWidth: 520, margin: "6px auto 16px" }}>
+                          {hi
+                            ? `आपकी राशि (${dailySign}) के लिए दैनिक अलर्ट, शुभ मुहूर्त व उपाय आपके चयनित मैसेंजर पर नित्य प्रातः 7:00 बजे भेजे जा रहे हैं।`
+                            : `Personalized daily alerts, favorable muhurats & remedies for ${dailySign} are scheduled to your messenger every morning at 7:00 AM.`}
+                        </p>
+                        <a
+                          href="https://wa.me/918094199663?text=Hi%20Jyotish%20Kundli%2C%20I%20am%20a%20subscribed%20user.%20Please%20verify%20my%20daily%20horoscope%20delivery."
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            background: "#25D366",
+                            color: "#0F0A1E",
+                            padding: "10px 20px",
+                            borderRadius: 10,
+                            fontSize: 13,
+                            fontWeight: 700,
+                            textDecoration: "none"
+                          }}
+                        >
+                          <span>💬</span> Connect with WhatsApp Bot / Support
+                        </a>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+                          <div>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "3px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 6 }}>
+                              <span>⚡</span> {hi ? "नियमित राशिफल सेवा" : "AUTOMATED MESSENGER DELIVERY"}
+                            </div>
+                            <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800 }}>
+                              {hi ? "📲 व्हाट्सएप पर नित्य प्रातः दैनिक राशिफल प्राप्त करें" : "📲 Get Your Personalized Daily Horoscope on WhatsApp / Email"}
+                            </h3>
+                            <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12.5, marginTop: 4, maxWidth: 620 }}>
+                              {hi
+                                ? "दिन की शुरुआत से पहले जानें — आज क्या होगा शुभ, क्या सावधानियां रखनी हैं, और कौन सा समय सबसे फलदायी है। सीधे अपने व्हाट्सएप या ईमेल पर।"
+                                : "Wake up with cosmic clarity: Auspicious hours, cautionary alerts, lucky numbers, and daily customized Vedic remedies delivered directly to your chat every morning."}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Feature bullets */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 18 }}>
+                          {[
+                            { icon: "🌅", titleEn: "Daily 7:00 AM Delivery", titleHi: "प्रातः 7:00 बजे सीधा प्रसारण" },
+                            { icon: "🛡️", titleEn: "Customized Daily Upay", titleHi: "राशि अनुसार नित्य अचूक उपाय" },
+                            { icon: "⏳", titleEn: "Abhijit Muhurat Timings", titleHi: "शुभ मुहूर्त व राहुकाल अलर्ट" },
+                          ].map((f, i) => (
+                            <div key={i} style={{ background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "8px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 16 }}>{f.icon}</span>
+                              <span style={{ color: "#FDE68A", fontSize: 11.5, fontWeight: 600 }}>{hi ? f.titleHi : f.titleEn}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Delivery Customizer Controls */}
+                        <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 18px", marginBottom: 18 }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+                            {/* Channel Picker */}
+                            <div>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                                {hi ? "डिलीवरी माध्यम चुनें:" : "Choose Delivery Channel:"}
+                              </label>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                                {[
+                                  { id: "whatsapp", name: "WhatsApp", icon: "📱" },
+                                  { id: "email", name: "Email", icon: "✉️" },
+                                  { id: "telegram", name: "Telegram", icon: "✈️" },
+                                ].map(ch => (
+                                  <button
+                                    key={ch.id}
+                                    onClick={() => setDailyChannel(ch.id)}
+                                    style={{
+                                      background: dailyChannel === ch.id ? "rgba(245,158,11,0.2)" : "rgba(0,0,0,0.5)",
+                                      border: `1px solid ${dailyChannel === ch.id ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
+                                      color: dailyChannel === ch.id ? "#FDE68A" : "#FFF",
+                                      borderRadius: 8,
+                                      padding: "8px 4px",
+                                      fontSize: 11,
+                                      fontWeight: 600,
+                                      cursor: "pointer"
+                                    }}
+                                  >
+                                    <div>{ch.icon}</div>
+                                    <div>{ch.name}</div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Preferred Delivery Time */}
+                            <div>
+                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                                {hi ? "प्राप्ति समय (Delivery Time):" : "Preferred Time:"}
+                              </label>
+                              <select
+                                value={dailyTime}
+                                onChange={e => setDailyTime(e.target.value)}
+                                style={{
+                                  width: "100%",
+                                  background: "rgba(0,0,0,0.6)",
+                                  border: "1px solid rgba(212,175,55,0.3)",
+                                  borderRadius: 8,
+                                  padding: "9px 12px",
+                                  color: "#FFF",
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  outline: "none"
+                                }}
+                              >
+                                <option value="07:00 AM" style={{ background: "#0B0819" }}>🌅 07:00 AM (Morning Sunrise - Recommended)</option>
+                                <option value="06:00 AM" style={{ background: "#0B0819" }}>🌄 06:00 AM (Early Morning Riser)</option>
+                                <option value="08:00 PM" style={{ background: "#0B0819" }}>🌙 08:00 PM (Night Before Preview)</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Subscription Plan Switcher (Monthly vs Yearly) */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+                          {/* Yearly Plan */}
+                          <div
+                            onClick={() => setDailyPlan("yearly")}
+                            style={{
+                              background: dailyPlan === "yearly" ? "rgba(245,158,11,0.18)" : "rgba(11,8,25,0.6)",
+                              border: `2px solid ${dailyPlan === "yearly" ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
+                              borderRadius: 12,
+                              padding: "14px 16px",
+                              cursor: "pointer",
+                              position: "relative",
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <div style={{ position: "absolute", top: -10, right: 12, background: "linear-gradient(90deg, #F59E0B, #D97706)", color: "#0F0A1E", padding: "2px 8px", borderRadius: 10, fontSize: 10, fontWeight: 800 }}>
+                              BEST VALUE · 60% OFF
+                            </div>
+                            <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                              {hi ? "वार्षिक सदस्यता (Yearly Pass)" : "1-Year VIP Subscription"}
+                            </div>
+                            <div style={{ color: "#34D399", fontSize: 20, fontWeight: 800, marginTop: 4 }}>
+                              {PRODUCT_PRICES.dailyYearly[currency]} <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)", fontWeight: 500 }}>/ year</span>
+                            </div>
+                            <div style={{ fontSize: 10, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>
+                              {hi ? "पूरे 365 दिन दैनिक मार्गदर्शन" : "365 Days of daily alerts & remedies"}
+                            </div>
+                          </div>
+
+                          {/* Monthly Plan */}
+                          <div
+                            onClick={() => setDailyPlan("monthly")}
+                            style={{
+                              background: dailyPlan === "monthly" ? "rgba(245,158,11,0.18)" : "rgba(11,8,25,0.6)",
+                              border: `2px solid ${dailyPlan === "monthly" ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
+                              borderRadius: 12,
+                              padding: "14px 16px",
+                              cursor: "pointer",
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                              {hi ? "मासिक सदस्यता (Monthly Pass)" : "Monthly Subscription"}
+                            </div>
+                            <div style={{ color: "#FFF", fontSize: 20, fontWeight: 800, marginTop: 4 }}>
+                              {PRODUCT_PRICES.dailyMonthly[currency]} <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)", fontWeight: 500 }}>/ month</span>
+                            </div>
+                            <div style={{ fontSize: 10, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>
+                              {hi ? "माह-दर-माह नवीकरणीय" : "Cancel or renew anytime"}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* CTA Button */}
+                        <button
+                          onClick={() => setActiveCheckout({
+                            title: dailyPlan === "yearly"
+                              ? `${dailySign} — 1-Year Daily Horoscope Subscription (${dailyChannel.toUpperCase()})`
+                              : `${dailySign} — Monthly Daily Horoscope Subscription (${dailyChannel.toUpperCase()})`,
+                            priceKey: activePriceKey,
+                            price: activePrice,
+                            desc: `Daily delivery to ${dailyChannel.toUpperCase()} at ${dailyTime} with custom remedies & alerts`,
+                            icon: "☀️",
+                            isDailySub: true
+                          })}
+                          className="gold-cta-btn"
+                          style={{ width: "100%", padding: "14px 20px", fontSize: 14, fontWeight: 800 }}
+                        >
+                          {hi
+                            ? `सदस्यता लें (${activePrice}) — व्हाट्सएप पर शुरू करें ✦`
+                            : `Subscribe Now (${activePrice}) — Start Daily Delivery ✦`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ── TAB 3: 2026–2027 ANNUAL FORECAST (REVENUE MAGNET) ── */}
             {tab === "forecast" && (

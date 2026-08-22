@@ -698,3 +698,161 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     annualTransit
   };
 }
+
+/* -------------------------------------------------------------
+   DAILY HOROSCOPE ENGINE (TRANSIT-BASED PREDICTIONS & REMEDIES)
+------------------------------------------------------------- */
+export function generateDailyHoroscope(signName = "Aries", lang = "en") {
+  const isHi = lang === "hi";
+  const now = new Date();
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const daysOfWeekHi = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
+  const dayIndex = now.getDay();
+  const dayName = isHi ? daysOfWeekHi[dayIndex] : daysOfWeek[dayIndex];
+  
+  const signIndex = Math.max(0, SIGNS.findIndex(s => s.name.toLowerCase() === signName.toLowerCase()));
+  const signObj = SIGNS[signIndex] || SIGNS[0];
+
+  // Deterministic seed based on day, month, year, and sign
+  const dateSeed = (now.getDate() * 13 + (now.getMonth() + 1) * 29 + now.getFullYear() * 7 + signIndex * 17) % 100;
+  
+  const careerScore = 3 + (dateSeed % 3);
+  const loveScore = 3 + ((dateSeed + 2) % 3);
+  const wealthScore = 3 + ((dateSeed + 4) % 3);
+  const healthScore = 3 + ((dateSeed + 1) % 3);
+  const overallScore = Math.min(95, Math.max(68, 70 + (dateSeed % 26)));
+
+  const luckyColors = ["Saffron Gold", "Emerald Green", "Royal Crimson", "Pearl White", "Sunflower Yellow", "Electric Blue", "Copper Bronze"];
+  const luckyColorsHi = ["केसरिया सुनहरा", "पन्ना हरा", "गहरा लाल", "मोती जैसा सफेद", "पीला", "रॉयल नीला", "ताम्र वर्ण"];
+  const luckyColor = isHi ? luckyColorsHi[dateSeed % 7] : luckyColors[dateSeed % 7];
+  const luckyNumber = ((dateSeed % 9) + 1);
+
+  const muhuratWindows = [
+    "10:30 AM – 12:00 PM (Abhijit)",
+    "02:15 PM – 03:45 PM (Amrit Kaal)",
+    "08:30 AM – 10:00 AM (Shubh)",
+    "04:00 PM – 05:30 PM (Labh)"
+  ];
+  const auspiciousWindow = muhuratWindows[dateSeed % 4];
+
+  // Predictions database tailored to Zodiac Sign elements & Day
+  const dailyInsights = {
+    Aries: {
+      goodEn: "Dynamic burst of productivity in workplace tasks. A pending communication or client approval swings in your favor. Confidence remains at an all-time high.",
+      goodHi: "कार्यक्षेत्र में ऊर्जा और पराक्रम का संचार होगा। रुका हुआ सरकारी अथवा व्यापारिक कार्य गति पकड़ेगा। नए संपर्क लाभदायक सिद्ध होंगे।",
+      cautionEn: "Avoid impulsive financial spending or rushing into aggressive debates with peers. Double-check contractual paperwork before signing.",
+      cautionHi: "जल्दबाजी में धन निवेश या विवाद से बचें। किसी के उकसावे में आकर कटु शब्दों का प्रयोग न करें। वाहन चलाते समय सतर्क रहें।",
+      remedyEn: "Chant the Hanuman Gayatri or 'Om Hanumate Namah' 11 times. Offer water to a Tulsi plant.",
+      remedyHi: "हनुमान चालीसा का पाठ करें और 'ॐ हनुमते नमः' का ११ बार जप करें। सूर्य देव को तांबे के पात्र से जल अर्पित करें।"
+    },
+    Taurus: {
+      goodEn: "Financial clarity and family harmony blossom. Strong prospects for gains through creative ventures, luxury goods, or property discussions.",
+      goodHi: "आर्थिक मामलों में अनुकूलता रहेगी। परिवार में सौहार्द और सुखद वातावरण रहेगा। सौंदर्य, आभूषण या कला क्षेत्र से जुड़े लोगों को विशेष लाभ होगा।",
+      cautionEn: "Watch your dietary habits; avoid excessively rich or sugary foods. Do not lend unsecured money to casual acquaintances today.",
+      cautionHi: "खान-पान में संयम रखें और गरिष्ठ भोजन से बचें। किसी को भी बिना लिखा-पढ़ी के उधार देने से परहेज करें।",
+      remedyEn: "Recite 'Om Shukraya Namah' 11 times. Offer white flowers or sweet curd in your morning prayers.",
+      remedyHi: "'ॐ शुं शुक्राय नमः' मंत्र का ११ बार जप करें और प्रातः मिश्री या मीठे दही का भोग लगाएं।"
+    },
+    Gemini: {
+      goodEn: "Exceptional analytical and communication prowess today. Great day for negotiations, interviews, digital marketing, and intellectual networking.",
+      goodHi: "बुद्धि और संवाद कौशल से कार्य सफल होंगे। व्यापारिक वार्ता, साक्षात्कार एवं मीडिया से जुड़े कार्यों में अप्रत्याशित सफलता मिलेगी।",
+      cautionEn: "Avoid overthinking and scattershot multitasking. Ensure you take adequate screen breaks to prevent mental fatigue.",
+      cautionHi: "एक साथ कई कार्यों में हाथ डालने से मानसिक तनाव हो सकता है। किसी भी दस्तावेज को बिना पढ़े हस्ताक्षर न करें।",
+      remedyEn: "Feed green grass or spinach to a cow, or chant 'Om Budhaya Namah' 11 times.",
+      remedyHi: "गाय को हरी घास या पालक खिलाएं और 'ॐ बुं बुधाय नमः' का ११ बार जप करें।"
+    },
+    Cancer: {
+      goodEn: "Intuitive decision-making and warm emotional connections with loved ones. Opportunities for peaceful domestic improvements and spiritual calm.",
+      goodHi: "पारिवारिक सुख एवं मानसिक शांति में वृद्धि होगी। माताजी का आशीर्वाद मिलेगा और अटके हुए घरेलू कार्य सुगमता से संपन्न होंगे।",
+      cautionEn: "Guard against sudden mood swings or taking professional feedback too personally. Keep stress-related expenses in check.",
+      cautionHi: "भावुकता में आकर कोई बड़ा आर्थिक फैसला न लें। अनावश्यक चिंताओं से बचें और भरपूर नींद लें।",
+      remedyEn: "Offer raw milk or clean water to a Shiva Lingam while reciting 'Om Namah Shivaya'.",
+      remedyHi: "शिवलिंग पर कच्चा दूध अथवा शुद्ध जल अर्पित करें और 'ॐ नमः शिवाय' का जप करें।"
+    },
+    Leo: {
+      goodEn: "Leadership aura and recognition from superiors. Your authority and strategic planning bring decisive breakthroughs in major projects.",
+      goodHi: "मान-सम्मान और सामाजिक प्रतिष्ठा में वृद्धि होगी। अधिकारियों एवं वरिष्ठों का पूरा सहयोग मिलेगा। नेतृत्व क्षमता चमकेगी।",
+      cautionEn: "Keep ego in check during team collaborations. Avoid delegating critical financial details without verification.",
+      cautionHi: "अहंकार और क्रोध से बचें। सहकर्मियों के साथ तालमेल बनाए रखें और कागजी काम में लापरवाही न बरतें।",
+      remedyEn: "Recite the Aditya Hridaya Stotra or chant 'Om Suryaya Namah' facing east at sunrise.",
+      remedyHi: "प्रातः सूर्य देव को जल में रोली मिलाकर अर्घ्य दें और 'ॐ सूर्याय नमः' का जप करें।"
+    },
+    Virgo: {
+      goodEn: "Precision, problem-solving, and professional diligence shine. Favorable transit for debt clearance, career optimization, and health regimens.",
+      goodHi: "कार्यकुशलता और योजनाबद्ध परिश्रम से लक्ष्य प्राप्त होंगे। ऋण व खर्चों पर नियंत्रण पाने में सफलता मिलेगी।",
+      cautionEn: "Avoid being overly critical of family members. Guard against perfectionist paralysis by pacing your milestones.",
+      cautionHi: "दूसरों की छोटी गलतियों पर अधिक प्रतिक्रिया न दें। अत्यधिक काम से पाचन तंत्र पर असर पड़ सकता है, सादा भोजन करें।",
+      remedyEn: "Water a Tulsi plant and chant 'Om Gan Ganapataye Namah' 11 times for obstacle removal.",
+      remedyHi: "भगवान श्री गणेश को दूर्वा अर्पित करें और 'ॐ गं गणपतये नमः' का जप करें।"
+    },
+    Libra: {
+      goodEn: "Diplomatic charm and commercial partnership harmony. Lucrative business proposals or collaborative breakthroughs appear on the horizon.",
+      goodHi: "साझेदारी और वैवाहिक जीवन में मधुरता आएगी। कला, फैशन और डिजाइन से जुड़े कार्यों में विशेष धन लाभ के योग हैं।",
+      cautionEn: "Do not delay important commitments due to indecisiveness. Avoid speculative trading in unfamiliar instruments.",
+      cautionHi: "अनिर्णय की स्थिति से बचें और समय पर फैसले लें। शेयर बाजार या सट्टेबाजी में बिना सोचे-समझे धन न लगाएं।",
+      remedyEn: "Light a fragrant incense or ghee lamp in your puja corner. Chant 'Om Mahalakshmyai Namah'.",
+      remedyHi: "माता महालक्ष्मी की आरती करें और 'ॐ श्रीं ह्रीं क्लीं महालक्ष्म्यै नमः' का ११ बार जप करें।"
+    },
+    Scorpio: {
+      goodEn: "Deep investigative focus and breakthroughs in research, occult, or technical problem-solving. Strong financial recovery from unexpected channels.",
+      goodHi: "गूढ़ विद्या, अनुसंधान और तकनीकी कार्यों में बड़ी सफलता मिलेगी। पुराना रुका हुआ धन वापस मिलने के प्रबल संकेत हैं।",
+      cautionEn: "Refrain from keeping secrets or brooding over past grievances. Guard against minor physical bumps or cuts.",
+      cautionHi: "पुरानी बातों को लेकर मन में कटुता न पालें। वाहन की गति पर नियंत्रण रखें और विवादों से दूर रहें।",
+      remedyEn: "Chant 'Om Bhaumaya Namah' or recite the Hanuman Chalisa. Distribute jaggery or gram to the needy.",
+      remedyHi: "हनुमान जी के मंदिर में सिंदूर या चमेली का तेल अर्पित करें और गुड़-चने का दान करें।"
+    },
+    Sagittarius: {
+      goodEn: "Expansion of spiritual wisdom, higher learning, and joyful long-term planning. Mentorship and auspicious guidance guide your endeavors.",
+      goodHi: "भाग्य का पूरा साथ मिलेगा। धर्म, ज्ञान और उच्च शिक्षा के क्षेत्र में उत्कृष्ट परिणाम मिलेंगे। गुरुजनों का आशीर्वाद प्राप्त होगा।",
+      cautionEn: "Do not over-commit your bandwidth or over-promise timelines. Avoid uncalculated travel disruptions.",
+      cautionHi: "अपनी क्षमता से अधिक वादे न करें। यात्रा करते समय सामान और समय का विशेष ध्यान रखें।",
+      remedyEn: "Apply a subtle saffron or turmeric tilak on your forehead. Chant 'Om Brihaspataye Namah'.",
+      remedyHi: "माथे पर केसर या हल्दी का तिलक लगाएं और 'ॐ बृं बृहस्पतये नमः' का ११ बार जप करें।"
+    },
+    Capricorn: {
+      goodEn: "Steadfast discipline and long-term career consolidation. Your meticulous effort earns deep credibility and executive goodwill.",
+      goodHi: "कड़ी मेहनत और अनुशासन का पूरा प्रतिफल मिलेगा। कार्यक्षेत्र में आपकी प्रतिष्ठा और प्रभाव में उल्लेखनीय वृद्धि होगी।",
+      cautionEn: "Avoid letting workaholic routines compromise your rest. Refrain from cold, aloof communication with family members.",
+      cautionHi: "काम के दबाव में स्वास्थ्य की अनदेखी न करें। जोड़ों के दर्द या थकावट से बचने के लिए पर्याप्त आराम करें।",
+      remedyEn: "Light a mustard oil lamp under a Peepal tree in the evening or chant 'Om Sham Shanaishcharaya Namah'.",
+      remedyHi: "संध्याकाल में शनि देव के नाम से सरसों के तेल का दीपक जलाएं और 'ॐ शं शनैश्चराय नमः' का जप करें।"
+    },
+    Aquarius: {
+      goodEn: "Visionary innovative ideas and support from extensive social networks. Favorable for group projects, tech initiatives, and humanitarian causes.",
+      goodHi: "मित्रों और सामाजिक संपर्कों से बड़ा लाभ होगा। नई तकनीकों और सामूहिक योजनाओं में आशातीत प्रगति होगी।",
+      cautionEn: "Keep personal finances separate from group initiatives. Avoid excessive screen time late at night.",
+      cautionHi: "दोस्तों के साथ लेन-देन में स्पष्टता रखें। अनिद्रा और आंखों के तनाव से बचने के लिए समय पर सोएं।",
+      remedyEn: "Feed black birds or offer bread to stray dogs. Chant 'Om Pram Preem Prom Sah Shanaishcharaya Namah'.",
+      remedyHi: "काले कौवों या श्वानों को रोटी खिलाएं और जरूरतमंदों की सहायता करें।"
+    },
+    Pisces: {
+      goodEn: "Spiritual transcendence, empathy, and artistic inspiration flow effortlessly. Favorable transit for international connections and philanthropic goodwill.",
+      goodHi: "आध्यात्मिक ऊर्जा और रचनात्मक प्रेरणा का विकास होगा। विदेश अथवा दूरस्थ स्थानों से शुभ समाचार प्राप्त होंगे।",
+      cautionEn: "Stay anchored in practical reality; avoid rose-colored assumptions in monetary contracts.",
+      cautionHi: "काल्पनिक दुनिया में रहने से बचें और व्यावहारिक दृष्टिकोण अपनाएं। व्यर्थ के खर्चों पर लगाम लगाएं।",
+      remedyEn: "Chant 'Om Gurave Namah' and offer yellow grains or gram pulse in charity.",
+      remedyHi: "भगवान श्री विष्णु की आराधना करें और पीले फल अथवा चने की दाल का दान करें।"
+    }
+  };
+
+  const insight = dailyInsights[signObj.name] || dailyInsights.Aries;
+
+  return {
+    sign: signObj.name,
+    signSanskrit: signObj.sanskrit,
+    symbol: signObj.symbol,
+    dateStr: now.toLocaleDateString(isHi ? "hi-IN" : "en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+    dayName,
+    overallScore,
+    careerScore,
+    loveScore,
+    wealthScore,
+    healthScore,
+    good: isHi ? insight.goodHi : insight.goodEn,
+    caution: isHi ? insight.cautionHi : insight.cautionEn,
+    remedy: isHi ? insight.remedyHi : insight.remedyEn,
+    luckyColor,
+    luckyNumber,
+    auspiciousWindow
+  };
+}
