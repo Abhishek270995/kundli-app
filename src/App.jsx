@@ -81,10 +81,10 @@ const UI = {
     hnames: ["Self & Vitality", "Wealth & Lineage", "Courage & Siblings", "Home & Happiness", "Intellect & Karma", "Health & Service", "Marriage & Partners", "Longevity & Transformation", "Fortune & Dharma", "Career & Status", "Gains & Aspirations", "Moksha & Expenses"],
     nopl: "No planets residing",
     langBtn: "हिंदी में देखें",
-    printBtn: "Print / Save PDF",
+    printBtn: "Save Complete Kundli as PDF",
     editBtn: "Edit Details",
     footer1: "✦ OM TAT SAT ✦",
-    footer2: "Authentic Parashari Vedic Astrology Engine · Privacy-first Client Computation",
+    footer2: "Authentic Parashari Vedic Astrology Engine · Client Computation",
   },
   hi: {
     title: "ज्योतिष कुंडली",
@@ -127,7 +127,7 @@ const UI = {
     hnames: ["स्वयं एवं व्यक्तित्व", "धन एवं कुटुंब", "पराक्रम व बंधु", "गृह-माता सुख", "बुद्धि व संतान", "स्वास्थ्य व प्रतिस्पर्धा", "दांपत्य व साझेदारी", "आयु व परिवर्तन", "भाग्य व धर्म", "करियर व प्रतिष्ठा", "लाभ व आय", "मोक्ष व व्यय"],
     nopl: "कोई ग्रह नहीं",
     langBtn: "View in English",
-    printBtn: "प्रिंट / PDF सहेजें",
+    printBtn: "सम्पूर्ण कुंडली PDF सहेजें",
     editBtn: "विवरण बदलें",
     footer1: "✦ ॐ तत् सत् ✦",
     footer2: "प्रामाणिक वैदिक ज्योतिष गणना प्रणाली · सुरक्षित एवं पूर्णतः गोपनीय",
@@ -167,31 +167,27 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
   ];
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="kundli-svg" style={{ width: "100%", maxWidth: 520, height: "auto" }}>
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="kundli-svg" style={{ width: "100%", maxWidth: 500, height: "auto" }}>
       <defs>
         <radialGradient id="kundliGlow" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#2A1B4E" stopOpacity="0.8" />
           <stop offset="100%" stopColor="#0D0A1C" stopOpacity="0.98" />
         </radialGradient>
-        <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
       </defs>
 
-      <rect width={SIZE} height={SIZE} fill="url(#kundliGlow)" rx="16" stroke="rgba(212,175,55,0.3)" strokeWidth="1.5" />
+      <rect width={SIZE} height={SIZE} fill="url(#kundliGlow)" rx="16" stroke="rgba(212,175,55,0.35)" strokeWidth="1.5" />
 
       {/* House hover highlight polygons */}
       {houseLayout.map(({ n, path }) => (
         <polygon
           key={`poly-${n}`}
           points={path}
-          fill={hoveredHouse === n ? "rgba(212,175,55,0.18)" : "transparent"}
+          fill={hoveredHouse === n ? "rgba(212,175,55,0.2)" : "transparent"}
           stroke={hoveredHouse === n ? "#F3D37A" : "none"}
           strokeWidth={hoveredHouse === n ? "1.5" : "0"}
-          style={{ cursor: "pointer", transition: "fill 0.2s ease, stroke 0.2s ease" }}
-          onMouseEnter={() => setHoveredHouse(n)}
-          onMouseLeave={() => setHoveredHouse(null)}
+          style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
+          onMouseEnter={() => setHoveredHouse && setHoveredHouse(n)}
+          onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}
         />
       ))}
 
@@ -214,31 +210,26 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 
         return (
           <g key={n} style={{ pointerEvents: "none" }}>
-            {/* Lagna Badge on H1 */}
             {isLagna && (
               <g>
-                <rect x={cx - 24} y={cy - 36} width="48" height="15" rx="4" fill="rgba(245,158,11,0.2)" stroke="#F59E0B" strokeWidth="0.8" />
+                <rect x={cx - 24} y={cy - 36} width="48" height="15" rx="4" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" strokeWidth="0.8" />
                 <text x={cx} y={cy - 25} textAnchor="middle" fill="#FDE68A" fontSize="8.5" fontWeight="700" letterSpacing="0.8">
                   {lang === "hi" ? "लग्न १" : "LAGNA 1"}
                 </text>
               </g>
             )}
 
-            {/* Rashi Number in House */}
             <text x={cx} y={isLagna ? cy - 6 : cy - 12} textAnchor="middle" fill="#F3D37A" fontSize="13" fontWeight="700" fontFamily="'Outfit', sans-serif">
               {signNum}
             </text>
 
-            {/* Planet Badges */}
             {planetsInHouse.map((pName, idx) => {
-              const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37", glyph: "" };
+              const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37" };
               const yOffset = (isLagna ? cy + 12 : cy + 5) + idx * 14;
               return (
-                <g key={idx}>
-                  <text x={cx} y={yOffset} textAnchor="middle" fill={pObj.color} fontSize="12" fontWeight="700" style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.8))" }}>
-                    {pObj.symbol}
-                  </text>
-                </g>
+                <text key={idx} x={cx} y={yOffset} textAnchor="middle" fill={pObj.color} fontSize="12" fontWeight="700">
+                  {pObj.symbol}
+                </text>
               );
             })}
           </g>
@@ -256,11 +247,6 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
   const x0 = PAD;
   const y0 = PAD;
 
-  // Fixed Rashi positions in South Indian Chart:
-  // 1: Pisces (0,0), 2: Aries (1,0), 3: Taurus (2,0), 4: Gemini (3,0)
-  // 12: Aquarius (0,1),                                5: Cancer (3,1)
-  // 11: Capricorn (0,2),                               6: Leo (3,2)
-  // 10: Sagittarius (0,3), 9: Scorpio (1,3), 8: Libra (2,3), 7: Virgo (3,3)
   const rashiGrid = [
     { signNum: 12, col: 0, row: 0, signName: "Pisces", signHi: "मीन" },
     { signNum: 1,  col: 1, row: 0, signName: "Aries", signHi: "मेष" },
@@ -277,20 +263,18 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
   ];
 
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="kundli-svg" style={{ width: "100%", maxWidth: 520, height: "auto" }}>
-      <rect width={SIZE} height={SIZE} fill="#0D0A1C" rx="16" stroke="rgba(212,175,55,0.3)" strokeWidth="1.5" />
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="kundli-svg" style={{ width: "100%", maxWidth: 500, height: "auto" }}>
+      <rect width={SIZE} height={SIZE} fill="#0D0A1C" rx="16" stroke="rgba(212,175,55,0.35)" strokeWidth="1.5" />
 
       {/* Center decorative area */}
       <rect x={x0 + W} y={y0 + W} width={W * 2} height={W * 2} fill="rgba(20,15,40,0.6)" stroke="rgba(212,175,55,0.4)" strokeWidth="1.5" rx="8" />
       <text x={SIZE / 2} y={SIZE / 2 - 8} textAnchor="middle" fill="#F3D37A" fontSize="12" letterSpacing="2" fontWeight="600">SOUTH INDIAN CHART</text>
       <text x={SIZE / 2} y={SIZE / 2 + 18} textAnchor="middle" fill="#F3D37A" fontSize="24">ॐ</text>
 
-      {/* 12 Rashi Boxes */}
       {rashiGrid.map((box) => {
         const bx = x0 + box.col * W;
         const by = y0 + box.row * W;
 
-        // Find which house occupies this sign
         let houseNum = null;
         let isLagna = false;
         let planetsInBox = [];
@@ -305,24 +289,22 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         }
 
         return (
-          <g key={box.signNum} onMouseEnter={() => houseNum && setHoveredHouse(houseNum)} onMouseLeave={() => setHoveredHouse(null)}>
+          <g key={box.signNum} onMouseEnter={() => houseNum && setHoveredHouse && setHoveredHouse(houseNum)} onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}>
             <rect
               x={bx}
               y={by}
               width={W}
               height={W}
-              fill={hoveredHouse === houseNum ? "rgba(212,175,55,0.18)" : "rgba(15,10,32,0.85)"}
+              fill={hoveredHouse === houseNum ? "rgba(212,175,55,0.2)" : "rgba(15,10,32,0.85)"}
               stroke="rgba(212,175,55,0.5)"
               strokeWidth="1.2"
               style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
             />
 
-            {/* Sign Name */}
-            <text x={bx + 8} y={by + 16} fill="rgba(212,175,55,0.65)" fontSize="10" fontWeight="600">
+            <text x={bx + 8} y={by + 16} fill="rgba(212,175,55,0.7)" fontSize="10" fontWeight="600">
               {lang === "hi" ? box.signHi : box.signName}
             </text>
 
-            {/* Lagna marker line/badge */}
             {isLagna && (
               <g>
                 <line x1={bx} y1={by} x2={bx + W} y2={by + W} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
@@ -331,14 +313,12 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
               </g>
             )}
 
-            {/* House indicator tag */}
             {houseNum && (
               <text x={bx + 8} y={by + W - 8} fill="rgba(243,211,122,0.4)" fontSize="9">
                 H{houseNum}
               </text>
             )}
 
-            {/* Planets */}
             {planetsInBox.map((pName, idx) => {
               const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37" };
               return (
@@ -356,11 +336,9 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 
 // ── COSMIC BACKGROUND CANVAS PARTICLES ───────────────────────────
 const CosmicBackdrop = () => (
-  <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-    {/* Nebula glowing blobs */}
+  <div className="no-print" style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
     <div style={{ position: "absolute", top: "-10%", left: "15%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,58,237,0.12) 0%, rgba(13,10,28,0) 70%)", filter: "blur(60px)" }} />
     <div style={{ position: "absolute", bottom: "10%", right: "10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(217,119,6,0.09) 0%, rgba(13,10,28,0) 70%)", filter: "blur(70px)" }} />
-    {/* Star dust */}
     {Array.from({ length: 65 }).map((_, i) => (
       <div
         key={i}
@@ -386,7 +364,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
   const [tab, setTab] = useState("chart");
-  const [chartStyle, setChartStyle] = useState("north"); // "north" | "south"
+  const [chartStyle, setChartStyle] = useState("north");
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
   const [lang, setLang] = useState("en");
@@ -489,10 +467,6 @@ export default function App() {
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        .glass-card:hover {
-          border-color: rgba(212, 175, 55, 0.38);
-        }
-
         .tab-btn {
           display: flex;
           align-items: center;
@@ -526,10 +500,6 @@ export default function App() {
           color: #FFF;
         }
 
-        .input-group {
-          position: relative;
-        }
-
         .gold-cta-btn {
           width: 100%;
           padding: 15px 24px;
@@ -548,20 +518,46 @@ export default function App() {
           animation: shimmerBtn 4s linear infinite;
         }
 
-        .gold-cta-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 26px rgba(245, 158, 11, 0.45);
+        /* ── SCREEN vs PRINT STYLES ── */
+        .print-only-report {
+          display: none;
         }
 
-        .gold-cta-btn:active:not(:disabled) {
-          transform: translateY(0);
+        @media print {
+          @page {
+            size: A4;
+            margin: 1.2cm;
+          }
+          body, html, #root {
+            background: #0B0819 !important;
+            color: #F1E7D0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .no-print, header, .form-section-card, footer, .tab-bar-nav {
+            display: none !important;
+          }
+          .screen-only-tabs {
+            display: none !important;
+          }
+          .print-only-report {
+            display: block !important;
+          }
+          .page-break-avoid {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .page-break-before {
+            page-break-before: always !important;
+            break-before: always !important;
+          }
         }
       `}</style>
 
       <CosmicBackdrop />
 
-      {/* Top Bar / Language & Print Switcher */}
-      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(11, 8, 25, 0.82)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(212, 175, 55, 0.15)", padding: "12px 24px" }}>
+      {/* Top Header Bar */}
+      <header className="no-print" style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(11, 8, 25, 0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(212, 175, 55, 0.15)", padding: "12px 24px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22, animation: "pulseSlow 3s infinite" }}>🔯</span>
@@ -575,15 +571,15 @@ export default function App() {
             {result && (
               <button
                 onClick={() => window.print()}
-                style={{ background: "rgba(212, 175, 55, 0.08)", border: "1px solid rgba(212, 175, 55, 0.25)", color: "#F3D37A", padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+                style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "7px 16px", borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 10px rgba(245,158,11,0.35)" }}
               >
-                <span>🖨️</span> {t.printBtn}
+                <span>📥</span> {t.printBtn}
               </button>
             )}
 
             <button
               onClick={handleLangToggle}
-              style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212, 175, 55, 0.35)", borderRadius: 24, padding: "6px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#F3D37A", fontSize: 12, fontWeight: 600, boxShadow: "0 2px 8px rgba(0,0,0,0.3)" }}
+              style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212, 175, 55, 0.35)", borderRadius: 24, padding: "6px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#F3D37A", fontSize: 12, fontWeight: 600 }}
             >
               <span>{hi ? "🇬🇧" : "🇮🇳"}</span>
               <span>{t.langBtn}</span>
@@ -593,10 +589,10 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "36px 20px 80px" }}>
+      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "32px 20px 80px" }}>
 
         {/* Hero Section */}
-        <section style={{ textAlign: "center", marginBottom: 36 }}>
+        <section className="no-print" style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 30, padding: "6px 16px", marginBottom: 14 }}>
             <span style={{ fontSize: 14 }}>✨</span>
             <span style={{ fontSize: 11, fontWeight: 600, color: "#FDE68A", letterSpacing: 1.5 }}>
@@ -604,7 +600,7 @@ export default function App() {
             </span>
           </div>
 
-          <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(24px, 5.5vw, 42px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 3, fontWeight: 800, marginBottom: 8 }}>
+          <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(24px, 5.5vw, 40px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 3, fontWeight: 800, marginBottom: 8 }}>
             {t.title}
           </h1>
           <p style={{ color: "rgba(243, 211, 122, 0.65)", fontSize: hi ? 13 : 12, letterSpacing: hi ? 0 : 3, textTransform: "uppercase", fontWeight: 500 }}>
@@ -615,7 +611,7 @@ export default function App() {
         </section>
 
         {/* Input Form Card */}
-        <div className="glass-card" style={{ padding: "30px 32px", marginBottom: 36 }}>
+        <div className="glass-card form-section-card no-print" style={{ padding: "30px 32px", marginBottom: 36 }}>
           <div style={{ marginBottom: 22, textAlign: "center" }}>
             <h2 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
             <p style={{ color: "rgba(243, 211, 122, 0.45)", fontSize: 12 }}>{t.formSub}</p>
@@ -688,9 +684,9 @@ export default function App() {
           </button>
         </div>
 
-        {/* Loading Consultation Progress */}
+        {/* Loading Progress */}
         {step > 0 && (
-          <div className="glass-card" style={{ padding: "36px 20px", textAlign: "center", marginBottom: 32 }}>
+          <div className="glass-card no-print" style={{ padding: "36px 20px", textAlign: "center", marginBottom: 32 }}>
             <div style={{ display: "inline-block", position: "relative", width: 80, height: 80, marginBottom: 16 }}>
               <div style={{ position: "absolute", inset: 0, border: "2px solid rgba(245, 158, 11, 0.3)", borderRadius: "50%", borderTopColor: "#F59E0B", animation: "spin 1.2s linear infinite" }} />
               <div style={{ position: "absolute", inset: 8, border: "2px solid rgba(245, 158, 11, 0.15)", borderRadius: "50%", borderBottomColor: "#FDE68A", animation: "spin 2s linear infinite reverse" }} />
@@ -700,9 +696,11 @@ export default function App() {
           </div>
         )}
 
-        {/* ── KUNDLI RESULTS SECTION ── */}
+        {/* ══════════════════════════════════════════════════════════════════════
+            SCREEN VIEW (Interactive Tabs)
+        ══════════════════════════════════════════════════════════════════════ */}
         {result && (
-          <div ref={resultRef} style={{ animation: "fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}>
+          <div ref={resultRef} className="screen-only-tabs" style={{ animation: "fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}>
 
             {/* Profile Overview Header Card */}
             <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 28, textAlign: "center" }}>
@@ -737,7 +735,7 @@ export default function App() {
             </div>
 
             {/* Navigation Tabs */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 28 }}>
+            <div className="tab-bar-nav" style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 28 }}>
               {TABS.map(tabItem => (
                 <button
                   key={tabItem.id}
@@ -759,7 +757,6 @@ export default function App() {
                     <p style={{ color: "rgba(241, 231, 208, 0.5)", fontSize: 12 }}>{t.chartSub}</p>
                   </div>
 
-                  {/* Chart Style Switcher */}
                   <div style={{ display: "flex", background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 20, padding: 3 }}>
                     <button
                       onClick={() => setChartStyle("north")}
@@ -776,7 +773,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* SVG Chart Display */}
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
                   {chartStyle === "north" ? (
                     <NorthIndianChart houses={result.houses} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
@@ -785,7 +781,6 @@ export default function App() {
                   )}
                 </div>
 
-                {/* House Hover Insight Card */}
                 {hoveredHouse && (
                   <div style={{ background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 12, padding: "12px 18px", marginBottom: 20, animation: "fadeInCard 0.2s ease" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
@@ -802,7 +797,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Planet Glyph Legend */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 24 }}>
                   {PLANETS.map(p => (
                     <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(15, 10, 32, 0.8)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "5px 10px" }}>
@@ -812,7 +806,6 @@ export default function App() {
                   ))}
                 </div>
 
-                {/* Quick Astrological Highlights */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
                   <div style={{ background: "rgba(15, 10, 32, 0.7)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 12, padding: "18px 20px" }}>
                     <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
@@ -868,9 +861,7 @@ export default function App() {
                           return (
                             <tr key={p.name} style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.08)", background: idx % 2 ? "rgba(255, 255, 255, 0.015)" : "transparent" }}>
                               <td style={{ padding: "10px 12px" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                  <span style={{ color: p.color, fontWeight: "bold", fontSize: 13 }}>{p.symbol} {p.name}</span>
-                                </div>
+                                <span style={{ color: p.color, fontWeight: "bold", fontSize: 13 }}>{p.symbol} {p.name}</span>
                                 <div style={{ fontSize: 10, color: "rgba(241, 231, 208, 0.45)" }}>{p.sanskrit}</div>
                               </td>
                               <td style={{ padding: "10px 12px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13 }}>
@@ -986,7 +977,6 @@ export default function App() {
             {/* ── TAB 7: REMEDIES ── */}
             {tab === "remedies" && (
               <div>
-                {/* Lucky Attributes Grid */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
                   {[
                     { title: t.sec.colours, icon: "🎨", val: result.colours },
@@ -1013,8 +1003,187 @@ export default function App() {
           </div>
         )}
 
-        {/* Footer */}
-        <footer style={{ textAlign: "center", marginTop: 56, color: "rgba(243, 211, 122, 0.35)", fontSize: 11, letterSpacing: 1.5 }}>
+        {/* ══════════════════════════════════════════════════════════════════════
+            PRINT-ONLY FULL DETAILED REPORT (All Sections in Order, Clean PDF)
+        ══════════════════════════════════════════════════════════════════════ */}
+        {result && (
+          <div className="print-only-report">
+            {/* Print Document Header */}
+            <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+              <div style={{ fontSize: 24, marginBottom: 4 }}>🔯</div>
+              <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 26, fontWeight: 800, letterSpacing: 2 }}>
+                JYOTISH KUNDLI — COMPLETE VEDIC REPORT
+              </h1>
+              <p style={{ color: "rgba(243,211,122,0.8)", fontSize: 12, letterSpacing: 1, textTransform: "uppercase" }}>
+                {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+              </p>
+            </div>
+
+            {/* 1. Panchang Highlights */}
+            <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 24 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                ✦ CORE PANCHANG & VEDIC METRICS
+              </h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, textAlign: "center" }}>
+                {[
+                  { label: "Ascendant (Lagna)", val: result.lagna },
+                  { label: "Moon Sign (Rashi)", val: result.rashi },
+                  { label: "Nakshatra & Pada", val: result.nakshatra },
+                  { label: "Tithi", val: result.tithi },
+                  { label: "Yoga", val: result.yoga },
+                ].map((p, i) => (
+                  <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 10px" }}>
+                    <div style={{ fontSize: 10, color: "rgba(243,211,122,0.6)", marginBottom: 4 }}>{p.label}</div>
+                    <div style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700 }}>{p.val}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Natal Chart */}
+            <div className="page-break-avoid" style={{ textAlign: "center", marginBottom: 28 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
+                ✦ NATAL LAGNA KUNDLI CHART
+              </h3>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <NorthIndianChart houses={result.houses} lang={lang} />
+              </div>
+            </div>
+
+            {/* 3. Planetary Positions Table */}
+            <div className="page-break-avoid" style={{ marginBottom: 28 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
+                ✦ PLANETARY POSITIONS, HOUSES & DIGNITIES
+              </h3>
+              <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
+                <thead>
+                  <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Planet</th>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Sign</th>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>House</th>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Degree & Nakshatra</th>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Dignity</th>
+                    <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Astrological Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {PLANETS.map((p, idx) => {
+                    const pd = result.planetData?.[p.name] || {};
+                    return (
+                      <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                        <td style={{ padding: "8px 10px", fontWeight: 700, color: p.color }}>{p.symbol} {p.name} ({p.sanskrit})</td>
+                        <td style={{ padding: "8px 10px" }}>{pd.sign} ({pd.signSanskrit})</td>
+                        <td style={{ padding: "8px 10px", fontWeight: 700, color: "#FDE68A" }}>House {pd.house}</td>
+                        <td style={{ padding: "8px 10px" }}>{pd.degree} · {pd.nakshatra} (P{pd.pada})</td>
+                        <td style={{ padding: "8px 10px" }}>{pd.status}</td>
+                        <td style={{ padding: "8px 10px" }}>{pd.effect}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Page Break for narrative sections */}
+            <div className="page-break-before" />
+
+            {/* 4. Cosmic Blueprint & Overview */}
+            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 8 }}>🌟 {t.sec.blueprint}</h3>
+              <p style={{ lineHeight: 1.8, fontSize: 13, color: "rgba(241,231,208,0.9)" }}>{result.overview}</p>
+            </div>
+
+            {/* 5. Yogas & Dashas */}
+            <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+              <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
+                <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>⚡ {t.sec.yogas}</h4>
+                <div style={{ lineHeight: 1.7, fontSize: 12, whiteSpace: "pre-wrap" }}>{result.yogas}</div>
+              </div>
+              <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
+                <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>⏱️ {t.sec.dasha}</h4>
+                <div style={{ lineHeight: 1.7, fontSize: 12, whiteSpace: "pre-wrap" }}>{result.dasha}</div>
+              </div>
+            </div>
+
+            {/* 6. 12 Bhavas (Houses) */}
+            <div className="page-break-avoid" style={{ marginBottom: 20 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>🏠 {t.htTitle}</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {Array.from({ length: 12 }, (_, i) => {
+                  const n = i + 1;
+                  const d = result.houses?.[n] || {};
+                  return (
+                    <div key={n} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 10, background: "rgba(15,10,32,0.6)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>House {n}: {t.hnames[i]}</span>
+                        <span style={{ color: "#F3D37A", fontSize: 11 }}>{d.sign}</span>
+                      </div>
+                      <p style={{ fontSize: 11, lineHeight: 1.5, color: "rgba(241,231,208,0.8)" }}>{d.interpretation}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Page Break */}
+            <div className="page-break-before" />
+
+            {/* 7. Life Areas Analysis */}
+            <div className="page-break-avoid" style={{ marginBottom: 20 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>🌿 LIFE DOMAIN ANALYSIS</h3>
+              {[
+                { title: t.sec.health, icon: "🌿", content: result.health },
+                { title: t.sec.wealth, icon: "💰", content: result.wealth },
+                { title: t.sec.education, icon: "📚", content: result.education },
+                { title: t.sec.career, icon: "🏆", content: result.career },
+                { title: t.sec.marriage, icon: "💑", content: result.marriage },
+              ].map(sec => (
+                <div key={sec.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "12px 14px", marginBottom: 8, background: "rgba(15,10,32,0.6)" }}>
+                  <h4 style={{ color: "#FDE68A", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{sec.icon} {sec.title}</h4>
+                  <p style={{ fontSize: 12, lineHeight: 1.6, color: "rgba(241,231,208,0.85)" }}>{sec.content}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 8. Decade Predictions */}
+            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 8 }}>🔮 {t.sec.pred}</h3>
+              <p style={{ lineHeight: 1.8, fontSize: 12, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.85)" }}>{result.pred}</p>
+            </div>
+
+            {/* 9. Remedies & Lucky Attributes */}
+            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>💎 {t.sec.gems}</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 12 }}>
+                {[
+                  { title: t.sec.colours, val: result.colours },
+                  { title: t.sec.numbers, val: result.numbers },
+                  { title: t.sec.days, val: result.days },
+                  { title: t.sec.rudraksha, val: result.rudraksha },
+                ].map(item => (
+                  <div key={item.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: 8, background: "rgba(11,8,25,0.7)" }}>
+                    <div style={{ fontSize: 10, color: "#FDE68A", fontWeight: 700 }}>{item.title}</div>
+                    <div style={{ fontSize: 11, color: "rgba(241,231,208,0.85)", marginTop: 2 }}>{item.val}</div>
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, lineHeight: 1.7, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.85)" }}>{result.gems}</p>
+            </div>
+
+            {/* 10. Stars' Final Verdict */}
+            <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 16, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 6 }}>✨ {t.sec.verdict}</h3>
+              <p style={{ fontSize: 13, lineHeight: 1.8, color: "#FFF" }}>{result.verdict}</p>
+              <div style={{ textAlign: "center", marginTop: 14, color: "rgba(243,211,122,0.5)", fontSize: 10, letterSpacing: 1.5 }}>
+                ✦ OM TAT SAT ✦ — {t.footer2}
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* Screen Footer */}
+        <footer className="no-print" style={{ textAlign: "center", marginTop: 56, color: "rgba(243, 211, 122, 0.35)", fontSize: 11, letterSpacing: 1.5 }}>
           <div style={{ marginBottom: 4, fontWeight: 600 }}>{t.footer1}</div>
           <div style={{ fontSize: 10, letterSpacing: 0.5 }}>{t.footer2}</div>
         </footer>
