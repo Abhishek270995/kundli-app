@@ -458,17 +458,19 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
 
             {method === "upi" ? (
               <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, textAlign: "center", marginBottom: 16 }}>
-                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8 }}>
-                  Scan UPI QR (GPay, PhonePe, Paytm)
+                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8, fontWeight: 600 }}>
+                  Scan UPI QR (GPay, PhonePe, Paytm, BHIM)
                 </div>
-                <div style={{ width: 130, height: 130, background: "#FFF", borderRadius: 8, margin: "0 auto", padding: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: 190, height: 190, background: "#000", borderRadius: 12, margin: "0 auto", padding: 6, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(245,158,11,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.6)", overflow: "hidden" }}>
                   <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=vedicastro@upi&pn=JyotishKundli"
-                    alt="UPI QR"
-                    style={{ width: "100%", height: "100%" }}
+                    src="/upi-qr.jpg"
+                    alt="UPI Payment QR Code"
+                    style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8 }}
                   />
                 </div>
-                <div style={{ fontSize: 10, color: "rgba(241,231,208,0.5)", marginTop: 6 }}>UPI ID: `vedicastro@upi`</div>
+                <div style={{ fontSize: 11, color: "rgba(241,231,208,0.75)", marginTop: 8 }}>
+                  Scan with any UPI app to complete payment
+                </div>
               </div>
             ) : (
               <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
