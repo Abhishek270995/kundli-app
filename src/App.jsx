@@ -42,42 +42,6 @@ const TABS = [
   { id: "predictions", icon: "🔮", labelEn: "Predictions", labelHi: "भविष्यवाणी" },
 ];
 
-const ASTROLOGERS = [
-  {
-    name: "Acharya Vidyadhar Shastri",
-    exp: "18+ Yrs Exp",
-    specialty: "Vedic Kundli, Career & Business Growth",
-    specialtyHi: "वैदिक कुंडली, करियर एवं व्यापार वृद्धि",
-    lang: "Hindi, English",
-    rating: "4.9 ★ (12.4k consults)",
-    price: "₹499 / 20 mins",
-    avatar: "🕉️",
-    badge: "Top Rated"
-  },
-  {
-    name: "Dr. Ananya Vashistha",
-    exp: "14+ Yrs Exp",
-    specialty: "Kundli Milan, Marriage & Relationship Harmony",
-    specialtyHi: "कुंडली मिलान, दांपत्य एवं प्रेम संबंध",
-    lang: "Hindi, English, Bengali",
-    rating: "4.95 ★ (9.8k consults)",
-    price: "₹599 / 20 mins",
-    avatar: "🪷",
-    badge: "Gold Certified"
-  },
-  {
-    name: "Pt. Rameshwar Joshi",
-    exp: "22+ Yrs Exp",
-    specialty: "Sade Sati, Kaal Sarp & Certified Gemstones",
-    specialtyHi: "साढ़ेसाती, कालसर्प एवं सिद्ध रत्न",
-    lang: "Hindi, Sanskrit",
-    rating: "4.88 ★ (15.2k consults)",
-    price: "₹399 / 20 mins",
-    avatar: "☀️",
-    badge: "Senior Guru"
-  }
-];
-
 const UI = {
   en: {
     title: "JYOTISH KUNDLI",
@@ -1389,160 +1353,125 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 5: 1-ON-1 ASTROLOGER CONSULTATION ── */}
+            {/* ── TAB 5: 1-ON-1 ASTROLOGER CONSULTATION (COMING SOON) ── */}
             {tab === "consult" && (
-              <div className="glass-card" style={{ padding: "28px 24px", marginBottom: 20 }}>
-                <div style={{ textAlign: "center", marginBottom: 22 }}>
-                  <span style={{ fontSize: 32 }}>🔮</span>
-                  <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>
-                    {hi ? "प्रमाणित वैदिक ज्योतिषियों से 1-on-1 परामर्श लें" : "Consult 1-on-1 with Certified Vedic Astrologers"}
-                  </h3>
-                  <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
-                    {hi ? "करियर, विवाह, वित्त एवं स्वास्थ्य पर व्यक्तिगत मार्गदर्शन (Call / WhatsApp)" : "Private Audio/WhatsApp consultation for career, marriage & life clarity"}
-                  </p>
+              <div className="glass-card" style={{ padding: "36px 26px", marginBottom: 20, textAlign: "center" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 20, padding: "5px 14px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 16 }}>
+                  <span>⏳</span> {hi ? "जल्द आ रहा है · COMING SOON" : "COMING SOON · PRIORITY LAUNCH"}
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
-                  {ASTROLOGERS.map((ast, i) => (
-                    <div key={i} style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                          <span style={{ fontSize: 32 }}>{ast.avatar}</span>
-                          <span style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", color: "#FDE68A", fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 12 }}>
-                            {ast.badge}
-                          </span>
-                        </div>
-                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700 }}>{ast.name}</h4>
-                        <div style={{ color: "#34D399", fontSize: 11, fontWeight: 600, marginTop: 2 }}>{ast.rating} · {ast.exp}</div>
-                        <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
-                          {hi ? ast.specialtyHi : ast.specialty}
-                        </div>
-                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.5)", marginTop: 4 }}>
-                          🗣️ {ast.lang}
-                        </div>
-                      </div>
+                <div style={{ fontSize: 44, marginBottom: 10 }}>🔮</div>
+                <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
+                  {hi ? "1-on-1 प्रमाणित ज्योतिषी परामर्श सेवा" : "1-on-1 Certified Astrologer Consultation"}
+                </h3>
+                <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, maxWidth: 540, margin: "0 auto 24px", lineHeight: 1.7 }}>
+                  {hi 
+                    ? "हम वर्तमान में उच्च योग्यता प्राप्त, अनुभवी एवं प्रामाणिक वैदिक विद्वानों को जोड़ रहे हैं। शीघ्र ही आप करियर, विवाह, स्वास्थ्य एवं व्यक्तिगत प्रश्नों पर सीधे ऑडियो/व्हाट्सएप परामर्श प्राप्त कर सकेंगे।" 
+                    : "We are currently curating and verifying top-tier Vedic Astrologers and PhD scholars. Direct private 1-on-1 audio/video consultations for Career, Marriage & Life Guidance will be live shortly."}
+                </p>
 
-                      <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                          <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Consultation Fee:</span>
-                          <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE68A" }}>{ast.price}</span>
-                        </div>
-                        <button
-                          onClick={() => setActiveCheckout({
-                            title: `1-on-1 Consultation: ${ast.name}`,
-                            price: ast.price,
-                            desc: `Instant appointment confirmation & WhatsApp audio consult connection`,
-                            icon: "📞"
-                          })}
-                          style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-                        >
-                          {hi ? "परामर्श बुक करें 📞" : "Book Call / WhatsApp 📞"}
-                        </button>
-                      </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, maxWidth: 720, margin: "0 auto 26px", textAlign: "left" }}>
+                  {[
+                    { icon: "🛡️", title: hi ? "100% गोपनीय व सुरक्षित" : "100% Confidential", desc: hi ? "निजी परामर्श और पूर्ण गोपनीयता" : "Private & encrypted discussions" },
+                    { icon: "📜", title: hi ? "सटीक पराशरी गणना" : "Parashari Principles", desc: hi ? "प्रामाणिक शास्त्रीय पद्धति" : "Classical Vedic astrological analysis" },
+                    { icon: "⏱️", title: hi ? "कॉल व व्हाट्सएप सुविधा" : "Instant Audio / Chat", desc: hi ? "सुविधाजनक समय स्लॉट बुकिंग" : "Flexible scheduling & instant booking" },
+                  ].map((feat, idx) => (
+                    <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                      <div style={{ fontSize: 20, marginBottom: 4 }}>{feat.icon}</div>
+                      <div style={{ color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>{feat.title}</div>
+                      <div style={{ color: "rgba(241,231,208,0.6)", fontSize: 11, marginTop: 2 }}>{feat.desc}</div>
                     </div>
                   ))}
                 </div>
+
+                <a
+                  href={`https://wa.me/918094199663?text=${encodeURIComponent("Namaste, I would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Kundli.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    background: "linear-gradient(90deg, #F59E0B, #D97706)",
+                    color: "#0F0A1E",
+                    padding: "12px 24px",
+                    borderRadius: 10,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    boxShadow: "0 4px 16px rgba(245,158,11,0.3)"
+                  }}
+                >
+                  <span>💬</span> {hi ? "प्राथमिकता प्रतीक्षा सूची (Waitlist) में जुड़ें" : "Join Priority Waitlist on WhatsApp"}
+                </a>
               </div>
             )}
 
-            {/* ── TAB 6: VEDIC STORE & CERTIFIED REMEDIES ── */}
+            {/* ── TAB 6: VEDIC STORE & CERTIFIED REMEDIES (COMING SOON) ── */}
             {tab === "store" && (
               <div className="glass-card" style={{ padding: "28px 24px", marginBottom: 20 }}>
                 <div style={{ textAlign: "center", marginBottom: 22 }}>
-                  <span style={{ fontSize: 32 }}>💎</span>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 20, padding: "4px 12px", color: "#FDE68A", fontSize: 10.5, fontWeight: 700, marginBottom: 12 }}>
+                    <span>⏳</span> {hi ? "स्टोर जल्द उपलब्ध होगा · VENDOR ONBOARDING IN PROGRESS" : "STORE COMING SOON · CERTIFIED VENDOR ONBOARDING"}
+                  </div>
+                  <div style={{ fontSize: 32 }}>💎</div>
                   <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>
-                    {hi ? "आपकी कुंडली के अनुसार प्रमाणित रत्न एवं सिद्ध रुद्राक्ष" : "Prescribed Certified Gemstones & Energized Rudraksha"}
+                    {hi ? "आपकी कुंडली के अनुकूल निर्धारित रत्न एवं उपाय" : "Prescribed Gemstones & Astrological Remedies"}
                   </h3>
                   <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
-                    {hi ? `आपके लग्न (${result.lagnaSign}) के अनुकूल 100% लैब-प्रमाणित रत्न` : `100% Lab-Tested & Energized specifically for ${result.lagnaSign} Lagna`}
+                    {hi ? `आपके लग्न (${result.lagnaSign}) के अनुसार शास्त्रीय ज्योतिषीय विश्लेषण` : `Astrological prescription tailored specifically for your ${result.lagnaSign} Lagna`}
                   </p>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
                   {/* Prescribed Gemstone */}
-                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                     <div>
                       <span style={{ fontSize: 30 }}>💍</span>
-                      <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>PRIMARY LUCKY GEMSTONE</div>
+                      <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>PRESCRIBED LUCKY GEMSTONE</div>
                       <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>{result.gemObj.gem}</h4>
                       <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
-                        Certified natural, unheated gemstone to strengthen {result.lagnaSign} Lagna lord and accelerate wealth & vitality.
+                        Certified natural, unheated gemstone recommended to strengthen your {result.lagnaSign} Lagna and enhance vitality & success.
                       </p>
                     </div>
                     <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Lab Certified:</span>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>{result.gemObj.certPrice}</span>
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.3)", borderRadius: 8, padding: "8px 12px", textAlign: "center", color: "#FDE68A", fontSize: 11, fontWeight: 600 }}>
+                        ⏳ {hi ? "प्रमाणित लैब रत्न स्टोर (जल्द शुरू)" : "Lab Certified Gemstone Store (Coming Soon)"}
                       </div>
-                      <button
-                        onClick={() => setActiveCheckout({
-                          title: `Certified ${result.gemObj.gem}`,
-                          price: result.gemObj.certPrice,
-                          desc: "100% Natural Lab-Certified Gemstone with Certificate of Authenticity",
-                          icon: "💍"
-                        })}
-                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-                      >
-                        {hi ? "प्रमाणित रत्न आर्डर करें ✦" : "Order Certified Gemstone ✦"}
-                      </button>
                     </div>
                   </div>
 
                   {/* Energized Rudraksha */}
-                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                     <div>
                       <span style={{ fontSize: 30 }}>📿</span>
                       <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>SACRED ENERGIZED RUDRAKSHA</div>
                       <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>{result.rudraksha}</h4>
                       <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
-                        Consecrated with sacred Vedic Beej Mantras for mental clarity, stress removal, and spiritual protection.
+                        Consecrated with sacred Vedic Beej Mantras for mental clarity, spiritual protection, and planetary peace.
                       </p>
                     </div>
                     <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Pran-Pratishtha:</span>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>₹1,499</span>
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.3)", borderRadius: 8, padding: "8px 12px", textAlign: "center", color: "#FDE68A", fontSize: 11, fontWeight: 600 }}>
+                        ⏳ {hi ? "सिद्ध रुद्राक्ष स्टोर (जल्द शुरू)" : "Energized Rudraksha Store (Coming Soon)"}
                       </div>
-                      <button
-                        onClick={() => setActiveCheckout({
-                          title: `Energized ${result.rudraksha}`,
-                          price: "₹1,499",
-                          desc: "Vedic Pran-Pratishtha energized authentic Nepali Rudraksha bead",
-                          icon: "📿"
-                        })}
-                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-                      >
-                        {hi ? "सिद्ध रुद्राक्ष प्राप्त करें ✦" : "Order Energized Rudraksha ✦"}
-                      </button>
                     </div>
                   </div>
 
                   {/* Navagraha Yantra */}
-                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                     <div>
                       <span style={{ fontSize: 30 }}>🔯</span>
                       <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>COPPER NAVAGRAHA YANTRA</div>
                       <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>Shree Sampoorna Navagraha Yantra</h4>
                       <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
-                        Pure copper geometric plate to balance all 9 planetary doshas in your residence or office.
+                        Pure copper geometric plate to balance planetary doshas in your residence or workspace.
                       </p>
                     </div>
                     <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Pure Copper:</span>
-                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>₹899</span>
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.3)", borderRadius: 8, padding: "8px 12px", textAlign: "center", color: "#FDE68A", fontSize: 11, fontWeight: 600 }}>
+                        ⏳ {hi ? "वैदिक यंत्र स्टोर (जल्द शुरू)" : "Sacred Yantra Store (Coming Soon)"}
                       </div>
-                      <button
-                        onClick={() => setActiveCheckout({
-                          title: "Sampoorna Navagraha Yantra",
-                          price: "₹899",
-                          desc: "Pure energized copper Navagraha Yantra with wooden frame",
-                          icon: "🔯"
-                        })}
-                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-                      >
-                        {hi ? "यंत्र आर्डर करें ✦" : "Order Sacred Yantra ✦"}
-                      </button>
                     </div>
                   </div>
                 </div>
