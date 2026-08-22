@@ -356,9 +356,44 @@ const CosmicBackdrop = () => (
   </div>
 );
 
+const CURRENCIES = {
+  INR: { code: "INR", symbol: "₹", name: "INR (₹)", flag: "🇮🇳", baseRate: 1 },
+  USD: { code: "USD", symbol: "$", name: "USD ($)", flag: "🇺🇸", baseRate: 0.012 },
+  EUR: { code: "EUR", symbol: "€", name: "EUR (€)", flag: "🇪🇺", baseRate: 0.011 },
+  GBP: { code: "GBP", symbol: "£", name: "GBP (£)", flag: "🇬🇧", baseRate: 0.0095 },
+  CAD: { code: "CAD", symbol: "CA$", name: "CAD (CA$)", flag: "🇨🇦", baseRate: 0.016 },
+  AUD: { code: "AUD", symbol: "AU$", name: "AUD (AU$)", flag: "🇦🇺", baseRate: 0.018 },
+  AED: { code: "AED", symbol: "AED ", name: "AED (د.إ)", flag: "🇦🇪", baseRate: 0.044 },
+};
+
+const PRODUCT_PRICES = {
+  dakshina: { INR: "₹108", USD: "$1.99", EUR: "€1.99", GBP: "£1.49", CAD: "CA$2.49", AUD: "AU$2.99", AED: "AED 9" },
+  deluxeReport: { INR: "₹199", USD: "$2.99", EUR: "€2.99", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 14" },
+  annualReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+  matchmakingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+};
+
+const detectDefaultCurrency = () => {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    const navLang = navigator.language || "";
+    if (tz.includes("Calcutta") || tz.includes("Kolkata") || navLang.includes("en-IN") || navLang.includes("hi")) {
+      return "INR";
+    }
+    if (tz.includes("Europe/London") || navLang.includes("en-GB")) return "GBP";
+    if (tz.includes("Europe/")) return "EUR";
+    if (tz.includes("Canada") || tz.includes("Toronto") || tz.includes("Vancouver")) return "CAD";
+    if (tz.includes("Australia") || tz.includes("Sydney") || tz.includes("Melbourne")) return "AUD";
+    if (tz.includes("Dubai")) return "AED";
+    return "USD";
+  } catch (e) {
+    return "INR";
+  }
+};
+
 // ── MONETIZATION CHECKOUT MODAL ──────────────────────────────────
-const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
-  const [method, setMethod] = useState("upi");
+const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) => {
+  const [method, setMethod] = useState(currency === "INR" ? "upi" : "card");
   const [checkoutStep, setCheckoutStep] = useState("pay"); // "pay" | "verify" | "success"
   const [utr, setUtr] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -366,12 +401,18 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
   const [orderId, setOrderId] = useState("");
   const hi = lang === "hi";
 
-  // Extract clean numerical amount from price string (e.g. ₹199 -> 199)
-  const rawPriceMatch = item.price.match(/₹([0-9,]+)/);
-  const amountVal = rawPriceMatch ? rawPriceMatch[1].replace(/,/g, "") : "199";
+  // Dynamic price formatted for the current currency
+  const displayPrice = item.priceKey && PRODUCT_PRICES[item.priceKey]
+    ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
+    : item.price;
+
+  // Inr numerical value for UPI URL
+  const inrPriceVal = item.priceKey && PRODUCT_PRICES[item.priceKey]
+    ? (PRODUCT_PRICES[item.priceKey].INR.match(/₹([0-9,]+)/)?.[1] || "199").replace(/,/g, "")
+    : (item.price.match(/₹([0-9,]+)/)?.[1] || "199").replace(/,/g, "");
 
   // Dynamic NPCI-compliant UPI Intent URL with pre-filled locked amount and note
-  const upiIntentUrl = `upi://pay?pa=8094199663@upi&pn=ABHISHEK%20KUMAR%20SINGH&am=${amountVal}.00&cu=INR&tn=${encodeURIComponent(item.title)}`;
+  const upiIntentUrl = `upi://pay?pa=8094199663@upi&pn=ABHISHEK%20KUMAR%20SINGH&am=${inrPriceVal}.00&cu=INR&tn=${encodeURIComponent(item.title)}`;
   const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(upiIntentUrl)}&margin=10`;
 
   const handleProceedToVerify = () => {
@@ -380,15 +421,14 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
   };
 
   const handleConfirmPayment = () => {
-    const cleanUtr = utr.trim().replace(/\s+/g, "");
     const cleanPhone = whatsapp.trim().replace(/\D/g, "");
 
     if (cleanPhone.length < 10) {
-      setVerifyErr(hi ? "कृपया मान्य 10-अंकों का व्हाट्सएप नंबर दर्ज करें।" : "Please enter a valid 10-digit WhatsApp number.");
+      setVerifyErr(hi ? "कृपया मान्य व्हाट्सएप नंबर दर्ज करें।" : "Please enter a valid WhatsApp / Mobile number.");
       return;
     }
 
-    if (cleanUtr.length < 6) {
+    if (currency === "INR" && method === "upi" && utr.trim().length < 6) {
       setVerifyErr(hi ? "कृपया बैंक रसीद से 12-अंकों का UPI UTR / Ref No. दर्ज करें।" : "Please enter the 12-digit UPI Reference / UTR Number from your payment receipt.");
       return;
     }
@@ -406,9 +446,9 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
     const text = encodeURIComponent(
       `🙏 *Jyotish Kundli Payment Confirmation*\n\n` +
       `📦 *Item:* ${item.title}\n` +
-      `💰 *Amount:* ₹${amountVal}\n` +
+      `💰 *Amount:* ${displayPrice}\n` +
       `🧾 *Order ID:* ${orderId || "Pending"}\n` +
-      `🔢 *UPI UTR / Ref No:* ${utr || "N/A"}\n` +
+      `${currency === "INR" && utr ? `🔢 *UPI UTR / Ref No:* ${utr}\n` : ""}` +
       `📱 *Customer WhatsApp:* ${whatsapp || "N/A"}\n\n` +
       `Please verify and activate my order. Thank you!`
     );
@@ -438,15 +478,17 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                 <span style={{ color: "rgba(241,231,208,0.6)" }}>Amount Paid:</span>
-                <span style={{ color: "#34D399", fontWeight: 700 }}>₹{amountVal}.00</span>
+                <span style={{ color: "#34D399", fontWeight: 700 }}>{displayPrice}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                <span style={{ color: "rgba(241,231,208,0.6)" }}>UPI UTR:</span>
-                <span style={{ color: "#FDE68A", fontWeight: 600 }}>{utr}</span>
-              </div>
+              {currency === "INR" && utr && (
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ color: "rgba(241,231,208,0.6)" }}>UPI UTR:</span>
+                  <span style={{ color: "#FDE68A", fontWeight: 600 }}>{utr}</span>
+                </div>
+              )}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "rgba(241,231,208,0.6)" }}>WhatsApp:</span>
-                <span style={{ color: "#FFF" }}>+91 {whatsapp}</span>
+                <span style={{ color: "#FFF" }}>{whatsapp}</span>
               </div>
             </div>
 
@@ -488,51 +530,52 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
                 {hi ? "भुगतान सत्यापन विवरण" : "Confirm Payment Details"}
               </h3>
               <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
-                {item.title} — <b style={{ color: "#FDE68A" }}>₹{amountVal}.00</b>
+                {item.title} — <b style={{ color: "#FDE68A" }}>{displayPrice}</b>
               </p>
             </div>
 
             <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 14px", marginBottom: 16 }}>
               {/* WhatsApp Number Field */}
-              <div style={{ marginBottom: 14 }}>
+              <div style={{ marginBottom: currency === "INR" && method === "upi" ? 14 : 0 }}>
                 <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                  <span>📱</span> {hi ? "आपका व्हाट्सएप नंबर (WhatsApp Number) *" : "Your WhatsApp Number *"}
+                  <span>📱</span> {hi ? "आपका व्हाट्सएप / मोबाइल नंबर *" : "Your WhatsApp / Mobile Number *"}
                 </label>
                 <div style={{ display: "flex", gap: 6 }}>
                   <div style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "rgba(241,231,208,0.8)", fontSize: 13, fontWeight: 600 }}>
-                    +91
+                    {CURRENCIES[currency]?.flag || "🌐"}
                   </div>
                   <input
                     type="tel"
-                    maxLength={10}
                     value={whatsapp}
-                    onChange={e => setWhatsapp(e.target.value.replace(/\D/g, ""))}
-                    placeholder="e.g. 9876543210"
+                    onChange={e => setWhatsapp(e.target.value)}
+                    placeholder="e.g. +91 9876543210"
                     style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "#FFF", fontSize: 13 }}
                   />
                 </div>
                 <div style={{ fontSize: 10, color: "rgba(241,231,208,0.5)", marginTop: 4 }}>
-                  {hi ? "PDF रिपोर्ट व परामर्श लिंक इस नंबर पर भेजा जाएगा।" : "PDF copy & consult updates will be delivered here."}
+                  {hi ? "PDF रिपोर्ट व पुष्टि इस नंबर पर भेजी जाएगी।" : "PDF report & confirmation will be sent here."}
                 </div>
               </div>
 
-              {/* 12-Digit UTR Field */}
-              <div>
-                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                  <span>🔢</span> {hi ? "12-अंकों का UPI UTR / Ref No. *" : "12-Digit UPI Ref / UTR No. *"}
-                </label>
-                <input
-                  type="text"
-                  maxLength={16}
-                  value={utr}
-                  onChange={e => setUtr(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
-                  placeholder="e.g. 423819283746"
-                  style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "#FFF", fontSize: 13, letterSpacing: 1 }}
-                />
-                <div style={{ fontSize: 10, color: "rgba(243,211,122,0.65)", marginTop: 4 }}>
-                  💡 {hi ? "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।" : "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt."}
+              {/* 12-Digit UTR Field (Shown for Indian UPI payments) */}
+              {currency === "INR" && method === "upi" && (
+                <div>
+                  <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                    <span>🔢</span> {hi ? "12-अंकों का UPI UTR / Ref No. *" : "12-Digit UPI Ref / UTR No. *"}
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={16}
+                    value={utr}
+                    onChange={e => setUtr(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
+                    placeholder="e.g. 423819283746"
+                    style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "#FFF", fontSize: 13, letterSpacing: 1 }}
+                  />
+                  <div style={{ fontSize: 10, color: "rgba(243,211,122,0.65)", marginTop: 4 }}>
+                    💡 {hi ? "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।" : "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt."}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {verifyErr && (
@@ -549,31 +592,36 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
                 ← Back
               </button>
               <button onClick={handleConfirmPayment} className="gold-cta-btn" style={{ padding: "12px 14px", fontSize: 13 }}>
-                {hi ? "सत्यापित करें एवं अनलॉक करें ✦" : "Confirm & Unlock Instant Access ✦"}
+                {hi ? "सत्यापित करें एवं अनलॉक करें ✦" : `Confirm & Unlock (${displayPrice}) ✦`}
               </button>
             </div>
           </div>
         )}
 
-        {/* ── STEP 1: PAYMENT (QR & DIRECT INTENT) ── */}
+        {/* ── STEP 1: PAYMENT ── */}
         {checkoutStep === "pay" && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <span style={{ fontSize: 32 }}>{item.icon || "💎"}</span>
               <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
-              <div style={{ color: "#FDE68A", fontSize: 24, fontWeight: 800, marginTop: 4 }}>₹{amountVal}</div>
+              <div style={{ color: "#FDE68A", fontSize: 26, fontWeight: 800, marginTop: 4 }}>{displayPrice}</div>
               <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 4 }}>{item.desc}</p>
             </div>
 
             {/* Payment Mode Selector */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
               {[
-                { id: "upi", name: "Dynamic UPI QR", icon: "📱" },
+                { id: "upi", name: currency === "INR" ? "UPI / QR Code" : "UPI (INR Only)", icon: "📱" },
                 { id: "card", name: "Cards / NetBanking", icon: "💳" },
               ].map(m => (
                 <button
                   key={m.id}
-                  onClick={() => setMethod(m.id)}
+                  onClick={() => {
+                    if (m.id === "upi" && currency !== "INR" && setCurrency) {
+                      setCurrency("INR");
+                    }
+                    setMethod(m.id);
+                  }}
                   style={{
                     background: method === m.id ? "rgba(245,158,11,0.2)" : "rgba(11,8,25,0.6)",
                     border: `1px solid ${method === m.id ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
@@ -594,7 +642,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
             {method === "upi" ? (
               <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center", marginBottom: 16 }}>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "3px 10px", color: "#34D399", fontSize: 11, fontWeight: 700, marginBottom: 10 }}>
-                  <span>🔒</span> Amount Locked: ₹{amountVal}.00
+                  <span>🔒</span> Amount Locked: ₹{inrPriceVal}.00
                 </div>
 
                 {/* Amount-Enforced High-Contrast QR Code */}
@@ -628,11 +676,14 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
                     textDecoration: "none"
                   }}
                 >
-                  🚀 Tap to Open GPay / PhonePe / Paytm Directly
+                  🚀 Tap to Open GPay / PhonePe / Paytm (₹{inrPriceVal})
                 </a>
               </div>
             ) : (
               <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8 }}>
+                  Pay with Credit / Debit Card ({displayPrice})
+                </div>
                 <input placeholder="Card Number (0000 0000 0000 0000)" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12, marginBottom: 8 }} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   <input placeholder="MM/YY" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }} />
@@ -642,7 +693,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
             )}
 
             <button onClick={handleProceedToVerify} className="gold-cta-btn" style={{ padding: "12px 18px", fontSize: 14 }}>
-              {hi ? `मैंने भुगतान कर दिया है (₹${amountVal}) →` : `I Have Made the Payment (₹${amountVal}) →`}
+              {hi ? `मैंने भुगतान कर दिया है (${displayPrice}) →` : `I Have Made the Payment (${displayPrice}) →`}
             </button>
             <div style={{ textAlign: "center", fontSize: 10, color: "rgba(243,211,122,0.4)", marginTop: 8 }}>
               🔒 256-Bit Bank Grade SSL Encrypted Checkout
@@ -664,6 +715,7 @@ export default function App() {
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
   const [lang, setLang] = useState("en");
+  const [currency, setCurrency] = useState(detectDefaultCurrency);
   const [lastCoords, setLastCoords] = useState({ lat: 26.8467, lon: 80.9462 });
 
   // Matchmaking State
@@ -877,6 +929,8 @@ export default function App() {
           onClose={() => setActiveCheckout(null)}
           onPaid={() => setUnlockedProReport(true)}
           lang={lang}
+          currency={currency}
+          setCurrency={setCurrency}
         />
       )}
 
@@ -891,17 +945,41 @@ export default function App() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {/* Currency Selector */}
+            <select
+              value={currency}
+              onChange={e => setCurrency(e.target.value)}
+              style={{
+                background: "rgba(26,18,48,0.9)",
+                border: "1px solid rgba(212,175,55,0.35)",
+                borderRadius: 20,
+                padding: "6px 10px",
+                color: "#FDE68A",
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                outline: "none"
+              }}
+            >
+              {Object.values(CURRENCIES).map(c => (
+                <option key={c.code} value={c.code} style={{ background: "#0D0A1C", color: "#FFF" }}>
+                  {c.flag} {c.code} ({c.symbol.trim()})
+                </option>
+              ))}
+            </select>
+
             <button
               onClick={() => setActiveCheckout({
                 title: hi ? "दक्षिणा / आध्यात्मिक सहयोग" : "Offer Dakshina (Support)",
-                price: "₹108 / $2.99",
+                priceKey: "dakshina",
+                price: PRODUCT_PRICES.dakshina[currency],
                 desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं सर्वर के रख-रखाव हेतु सहयोग" : "Support free spiritual Vedic Astrology research & maintenance",
                 icon: "🪷"
               })}
               style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
             >
-              <span>🙏</span> {hi ? "दक्षिणा दें" : "Offer Dakshina"}
+              <span>🙏</span> {hi ? "दक्षिणा दें" : "Offer Dakshina"} ({PRODUCT_PRICES.dakshina[currency]})
             </button>
 
             {result && (
@@ -1079,13 +1157,14 @@ export default function App() {
               <button
                 onClick={() => setActiveCheckout({
                   title: hi ? "50-पेज गोल्डन महा-कुंडली रिपोर्ट" : "Golden Deluxe 50-Page Life Report",
-                  price: "₹199 / $4.99",
+                  priceKey: "deluxeReport",
+                  price: PRODUCT_PRICES.deluxeReport[currency],
                   desc: hi ? "दशा विश्लेषण, साढ़ेसाती, करियर और व्यक्तिगत उपाय सहित विस्तृत PDF" : "Full life analysis, transit timing, Sade Sati & energized gemstones PDF",
                   icon: "📜"
                 })}
                 style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)" }}
               >
-                {hi ? "अनलॉक करें (₹199)" : "Unlock Report ($4.99)"}
+                {hi ? "अनलॉक करें" : "Unlock Report"} ({PRODUCT_PRICES.deluxeReport[currency]})
               </button>
             </div>
 
@@ -1243,13 +1322,14 @@ export default function App() {
                     <button
                       onClick={() => setActiveCheckout({
                         title: "2026-2027 Annual Transit Forecast PDF",
-                        price: "₹149 / $3.99",
+                        priceKey: "annualReport",
+                        price: PRODUCT_PRICES.annualReport[currency],
                         desc: "Detailed monthly predictions, wealth windows & auspicious dates",
                         icon: "📅"
                       })}
                       style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
                     >
-                      {hi ? "पूर्ण रिपोर्ट प्राप्त करें (₹149)" : "Get Full PDF ($3.99)"}
+                      {hi ? "पूर्ण रिपोर्ट प्राप्त करें" : "Get Full PDF"} ({PRODUCT_PRICES.annualReport[currency]})
                     </button>
                   </div>
                 </div>
@@ -1339,13 +1419,14 @@ export default function App() {
                       <button
                         onClick={() => setActiveCheckout({
                           title: "Kundli Milan Comprehensive PDF Report",
-                          price: "₹149 / $3.99",
+                          priceKey: "matchmakingReport",
+                          price: PRODUCT_PRICES.matchmakingReport[currency],
                           desc: "In-depth Bhakoot/Nadi analysis, future timing, and harmony remedies",
                           icon: "❤️"
                         })}
                         style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
                       >
-                        {hi ? "डाउनलोड करें (₹149)" : "Unlock Matrimonial Report ($3.99)"}
+                        {hi ? "डाउनलोड करें" : "Unlock Report"} ({PRODUCT_PRICES.matchmakingReport[currency]})
                       </button>
                     </div>
                   </div>
