@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { generateVedicKundliData, SIGNS } from "./jyotishEngine";
+import { generateVedicKundliData, calculateGunMilan, SIGNS } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
@@ -32,11 +32,50 @@ const PLANETS = [
 const TABS = [
   { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "चार्ट" },
   { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
+  { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
+  { id: "consult", icon: "🔮", labelEn: "Talk to Astrologer", labelHi: "ज्योतिषी परामर्श" },
+  { id: "store", icon: "💎", labelEn: "Gemstones & Remedies", labelHi: "रत्न व उपाय" },
   { id: "planets", icon: "🪐", labelEn: "Planets", labelHi: "ग्रह स्थिति" },
   { id: "houses", icon: "🏠", labelEn: "Houses", labelHi: "भाव विश्लेषण" },
   { id: "life", icon: "🌿", labelEn: "Life Areas", labelHi: "जीवन क्षेत्र" },
   { id: "predictions", icon: "🔮", labelEn: "Predictions", labelHi: "भविष्यवाणी" },
-  { id: "remedies", icon: "💎", labelEn: "Remedies", labelHi: "उपाय व रत्न" },
+];
+
+const ASTROLOGERS = [
+  {
+    name: "Acharya Vidyadhar Shastri",
+    exp: "18+ Yrs Exp",
+    specialty: "Vedic Kundli, Career & Business Growth",
+    specialtyHi: "वैदिक कुंडली, करियर एवं व्यापार वृद्धि",
+    lang: "Hindi, English",
+    rating: "4.9 ★ (12.4k consults)",
+    price: "₹499 / 20 mins",
+    avatar: "🕉️",
+    badge: "Top Rated"
+  },
+  {
+    name: "Dr. Ananya Vashistha",
+    exp: "14+ Yrs Exp",
+    specialty: "Kundli Milan, Marriage & Relationship Harmony",
+    specialtyHi: "कुंडली मिलान, दांपत्य एवं प्रेम संबंध",
+    lang: "Hindi, English, Bengali",
+    rating: "4.95 ★ (9.8k consults)",
+    price: "₹599 / 20 mins",
+    avatar: "🪷",
+    badge: "Gold Certified"
+  },
+  {
+    name: "Pt. Rameshwar Joshi",
+    exp: "22+ Yrs Exp",
+    specialty: "Sade Sati, Kaal Sarp & Certified Gemstones",
+    specialtyHi: "साढ़ेसाती, कालसर्प एवं सिद्ध रत्न",
+    lang: "Hindi, Sanskrit",
+    rating: "4.88 ★ (15.2k consults)",
+    price: "₹399 / 20 mins",
+    avatar: "☀️",
+    badge: "Senior Guru"
+  }
 ];
 
 const UI = {
@@ -177,7 +216,6 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 
       <rect width={SIZE} height={SIZE} fill="url(#kundliGlow)" rx="16" stroke="rgba(212,175,55,0.35)" strokeWidth="1.5" />
 
-      {/* House hover highlight polygons */}
       {houseLayout.map(({ n, path }) => (
         <polygon
           key={`poly-${n}`}
@@ -191,18 +229,15 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         />
       ))}
 
-      {/* Chart Geometry Lines */}
       <rect x={x0} y={y0} width={W} height={W} fill="none" stroke="rgba(212,175,55,0.7)" strokeWidth="2" />
       <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="rgba(212,175,55,0.6)" strokeWidth="1.6" />
       <line x1={x1} y1={y0} x2={x0} y2={y1} stroke="rgba(212,175,55,0.6)" strokeWidth="1.6" />
       <polygon points={`${xc},${y0} ${x1},${yc} ${xc},${y1} ${x0},${yc}`} fill="none" stroke="rgba(212,175,55,0.65)" strokeWidth="1.6" />
 
-      {/* Center Cosmic Seal */}
       <circle cx={xc} cy={yc} r="32" fill="rgba(15,10,30,0.85)" stroke="rgba(212,175,55,0.4)" strokeWidth="1" />
       <text x={xc} y={yc - 6} textAnchor="middle" fill="#F3D37A" fontSize="9" letterSpacing="1.5" fontWeight="600" opacity="0.8">LAGNA</text>
       <text x={xc} y={yc + 14} textAnchor="middle" fill="#F3D37A" fontSize="20" fontFamily="serif">ॐ</text>
 
-      {/* House Numbers & Planets */}
       {houseLayout.map(({ n, cx, cy, isLagna }) => {
         const houseData = houses?.[n] || {};
         const signNum = getSignNum(houseData.sign);
@@ -266,7 +301,6 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="kundli-svg" style={{ width: "100%", maxWidth: 500, height: "auto" }}>
       <rect width={SIZE} height={SIZE} fill="#0D0A1C" rx="16" stroke="rgba(212,175,55,0.35)" strokeWidth="1.5" />
 
-      {/* Center decorative area */}
       <rect x={x0 + W} y={y0 + W} width={W * 2} height={W * 2} fill="rgba(20,15,40,0.6)" stroke="rgba(212,175,55,0.4)" strokeWidth="1.5" rx="8" />
       <text x={SIZE / 2} y={SIZE / 2 - 8} textAnchor="middle" fill="#F3D37A" fontSize="12" letterSpacing="2" fontWeight="600">SOUTH INDIAN CHART</text>
       <text x={SIZE / 2} y={SIZE / 2 + 18} textAnchor="middle" fill="#F3D37A" fontSize="24">ॐ</text>
@@ -358,6 +392,107 @@ const CosmicBackdrop = () => (
   </div>
 );
 
+// ── MONETIZATION CHECKOUT MODAL ──────────────────────────────────
+const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
+  const [method, setMethod] = useState("upi");
+  const [success, setSuccess] = useState(false);
+  const hi = lang === "hi";
+
+  const handlePay = () => {
+    setSuccess(true);
+    setTimeout(() => {
+      onPaid && onPaid(item);
+      onClose();
+    }, 1200);
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", padding: 20 }}>
+      <div className="glass-card" style={{ maxWidth: 440, width: "100%", padding: "28px 24px", position: "relative" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 18, cursor: "pointer" }}>✕</button>
+
+        {success ? (
+          <div style={{ textAlign: "center", padding: "30px 10px" }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
+            <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
+              {hi ? "भुगतान सफल रहा!" : "Payment Successful!"}
+            </h3>
+            <p style={{ color: "rgba(241,231,208,0.7)", fontSize: 13 }}>
+              {hi ? "आपकी सेवा सक्रिय कर दी गई है।" : "Your service is being unlocked..."}
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div style={{ textAlign: "center", marginBottom: 18 }}>
+              <span style={{ fontSize: 28 }}>{item.icon || "💎"}</span>
+              <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
+              <div style={{ color: "#FDE68A", fontSize: 20, fontWeight: 800, marginTop: 4 }}>{item.price}</div>
+              <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 4 }}>{item.desc}</p>
+            </div>
+
+            {/* Payment Options */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
+              {[
+                { id: "upi", name: "Instant UPI / QR", icon: "📱" },
+                { id: "card", name: "Cards / NetBanking", icon: "💳" },
+              ].map(m => (
+                <button
+                  key={m.id}
+                  onClick={() => setMethod(m.id)}
+                  style={{
+                    background: method === m.id ? "rgba(245,158,11,0.2)" : "rgba(11,8,25,0.6)",
+                    border: `1px solid ${method === m.id ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
+                    color: method === m.id ? "#FDE68A" : "#FFF",
+                    borderRadius: 10,
+                    padding: "10px 8px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  <div>{m.icon}</div>
+                  <div>{m.name}</div>
+                </button>
+              ))}
+            </div>
+
+            {method === "upi" ? (
+              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, textAlign: "center", marginBottom: 16 }}>
+                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8 }}>
+                  Scan UPI QR (GPay, PhonePe, Paytm)
+                </div>
+                <div style={{ width: 130, height: 130, background: "#FFF", borderRadius: 8, margin: "0 auto", padding: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=vedicastro@upi&pn=JyotishKundli"
+                    alt="UPI QR"
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </div>
+                <div style={{ fontSize: 10, color: "rgba(241,231,208,0.5)", marginTop: 6 }}>UPI ID: `vedicastro@upi`</div>
+              </div>
+            ) : (
+              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
+                <input placeholder="Card Number (0000 0000 0000 0000)" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12, marginBottom: 8 }} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <input placeholder="MM/YY" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }} />
+                  <input placeholder="CVV" type="password" maxLength={3} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }} />
+                </div>
+              </div>
+            )}
+
+            <button onClick={handlePay} className="gold-cta-btn" style={{ padding: "12px 18px", fontSize: 14 }}>
+              {hi ? `अभी सुरक्षित भुगतान करें (${item.price})` : `Complete Secure Payment (${item.price})`}
+            </button>
+            <div style={{ textAlign: "center", fontSize: 10, color: "rgba(243,211,122,0.4)", marginTop: 8 }}>
+              🔒 256-Bit Bank Grade SSL Encrypted Checkout
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── MAIN APP COMPONENT ───────────────────────────────────────────
 export default function App() {
   const [form, setForm] = useState({ name: "", dob: "", pob: "", tob: "" });
@@ -369,6 +504,14 @@ export default function App() {
   const [err, setErr] = useState("");
   const [lang, setLang] = useState("en");
   const [lastCoords, setLastCoords] = useState({ lat: 26.8467, lon: 80.9462 });
+
+  // Matchmaking State
+  const [partnerForm, setPartnerForm] = useState({ name: "", dob: "", pob: "", tob: "" });
+  const [milanResult, setMilanResult] = useState(null);
+
+  // Monetization Modal State
+  const [activeCheckout, setActiveCheckout] = useState(null);
+  const [unlockedProReport, setUnlockedProReport] = useState(false);
 
   const resultRef = useRef(null);
   const t = UI[lang];
@@ -420,6 +563,18 @@ export default function App() {
     } finally {
       setStep(0);
     }
+  };
+
+  const handleRunGunMilan = () => {
+    if (!partnerForm.name || !partnerForm.dob) {
+      alert("Please enter partner name and date of birth.");
+      return;
+    }
+    const res = calculateGunMilan({
+      partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
+      partner2: partnerForm
+    });
+    setMilanResult(res);
   };
 
   const handleLangToggle = () => {
@@ -518,7 +673,6 @@ export default function App() {
           animation: shimmerBtn 4s linear infinite;
         }
 
-        /* ── SCREEN vs PRINT STYLES ── */
         .print-only-report {
           display: none;
         }
@@ -556,6 +710,15 @@ export default function App() {
 
       <CosmicBackdrop />
 
+      {activeCheckout && (
+        <CheckoutModal
+          item={activeCheckout}
+          onClose={() => setActiveCheckout(null)}
+          onPaid={() => setUnlockedProReport(true)}
+          lang={lang}
+        />
+      )}
+
       {/* Top Header Bar */}
       <header className="no-print" style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(11, 8, 25, 0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(212, 175, 55, 0.15)", padding: "12px 24px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -563,11 +726,23 @@ export default function App() {
             <span style={{ fontSize: 22, animation: "pulseSlow 3s infinite" }}>🔯</span>
             <div>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 700, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH KUNDLI</div>
-              <div style={{ fontSize: 10, color: "rgba(243, 211, 122, 0.55)", letterSpacing: 0.5 }}>{hi ? "वैदिक ज्योतिष प्रणाली" : "Vedic Astrology Engine"}</div>
+              <div style={{ fontSize: 10, color: "rgba(243, 211, 122, 0.55)", letterSpacing: 0.5 }}>{hi ? "वैदिक ज्योतिष एवं कुंडली मिलान" : "Vedic Astrology & Matchmaking"}</div>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button
+              onClick={() => setActiveCheckout({
+                title: hi ? "दक्षिणा / आध्यात्मिक सहयोग" : "Offer Dakshina (Support)",
+                price: "₹108 / $2.99",
+                desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं सर्वर के रख-रखाव हेतु सहयोग" : "Support free spiritual Vedic Astrology research & maintenance",
+                icon: "🪷"
+              })}
+              style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", padding: "6px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
+            >
+              <span>🙏</span> {hi ? "दक्षिणा दें" : "Offer Dakshina"}
+            </button>
+
             {result && (
               <button
                 onClick={() => window.print()}
@@ -618,7 +793,6 @@ export default function App() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-            {/* Name */}
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>👤</span> {t.fName} *
@@ -632,7 +806,6 @@ export default function App() {
               />
             </div>
 
-            {/* Date of Birth */}
             <div>
               <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>📅</span> {t.fDob} *
@@ -645,7 +818,6 @@ export default function App() {
               />
             </div>
 
-            {/* Time of Birth */}
             <div>
               <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>⏰</span> {t.fTob} (12:00 PM if unsure)
@@ -658,7 +830,6 @@ export default function App() {
               />
             </div>
 
-            {/* Place of Birth */}
             <div style={{ gridColumn: "1 / -1" }}>
               <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>📍</span> {t.fPob} *
@@ -732,6 +903,29 @@ export default function App() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Monetization Promotion Banner */}
+            <div className="glass-card" style={{ padding: "18px 24px", marginBottom: 24, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))", border: "1px solid rgba(245,158,11,0.4)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+              <div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", borderRadius: 12, padding: "3px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
+                  <span>⭐</span> {hi ? "प्रीमियम 50+ पेज महा-कुंडली रिपोर्ट" : "DELUXE 50+ PAGE LIFE REPORT"}
+                </div>
+                <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700 }}>
+                  {hi ? "वर्ष 2026-2027 वार्षिक गोचर, साढ़ेसाती व विस्तृत समाधान प्राप्त करें" : "Unlock Complete 2026-2027 Annual Transit Forecast & Remedies"}
+                </h4>
+              </div>
+              <button
+                onClick={() => setActiveCheckout({
+                  title: hi ? "50-पेज गोल्डन महा-कुंडली रिपोर्ट" : "Golden Deluxe 50-Page Life Report",
+                  price: "₹199 / $4.99",
+                  desc: hi ? "दशा विश्लेषण, साढ़ेसाती, करियर और व्यक्तिगत उपाय सहित विस्तृत PDF" : "Full life analysis, transit timing, Sade Sati & energized gemstones PDF",
+                  icon: "📜"
+                })}
+                style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)" }}
+              >
+                {hi ? "अनलॉक करें (₹199)" : "Unlock Report ($4.99)"}
+              </button>
             </div>
 
             {/* Navigation Tabs */}
@@ -837,7 +1031,328 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 3: PLANETS ── */}
+            {/* ── TAB 3: 2026–2027 ANNUAL FORECAST (REVENUE MAGNET) ── */}
+            {tab === "forecast" && (
+              <div>
+                <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+                    <div>
+                      <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>
+                        📅 {hi ? "वर्ष 2026–2027 वार्षिक गोचर एवं भविष्यवाणी" : "2026–2027 Annual Transit & Planetary Forecast"}
+                      </h3>
+                      <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12 }}>
+                        {hi ? `मूल नक्षत्र: ${result.nakshatra} | चंद्र राशि: ${result.rashi}` : `Natal Nakshatra: ${result.nakshatra} | Moon: ${result.rashi}`}
+                      </p>
+                    </div>
+                    <span style={{ padding: "4px 12px", borderRadius: 14, background: "rgba(245,158,11,0.15)", color: "#FDE68A", fontSize: 12, fontWeight: 700, border: "1px solid rgba(245,158,11,0.3)" }}>
+                      {result.annualTransit.sadeSatiStatus}
+                    </span>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 22 }}>
+                    {result.annualTransit.transits.map((tr, i) => (
+                      <div key={i} style={{ background: "rgba(15,10,32,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "14px 16px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{tr.planet} in {tr.sign}</div>
+                        <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12, lineHeight: 1.6 }}>{tr.effect}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 12 }}>
+                    ⚡ {hi ? "त्रैमासिक स्कोरकार्ड (Quarterly Milestones)" : "Quarterly Life Milestones"}
+                  </h4>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
+                    {result.annualTransit.quarters.map((q, i) => (
+                      <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                          <span style={{ color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>{q.quarter}</span>
+                          <span style={{ color: "#34D399", fontSize: 11, fontWeight: 800 }}>{q.rating}</span>
+                        </div>
+                        <div style={{ color: "#F3D37A", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>{q.theme}</div>
+                        <div style={{ color: "rgba(241,231,208,0.75)", fontSize: 11, lineHeight: 1.5 }}>{q.impact}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Upsell to PDF */}
+                  <div style={{ textAlign: "center", padding: "16px", background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.4)", borderRadius: 12 }}>
+                    <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                      {hi ? "महीने-दर-महीने संपूर्ण 2026-2027 PDF रिपोर्ट डाउनलोड करें" : "Download Full 2026-2027 Month-by-Month Forecast PDF"}
+                    </div>
+                    <button
+                      onClick={() => setActiveCheckout({
+                        title: "2026-2027 Annual Transit Forecast PDF",
+                        price: "₹149 / $3.99",
+                        desc: "Detailed monthly predictions, wealth windows & auspicious dates",
+                        icon: "📅"
+                      })}
+                      style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                    >
+                      {hi ? "पूर्ण रिपोर्ट प्राप्त करें (₹149)" : "Get Full PDF ($3.99)"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── TAB 4: KUNDLI MILAN (GUN MILAN 36 POINTS) ── */}
+            {tab === "matchmaking" && (
+              <div className="glass-card" style={{ padding: "28px 26px", marginBottom: 20 }}>
+                <div style={{ textAlign: "center", marginBottom: 20 }}>
+                  <span style={{ fontSize: 32 }}>❤️</span>
+                  <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>
+                    {hi ? "वैदिक कुंडली मिलान (अष्टकूट ३६ गुण मिलान)" : "Vedic Kundli Matchmaking (Ashtakoot 36 Gunas)"}
+                  </h3>
+                  <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+                    {hi ? `प्रथम जातक: ${form.name || "User"} (चंद्र राशि: ${result.rashi})` : `Primary Native: ${form.name || "User"} (Moon: ${result.rashi})`}
+                  </p>
+                </div>
+
+                {/* Partner Form */}
+                <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "18px 20px", marginBottom: 20 }}>
+                  <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
+                    {hi ? "द्वितीय जातक (Partner) का विवरण दर्ज करें:" : "Enter Partner's Details:"}
+                  </h4>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Partner Name *</label>
+                      <input placeholder="e.g. Priya Sharma" value={partnerForm.name} onChange={e => setPartnerForm({ ...partnerForm, name: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13 }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Date of Birth *</label>
+                      <input type="date" value={partnerForm.dob} onChange={e => setPartnerForm({ ...partnerForm, dob: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Time of Birth</label>
+                      <input type="time" value={partnerForm.tob} onChange={e => setPartnerForm({ ...partnerForm, tob: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }} />
+                    </div>
+                  </div>
+                  <button onClick={handleRunGunMilan} className="gold-cta-btn" style={{ marginTop: 14, padding: "10px 18px", fontSize: 13 }}>
+                    {hi ? "गुण मिलान गणना करें ✦" : "Calculate Gun Milan Compatibility ✦"}
+                  </button>
+                </div>
+
+                {/* Gun Milan Results */}
+                {milanResult && (
+                  <div style={{ background: "rgba(15,10,32,0.9)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 14, padding: "20px 22px", animation: "fadeInCard 0.4s ease" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 14, marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+                      <div>
+                        <div style={{ fontSize: 12, color: "rgba(241,231,208,0.7)" }}>
+                          {milanResult.p1.name} ({milanResult.p1.sign}) × {milanResult.p2.name} ({milanResult.p2.sign})
+                        </div>
+                        <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700, marginTop: 2 }}>
+                          {hi ? milanResult.verdictHi : milanResult.verdict}
+                        </h4>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontSize: 24, fontWeight: 800, color: Number(milanResult.totalGunas) >= 18 ? "#34D399" : "#F87171" }}>
+                          {milanResult.totalGunas} / {milanResult.maxGunas}
+                        </div>
+                        <div style={{ fontSize: 10, color: "rgba(243,211,122,0.6)" }}>{milanResult.percentage}% Match Score</div>
+                      </div>
+                    </div>
+
+                    {/* Kootas Breakdown */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 16 }}>
+                      {milanResult.kootas.map((k, idx) => (
+                        <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 8, padding: "10px 12px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#FDE68A" }}>
+                            <span>{k.name}</span>
+                            <span>{k.score}/{k.max}</span>
+                          </div>
+                          <div style={{ fontSize: 10, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>{k.desc}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Manglik status */}
+                    <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "#FDE68A", marginBottom: 16 }}>
+                      🔥 <b>Manglik Alignment:</b> {milanResult.manglikStatus}
+                    </div>
+
+                    {/* Pro compatibility report unlock */}
+                    <div style={{ textAlign: "center", padding: "14px", background: "rgba(35,22,65,0.8)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10 }}>
+                      <div style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700 }}>
+                        {hi ? "विस्तृत दांपत्य भविष्य, संतान योग एवं निवारण रिपोर्ट (PDF)" : "Unlock Complete 25-Page Matrimonial Compatibility PDF"}
+                      </div>
+                      <button
+                        onClick={() => setActiveCheckout({
+                          title: "Kundli Milan Comprehensive PDF Report",
+                          price: "₹149 / $3.99",
+                          desc: "In-depth Bhakoot/Nadi analysis, future timing, and harmony remedies",
+                          icon: "❤️"
+                        })}
+                        style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        {hi ? "डाउनलोड करें (₹149)" : "Unlock Matrimonial Report ($3.99)"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── TAB 5: 1-ON-1 ASTROLOGER CONSULTATION ── */}
+            {tab === "consult" && (
+              <div className="glass-card" style={{ padding: "28px 24px", marginBottom: 20 }}>
+                <div style={{ textAlign: "center", marginBottom: 22 }}>
+                  <span style={{ fontSize: 32 }}>🔮</span>
+                  <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>
+                    {hi ? "प्रमाणित वैदिक ज्योतिषियों से 1-on-1 परामर्श लें" : "Consult 1-on-1 with Certified Vedic Astrologers"}
+                  </h3>
+                  <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+                    {hi ? "करियर, विवाह, वित्त एवं स्वास्थ्य पर व्यक्तिगत मार्गदर्शन (Call / WhatsApp)" : "Private Audio/WhatsApp consultation for career, marriage & life clarity"}
+                  </p>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+                  {ASTROLOGERS.map((ast, i) => (
+                    <div key={i} style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                          <span style={{ fontSize: 32 }}>{ast.avatar}</span>
+                          <span style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", color: "#FDE68A", fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 12 }}>
+                            {ast.badge}
+                          </span>
+                        </div>
+                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700 }}>{ast.name}</h4>
+                        <div style={{ color: "#34D399", fontSize: 11, fontWeight: 600, marginTop: 2 }}>{ast.rating} · {ast.exp}</div>
+                        <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
+                          {hi ? ast.specialtyHi : ast.specialty}
+                        </div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.5)", marginTop: 4 }}>
+                          🗣️ {ast.lang}
+                        </div>
+                      </div>
+
+                      <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Consultation Fee:</span>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE68A" }}>{ast.price}</span>
+                        </div>
+                        <button
+                          onClick={() => setActiveCheckout({
+                            title: `1-on-1 Consultation: ${ast.name}`,
+                            price: ast.price,
+                            desc: `Instant appointment confirmation & WhatsApp audio consult connection`,
+                            icon: "📞"
+                          })}
+                          style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                        >
+                          {hi ? "परामर्श बुक करें 📞" : "Book Call / WhatsApp 📞"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── TAB 6: VEDIC STORE & CERTIFIED REMEDIES ── */}
+            {tab === "store" && (
+              <div className="glass-card" style={{ padding: "28px 24px", marginBottom: 20 }}>
+                <div style={{ textAlign: "center", marginBottom: 22 }}>
+                  <span style={{ fontSize: 32 }}>💎</span>
+                  <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>
+                    {hi ? "आपकी कुंडली के अनुसार प्रमाणित रत्न एवं सिद्ध रुद्राक्ष" : "Prescribed Certified Gemstones & Energized Rudraksha"}
+                  </h3>
+                  <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+                    {hi ? `आपके लग्न (${result.lagnaSign}) के अनुकूल 100% लैब-प्रमाणित रत्न` : `100% Lab-Tested & Energized specifically for ${result.lagnaSign} Lagna`}
+                  </p>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+                  {/* Prescribed Gemstone */}
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <div>
+                      <span style={{ fontSize: 30 }}>💍</span>
+                      <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>PRIMARY LUCKY GEMSTONE</div>
+                      <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>{result.gemObj.gem}</h4>
+                      <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
+                        Certified natural, unheated gemstone to strengthen {result.lagnaSign} Lagna lord and accelerate wealth & vitality.
+                      </p>
+                    </div>
+                    <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Lab Certified:</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>{result.gemObj.certPrice}</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveCheckout({
+                          title: `Certified ${result.gemObj.gem}`,
+                          price: result.gemObj.certPrice,
+                          desc: "100% Natural Lab-Certified Gemstone with Certificate of Authenticity",
+                          icon: "💍"
+                        })}
+                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        {hi ? "प्रमाणित रत्न आर्डर करें ✦" : "Order Certified Gemstone ✦"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Energized Rudraksha */}
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <div>
+                      <span style={{ fontSize: 30 }}>📿</span>
+                      <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>SACRED ENERGIZED RUDRAKSHA</div>
+                      <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>{result.rudraksha}</h4>
+                      <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
+                        Consecrated with sacred Vedic Beej Mantras for mental clarity, stress removal, and spiritual protection.
+                      </p>
+                    </div>
+                    <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Pran-Pratishtha:</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>₹1,499</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveCheckout({
+                          title: `Energized ${result.rudraksha}`,
+                          price: "₹1,499",
+                          desc: "Vedic Pran-Pratishtha energized authentic Nepali Rudraksha bead",
+                          icon: "📿"
+                        })}
+                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        {hi ? "सिद्ध रुद्राक्ष प्राप्त करें ✦" : "Order Energized Rudraksha ✦"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Navagraha Yantra */}
+                  <div style={{ background: "rgba(15,10,32,0.85)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <div>
+                      <span style={{ fontSize: 30 }}>🔯</span>
+                      <div style={{ color: "#FDE68A", fontSize: 11, fontWeight: 700, marginTop: 4 }}>COPPER NAVAGRAHA YANTRA</div>
+                      <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 700 }}>Shree Sampoorna Navagraha Yantra</h4>
+                      <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 6, lineHeight: 1.5 }}>
+                        Pure copper geometric plate to balance all 9 planetary doshas in your residence or office.
+                      </p>
+                    </div>
+                    <div style={{ marginTop: 16, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span style={{ fontSize: 11, color: "rgba(241,231,208,0.6)" }}>Pure Copper:</span>
+                        <span style={{ fontSize: 16, fontWeight: 800, color: "#FDE68A" }}>₹899</span>
+                      </div>
+                      <button
+                        onClick={() => setActiveCheckout({
+                          title: "Sampoorna Navagraha Yantra",
+                          price: "₹899",
+                          desc: "Pure energized copper Navagraha Yantra with wooden frame",
+                          icon: "🔯"
+                        })}
+                        style={{ width: "100%", background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        {hi ? "यंत्र आर्डर करें ✦" : "Order Sacred Yantra ✦"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── TAB 7: PLANETS ── */}
             {tab === "planets" && (
               <div>
                 <div className="glass-card" style={{ padding: "24px 20px", marginBottom: 20 }}>
@@ -902,7 +1417,7 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 4: HOUSES ── */}
+            {/* ── TAB 8: HOUSES ── */}
             {tab === "houses" && (
               <div>
                 <div className="glass-card" style={{ padding: "24px 20px", marginBottom: 20 }}>
@@ -955,7 +1470,7 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 5: LIFE AREAS ── */}
+            {/* ── TAB 9: LIFE AREAS ── */}
             {tab === "life" && (
               <div>
                 <SectionCard icon="🌿" title={t.sec.health} content={result.health} />
@@ -966,37 +1481,11 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 6: PREDICTIONS ── */}
+            {/* ── TAB 10: PREDICTIONS ── */}
             {tab === "predictions" && (
               <div>
                 <SectionCard icon="🔮" title={t.sec.pred} content={result.pred} />
                 <SectionCard icon="⏱️" title={t.sec.dasha} content={result.dasha} />
-              </div>
-            )}
-
-            {/* ── TAB 7: REMEDIES ── */}
-            {tab === "remedies" && (
-              <div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-                  {[
-                    { title: t.sec.colours, icon: "🎨", val: result.colours },
-                    { title: t.sec.numbers, icon: "🔢", val: result.numbers },
-                    { title: t.sec.days, icon: "📅", val: result.days },
-                    { title: t.sec.rudraksha, icon: "📿", val: result.rudraksha },
-                  ].map(item => (
-                    <div key={item.title} className="glass-card" style={{ padding: "18px 20px" }}>
-                      <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
-                        <span>{item.icon}</span> {item.title}
-                      </div>
-                      <div style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.6, fontWeight: 500 }}>
-                        {item.val}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <SectionCard icon="💎" title={t.sec.gems} content={result.gems} />
-                <SectionCard icon="⏳" title={t.sec.longevity} content={result.longevity} />
               </div>
             )}
 
@@ -1008,7 +1497,6 @@ export default function App() {
         ══════════════════════════════════════════════════════════════════════ */}
         {result && (
           <div className="print-only-report">
-            {/* Print Document Header */}
             <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
               <div style={{ fontSize: 24, marginBottom: 4 }}>🔯</div>
               <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 26, fontWeight: 800, letterSpacing: 2 }}>
@@ -1019,7 +1507,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* 1. Panchang Highlights */}
             <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 24 }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
                 ✦ CORE PANCHANG & VEDIC METRICS
@@ -1040,7 +1527,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* 2. Natal Chart */}
             <div className="page-break-avoid" style={{ textAlign: "center", marginBottom: 28 }}>
               <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
                 ✦ NATAL LAGNA KUNDLI CHART
@@ -1050,7 +1536,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* 3. Planetary Positions Table */}
             <div className="page-break-avoid" style={{ marginBottom: 28 }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
                 ✦ PLANETARY POSITIONS, HOUSES & DIGNITIES
@@ -1084,16 +1569,13 @@ export default function App() {
               </table>
             </div>
 
-            {/* Page Break for narrative sections */}
             <div className="page-break-before" />
 
-            {/* 4. Cosmic Blueprint & Overview */}
             <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 8 }}>🌟 {t.sec.blueprint}</h3>
               <p style={{ lineHeight: 1.8, fontSize: 13, color: "rgba(241,231,208,0.9)" }}>{result.overview}</p>
             </div>
 
-            {/* 5. Yogas & Dashas */}
             <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
               <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
                 <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>⚡ {t.sec.yogas}</h4>
@@ -1105,7 +1587,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* 6. 12 Bhavas (Houses) */}
             <div className="page-break-avoid" style={{ marginBottom: 20 }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>🏠 {t.htTitle}</h3>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -1125,10 +1606,8 @@ export default function App() {
               </div>
             </div>
 
-            {/* Page Break */}
             <div className="page-break-before" />
 
-            {/* 7. Life Areas Analysis */}
             <div className="page-break-avoid" style={{ marginBottom: 20 }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>🌿 LIFE DOMAIN ANALYSIS</h3>
               {[
@@ -1145,13 +1624,11 @@ export default function App() {
               ))}
             </div>
 
-            {/* 8. Decade Predictions */}
             <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 8 }}>🔮 {t.sec.pred}</h3>
               <p style={{ lineHeight: 1.8, fontSize: 12, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.85)" }}>{result.pred}</p>
             </div>
 
-            {/* 9. Remedies & Lucky Attributes */}
             <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, background: "rgba(15,10,32,0.6)" }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 10 }}>💎 {t.sec.gems}</h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 12 }}>
@@ -1170,7 +1647,6 @@ export default function App() {
               <p style={{ fontSize: 12, lineHeight: 1.7, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.85)" }}>{result.gems}</p>
             </div>
 
-            {/* 10. Stars' Final Verdict */}
             <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 16, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
               <h3 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 700, marginBottom: 6 }}>✨ {t.sec.verdict}</h3>
               <p style={{ fontSize: 13, lineHeight: 1.8, color: "#FFF" }}>{result.verdict}</p>

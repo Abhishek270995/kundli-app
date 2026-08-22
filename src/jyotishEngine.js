@@ -4,48 +4,48 @@ import { AstroTime, GeoVector, Ecliptic, Body, SiderealTime } from "astronomy-en
    ZODIAC SIGNS & NAKSHATRAS
 ------------------------------------------------------------- */
 export const SIGNS = [
-  { name: "Aries", sanskrit: "Mesha", lord: "Mars", element: "Fire", symbol: "♈" },
-  { name: "Taurus", sanskrit: "Vrishabha", lord: "Venus", element: "Earth", symbol: "♉" },
-  { name: "Gemini", sanskrit: "Mithuna", lord: "Mercury", element: "Air", symbol: "♊" },
-  { name: "Cancer", sanskrit: "Karka", lord: "Moon", element: "Water", symbol: "♋" },
-  { name: "Leo", sanskrit: "Simha", lord: "Sun", element: "Fire", symbol: "♌" },
-  { name: "Virgo", sanskrit: "Kanya", lord: "Mercury", element: "Earth", symbol: "♍" },
-  { name: "Libra", sanskrit: "Tula", lord: "Venus", element: "Air", symbol: "♎" },
-  { name: "Scorpio", sanskrit: "Vrishchika", lord: "Mars", element: "Water", symbol: "♏" },
-  { name: "Sagittarius", sanskrit: "Dhanu", lord: "Jupiter", element: "Fire", symbol: "♐" },
-  { name: "Capricorn", sanskrit: "Makara", lord: "Saturn", element: "Earth", symbol: "♑" },
-  { name: "Aquarius", sanskrit: "Kumbha", lord: "Saturn", element: "Air", symbol: "♒" },
-  { name: "Pisces", sanskrit: "Meena", lord: "Jupiter", element: "Water", symbol: "♓" }
+  { name: "Aries", sanskrit: "Mesha", lord: "Mars", element: "Fire", symbol: "♈", varna: "Kshatriya", vashya: "Chatushpada" },
+  { name: "Taurus", sanskrit: "Vrishabha", lord: "Venus", element: "Earth", symbol: "♉", varna: "Vaishya", vashya: "Chatushpada" },
+  { name: "Gemini", sanskrit: "Mithuna", lord: "Mercury", element: "Air", symbol: "♊", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Cancer", sanskrit: "Karka", lord: "Moon", element: "Water", symbol: "♋", varna: "Brahmin", vashya: "Jalachara" },
+  { name: "Leo", sanskrit: "Simha", lord: "Sun", element: "Fire", symbol: "♌", varna: "Kshatriya", vashya: "Vanachara" },
+  { name: "Virgo", sanskrit: "Kanya", lord: "Mercury", element: "Earth", symbol: "♍", varna: "Vaishya", vashya: "Dwipada" },
+  { name: "Libra", sanskrit: "Tula", lord: "Venus", element: "Air", symbol: "♎", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Scorpio", sanskrit: "Vrishchika", lord: "Mars", element: "Water", symbol: "♏", varna: "Brahmin", vashya: "Keeta" },
+  { name: "Sagittarius", sanskrit: "Dhanu", lord: "Jupiter", element: "Fire", symbol: "♐", varna: "Kshatriya", vashya: "Dwipada" },
+  { name: "Capricorn", sanskrit: "Makara", lord: "Saturn", element: "Earth", symbol: "♑", varna: "Vaishya", vashya: "Jalachara" },
+  { name: "Aquarius", sanskrit: "Kumbha", lord: "Saturn", element: "Air", symbol: "♒", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Pisces", sanskrit: "Meena", lord: "Jupiter", element: "Water", symbol: "♓", varna: "Brahmin", vashya: "Jalachara" }
 ];
 
 export const NAKSHATRAS = [
-  { name: "Ashwini", hindi: "अश्विनी", lord: "Ketu", deity: "Ashwini Kumaras" },
-  { name: "Bharani", hindi: "भरणी", lord: "Venus", deity: "Yama" },
-  { name: "Krittika", hindi: "कृत्तिका", lord: "Sun", deity: "Agni" },
-  { name: "Rohini", hindi: "रोहिणी", lord: "Moon", deity: "Brahma" },
-  { name: "Mrigashira", hindi: "मृगशिरा", lord: "Mars", deity: "Soma" },
-  { name: "Ardra", hindi: "आर्द्रा", lord: "Rahu", deity: "Rudra" },
-  { name: "Punarvasu", hindi: "पुनर्वसु", lord: "Jupiter", deity: "Aditi" },
-  { name: "Pushya", hindi: "पुष्य", lord: "Saturn", deity: "Brihaspati" },
-  { name: "Ashlesha", hindi: "आश्लेषा", lord: "Mercury", deity: "Nagas" },
-  { name: "Magha", hindi: "मघा", lord: "Ketu", deity: "Pitris" },
-  { name: "Purva Phalguni", hindi: "पूर्वा फाल्गुनी", lord: "Venus", deity: "Bhaga" },
-  { name: "Uttara Phalguni", hindi: "उत्तरा फाल्गुनी", lord: "Sun", deity: "Aryaman" },
-  { name: "Hasta", hindi: "हस्त", lord: "Moon", deity: "Savitar" },
-  { name: "Chitra", hindi: "चित्रा", lord: "Mars", deity: "Tvashtar" },
-  { name: "Swati", hindi: "स्वाति", lord: "Rahu", deity: "Vayu" },
-  { name: "Vishakha", hindi: "विशाखा", lord: "Jupiter", deity: "Indra-Agni" },
-  { name: "Anuradha", hindi: "अनुराधा", lord: "Saturn", deity: "Mitra" },
-  { name: "Jyeshtha", hindi: "ज्येष्ठा", lord: "Mercury", deity: "Indra" },
-  { name: "Mula", hindi: "मूल", lord: "Ketu", deity: "Nirriti" },
-  { name: "Purva Ashadha", hindi: "पूर्वाषाढ़ा", lord: "Venus", deity: "Apas" },
-  { name: "Uttara Ashadha", hindi: "उत्तराषाढ़ा", lord: "Sun", deity: "Vishwadevas" },
-  { name: "Shravana", hindi: "श्रवण", lord: "Moon", deity: "Vishnu" },
-  { name: "Dhanishta", hindi: "धनिष्ठा", lord: "Mars", deity: "Ashta Vasus" },
-  { name: "Shatabhisha", hindi: "शतभिषा", lord: "Rahu", deity: "Varuna" },
-  { name: "Purva Bhadrapada", hindi: "पूर्वभाद्रपदा", lord: "Jupiter", deity: "Aja Ekapada" },
-  { name: "Uttara Bhadrapada", hindi: "उत्तरभाद्रपदा", lord: "Saturn", deity: "Ahirbudhnya" },
-  { name: "Revati", hindi: "रेवती", lord: "Mercury", deity: "Pushan" }
+  { name: "Ashwini", hindi: "अश्विनी", lord: "Ketu", gana: "Deva", yoni: "Horse", nadi: "Adi" },
+  { name: "Bharani", hindi: "भरणी", lord: "Venus", gana: "Manushya", yoni: "Elephant", nadi: "Madhya" },
+  { name: "Krittika", hindi: "कृत्तिका", lord: "Sun", gana: "Rakshasa", yoni: "Sheep", nadi: "Antya" },
+  { name: "Rohini", hindi: "रोहिणी", lord: "Moon", gana: "Manushya", yoni: "Serpent", nadi: "Antya" },
+  { name: "Mrigashira", hindi: "मृगशिरा", lord: "Mars", gana: "Deva", yoni: "Serpent", nadi: "Madhya" },
+  { name: "Ardra", hindi: "आर्द्रा", lord: "Rahu", gana: "Manushya", yoni: "Dog", nadi: "Adi" },
+  { name: "Punarvasu", hindi: "पुनर्वसु", lord: "Jupiter", gana: "Deva", yoni: "Cat", nadi: "Adi" },
+  { name: "Pushya", hindi: "पुष्य", lord: "Saturn", gana: "Deva", yoni: "Sheep", nadi: "Madhya" },
+  { name: "Ashlesha", hindi: "आश्लेषा", lord: "Mercury", gana: "Rakshasa", yoni: "Cat", nadi: "Antya" },
+  { name: "Magha", hindi: "मघा", lord: "Ketu", gana: "Rakshasa", yoni: "Rat", nadi: "Antya" },
+  { name: "Purva Phalguni", hindi: "पूर्वा फाल्गुनी", lord: "Venus", gana: "Manushya", yoni: "Rat", nadi: "Madhya" },
+  { name: "Uttara Phalguni", hindi: "उत्तरा फाल्गुनी", lord: "Sun", gana: "Manushya", yoni: "Cow", nadi: "Adi" },
+  { name: "Hasta", hindi: "हस्त", lord: "Moon", gana: "Deva", yoni: "Buffalo", nadi: "Adi" },
+  { name: "Chitra", hindi: "चित्रा", lord: "Mars", gana: "Rakshasa", yoni: "Tiger", nadi: "Madhya" },
+  { name: "Swati", hindi: "स्वाति", lord: "Rahu", gana: "Deva", yoni: "Buffalo", nadi: "Antya" },
+  { name: "Vishakha", hindi: "विशाखा", lord: "Jupiter", gana: "Rakshasa", yoni: "Tiger", nadi: "Antya" },
+  { name: "Anuradha", hindi: "अनुराधा", lord: "Saturn", gana: "Deva", yoni: "Deer", nadi: "Madhya" },
+  { name: "Jyeshtha", hindi: "ज्येष्ठा", lord: "Mercury", gana: "Rakshasa", yoni: "Deer", nadi: "Adi" },
+  { name: "Mula", hindi: "मूल", lord: "Ketu", gana: "Rakshasa", yoni: "Dog", nadi: "Adi" },
+  { name: "Purva Ashadha", hindi: "पूर्वाषाढ़ा", lord: "Venus", gana: "Manushya", yoni: "Monkey", nadi: "Madhya" },
+  { name: "Uttara Ashadha", hindi: "उत्तराषाढ़ा", lord: "Sun", gana: "Manushya", yoni: "Mongoose", nadi: "Antya" },
+  { name: "Shravana", hindi: "श्रवण", lord: "Moon", gana: "Deva", yoni: "Monkey", nadi: "Antya" },
+  { name: "Dhanishta", hindi: "धनिष्ठा", lord: "Mars", gana: "Rakshasa", yoni: "Lion", nadi: "Madhya" },
+  { name: "Shatabhisha", hindi: "शतभिषा", lord: "Rahu", gana: "Rakshasa", yoni: "Horse", nadi: "Adi" },
+  { name: "Purva Bhadrapada", hindi: "पूर्वभाद्रपदा", lord: "Jupiter", gana: "Manushya", yoni: "Lion", nadi: "Adi" },
+  { name: "Uttara Bhadrapada", hindi: "उत्तरभाद्रपदा", lord: "Saturn", gana: "Manushya", yoni: "Cow", nadi: "Madhya" },
+  { name: "Revati", hindi: "रेवती", lord: "Mercury", gana: "Deva", yoni: "Elephant", nadi: "Antya" }
 ];
 
 export const TITHIS_EN = [
@@ -98,22 +98,24 @@ export function degreeToSign(deg) {
 
 export function getNakshatraInfo(deg) {
   const norm = ((deg % 360) + 360) % 360;
-  const segment = 360 / 27; // 13°20' = 13.33333°
+  const segment = 360 / 27;
   const index = Math.floor(norm / segment);
   const pada = Math.floor((norm % segment) / (segment / 4)) + 1;
   const nak = NAKSHATRAS[index % 27];
   return {
-    index,
+    index: index % 27,
     name: nak.name,
     hindi: nak.hindi,
     lord: nak.lord,
+    gana: nak.gana,
+    yoni: nak.yoni,
+    nadi: nak.nadi,
     pada,
     degInNak: norm % segment
   };
 }
 
 export function getLahiriAyanamsa(date) {
-  // Epoch 2000.0 (J2000): 23.85° + precession rate ~50.29 arcsec/yr
   const yr = date.getFullYear() + (date.getMonth() * 30 + date.getDate()) / 365.25;
   return 23.85 + (yr - 2000) * 0.01397;
 }
@@ -143,8 +145,7 @@ export function calculatePlanets(date) {
     planets[name] = applyLahiriAyanamsa(lon, date);
   }
 
-  // Mean Lunar Nodes (Rahu / Ketu)
-  const d = time.ut; // Days from J2000.0
+  const d = time.ut;
   const T = d / 36525.0;
   let rahuMean = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + (T * T * T) / 450000;
   rahuMean = ((rahuMean % 360) + 360) % 360;
@@ -166,15 +167,13 @@ export function calculateAscendant(date, lat, lon) {
 
   const theta = (lstDeg * Math.PI) / 180;
   const phi = (lat * Math.PI) / 180;
-  const eps = (23.439 * Math.PI) / 180; // Earth obliquity
+  const eps = (23.439 * Math.PI) / 180;
 
-  // Tropical Ascendant formula
   const y = Math.cos(theta);
   const x = - (Math.sin(theta) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps));
   let ascTropical = Math.atan2(y, x) * (180 / Math.PI);
   ascTropical = ((ascTropical % 360) + 360) % 360;
 
-  // Convert to Sidereal with Lahiri Ayanamsa
   return applyLahiriAyanamsa(ascTropical, date);
 }
 
@@ -182,15 +181,15 @@ export function evaluatePlanetStatus(planet, deg) {
   const signIdx = getSignIndex(deg);
 
   const dignities = {
-    Sun: { exalted: 0, debilitated: 6, own: [4] },       // Aries (0), Libra (6), Leo (4)
-    Moon: { exalted: 1, debilitated: 7, own: [3] },      // Taurus (1), Scorpio (7), Cancer (3)
-    Mars: { exalted: 9, debilitated: 3, own: [0, 7] },   // Capricorn (9), Cancer (3), Aries (0), Scorpio (7)
-    Mercury: { exalted: 5, debilitated: 11, own: [2, 5] },// Virgo (5), Pisces (11), Gemini (2), Virgo (5)
-    Jupiter: { exalted: 3, debilitated: 9, own: [8, 11] },// Cancer (3), Capricorn (9), Sag (8), Pisces (11)
-    Venus: { exalted: 11, debilitated: 5, own: [1, 6] }, // Pisces (11), Virgo (5), Taurus (1), Libra (6)
-    Saturn: { exalted: 6, debilitated: 0, own: [9, 10] }, // Libra (6), Aries (0), Capricorn (9), Aquarius (10)
-    Rahu: { exalted: 1, debilitated: 7, own: [10] },     // Taurus/Gemini, Scorpio/Sag
-    Ketu: { exalted: 7, debilitated: 1, own: [8] }       // Scorpio/Sag, Taurus/Gemini
+    Sun: { exalted: 0, debilitated: 6, own: [4] },
+    Moon: { exalted: 1, debilitated: 7, own: [3] },
+    Mars: { exalted: 9, debilitated: 3, own: [0, 7] },
+    Mercury: { exalted: 5, debilitated: 11, own: [2, 5] },
+    Jupiter: { exalted: 3, debilitated: 9, own: [8, 11] },
+    Venus: { exalted: 11, debilitated: 5, own: [1, 6] },
+    Saturn: { exalted: 6, debilitated: 0, own: [9, 10] },
+    Rahu: { exalted: 1, debilitated: 7, own: [10] },
+    Ketu: { exalted: 7, debilitated: 1, own: [8] }
   };
 
   const info = dignities[planet];
@@ -230,10 +229,153 @@ export function evaluatePlanetStatus(planet, deg) {
 }
 
 /* -------------------------------------------------------------
+   KUNDLI MILAN / ASHTAKOOTA COMPATIBILITY ENGINE (36 GUNAS)
+------------------------------------------------------------- */
+export function calculateGunMilan({ partner1, partner2 }) {
+  const d1 = new Date(`${partner1.dob}T${partner1.tob || "12:00"}`);
+  const d2 = new Date(`${partner2.dob}T${partner2.tob || "12:00"}`);
+
+  const p1Planets = calculatePlanets(d1);
+  const p2Planets = calculatePlanets(d2);
+
+  const m1Deg = p1Planets["Moon"];
+  const m2Deg = p2Planets["Moon"];
+
+  const s1Idx = getSignIndex(m1Deg);
+  const s2Idx = getSignIndex(m2Deg);
+
+  const sign1 = SIGNS[s1Idx];
+  const sign2 = SIGNS[s2Idx];
+
+  const nak1 = getNakshatraInfo(m1Deg);
+  const nak2 = getNakshatraInfo(m2Deg);
+
+  // 1. Varna (1 Point)
+  const varnaRank = { Brahmin: 4, Kshatriya: 3, Vaishya: 2, Shudra: 1 };
+  let varnaScore = varnaRank[sign1.varna] >= varnaRank[sign2.varna] ? 1 : 0;
+
+  // 2. Vashya (2 Points)
+  let vashyaScore = sign1.vashya === sign2.vashya ? 2 : (sign1.element === sign2.element ? 1 : 0.5);
+
+  // 3. Tara (3 Points)
+  const taraDist = (nak2.index - nak1.index + 27) % 9;
+  let taraScore = [1, 2, 4, 6, 8].includes(taraDist) ? 3 : 1.5;
+
+  // 4. Yoni (4 Points)
+  let yoniScore = nak1.yoni === nak2.yoni ? 4 : 2;
+
+  // 5. Graha Maitri (5 Points)
+  let maitriScore = sign1.lord === sign2.lord ? 5 : (sign1.element === sign2.element ? 4 : 3);
+
+  // 6. Gana (6 Points)
+  let ganaScore = 0;
+  if (nak1.gana === nak2.gana) ganaScore = 6;
+  else if (nak1.gana === "Deva" && nak2.gana === "Manushya") ganaScore = 5;
+  else if (nak1.gana === "Manushya" && nak2.gana === "Deva") ganaScore = 5;
+  else ganaScore = 1;
+
+  // 7. Bhakoot (7 Points)
+  const signDist = (s2Idx - s1Idx + 12) % 12 + 1;
+  const isBhakootDosha = [2, 12, 6, 8, 9, 5].includes(signDist);
+  let bhakootScore = isBhakootDosha ? 0 : 7;
+
+  // 8. Nadi (8 Points)
+  const isNadiDosha = nak1.nadi === nak2.nadi;
+  let nadiScore = isNadiDosha ? 0 : 8;
+
+  const totalGunas = varnaScore + vashyaScore + taraScore + yoniScore + maitriScore + ganaScore + bhakootScore + nadiScore;
+
+  // Manglik Check
+  const mars1H = ((getSignIndex(p1Planets["Mars"]) - s1Idx + 12) % 12) + 1;
+  const mars2H = ((getSignIndex(p2Planets["Mars"]) - s2Idx + 12) % 12) + 1;
+  const p1Manglik = [1, 4, 7, 8, 12].includes(mars1H);
+  const p2Manglik = [1, 4, 7, 8, 12].includes(mars2H);
+
+  let matchVerdict = "Excellent Match (Uttam)";
+  let matchVerdictHi = "उत्कृष्ट एवं अत्यंत शुभ मिलान (Uttam)";
+  if (totalGunas < 18) {
+    matchVerdict = "Challenging Compatibility (Remedies Advised)";
+    matchVerdictHi = "सावधानी एवं वैदिक उपाय आवश्यक (Challenging)";
+  } else if (totalGunas <= 25) {
+    matchVerdict = "Good & Harmonious Match (Madhyam)";
+    matchVerdictHi = "शुभ एवं सामंजस्यपूर्ण मिलान (Madhyam)";
+  }
+
+  return {
+    totalGunas: totalGunas.toFixed(1),
+    maxGunas: 36,
+    percentage: ((totalGunas / 36) * 100).toFixed(0),
+    verdict: matchVerdict,
+    verdictHi: matchVerdictHi,
+    p1: { name: partner1.name, sign: sign1.name, signHi: sign1.sanskrit, nak: nak1.name, nakHi: nak1.hindi, pada: nak1.pada, manglik: p1Manglik },
+    p2: { name: partner2.name, sign: sign2.name, signHi: sign2.sanskrit, nak: nak2.name, nakHi: nak2.hindi, pada: nak2.pada, manglik: p2Manglik },
+    kootas: [
+      { name: "Varna Koota (Spiritual / Work Ego)", score: varnaScore, max: 1, desc: "Soul temperament and spiritual compatibility" },
+      { name: "Vashya Koota (Dominance / Harmony)", score: vashyaScore, max: 2, desc: "Mutual attraction, influence and emotional alignment" },
+      { name: "Tara Koota (Destiny / Health)", score: taraScore, max: 3, desc: "Longevity, health resilience and fortune bonding" },
+      { name: "Yoni Koota (Physical / Biology)", score: yoniScore, max: 4, desc: "Physical harmony, biological chemistry and intimacy" },
+      { name: "Graha Maitri (Psychological Bond)", score: maitriScore, max: 5, desc: "Intellectual friendship and daily worldview resonance" },
+      { name: "Gana Koota (Temperament / Behavior)", score: ganaScore, max: 6, desc: "Social behavior, core lifestyle and lifestyle values" },
+      { name: "Bhakoot Koota (Family / Prosperity)", score: bhakootScore, max: 7, desc: "Financial growth, emotional longevity and offspring" },
+      { name: "Nadi Koota (Genetic / Prana Resonance)", score: nadiScore, max: 8, desc: "Hereditary vitality, neurological harmony and progeny" }
+    ],
+    manglikStatus: (p1Manglik === p2Manglik)
+      ? "Both charts have matching Manglik energies — cancellation applies."
+      : "One partner is Manglik — simple Kumbh Vivah / Hanuman Chalisa remedies recommended for lasting harmony."
+  };
+}
+
+/* -------------------------------------------------------------
+   ANNUAL TRANSIT & FORECAST (2026–2027)
+------------------------------------------------------------- */
+export function generateAnnualTransitReport({ name, ascSignName, moonSignName, lang = "en" }) {
+  const isHi = lang === "hi";
+
+  const quarters = [
+    {
+      quarter: "Q1 (Jan – Mar 2026)",
+      theme: isHi ? "करियर विस्तार एवं नई शुरुआत" : "Career Expansion & Strategic Launches",
+      impact: isHi ? "गुरु का अनुकूल प्रभाव आपके नए व्यावसायिक प्रस्तावों और पदोन्नति को गति देगा। कार्यक्षेत्र में वरिष्ठों का सहयोग प्राप्त होगा।" : "Benefic Jupiter transits activate high professional recognition, lucrative projects, and strategic career pivots.",
+      rating: "9.2/10"
+    },
+    {
+      quarter: "Q2 (Apr – Jun 2026)",
+      theme: isHi ? "आर्थिक स्थिरता एवं संपत्ति लाभ" : "Asset Consolidation & Financial Inflows",
+      impact: isHi ? "धन भाव में शुभ गोचर संचित पूंजी में वृद्धि और दीर्घकालिक निवेशों से अप्रत्याशित लाभ प्रदान करेगा।" : "Favorable solar and mercurial trines stimulate secondary income channels and high-value property/investment consolidation.",
+      rating: "8.8/10"
+    },
+    {
+      quarter: "Q3 (Jul – Sep 2026)",
+      theme: isHi ? "पारिवारिक सुख एवं आध्यात्मिक यात्रा" : "Domestic Harmony & Spiritual Journeys",
+      impact: isHi ? "परिवार में मांगलिक कार्य के योग। विदेश अथवा तीर्थ यात्रा की योजनाएं फलीभूत होंगी। मन में गहन शांति रहेगी।" : "Harmonious Venus and Moon transits nurture relationship bonding, sacred pilgrimages, and inner creative equilibrium.",
+      rating: "9.0/10"
+    },
+    {
+      quarter: "Q4 (Oct – Dec 2026)",
+      theme: isHi ? "महत्वाकांक्षाओं की पूर्णता एवं विजय" : "Peak Triumph & Multi-Source Wealth",
+      impact: isHi ? "वर्ष के अंतिम चरण में शनि और मंगल का शुभ गोचर सभी लंबित कार्यों को संपन्न कराएगा और मान-प्रतिष्ठा में वृद्धि करेगा।" : "Saturn and Mars transits solidify authority, resolving protracted hurdles and delivering monumental milestone triumphs.",
+      rating: "9.5/10"
+    }
+  ];
+
+  return {
+    year: "2026–2027",
+    sadeSatiStatus: ["Capricorn", "Aquarius", "Pisces"].includes(moonSignName)
+      ? (isHi ? "शनि की साढ़ेसाती का प्रभाव (सकारात्मक रूपांतरण एवं अनुशासन काल)" : "Active Saturn Sade Sati Phase (Period of high discipline & monumental maturity)")
+      : (isHi ? "साढ़ेसाती का कोई प्रतिकूल प्रभाव नहीं है (शुभ गोचर)" : "Free from Sade Sati (Smooth and expansive planetary transits)"),
+    transits: [
+      { planet: "Jupiter (Guru)", sign: "Gemini / Cancer", effect: isHi ? "पंचम व नवम भाव पर अमृत दृष्टि — ज्ञान व भाग्य में वृद्धि" : "Exalted divine trines on natal Kendra houses conferring wealth & wisdom" },
+      { planet: "Saturn (Shani)", sign: "Pisces", effect: isHi ? "कर्म भाव में अनुशासन — दीर्घकालिक सफलता की नींव" : "Deep karmic structural realignment and enduring executive mastery" },
+      { planet: "Rahu & Ketu", sign: "Aquarius / Leo", effect: isHi ? "इनोवेशन, तकनीक एवं अचानक वित्तीय लाभ के प्रबल योग" : "Radical technological breakthroughs, international networks & unexpected windfalls" }
+    ],
+    quarters
+  };
+}
+
+/* -------------------------------------------------------------
    COMPLETE VEDIC ANALYSIS GENERATOR
 ------------------------------------------------------------- */
 export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = "en" }) {
-  // Parse date properly (supporting local time and ISO string)
   let birthDate;
   if (dob.includes("T")) {
     birthDate = new Date(dob);
@@ -265,7 +407,6 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
   const sunSignIdx = getSignIndex(sunDeg);
   const sunSign = SIGNS[sunSignIdx];
 
-  // Panchang calculations
   const diffDeg = ((moonDeg - sunDeg + 360) % 360);
   const tithiIdx = Math.floor(diffDeg / 12) % 30;
   const tithiEn = TITHIS_EN[tithiIdx];
@@ -275,7 +416,6 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
   const yogaIdx = Math.floor(yogaDeg / (360 / 27)) % 27;
   const yogaName = YOGAS_LIST[yogaIdx];
 
-  // Whole Sign Vedic Houses (Bhavas 1 to 12)
   const houses = {};
   for (let h = 1; h <= 12; h++) {
     const currentSignIdx = (ascSignIdx + (h - 1)) % 12;
@@ -288,7 +428,6 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     };
   }
 
-  // Planet table with house assignments
   const planetData = {};
   const planetHouseMap = {};
 
@@ -315,7 +454,6 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     houses[houseNum].planets.push(planet);
   });
 
-  // House interpretations
   const houseMeaningsEn = [
     "Personality, physical appearance, vitality, and primary life focus.",
     "Wealth accumulation, family lineage, speech, and material resources.",
@@ -358,13 +496,10 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     houses[h].interpretation = hDesc + plDesc;
   }
 
-  // -------------------------------------------------------------
-  // YOGAS DETECTION
-  // -------------------------------------------------------------
+  // Yogas
   const detectedYogas = [];
   const detectedYogasHi = [];
 
-  // Gajakesari Yoga (Jupiter in Kendra 1,4,7,10 from Moon)
   const jupHouse = planetHouseMap["Jupiter"];
   const moonHouse = planetHouseMap["Moon"];
   const kendraFromMoon = ((jupHouse - moonHouse + 12) % 12) + 1;
@@ -373,23 +508,19 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     detectedYogasHi.push("🌟 गजकेसरी योग: चंद्रमा से केंद्र में गुरु की स्थिति उत्तम विद्या, यश, दीर्घकालिक समृद्धि और मान-सम्मान प्रदान करती है।");
   }
 
-  // Budhaditya Yoga (Sun + Mercury in same house)
   if (planetHouseMap["Sun"] === planetHouseMap["Mercury"]) {
     detectedYogas.push(`⚡ Budhaditya Yoga: Sun & Mercury conjoint in House ${planetHouseMap["Sun"]} grants exceptional sharp intellect, analytical brilliance, and leadership.`);
     detectedYogasHi.push(`⚡ बुधादित्य योग: सूर्य और बुध की युति भाव ${planetHouseMap["Sun"]} में प्रखर बुद्धि, प्रशासनिक क्षमता और उत्कृष्ट वाक्पटुता देती है।`);
   }
 
-  // Chandra-Mangal Yoga (Moon + Mars together)
   if (planetHouseMap["Moon"] === planetHouseMap["Mars"]) {
     detectedYogas.push("💰 Chandra-Mangal Yoga: Conjunction of Moon & Mars activates profound financial acumen, enterprise, and material abundance.");
     detectedYogasHi.push("💰 चंद्र-मंगल योग: चंद्रमा और मंगल की युति धनार्जन की अद्भुत क्षमता और व्यवसाय में बड़ी सफलता का योग बनाती है।");
   }
 
-  // Raja Yoga / Kendra-Trikona Lord connection
   detectedYogas.push(`✨ Kendra-Trikona Raj Yoga: Strong alignment between Lagna lord (${ascSign.lord}) and 9th/10th house lords supports rise in status.`);
   detectedYogasHi.push(`✨ केंद्र-त्रिकोण राजयोग: लग्न अधिपति (${ascSign.lord}) और शुभ भावों का संबंध निरंतर प्रगति और उच्च प्रतिष्ठा कारक है।`);
 
-  // Manglik Check
   const marsH = planetHouseMap["Mars"];
   const isManglik = [1, 4, 7, 8, 12].includes(marsH);
   if (isManglik) {
@@ -397,9 +528,7 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     detectedYogasHi.push(`🔥 मंगल स्थिति: मंगल भाव ${marsH} में स्थित होकर असीम ऊर्जा व तेज प्रदान करता है; दांपत्य में धैर्य और समझदारी सुखद फल देगी।`);
   }
 
-  // -------------------------------------------------------------
-  // VIMSHOTTARI DASHA TIMELINE
-  // -------------------------------------------------------------
+  // Dashas
   const birthNakIdx = moonNak.index;
   const dashaLord = moonNak.lord;
   const dashaIdx = Math.max(0, DASHA_PERIODS.findIndex(d => d.lord === dashaLord));
@@ -421,104 +550,65 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     currentYear = endY;
   }
 
-  // -------------------------------------------------------------
-  // REMEDIES & AUSPICIOUS ATTRIBUTES
-  // -------------------------------------------------------------
   const luckyGemsByLagna = {
-    Aries: { gem: "Red Coral (Moonga)", metal: "Copper / Gold", hiGem: "लाल मूंगा (Red Coral)" },
-    Taurus: { gem: "Diamond / White Sapphire", metal: "Silver / Platinum", hiGem: "हीरा / सफेद पुखराज" },
-    Gemini: { gem: "Emerald (Panna)", metal: "Bronze / Gold", hiGem: "पन्ना (Emerald)" },
-    Cancer: { gem: "Pearl (Moti) / Moonstone", metal: "Silver", hiGem: "सच्चा मोती (Pearl)" },
-    Leo: { gem: "Ruby (Manikya)", metal: "Gold / Copper", hiGem: "माणिक्य (Ruby)" },
-    Virgo: { gem: "Emerald (Panna)", metal: "Gold / Bronze", hiGem: "पन्ना (Emerald)" },
-    Libra: { gem: "Diamond / Opal", metal: "Silver / White Gold", hiGem: "ओपल / हीरा" },
-    Scorpio: { gem: "Red Coral (Moonga) / Yellow Sapphire", metal: "Copper / Gold", hiGem: "लाल मूंगा / पुखराज" },
-    Sagittarius: { gem: "Yellow Sapphire (Pukhraj)", metal: "Gold", hiGem: "पीला पुखराज (Yellow Sapphire)" },
-    Capricorn: { gem: "Blue Sapphire (Neelam) / Blue Topaz", metal: "Silver / Iron", hiGem: "नीलम / जामुनिया" },
-    Aquarius: { gem: "Blue Sapphire / Amethyst", metal: "Silver / Panchdhatu", hiGem: "नीलम / अमेथिस्ट" },
-    Pisces: { gem: "Yellow Sapphire (Pukhraj) / Pearl", metal: "Gold", hiGem: "पीला पुखराज / मोती" }
+    Aries: { gem: "Red Coral (Moonga)", metal: "Copper / Gold", hiGem: "लाल मूंगा (Red Coral)", certPrice: "₹2,499" },
+    Taurus: { gem: "Diamond / White Sapphire", metal: "Silver / Platinum", hiGem: "हीरा / सफेद पुखराज", certPrice: "₹3,999" },
+    Gemini: { gem: "Emerald (Panna)", metal: "Bronze / Gold", hiGem: "पन्ना (Emerald)", certPrice: "₹3,499" },
+    Cancer: { gem: "Pearl (Moti) / Moonstone", metal: "Silver", hiGem: "सच्चा मोती (Pearl)", certPrice: "₹1,999" },
+    Leo: { gem: "Ruby (Manikya)", metal: "Gold / Copper", hiGem: "माणिक्य (Ruby)", certPrice: "₹3,499" },
+    Virgo: { gem: "Emerald (Panna)", metal: "Gold / Bronze", hiGem: "पन्ना (Emerald)", certPrice: "₹3,499" },
+    Libra: { gem: "Diamond / Opal", metal: "Silver / White Gold", hiGem: "ओपल / हीरा", certPrice: "₹2,999" },
+    Scorpio: { gem: "Red Coral (Moonga) / Yellow Sapphire", metal: "Copper / Gold", hiGem: "लाल मूंगा / पुखराज", certPrice: "₹2,499" },
+    Sagittarius: { gem: "Yellow Sapphire (Pukhraj)", metal: "Gold", hiGem: "पीला पुखराज (Yellow Sapphire)", certPrice: "₹4,999" },
+    Capricorn: { gem: "Blue Sapphire (Neelam) / Blue Topaz", metal: "Silver / Iron", hiGem: "नीलम / जामुनिया", certPrice: "₹4,499" },
+    Aquarius: { gem: "Blue Sapphire / Amethyst", metal: "Silver / Panchdhatu", hiGem: "नीलम / अमेथिस्ट", certPrice: "₹4,499" },
+    Pisces: { gem: "Yellow Sapphire (Pukhraj) / Pearl", metal: "Gold", hiGem: "पीला पुखराज / मोती", certPrice: "₹4,999" }
   };
 
   const luckyInfo = luckyGemsByLagna[ascSign.name] || luckyGemsByLagna["Aries"];
 
   const luckyColors = {
-    Aries: "Crimson Red, Saffron & Golden Yellow",
-    Taurus: "Lotus White, Cream & Soft Pastels",
-    Gemini: "Emerald Green, Mint & Turquoise",
-    Cancer: "Pearl White, Silver & Sea Green",
-    Leo: "Royal Gold, Orange & Ruby Red",
-    Virgo: "Forest Green, Jade & Earthy Tones",
-    Libra: "Silk White, Light Blue & Rose Pink",
-    Scorpio: "Deep Maroon, Coral Red & Amber",
-    Sagittarius: "Auspicious Yellow, Saffron & Gold",
-    Capricorn: "Deep Navy Blue, Charcoal & Slate Grey",
-    Aquarius: "Electric Blue, Violet & Sky Blue",
-    Pisces: "Golden Yellow, Saffron & Aquamarine"
+    Aries: "Crimson Red, Saffron & Golden Yellow", Taurus: "Lotus White, Cream & Soft Pastels",
+    Gemini: "Emerald Green, Mint & Turquoise", Cancer: "Pearl White, Silver & Sea Green",
+    Leo: "Royal Gold, Orange & Ruby Red", Virgo: "Forest Green, Jade & Earthy Tones",
+    Libra: "Silk White, Light Blue & Rose Pink", Scorpio: "Deep Maroon, Coral Red & Amber",
+    Sagittarius: "Auspicious Yellow, Saffron & Gold", Capricorn: "Deep Navy Blue, Charcoal & Slate Grey",
+    Aquarius: "Electric Blue, Violet & Sky Blue", Pisces: "Golden Yellow, Saffron & Aquamarine"
   }[ascSign.name];
 
   const luckyColorsHi = {
-    Aries: "गहरा लाल, केसरिया और सुनहरा पीला",
-    Taurus: "दूधिया सफेद, क्रीम और हल्का गुलाबी",
-    Gemini: "पन्ना हरा, तोतिया और आसमानी",
-    Cancer: "मोतिया सफेद, चांदी और हल्का नीला",
-    Leo: "शाही सुनहरा, नारंगी और माणिक्य लाल",
-    Virgo: "हरा, जामुनी और गहरा बादामी",
-    Libra: "चमकीला सफेद, हल्का नीला और गुलाबी",
-    Scorpio: "गहरा मैरून, सिंदूरी लाल और केसरिया",
-    Sagittarius: "पीला, केसरिया और स्वर्णिम रंग",
-    Capricorn: "गहरा नीला, नेवी ब्लू और स्लेटी",
-    Aquarius: "नीला, बैंगनी और हल्का आसमानी",
-    Pisces: "हल्दी पीला, केसरिया और हल्का हरा"
+    Aries: "गहरा लाल, केसरिया और सुनहरा पीला", Taurus: "दूधिया सफेद, क्रीम और हल्का गुलाबी",
+    Gemini: "पन्ना हरा, तोतिया और आसमानी", Cancer: "मोतिया सफेद, चांदी और हल्का नीला",
+    Leo: "शाही सुनहरा, नारंगी और माणिक्य लाल", Virgo: "हरा, जामुनी और गहरा बादामी",
+    Libra: "चमकीला सफेद, हल्का नीला और गुलाबी", Scorpio: "गहरा मैरून, सिंदूरी लाल और केसरिया",
+    Sagittarius: "पीला, केसरिया और स्वर्णिम रंग", Capricorn: "गहरा नीला, नेवी ब्लू और स्लेटी",
+    Aquarius: "नीला, बैंगनी और हल्का आसमानी", Pisces: "हल्दी पीला, केसरिया और हल्का हरा"
   }[ascSign.name];
 
   const luckyNumbers = {
-    Aries: "1, 9, 3",
-    Taurus: "6, 5, 8",
-    Gemini: "5, 1, 6",
-    Cancer: "2, 7, 9",
-    Leo: "1, 5, 9",
-    Virgo: "5, 6, 2",
-    Libra: "6, 7, 1",
-    Scorpio: "9, 3, 1",
-    Sagittarius: "3, 1, 9",
-    Capricorn: "8, 5, 6",
-    Aquarius: "8, 4, 7",
-    Pisces: "3, 2, 9"
+    Aries: "1, 9, 3", Taurus: "6, 5, 8", Gemini: "5, 1, 6", Cancer: "2, 7, 9",
+    Leo: "1, 5, 9", Virgo: "5, 6, 2", Libra: "6, 7, 1", Scorpio: "9, 3, 1",
+    Sagittarius: "3, 1, 9", Capricorn: "8, 5, 6", Aquarius: "8, 4, 7", Pisces: "3, 2, 9"
   }[ascSign.name];
 
   const auspiciousDays = {
-    Aries: "Tuesday, Sunday & Thursday",
-    Taurus: "Friday, Saturday & Wednesday",
-    Gemini: "Wednesday, Friday & Thursday",
-    Cancer: "Monday, Tuesday & Thursday",
-    Leo: "Sunday, Tuesday & Thursday",
-    Virgo: "Wednesday, Friday & Saturday",
-    Libra: "Friday, Saturday & Wednesday",
-    Scorpio: "Tuesday, Thursday & Sunday",
-    Sagittarius: "Thursday, Sunday & Tuesday",
-    Capricorn: "Saturday, Friday & Wednesday",
-    Aquarius: "Saturday, Wednesday & Friday",
-    Pisces: "Thursday, Monday & Tuesday"
+    Aries: "Tuesday, Sunday & Thursday", Taurus: "Friday, Saturday & Wednesday",
+    Gemini: "Wednesday, Friday & Thursday", Cancer: "Monday, Tuesday & Thursday",
+    Leo: "Sunday, Tuesday & Thursday", Virgo: "Wednesday, Friday & Saturday",
+    Libra: "Friday, Saturday & Wednesday", Scorpio: "Tuesday, Thursday & Sunday",
+    Sagittarius: "Thursday, Sunday & Tuesday", Capricorn: "Saturday, Friday & Wednesday",
+    Aquarius: "Saturday, Wednesday & Friday", Pisces: "Thursday, Monday & Tuesday"
   }[ascSign.name];
 
   const auspiciousDaysHi = {
-    Aries: "मंगलवार, रविवार और गुरुवार",
-    Taurus: "शुक्रवार, शनिवार और बुधवार",
-    Gemini: "बुधवार, शुक्रवार और गुरुवार",
-    Cancer: "सोमवार, मंगलवार और गुरुवार",
-    Leo: "रविवार, मंगलवार और गुरुवार",
-    Virgo: "बुधवार, शुक्रवार और शनिवार",
-    Libra: "शुक्रवार, शनिवार और बुधवार",
-    Scorpio: "मंगलवार, गुरुवार और रविवार",
-    Sagittarius: "गुरुवार, रविवार और मंगलवार",
-    Capricorn: "शनिवार, शुक्रवार और बुधवार",
-    Aquarius: "शनिवार, बुधवार और शुक्रवार",
-    Pisces: "गुरुवार, सोमवार और मंगलवार"
+    Aries: "मंगलवार, रविवार और गुरुवार", Taurus: "शुक्रवार, शनिवार और बुधवार",
+    Gemini: "बुधवार, शुक्रवार और गुरुवार", Cancer: "सोमवार, मंगलवार और गुरुवार",
+    Leo: "रविवार, मंगलवार और गुरुवार", Virgo: "बुधवार, शुक्रवार और शनिवार",
+    Libra: "शुक्रवार, शनिवार और बुधवार", Scorpio: "मंगलवार, गुरुवार और रविवार",
+    Sagittarius: "गुरुवार, रविवार और मंगलवार", Capricorn: "शनिवार, शुक्रवार और बुधवार",
+    Aquarius: "शनिवार, बुधवार और शुक्रवार", Pisces: "गुरुवार, सोमवार और मंगलवार"
   }[ascSign.name];
 
-  // -------------------------------------------------------------
-  // COMPREHENSIVE LIFE READINGS (EN / HI)
-  // -------------------------------------------------------------
   const isHi = lang === "hi";
 
   const overviewText = isHi
@@ -569,9 +659,18 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     ? `आपकी जन्म कुंडली एक अत्यंत सामर्थ्यवान, परिश्रमी और प्रगतिशील आत्मा का प्रतीक है। अपने आत्म-विश्वास को सर्वोच्च प्राथमिकता दें, किसी भी तात्कालिक बाधा से विचलित न हों। आपका पुरुषार्थ और ग्रहों का आशीर्वाद मिलकर आपको जीवन में उच्चतम सफलता दिलाएंगे।`
     : `Your Vedic birth chart is a powerful cosmic blueprint of resilience, high intellect, and purposeful ambition. Trust your intuitive wisdom, remain anchored in ethical action, and embrace calculated risks. The cosmic forces stand aligned to reward your dedication with lasting success and inner harmony.`;
 
+  const annualTransit = generateAnnualTransitReport({
+    name,
+    ascSignName: ascSign.name,
+    moonSignName: moonSign.name,
+    lang
+  });
+
   return {
     lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
+    lagnaSign: ascSign.name,
     rashi: `${moonSign.name} (${moonSign.sanskrit})`,
+    rashiSign: moonSign.name,
     nakshatra: `${moonNak.name} (Pada ${moonNak.pada})`,
     tithi: isHi ? tithiHi : tithiEn,
     yoga: yogaName,
@@ -591,9 +690,11 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     days: isHi ? auspiciousDaysHi : auspiciousDays,
     rudraksha: isHi ? `${ascSign.name === "Leo" ? "12 मुखी / 1 मुखी" : "5 मुखी / 7 मुखी"} रुद्राक्ष` : "5-Mukhi / 7-Mukhi Rudraksha",
     gems: remediesGemsText,
+    gemObj: luckyInfo,
     longevity: longevityText,
     verdict: verdictText,
     houses,
-    planetData
+    planetData,
+    annualTransit
   };
 }
