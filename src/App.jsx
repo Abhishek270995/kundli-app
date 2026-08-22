@@ -395,7 +395,11 @@ const CosmicBackdrop = () => (
 // ── MONETIZATION CHECKOUT MODAL ──────────────────────────────────
 const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
   const [method, setMethod] = useState("upi");
-  const [success, setSuccess] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState("pay"); // "pay" | "verify" | "success"
+  const [utr, setUtr] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [verifyErr, setVerifyErr] = useState("");
+  const [orderId, setOrderId] = useState("");
   const hi = lang === "hi";
 
   // Extract clean numerical amount from price string (e.g. ₹199 -> 199)
@@ -406,30 +410,189 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
   const upiIntentUrl = `upi://pay?pa=8094199663@upi&pn=ABHISHEK%20KUMAR%20SINGH&am=${amountVal}.00&cu=INR&tn=${encodeURIComponent(item.title)}`;
   const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(upiIntentUrl)}&margin=10`;
 
-  const handlePay = () => {
-    setSuccess(true);
+  const handleProceedToVerify = () => {
+    setCheckoutStep("verify");
+    setVerifyErr("");
+  };
+
+  const handleConfirmPayment = () => {
+    const cleanUtr = utr.trim().replace(/\s+/g, "");
+    const cleanPhone = whatsapp.trim().replace(/\D/g, "");
+
+    if (cleanPhone.length < 10) {
+      setVerifyErr(hi ? "कृपया मान्य 10-अंकों का व्हाट्सएप नंबर दर्ज करें।" : "Please enter a valid 10-digit WhatsApp number.");
+      return;
+    }
+
+    if (cleanUtr.length < 6) {
+      setVerifyErr(hi ? "कृपया बैंक रसीद से 12-अंकों का UPI UTR / Ref No. दर्ज करें।" : "Please enter the 12-digit UPI Reference / UTR Number from your payment receipt.");
+      return;
+    }
+
+    const generatedOrderId = "JK-" + Math.floor(100000 + Math.random() * 900000);
+    setOrderId(generatedOrderId);
+    setCheckoutStep("success");
+
     setTimeout(() => {
       onPaid && onPaid(item);
-      onClose();
-    }, 1400);
+    }, 1200);
+  };
+
+  const getWhatsAppShareLink = () => {
+    const text = encodeURIComponent(
+      `🙏 *Jyotish Kundli Payment Confirmation*\n\n` +
+      `📦 *Item:* ${item.title}\n` +
+      `💰 *Amount:* ₹${amountVal}\n` +
+      `🧾 *Order ID:* ${orderId || "Pending"}\n` +
+      `🔢 *UPI UTR / Ref No:* ${utr || "N/A"}\n` +
+      `📱 *Customer WhatsApp:* ${whatsapp || "N/A"}\n\n` +
+      `Please verify and activate my order. Thank you!`
+    );
+    return `https://wa.me/918094199663?text=${text}`;
   };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", padding: 20 }}>
-      <div className="glass-card" style={{ maxWidth: 450, width: "100%", padding: "28px 24px", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
+      <div className="glass-card" style={{ maxWidth: 460, width: "100%", padding: "26px 24px", position: "relative", maxHeight: "92vh", overflowY: "auto" }}>
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 20, cursor: "pointer" }}>✕</button>
 
-        {success ? (
-          <div style={{ textAlign: "center", padding: "34px 10px" }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
-            <h3 style={{ color: "#34D399", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
-              {hi ? "भुगतान सफल रहा!" : "Payment Confirmed!"}
+        {/* ── STEP 3: SUCCESS ── */}
+        {checkoutStep === "success" && (
+          <div style={{ textAlign: "center", padding: "20px 10px" }}>
+            <div style={{ fontSize: 44, marginBottom: 10 }}>🎉</div>
+            <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
+              {hi ? "भुगतान विवरण दर्ज हो गया!" : "Payment & Order Confirmed!"}
             </h3>
-            <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13 }}>
-              {hi ? "आपकी सेवा / रिपोर्ट सक्रिय की जा रही है..." : "Your report/service is being unlocked..."}
+            <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, marginBottom: 14 }}>
+              {hi ? `ऑर्डर आईडी: ${orderId} · सेवा अनलॉक कर दी गई है।` : `Order ID: ${orderId} · Your access is now activated.`}
             </p>
+
+            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14, textAlign: "left", fontSize: 12, marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>Item:</span>
+                <span style={{ color: "#F3D37A", fontWeight: 700 }}>{item.title}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>Amount Paid:</span>
+                <span style={{ color: "#34D399", fontWeight: 700 }}>₹{amountVal}.00</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>UPI UTR:</span>
+                <span style={{ color: "#FDE68A", fontWeight: 600 }}>{utr}</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>WhatsApp:</span>
+                <span style={{ color: "#FFF" }}>+91 {whatsapp}</span>
+              </div>
+            </div>
+
+            <a
+              href={getWhatsAppShareLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                width: "100%",
+                background: "#25D366",
+                color: "#0F0A1E",
+                padding: "10px 16px",
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 700,
+                textDecoration: "none",
+                marginBottom: 10
+              }}
+            >
+              <span>💬</span> Send Receipt on WhatsApp
+            </a>
+
+            <button onClick={onClose} className="gold-cta-btn" style={{ padding: "10px 18px", fontSize: 13 }}>
+              {hi ? "पूर्ण (Close)" : "Done / Continue"}
+            </button>
           </div>
-        ) : (
+        )}
+
+        {/* ── STEP 2: VERIFY (UTR & WHATSAPP) ── */}
+        {checkoutStep === "verify" && (
+          <div>
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <span style={{ fontSize: 30 }}>📝</span>
+              <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>
+                {hi ? "भुगतान सत्यापन विवरण" : "Confirm Payment Details"}
+              </h3>
+              <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+                {item.title} — <b style={{ color: "#FDE68A" }}>₹{amountVal}.00</b>
+              </p>
+            </div>
+
+            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 14px", marginBottom: 16 }}>
+              {/* WhatsApp Number Field */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <span>📱</span> {hi ? "आपका व्हाट्सएप नंबर (WhatsApp Number) *" : "Your WhatsApp Number *"}
+                </label>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <div style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "rgba(241,231,208,0.8)", fontSize: 13, fontWeight: 600 }}>
+                    +91
+                  </div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    value={whatsapp}
+                    onChange={e => setWhatsapp(e.target.value.replace(/\D/g, ""))}
+                    placeholder="e.g. 9876543210"
+                    style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "#FFF", fontSize: 13 }}
+                  />
+                </div>
+                <div style={{ fontSize: 10, color: "rgba(241,231,208,0.5)", marginTop: 4 }}>
+                  {hi ? "PDF रिपोर्ट व परामर्श लिंक इस नंबर पर भेजा जाएगा।" : "PDF copy & consult updates will be delivered here."}
+                </div>
+              </div>
+
+              {/* 12-Digit UTR Field */}
+              <div>
+                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <span>🔢</span> {hi ? "12-अंकों का UPI UTR / Ref No. *" : "12-Digit UPI Ref / UTR No. *"}
+                </label>
+                <input
+                  type="text"
+                  maxLength={16}
+                  value={utr}
+                  onChange={e => setUtr(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
+                  placeholder="e.g. 423819283746"
+                  style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 12px", color: "#FFF", fontSize: 13, letterSpacing: 1 }}
+                />
+                <div style={{ fontSize: 10, color: "rgba(243,211,122,0.65)", marginTop: 4 }}>
+                  💡 {hi ? "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।" : "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt."}
+                </div>
+              </div>
+            </div>
+
+            {verifyErr && (
+              <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 8, padding: "8px 12px", color: "#FCA5A5", fontSize: 11, marginBottom: 14 }}>
+                ⚠️ {verifyErr}
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 8 }}>
+              <button
+                onClick={() => setCheckoutStep("pay")}
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, color: "rgba(241,231,208,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+              >
+                ← Back
+              </button>
+              <button onClick={handleConfirmPayment} className="gold-cta-btn" style={{ padding: "12px 14px", fontSize: 13 }}>
+                {hi ? "सत्यापित करें एवं अनलॉक करें ✦" : "Confirm & Unlock Instant Access ✦"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 1: PAYMENT (QR & DIRECT INTENT) ── */}
+        {checkoutStep === "pay" && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
               <span style={{ fontSize: 32 }}>{item.icon || "💎"}</span>
@@ -471,7 +634,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
                 </div>
 
                 {/* Amount-Enforced High-Contrast QR Code */}
-                <div style={{ width: 190, height: 190, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #F59E0B", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
+                <div style={{ width: 185, height: 185, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #F59E0B", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
                   <img
                     src={dynamicQrCodeUrl}
                     alt="Amount-Locked Dynamic UPI QR"
@@ -514,8 +677,8 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
               </div>
             )}
 
-            <button onClick={handlePay} className="gold-cta-btn" style={{ padding: "12px 18px", fontSize: 14 }}>
-              {hi ? `भुगतान पूर्ण होने के बाद पुष्टि करें (₹${amountVal})` : `I Have Made the Payment (₹${amountVal})`}
+            <button onClick={handleProceedToVerify} className="gold-cta-btn" style={{ padding: "12px 18px", fontSize: 14 }}>
+              {hi ? `मैंने भुगतान कर दिया है (₹${amountVal}) →` : `I Have Made the Payment (₹${amountVal}) →`}
             </button>
             <div style={{ textAlign: "center", fontSize: 10, color: "rgba(243,211,122,0.4)", marginTop: 8 }}>
               🔒 256-Bit Bank Grade SSL Encrypted Checkout
