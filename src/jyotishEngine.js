@@ -1,4 +1,4 @@
-import { AstroTime, GeoVector, Body, SiderealTime } from "astronomy-engine";
+import { AstroTime, GeoVector, Ecliptic, Body, SiderealTime } from "astronomy-engine";
 
 /* -------------------------------------------------------------
    ZODIAC SIGNS & NAKSHATRAS
@@ -112,11 +112,14 @@ export function getNakshatraInfo(deg) {
   };
 }
 
+export function getLahiriAyanamsa(date) {
+  // Epoch 2000.0 (J2000): 23.85° + precession rate ~50.29 arcsec/yr
+  const yr = date.getFullYear() + (date.getMonth() * 30 + date.getDate()) / 365.25;
+  return 23.85 + (yr - 2000) * 0.01397;
+}
+
 export function applyLahiriAyanamsa(lon, date) {
-  // High precision Lahiri ayanamsa approximation
-  // Base Epoch 2000.0: ~23.85° + rate of precession ~50.29 arcsec/yr
-  const t = (date.getTime() - new Date("2000-01-01T12:00:00Z").getTime()) / (365.25 * 86400000);
-  const ayanamsa = 23.856 + t * (50.29 / 3600);
+  const ayanamsa = getLahiriAyanamsa(date);
   return ((lon - ayanamsa) % 360 + 360) % 360;
 }
 
@@ -134,32 +137,40 @@ export function calculatePlanets(date) {
 
   const planets = {};
   for (const [name, body] of Object.entries(bodies)) {
-    const vec = GeoVector(body, time);
-    let lon = ((vec.elon % 360) + 360) % 360;
+    const vec = GeoVector(body, time, false);
+    const ecl = Ecliptic(vec);
+    let lon = ((ecl.elon % 360) + 360) % 360;
     planets[name] = applyLahiriAyanamsa(lon, date);
   }
 
-  // Lunar Nodes (Rahu / Ketu mean / true node approximation)
-  const moonVec = GeoVector(Body.Moon, time);
-  let rahu = ((moonVec.elon - 180) + 360) % 360;
-  rahu = applyLahiriAyanamsa(rahu, date);
-  planets["Rahu"] = rahu;
-  planets["Ketu"] = (rahu + 180) % 360;
+  // Mean Lunar Nodes (Rahu / Ketu)
+  const d = time.ut; // Days from J2000.0
+  const T = d / 36525.0;
+  let rahuMean = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + (T * T * T) / 450000;
+  rahuMean = ((rahuMean % 360) + 360) % 360;
+
+  const ayanamsa = getLahiriAyanamsa(date);
+  const siderealRahu = ((rahuMean - ayanamsa) % 360 + 360) % 360;
+  const siderealKetu = (siderealRahu + 180) % 360;
+
+  planets["Rahu"] = siderealRahu;
+  planets["Ketu"] = siderealKetu;
 
   return planets;
 }
 
 export function calculateAscendant(date, lat, lon) {
   const time = new AstroTime(date);
-  const lstHours = SiderealTime(time) + lon / 15;
-  const lstDeg = (lstHours * 15) % 360;
-  const lstRad = (lstDeg * Math.PI) / 180;
-  const latRad = (lat * Math.PI) / 180;
-  const epsRad = (23.4367 * Math.PI) / 180; // Earth obliquity
+  const gmstHours = SiderealTime(time);
+  const lstDeg = ((gmstHours * 15 + lon) % 360 + 360) % 360;
+
+  const theta = (lstDeg * Math.PI) / 180;
+  const phi = (lat * Math.PI) / 180;
+  const eps = (23.439 * Math.PI) / 180; // Earth obliquity
 
   // Tropical Ascendant formula
-  const y = Math.cos(lstRad);
-  const x = - (Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad));
+  const y = Math.cos(theta);
+  const x = - (Math.sin(theta) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps));
   let ascTropical = Math.atan2(y, x) * (180 / Math.PI);
   ascTropical = ((ascTropical % 360) + 360) % 360;
 
@@ -169,7 +180,6 @@ export function calculateAscendant(date, lat, lon) {
 
 export function evaluatePlanetStatus(planet, deg) {
   const signIdx = getSignIndex(deg);
-  const degInSign = deg % 30;
 
   const dignities = {
     Sun: { exalted: 0, debilitated: 6, own: [4] },       // Aries (0), Libra (6), Leo (4)
@@ -184,7 +194,7 @@ export function evaluatePlanetStatus(planet, deg) {
   };
 
   const info = dignities[planet];
-  if (!info) return { status: "Neutral", effect: "Moderate results" };
+  if (!info) return { status: "Neutral", statusHi: "सम राशि", effect: "Moderate results", effectHi: "संतुलित फल" };
 
   if (signIdx === info.exalted) {
     return {
@@ -211,8 +221,6 @@ export function evaluatePlanetStatus(planet, deg) {
     };
   }
 
-  // Friendly / Neutral signs
-  const signElement = SIGNS[signIdx].element;
   return {
     status: "Direct",
     statusHi: "मित्र/सम राशि",
@@ -225,9 +233,24 @@ export function evaluatePlanetStatus(planet, deg) {
    COMPLETE VEDIC ANALYSIS GENERATOR
 ------------------------------------------------------------- */
 export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = "en" }) {
-  const birthDate = new Date(`${dob}T${tob || "12:00"}`);
+  // Parse date properly (supporting local time and ISO string)
+  let birthDate;
+  if (dob.includes("T")) {
+    birthDate = new Date(dob);
+  } else {
+    const timeStr = tob && tob.trim() ? tob.trim() : "12:00";
+    birthDate = new Date(`${dob}T${timeStr}`);
+  }
+
+  if (isNaN(birthDate.getTime())) {
+    birthDate = new Date();
+  }
+
+  const validLat = Number.isFinite(lat) ? lat : 26.8467;
+  const validLon = Number.isFinite(lon) ? lon : 80.9462;
+
   const planets = calculatePlanets(birthDate);
-  const ascDeg = calculateAscendant(birthDate, lat, lon);
+  const ascDeg = calculateAscendant(birthDate, validLat, validLon);
 
   const ascSignIdx = getSignIndex(ascDeg);
   const ascSign = SIGNS[ascSignIdx];
@@ -253,7 +276,6 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
   const yogaName = YOGAS_LIST[yogaIdx];
 
   // Whole Sign Vedic Houses (Bhavas 1 to 12)
-  // House 1 = Lagna Rashi, House 2 = Next Rashi, etc.
   const houses = {};
   for (let h = 1; h <= 12; h++) {
     const currentSignIdx = (ascSignIdx + (h - 1)) % 12;
@@ -380,7 +402,7 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
   // -------------------------------------------------------------
   const birthNakIdx = moonNak.index;
   const dashaLord = moonNak.lord;
-  const dashaIdx = DASHA_PERIODS.findIndex(d => d.lord === dashaLord);
+  const dashaIdx = Math.max(0, DASHA_PERIODS.findIndex(d => d.lord === dashaLord));
   const totalDashaYears = DASHA_PERIODS[dashaIdx].years;
   const fractionPassed = moonNak.degInNak / (360 / 27);
   const balanceYears = totalDashaYears * (1 - fractionPassed);
