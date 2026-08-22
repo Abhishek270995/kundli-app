@@ -398,42 +398,50 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
   const [success, setSuccess] = useState(false);
   const hi = lang === "hi";
 
+  // Extract clean numerical amount from price string (e.g. ₹199 -> 199)
+  const rawPriceMatch = item.price.match(/₹([0-9,]+)/);
+  const amountVal = rawPriceMatch ? rawPriceMatch[1].replace(/,/g, "") : "199";
+
+  // Dynamic NPCI-compliant UPI Intent URL with pre-filled locked amount and note
+  const upiIntentUrl = `upi://pay?pa=8094199663@upi&pn=ABHISHEK%20KUMAR%20SINGH&am=${amountVal}.00&cu=INR&tn=${encodeURIComponent(item.title)}`;
+  const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(upiIntentUrl)}&margin=10`;
+
   const handlePay = () => {
     setSuccess(true);
     setTimeout(() => {
       onPaid && onPaid(item);
       onClose();
-    }, 1200);
+    }, 1400);
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)", padding: 20 }}>
-      <div className="glass-card" style={{ maxWidth: 440, width: "100%", padding: "28px 24px", position: "relative" }}>
-        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 18, cursor: "pointer" }}>✕</button>
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", padding: 20 }}>
+      <div className="glass-card" style={{ maxWidth: 450, width: "100%", padding: "28px 24px", position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 20, cursor: "pointer" }}>✕</button>
 
         {success ? (
-          <div style={{ textAlign: "center", padding: "30px 10px" }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
-            <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
-              {hi ? "भुगतान सफल रहा!" : "Payment Successful!"}
+          <div style={{ textAlign: "center", padding: "34px 10px" }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+            <h3 style={{ color: "#34D399", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
+              {hi ? "भुगतान सफल रहा!" : "Payment Confirmed!"}
             </h3>
-            <p style={{ color: "rgba(241,231,208,0.7)", fontSize: 13 }}>
-              {hi ? "आपकी सेवा सक्रिय कर दी गई है।" : "Your service is being unlocked..."}
+            <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13 }}>
+              {hi ? "आपकी सेवा / रिपोर्ट सक्रिय की जा रही है..." : "Your report/service is being unlocked..."}
             </p>
           </div>
         ) : (
           <div>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
-              <span style={{ fontSize: 28 }}>{item.icon || "💎"}</span>
+              <span style={{ fontSize: 32 }}>{item.icon || "💎"}</span>
               <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
-              <div style={{ color: "#FDE68A", fontSize: 20, fontWeight: 800, marginTop: 4 }}>{item.price}</div>
+              <div style={{ color: "#FDE68A", fontSize: 24, fontWeight: 800, marginTop: 4 }}>₹{amountVal}</div>
               <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 4 }}>{item.desc}</p>
             </div>
 
-            {/* Payment Options */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
+            {/* Payment Mode Selector */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
               {[
-                { id: "upi", name: "Instant UPI / QR", icon: "📱" },
+                { id: "upi", name: "Dynamic UPI QR", icon: "📱" },
                 { id: "card", name: "Cards / NetBanking", icon: "💳" },
               ].map(m => (
                 <button
@@ -457,20 +465,44 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
             </div>
 
             {method === "upi" ? (
-              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, textAlign: "center", marginBottom: 16 }}>
-                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8, fontWeight: 600 }}>
-                  Scan UPI QR (GPay, PhonePe, Paytm, BHIM)
+              <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center", marginBottom: 16 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "3px 10px", color: "#34D399", fontSize: 11, fontWeight: 700, marginBottom: 10 }}>
+                  <span>🔒</span> Amount Locked: ₹{amountVal}.00
                 </div>
-                <div style={{ width: 190, height: 190, background: "#000", borderRadius: 12, margin: "0 auto", padding: 6, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(245,158,11,0.4)", boxShadow: "0 4px 16px rgba(0,0,0,0.6)", overflow: "hidden" }}>
+
+                {/* Amount-Enforced High-Contrast QR Code */}
+                <div style={{ width: 190, height: 190, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #F59E0B", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
                   <img
-                    src="/upi-qr.jpg"
-                    alt="UPI Payment QR Code"
-                    style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8 }}
+                    src={dynamicQrCodeUrl}
+                    alt="Amount-Locked Dynamic UPI QR"
+                    style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 4 }}
                   />
                 </div>
-                <div style={{ fontSize: 11, color: "rgba(241,231,208,0.75)", marginTop: 8 }}>
-                  Scan with any UPI app to complete payment
+
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#F3D37A" }}>Payee: ABHISHEK KUMAR SINGH</div>
+                  <div style={{ fontSize: 11, color: "rgba(241,231,208,0.7)", marginTop: 2 }}>UPI ID: <code style={{ color: "#FDE68A" }}>8094199663@upi</code></div>
                 </div>
+
+                {/* Direct 1-Tap Mobile UPI Intent Link */}
+                <a
+                  href={upiIntentUrl}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    marginTop: 12,
+                    background: "rgba(245,158,11,0.15)",
+                    border: "1px solid rgba(245,158,11,0.4)",
+                    color: "#FDE68A",
+                    padding: "9px 12px",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    textDecoration: "none"
+                  }}
+                >
+                  🚀 Tap to Open GPay / PhonePe / Paytm Directly
+                </a>
               </div>
             ) : (
               <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
@@ -483,7 +515,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang }) => {
             )}
 
             <button onClick={handlePay} className="gold-cta-btn" style={{ padding: "12px 18px", fontSize: 14 }}>
-              {hi ? `अभी सुरक्षित भुगतान करें (${item.price})` : `Complete Secure Payment (${item.price})`}
+              {hi ? `भुगतान पूर्ण होने के बाद पुष्टि करें (₹${amountVal})` : `I Have Made the Payment (₹${amountVal})`}
             </button>
             <div style={{ textAlign: "center", fontSize: 10, color: "rgba(243,211,122,0.4)", marginTop: 8 }}>
               🔒 256-Bit Bank Grade SSL Encrypted Checkout
