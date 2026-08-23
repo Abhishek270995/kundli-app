@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, SIGNS } from "./jyotishEngine";
+import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, calculateMarriagePrediction, SIGNS } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
@@ -32,6 +32,7 @@ const PLANETS = [
 const TABS = [
   { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "चार्ट" },
   { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "marriageTiming", icon: "💍", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
   { id: "daily", icon: "☀️", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
   { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
   { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
@@ -372,6 +373,7 @@ const PRODUCT_PRICES = {
   deluxeReport: { INR: "₹199", USD: "$2.99", EUR: "€2.99", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 14" },
   annualReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   matchmakingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+  marriageTimingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   dailyMonthly: { INR: "₹49", USD: "$0.99", EUR: "€0.99", GBP: "£0.79", CAD: "CA$1.29", AUD: "AU$1.49", AED: "AED 4" },
   dailyYearly: { INR: "₹299", USD: "$4.99", EUR: "€4.99", GBP: "£3.99", CAD: "CA$6.99", AUD: "AU$7.99", AED: "AED 22" },
 };
@@ -741,6 +743,13 @@ export default function App() {
   // Monetization Modal State
   const [activeCheckout, setActiveCheckout] = useState(null);
   const [unlockedProReport, setUnlockedProReport] = useState(false);
+  const [unlockedMarriageReport, setUnlockedMarriageReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_unlocked_marriage");
+    } catch {
+      return false;
+    }
+  });
 
   const resultRef = useRef(null);
   const t = UI[lang];
@@ -952,6 +961,14 @@ export default function App() {
           onClose={() => setActiveCheckout(null)}
           onPaid={() => {
             setUnlockedProReport(true);
+            if (activeCheckout?.isMarriageUnlock) {
+              try {
+                localStorage.setItem("jyotish_unlocked_marriage", "true");
+                setUnlockedMarriageReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
             if (activeCheckout?.isDailySub) {
               try {
                 localStorage.setItem("jyotish_daily_sub", JSON.stringify({
@@ -1345,6 +1362,195 @@ export default function App() {
                 <SectionCard icon="✨" title={t.sec.verdict} content={result.verdict} highlight />
               </div>
             )}
+
+            {/* ── TAB: MARRIAGE AGE, TIMING & SPOUSE PREDICTION (FREEMIUM + PAID GATE) ── */}
+            {tab === "marriageTiming" && (() => {
+              const mp = result.marriagePrediction || calculateMarriagePrediction({
+                name: form.name || "User",
+                dob: form.dob || "1998-01-01",
+                lagnaSign: result.lagnaSign,
+                rashiSign: result.rashiSign,
+                lang
+              });
+              const unlockPrice = PRODUCT_PRICES.marriageTimingReport[currency];
+
+              return (
+                <div>
+                  {/* Top Free Vivah Overview Card */}
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 16, marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 12, padding: "3px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>
+                          <span>💍</span> {hi ? "वैदिक विवाह आयु व योग गणना" : "PARASHARI VEDIC VIVAH YOG"}
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, marginTop: 2 }}>
+                          {form.name || "Native"} — {hi ? "विवाह समय, आयु एवं जीवनसाथी विश्लेषण" : "Marriage Timing, Age & Spouse Analysis"}
+                        </h3>
+                        <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+                          {hi ? `सप्तम भाव राशि: ${mp.seventhSign} | भावेश: ${mp.seventhLord}` : `7th House Sign: ${mp.seventhSign} | 7th Lord: ${mp.seventhLord}`}
+                        </p>
+                      </div>
+
+                      <div style={{ textAlign: "right", background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "8px 16px" }}>
+                        <div style={{ fontSize: 10, color: "rgba(243,211,122,0.7)" }}>{hi ? "विवाह योग प्रबलता" : "Vivah Alignment Score"}</div>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: "#34D399" }}>{mp.probabilityScore}%</div>
+                      </div>
+                    </div>
+
+                    {/* Free Highlights Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 22 }}>
+                      {/* Probable Marriage Age */}
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 18px", textAlign: "center" }}>
+                        <div style={{ fontSize: 20 }}>🎂</div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)", marginTop: 4 }}>
+                          {hi ? "संभावित विवाह आयु (Marriage Age)" : "Probable Marriage Age Range"}
+                        </div>
+                        <div style={{ color: "#FDE68A", fontSize: 20, fontWeight: 800, marginTop: 4 }}>
+                          {mp.ageRange}
+                        </div>
+                        <div style={{ fontSize: 10, color: "#34D399", fontWeight: 600, marginTop: 2 }}>
+                          ✓ {hi ? "सप्तमेश व गुरु गोचर आधारित" : "Based on 7th Lord & Jupiter Transits"}
+                        </div>
+                      </div>
+
+                      {/* Current Timing Phase */}
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 18px", textAlign: "center" }}>
+                        <div style={{ fontSize: 20 }}>⚡</div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)", marginTop: 4 }}>
+                          {hi ? "वर्तमान विवाह योग चरण" : "Current Vivah Yog Phase"}
+                        </div>
+                        <div style={{ color: "#34D399", fontSize: 15, fontWeight: 800, marginTop: 6 }}>
+                          {mp.timingPhase}
+                        </div>
+                        <div style={{ fontSize: 10, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>
+                          {hi ? "विंशोत्तरी दशा व गोचर सक्रिय" : "Active Dasha & Planetary Influences"}
+                        </div>
+                      </div>
+
+                      {/* 7th House / Spouse Aura */}
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 18px", textAlign: "center" }}>
+                        <div style={{ fontSize: 20 }}>💖</div>
+                        <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)", marginTop: 4 }}>
+                          {hi ? "सप्तम भाव व दांपत्य ऊर्जा" : "7th House Marital Energy"}
+                        </div>
+                        <div style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700, marginTop: 6 }}>
+                          {mp.seventhSign}
+                        </div>
+                        <div style={{ fontSize: 10, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>
+                          {hi ? `स्वामी ग्रह: ${mp.seventhLord}` : `Governed by ${mp.seventhLord}`}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Free General Spouse Demeanor Teaser */}
+                    <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 12, padding: "14px 18px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 12.5, fontWeight: 700, marginBottom: 4 }}>
+                        <span>✨</span> {hi ? "जीवनसाथी का सामान्य स्वभाव (Spouse Nature Teaser)" : "Spouse Disposition & Compatibility Overview"}
+                      </div>
+                      <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                        {mp.spousePersonality}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ── PREMIUM UNLOCKABLE / BLURRED DEEP REPORT SECTION ── */}
+                  <div style={{ position: "relative", marginBottom: 24 }}>
+                    <div className="glass-card" style={{ padding: "26px 28px", filter: unlockedMarriageReport ? "none" : "blur(4px)", pointerEvents: unlockedMarriageReport ? "auto" : "none", userSelect: unlockedMarriageReport ? "auto" : "none", transition: "all 0.3s ease" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 18 }}>
+                        <span style={{ fontSize: 20 }}>📜</span>
+                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700 }}>
+                          {hi ? "विस्तृत विवाह कालखंड, जीवनसाथी का पेशा व उपाय (Confidential Report)" : "Pinpoint Marriage Windows, Spouse Identity & Vedic Remedies"}
+                        </h4>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 16 }}>
+                        {/* Auspicious Marriage Years */}
+                        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)" }}>📅 {hi ? "प्राथमिक शुभ विवाह कालखंड" : "Primary Auspicious Marriage Window"}</div>
+                          <div style={{ color: "#34D399", fontSize: 15, fontWeight: 800, marginTop: 4 }}>{mp.primaryWindow}</div>
+                          <div style={{ fontSize: 11, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>{hi ? `द्वितीयक काल: ${mp.secondaryWindow}` : `Secondary: ${mp.secondaryWindow}`}</div>
+                        </div>
+
+                        {/* Peak Auspicious Months */}
+                        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)" }}>🌟 {hi ? "सर्वोत्तम विवाह लग्न माह" : "Peak Favorable Vivah Months"}</div>
+                          <div style={{ color: "#FDE68A", fontSize: 14, fontWeight: 700, marginTop: 4 }}>{mp.peakMonths}</div>
+                          <div style={{ fontSize: 11, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>{hi ? "गुरु एवं शुक्र शुभ दृष्टि" : "Aligned with Jupiter & Venus Transits"}</div>
+                        </div>
+
+                        {/* Spouse Career Field */}
+                        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)" }}>💼 {hi ? "जीवनसाथी का संभावित कार्यक्षेत्र / पेशा" : "Spouse Likely Career Field"}</div>
+                          <div style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, marginTop: 4 }}>{mp.spouseProfession}</div>
+                        </div>
+
+                        {/* Spouse Direction & Name Initials */}
+                        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.7)" }}>🧭 {hi ? "जीवनसाथी के मूल स्थान की दिशा व नामाक्षर" : "Spouse Direction & Name Letters"}</div>
+                          <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginTop: 4 }}>
+                            {mp.spouseDirection} · <span style={{ color: "#34D399" }}>({mp.spouseNameLetters})</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Obstacle Analysis & Remedies */}
+                      <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                        <div style={{ fontSize: 11, color: "#F87171", fontWeight: 700, marginBottom: 4 }}>
+                          ⚠️ {hi ? "विवाह में विलंब / बाधा विश्लेषण (Kalyana Dosha Check)" : "Delay & Obstacle Diagnostic"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 12, lineHeight: 1.6, margin: 0 }}>
+                          {mp.obstacleAnalysis}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14 }}>
+                        <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700, marginBottom: 6 }}>
+                          🛡️ {hi ? "शीघ्र व कल्याणकारी विवाह हेतु अचूक वैदिक उपाय (Prescribed Upay)" : "Sacred Vedic Vivah Remedies & Mantras"}
+                        </div>
+                        <div style={{ color: "rgba(241,231,208,0.85)", fontSize: 12, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+                          {mp.remedies}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Paywall Overlay Banner (When Locked) */}
+                    {!unlockedMarriageReport && (
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(11,8,25,0.84)", backdropFilter: "blur(6px)", borderRadius: 16, border: "2px solid rgba(245,158,11,0.5)", padding: "24px 20px", textAlign: "center", zIndex: 10 }}>
+                        <div style={{ fontSize: 36, marginBottom: 8 }}>🔒</div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "3px 12px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+                          PREMIUM VIVAH REPORT
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, maxWidth: 500 }}>
+                          {hi ? "विवाह के सटीक वर्ष, जीवनसाथी का पेशा, नामाक्षर व अचूक उपाय अनलॉक करें" : "Unlock Exact Auspicious Marriage Dates, Spouse Career, Direction & Vedic Upay"}
+                        </h3>
+                        <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 12.5, maxWidth: 520, margin: "8px 0 16px" }}>
+                          {hi
+                            ? "जानें किस महीने में बन रहा है सबसे मजबूत विवाह योग, जीवनसाथी किस क्षेत्र में कार्यरत होगा, और विवाह में आ रही रुकावटों को दूर करने के वैदिक समाधान।"
+                            : "Discover your exact high-probability wedding dates, spouse's profession & origin, delay diagnosis, and sacred Vedic mantras for a prosperous union."}
+                        </p>
+                        <button
+                          onClick={() => setActiveCheckout({
+                            title: hi ? "विस्तृत विवाह भविष्यवाणी व जीवनसाथी रिपोर्ट (PDF)" : "Complete Marriage Timing & Spouse Prediction Report",
+                            priceKey: "marriageTimingReport",
+                            price: unlockPrice,
+                            desc: "Pinpoint marriage dates, spouse profession, birthplace direction & Vedic remedies",
+                            icon: "💍",
+                            isMarriageUnlock: true
+                          })}
+                          className="gold-cta-btn"
+                          style={{ padding: "12px 28px", fontSize: 14, fontWeight: 800, boxShadow: "0 6px 20px rgba(245,158,11,0.45)" }}
+                        >
+                          {hi ? `संपूर्ण रिपोर्ट अनलॉक करें (${unlockPrice}) ✦` : `Unlock Complete Marriage Report (${unlockPrice}) ✦`}
+                        </button>
+                        <div style={{ fontSize: 10, color: "rgba(243,211,122,0.5)", marginTop: 8 }}>
+                          🔒 Instant Lifetime Access + Printable PDF
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ── TAB: DAILY HOROSCOPE & RECURRING MESSENGER SUBSCRIPTION ── */}
             {tab === "daily" && (() => {

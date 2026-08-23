@@ -666,6 +666,14 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     lang
   });
 
+  const marriagePrediction = calculateMarriagePrediction({
+    name,
+    dob,
+    lagnaSign: ascSign.name,
+    rashiSign: moonSign.name,
+    lang
+  });
+
   return {
     lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
     lagnaSign: ascSign.name,
@@ -695,7 +703,146 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     verdict: verdictText,
     houses,
     planetData,
-    annualTransit
+    annualTransit,
+    marriagePrediction
+  };
+}
+
+/* -------------------------------------------------------------
+   MARRIAGE AGE, TIMING & SPOUSE PREDICTION ENGINE
+------------------------------------------------------------- */
+export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", rashiSign = "Aries", lang = "en" }) {
+  const isHi = lang === "hi";
+  const birthDate = new Date(dob || "1998-01-01");
+  const birthYear = isNaN(birthDate.getFullYear()) ? 1998 : birthDate.getFullYear();
+  const currentYear = new Date().getFullYear();
+  const age = Math.max(18, currentYear - birthYear);
+
+  const lagnaIndex = Math.max(0, SIGNS.findIndex(s => s.name.toLowerCase() === lagnaSign.toLowerCase()));
+  const rashiIndex = Math.max(0, SIGNS.findIndex(s => s.name.toLowerCase() === rashiSign.toLowerCase()));
+  
+  // 7th House from Lagna
+  const seventhHouseIndex = (lagnaIndex + 6) % 12;
+  const seventhSign = SIGNS[seventhHouseIndex];
+  const seventhLord = seventhSign.lord;
+
+  // Base marriage age window derived deterministically
+  const seed = (birthYear * 7 + (birthDate.getMonth() + 1) * 13 + lagnaIndex * 19 + rashiIndex * 23) % 100;
+  
+  let baseMinAge = 24 + (seed % 4); // 24, 25, 26, 27
+  let baseMaxAge = baseMinAge + 2.5 + (seed % 2); // e.g. 26.5 to 29.5
+  
+  // If lagna or 7th lord is Saturn / Rahu influenced, add maturity years
+  if (seventhLord === "Saturn" || seventhSign.name === "Capricorn" || seventhSign.name === "Aquarius") {
+    baseMinAge += 2;
+    baseMaxAge += 2;
+  }
+
+  const ageRange = `${baseMinAge} – ${Math.round(baseMaxAge)} ${isHi ? "वर्ष" : "Years"}`;
+
+  // Timing phase status
+  let timingPhaseEn = "High Auspicious Vivah Yog Active";
+  let timingPhaseHi = "प्रबल विवाह योग सक्रिय (शुभ काल)";
+  if (age < baseMinAge - 1) {
+    timingPhaseEn = "Formative & Career Consolidation Phase";
+    timingPhaseHi = "शिक्षा व करियर सुदृढ़ीकरण काल";
+  } else if (age > baseMaxAge + 1) {
+    timingPhaseEn = "Karmic Dharma & Mature Vivah Window";
+    timingPhaseHi = "परिपक्व विवाह योग एवं आध्यात्मिक काल";
+  }
+
+  // Auspicious Years Window
+  const startYear = Math.max(currentYear, birthYear + baseMinAge);
+  const endYear = startYear + 2;
+  const primaryWindow = isHi 
+    ? `${startYear} के उत्तरार्ध से ${endYear} के मध्य तक` 
+    : `Late ${startYear} – Mid ${endYear}`;
+  
+  const secondaryWindow = isHi 
+    ? `${endYear + 1} – ${endYear + 2}` 
+    : `Early ${endYear + 1} – Late ${endYear + 2}`;
+
+  const favorableMonthsEn = ["November", "December", "January", "February", "April", "May"];
+  const favorableMonthsHi = ["नवंबर", "दिसंबर", "जनवरी", "फरवरी", "अप्रैल", "मई"];
+  const peakMonths = isHi 
+    ? [favorableMonthsHi[seed % 6], favorableMonthsHi[(seed + 2) % 6], favorableMonthsHi[(seed + 4) % 6]].join(", ")
+    : [favorableMonthsEn[seed % 6], favorableMonthsEn[(seed + 2) % 6], favorableMonthsEn[(seed + 4) % 6]].join(", ");
+
+  // Spouse Direction
+  const directions = [
+    { en: "North / North-East", hi: "उत्तर / ईशान कोण (North-East)" },
+    { en: "East / North-East", hi: "पूर्व / ईशान कोण (East/North-East)" },
+    { en: "South / South-West", hi: "दक्षिण / नैऋत्य कोण (South/South-West)" },
+    { en: "West / North-West", hi: "पश्चिम / वायव्य कोण (West/North-West)" }
+  ];
+  const spouseDirection = isHi ? directions[seventhHouseIndex % 4].hi : directions[seventhHouseIndex % 4].en;
+
+  // Spouse Career Field
+  const professionsEn = [
+    "Technology, Software Engineering, IT & Digital Architecture",
+    "Banking, Financial Strategy, Corporate Consulting & Analytics",
+    "Civil Administration, Governance, Law & Public Policy",
+    "Healthcare, Medical Research, Pharmaceuticals & Biotech",
+    "Architecture, Luxury Design, Media & Creative Entrepreneurship",
+    "Higher Academia, Scientific Research & Global Consulting"
+  ];
+  const professionsHi = [
+    "प्रौद्योगिकी, सॉफ्टवेयर इंजीनियरिंग, आईटी एवं डेटा साइंस",
+    "बैंकिंग, वित्तीय परामर्श, कॉर्पोरेट प्रबंधन व विश्लेषण",
+    "प्रशासनिक सेवा, विधि (Law), नीति निर्माण व उच्च प्रबंधन",
+    "चिकित्सा (Medicine), स्वास्थ्य सेवा, फार्मास्युटिकल व शोध",
+    "वास्तुकला (Architecture), डिजाइन, मीडिया व स्वतंत्र व्यवसाय",
+    "उच्च शिक्षा, वैज्ञानिक अनुसंधान व वैश्विक कंसल्टिंग"
+  ];
+  const spouseProfession = isHi ? professionsHi[seventhHouseIndex % 6] : professionsEn[seventhHouseIndex % 6];
+
+  // Spouse Personality Traits
+  const traitsEn = [
+    "Intellectually refined, graceful in demeanor, values harmony, strong aesthetic appreciation, and deeply family-oriented.",
+    "Driven and pragmatic, sharp leadership instincts, steadfast loyalty, and offers high emotional stability in partnerships.",
+    "Warm-hearted, compassionate, deeply spiritual and ethical, with a keen sense of humor and supportive communication.",
+    "Highly ambitious, analytical problem-solver, elegant communicator, with a dignified presence in social circles."
+  ];
+  const traitsHi = [
+    "बौद्धिक रूप से प्रखर, शालीन व गरिमामयी व्यक्तित्व, सौंदर्य व कलाप्रिय, पारिवारिक मूल्यों के प्रति अत्यंत समर्पित।",
+    "दृढ़ संकल्पी, व्यवहारकुशल, नेतृत्व क्षमता से युक्त, निष्ठावान और कठिन परिस्थितियों में संबल देने वाले।",
+    "सहानुभूतिपूर्ण, आध्यात्मिक व नीतिनिष्ठ, मिलनसार स्वभाव और खुले संवाद को प्राथमिकता देने वाले जीवनसाथी।",
+    "महत्वाकांक्षी, तार्किक चिंतन, समाज में प्रतिष्ठित और एक दूसरे के आत्म-सम्मान का आदर करने वाले।"
+  ];
+  const spousePersonality = isHi ? traitsHi[seed % 4] : traitsEn[seed % 4];
+
+  // Name Initials
+  const nameLetterSets = ["A, S, R, K", "M, P, V, N", "D, T, B, H", "J, G, L, S", "Y, C, K, A"];
+  const nameLetterSetsHi = ["अ, स, र, क", "म, प, व, न", "द, त, ब, ह", "ज, ग, ल, श", "य, च, क, आ"];
+  const spouseNameLetters = isHi ? nameLetterSetsHi[seed % 5] : nameLetterSets[seed % 5];
+
+  // Obstacle/Dosha Assessment
+  const obstacleEn = (seventhLord === "Saturn" || seed % 3 === 0)
+    ? "Minor Saturnian/Karmic delay pattern. Marriage yields profound long-term stability when solemnized after age 25. Regular Gauri-Shankar worship dissolves all hurdles."
+    : "Unobstructed smooth Vivah Yog. Planetary alignments favor peaceful matrimonial negotiation without prolonged delays.";
+  const obstacleHi = (seventhLord === "Saturn" || seed % 3 === 0)
+    ? "शनि अथवा कर्म भाव के प्रभाव से विवाह में कुछ विलंब या विचार-विमर्श में समय लग सकता है। २५ वर्ष के उपरांत विवाह अत्यंत शुभ व स्थायी रहता है। गौरी-शंकर उपासना से सभी अवरोध समाप्त होते हैं।"
+    : "कुंडली में निर्बाध शुभ विवाह योग है। ग्रहों की स्थिति अनुकूल है और वैवाहिक वार्ता शीघ्रता से सकारात्मक परिणाम देगी।";
+
+  // Prescribed Vivah Remedies
+  const remedyEn = `• Sacred Recitation: Chant the Swayamvara Parvati Mantra or "Om Namah Shivaya" 108 times on Mondays.\n• Jupiter Blessing: Offer water to a Peepal or Banana tree on Thursdays and donate yellow lentils (Chana Dal).\n• Gauri-Shankar Harmony: Fast or perform peaceful Shiva-Parvati puja on Pradosh Vrat for an auspicious life partner.`;
+  const remedyHi = `• मंत्र जप: नित्य प्रातः "ॐ गौरीशंकराय नमः" अथवा स्वयंवर पार्वती मंत्र का १०८ बार जप करें।\n• गुरु ग्रह का आशीर्वाद: गुरुवार को केले अथवा पीपल के वृक्ष में जल अर्पित करें और चने की दाल या पीली वस्तुओं का दान करें।\n• शिव-पार्वती आराधना: प्रदोष काल में शिवलिंग पर कच्चा दूध व बेलपत्र अर्पित करें, शीघ्र व सुयोग्य जीवनसाथी का योग बनेगा।`;
+
+  return {
+    ageRange,
+    timingPhase: isHi ? timingPhaseHi : timingPhaseEn,
+    probabilityScore: Math.min(96, 82 + (seed % 14)),
+    primaryWindow,
+    secondaryWindow,
+    peakMonths,
+    seventhSign: `${seventhSign.name} (${seventhSign.sanskrit})`,
+    seventhLord,
+    spouseDirection,
+    spouseProfession,
+    spousePersonality,
+    spouseNameLetters,
+    obstacleAnalysis: isHi ? obstacleHi : obstacleEn,
+    remedies: isHi ? remedyHi : remedyEn
   };
 }
 
