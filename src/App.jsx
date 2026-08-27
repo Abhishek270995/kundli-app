@@ -52,9 +52,11 @@ const UI = {
     formTitle: "Enter Your Birth Details",
     formSub: "Accurate planetary calculations according to traditional Parashari Vedic Astrology",
     fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth",
+    fTobHelp: "(12:00 PM if unsure)",
     phName: "e.g. Abhishek Kumar Singh", phPob: "e.g. Kanpur, Uttar Pradesh, India",
     btnGo: "Reveal My Kundli ✦", btnWait: "Consulting the Stars...",
     errFields: "Please fill in your Name, Date of Birth, and Place of Birth.",
+    errPartnerFields: "Please enter partner name and date of birth.",
     errApi: "Unable to generate Kundli. Please verify your details and try again.",
     s1: "Calculating exact planetary coordinates & Lagna...",
     s2: "Synthesizing 12 Bhavas, Yogas, Dashas & Life Predictions...",
@@ -90,6 +92,23 @@ const UI = {
     editBtn: "Edit Details",
     footer1: "✦ OM TAT SAT ✦",
     footer2: "Authentic Parashari Vedic Astrology Engine · Client Computation",
+    partnerName: "Partner Name",
+    partnerDob: "Date of Birth",
+    partnerTob: "Time of Birth",
+    partnerTobHelp: "(12:00 PM if unsure)",
+    partnerFormTitle: "Enter Partner's Details:",
+    calculateMatchBtn: "Calculate Gun Milan Compatibility ✦",
+    currencyLabel: "Select Currency",
+    deliveryTimeLabel: "Preferred Delivery Time",
+    checkoutWhatsAppLabel: "Your WhatsApp / Mobile Number",
+    checkoutWhatsAppHelp: "PDF report & confirmation will be sent here.",
+    checkoutUtrLabel: "12-Digit UPI Ref / UTR No.",
+    checkoutUtrHelp: "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt.",
+    cardNumberLabel: "Card Number",
+    cardExpiryLabel: "Card Expiry (MM/YY)",
+    cardCvvLabel: "Security Code (CVV)",
+    quickDailyPrompt: "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:",
+    quickDailyBtn: "Daily Horoscope",
   },
   hi: {
     title: "ज्योतिष कुंडली",
@@ -98,9 +117,11 @@ const UI = {
     formTitle: "अपना जन्म विवरण दर्ज करें",
     formSub: "पराशरी वैदिक ज्योतिष के प्रामाणिक सिद्धांतों पर आधारित सटीक गणना",
     fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान",
+    fTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
     phName: "उदा. अभिषेक कुमार सिंह", phPob: "उदा. कानपुर, उत्तर प्रदेश, भारत",
     btnGo: "मेरी कुंडली प्रकट करें ✦", btnWait: "ग्रहों से परामर्श जारी है...",
-    errFields: "कृपया नाम, जन्म तिथि और जन्म स्थान भरें।",
+    errFields: "कृपया अपना पूरा नाम, जन्म तिथि और जन्म स्थान भरें।",
+    errPartnerFields: "कृपया जीवनसाथी का नाम और जन्म तिथि दर्ज करें।",
     errApi: "कुंडली गणना में त्रुटि हुई। कृपया विवरण पुनः जांचें।",
     s1: "ग्रह स्थितियों एवं लग्न की सटीक खगोलीय गणना...",
     s2: "१२ भावों, योगों, विंशोत्तरी दशा और जीवन फल का विश्लेषण...",
@@ -136,6 +157,23 @@ const UI = {
     editBtn: "विवरण बदलें",
     footer1: "✦ ॐ तत् सत् ✦",
     footer2: "प्रामाणिक वैदिक ज्योतिष गणना प्रणाली · सुरक्षित एवं पूर्णतः गोपनीय",
+    partnerName: "जीवनसाथी (Partner) का पूरा नाम",
+    partnerDob: "जन्म तिथि",
+    partnerTob: "जन्म समय",
+    partnerTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
+    partnerFormTitle: "द्वितीय जातक (Partner) का विवरण दर्ज करें:",
+    calculateMatchBtn: "गुण मिलान गणना करें ✦",
+    currencyLabel: "मुद्रा चुनें (Select Currency)",
+    deliveryTimeLabel: "प्राप्ति समय (Delivery Time)",
+    checkoutWhatsAppLabel: "आपका व्हाट्सएप / मोबाइल नंबर",
+    checkoutWhatsAppHelp: "PDF रिपोर्ट व पुष्टि इस नंबर पर भेजी जाएगी।",
+    checkoutUtrLabel: "12-अंकों का UPI UTR / Ref No.",
+    checkoutUtrHelp: "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।",
+    cardNumberLabel: "कार्ड नंबर (Card Number)",
+    cardExpiryLabel: "समाप्ति तिथि (MM/YY)",
+    cardCvvLabel: "सुरक्षा कोड (CVV)",
+    quickDailyPrompt: "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:",
+    quickDailyBtn: "दैनिक राशिफल (Daily Horoscope)",
   }
 };
 
@@ -542,7 +580,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
             <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 14px", marginBottom: 16 }}>
               {/* WhatsApp Number Field */}
               <div style={{ marginBottom: currency === "INR" && method === "upi" ? 14 : 0 }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                <label htmlFor="checkout-whatsapp-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
                   <span>📱</span> {hi ? "आपका व्हाट्सएप / मोबाइल नंबर *" : "Your WhatsApp / Mobile Number *"}
                 </label>
                 <div style={{ display: "flex", gap: 6 }}>
@@ -550,7 +588,12 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                     {CURRENCIES[currency]?.flag || "🌐"}
                   </div>
                   <input
+                    id="checkout-whatsapp-input"
+                    name="whatsapp"
                     type="tel"
+                    required
+                    aria-required="true"
+                    aria-label={hi ? "व्हाट्सएप या मोबाइल नंबर" : "WhatsApp or Mobile Number"}
                     value={whatsapp}
                     onChange={e => setWhatsapp(e.target.value)}
                     placeholder="e.g. +91 9876543210"
@@ -565,11 +608,16 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
               {/* 12-Digit UTR Field (Shown for Indian UPI payments) */}
               {currency === "INR" && method === "upi" && (
                 <div>
-                  <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <label htmlFor="checkout-utr-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
                     <span>🔢</span> {hi ? "12-अंकों का UPI UTR / Ref No. *" : "12-Digit UPI Ref / UTR No. *"}
                   </label>
                   <input
+                    id="checkout-utr-input"
+                    name="utr"
                     type="text"
+                    required
+                    aria-required="true"
+                    aria-label={hi ? "12-अंकों का UPI UTR अथवा रेफरेंस नंबर" : "12-digit UPI UTR or Reference Number"}
                     maxLength={16}
                     value={utr}
                     onChange={e => setUtr(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
@@ -594,7 +642,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                 onClick={() => setCheckoutStep("pay")}
                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, color: "rgba(241,231,208,0.8)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
               >
-                ← Back
+                ← {hi ? "पीछे (Back)" : "Back"}
               </button>
               <button onClick={handleConfirmPayment} className="gold-cta-btn" style={{ padding: "12px 14px", fontSize: 13 }}>
                 {hi ? "सत्यापित करें एवं अनलॉक करें ✦" : `Confirm & Unlock (${displayPrice}) ✦`}
@@ -616,8 +664,8 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
             {/* Payment Mode Selector */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
               {[
-                { id: "upi", name: currency === "INR" ? "UPI / QR Code" : "UPI (INR Only)", icon: "📱" },
-                { id: "card", name: "Cards / NetBanking", icon: "💳" },
+                { id: "upi", name: currency === "INR" ? (hi ? "UPI / क्यूआर कोड" : "UPI / QR Code") : "UPI (INR Only)", icon: "📱" },
+                { id: "card", name: hi ? "कार्ड्स / नेटबैंकिंग" : "Cards / NetBanking", icon: "💳" },
               ].map(m => (
                 <button
                   key={m.id}
@@ -647,7 +695,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
             {method === "upi" ? (
               <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 14px", textAlign: "center", marginBottom: 16 }}>
                 <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "3px 10px", color: "#34D399", fontSize: 11, fontWeight: 700, marginBottom: 10 }}>
-                  <span>🔒</span> Amount Locked: ₹{inrPriceVal}.00
+                  <span>🔒</span> {hi ? `निर्धारित राशि: ₹${inrPriceVal}.00` : `Amount Locked: ₹${inrPriceVal}.00`}
                 </div>
 
                 {/* Amount-Enforced High-Contrast QR Code */}
@@ -660,7 +708,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                 </div>
 
                 <div style={{ marginTop: 10 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#F3D37A" }}>Payee: ABHISHEK KUMAR SINGH</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#F3D37A" }}>{hi ? "प्राप्तकर्ता:" : "Payee:"} ABHISHEK KUMAR SINGH</div>
                   <div style={{ fontSize: 11, color: "rgba(241,231,208,0.7)", marginTop: 2 }}>UPI ID: <code style={{ color: "#FDE68A" }}>8094199663@upi</code></div>
                 </div>
 
@@ -681,18 +729,53 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                     textDecoration: "none"
                   }}
                 >
-                  🚀 Tap to Open GPay / PhonePe / Paytm (₹{inrPriceVal})
+                  🚀 {hi ? `GPay / PhonePe / Paytm से ₹${inrPriceVal} का भुगतान करें` : `Tap to Open GPay / PhonePe / Paytm (₹${inrPriceVal})`}
                 </a>
               </div>
             ) : (
               <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14, marginBottom: 16 }}>
                 <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", marginBottom: 8 }}>
-                  Pay with Credit / Debit Card ({displayPrice})
+                  {hi ? `क्रेडिट / डेबिट कार्ड से भुगतान करें (${displayPrice})` : `Pay with Credit / Debit Card (${displayPrice})`}
                 </div>
-                <input placeholder="Card Number (0000 0000 0000 0000)" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12, marginBottom: 8 }} />
+                <div style={{ marginBottom: 8 }}>
+                  <label htmlFor="checkout-card-num" style={{ display: "block", fontSize: 10, color: "rgba(243,211,122,0.7)", marginBottom: 4 }}>
+                    {hi ? "कार्ड नंबर" : "Card Number"}
+                  </label>
+                  <input
+                    id="checkout-card-num"
+                    name="cardNumber"
+                    aria-label={hi ? "कार्ड नंबर" : "Card Number"}
+                    placeholder="0000 0000 0000 0000"
+                    style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }}
+                  />
+                </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  <input placeholder="MM/YY" style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }} />
-                  <input placeholder="CVV" type="password" maxLength={3} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }} />
+                  <div>
+                    <label htmlFor="checkout-card-exp" style={{ display: "block", fontSize: 10, color: "rgba(243,211,122,0.7)", marginBottom: 4 }}>
+                      {hi ? "समाप्ति (MM/YY)" : "Expiry (MM/YY)"}
+                    </label>
+                    <input
+                      id="checkout-card-exp"
+                      name="cardExpiry"
+                      aria-label={hi ? "समाप्ति तिथि" : "Card Expiry"}
+                      placeholder="MM/YY"
+                      style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="checkout-card-cvv" style={{ display: "block", fontSize: 10, color: "rgba(243,211,122,0.7)", marginBottom: 4 }}>
+                      {hi ? "सुरक्षा कोड (CVV)" : "Security Code (CVV)"}
+                    </label>
+                    <input
+                      id="checkout-card-cvv"
+                      name="cardCvv"
+                      aria-label={hi ? "सुरक्षा कोड CVV" : "Card Security Code CVV"}
+                      placeholder="CVV"
+                      type="password"
+                      maxLength={4}
+                      style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "8px 10px", color: "#FFF", fontSize: 12 }}
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -812,7 +895,7 @@ export default function App() {
 
   const handleRunGunMilan = () => {
     if (!partnerForm.name || !partnerForm.dob) {
-      alert("Please enter partner name and date of birth.");
+      alert(t.errPartnerFields || (hi ? "कृपया जीवनसाथी का नाम और जन्म तिथि दर्ज करें।" : "Please enter partner name and date of birth."));
       return;
     }
     const res = calculateGunMilan({
@@ -825,6 +908,9 @@ export default function App() {
   const handleLangToggle = () => {
     const newLang = lang === "en" ? "hi" : "en";
     setLang(newLang);
+    if (err) {
+      setErr(UI[newLang].errFields);
+    }
     if (result && form.dob && form.pob) {
       try {
         const updated = generateVedicKundliData({
@@ -1004,6 +1090,8 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             {/* Currency Selector */}
             <select
+              id="header-currency-select"
+              aria-label={t.currencyLabel}
               value={currency}
               onChange={e => setCurrency(e.target.value)}
               style={{
@@ -1089,36 +1177,49 @@ export default function App() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
+              <label htmlFor="birth-name" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>👤</span> {t.fName} *
               </label>
               <input
+                id="birth-name"
+                name="name"
                 type="text"
+                required
+                aria-required="true"
+                aria-label={t.fName}
                 value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
+                onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
                 placeholder={t.phName}
                 style={{ width: "100%", background: "rgba(11, 8, 25, 0.6)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "12px 14px", color: "#FFF", fontSize: 14, fontFamily: "inherit", colorScheme: "dark" }}
               />
             </div>
 
             <div>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
+              <label htmlFor="birth-dob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>📅</span> {t.fDob} *
               </label>
               <input
+                id="birth-dob"
+                name="dob"
                 type="date"
+                required
+                aria-required="true"
+                aria-label={t.fDob}
                 value={form.dob}
-                onChange={e => setForm({ ...form, dob: e.target.value })}
+                onChange={e => { setForm({ ...form, dob: e.target.value }); if (err) setErr(""); }}
                 style={{ width: "100%", background: "rgba(11, 8, 25, 0.6)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "12px 14px", color: "#FFF", fontSize: 14, fontFamily: "inherit", colorScheme: "dark" }}
               />
             </div>
 
             <div>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
-                <span>⏰</span> {t.fTob} (12:00 PM if unsure)
+              <label htmlFor="birth-tob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
+                <span>⏰</span> {t.fTob} <span style={{ fontSize: 10, color: "rgba(243, 211, 122, 0.55)", fontWeight: 400 }}>{t.fTobHelp}</span>
               </label>
               <input
+                id="birth-tob"
+                name="tob"
                 type="time"
+                aria-label={t.fTob}
                 value={form.tob}
                 onChange={e => setForm({ ...form, tob: e.target.value })}
                 style={{ width: "100%", background: "rgba(11, 8, 25, 0.6)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "12px 14px", color: "#FFF", fontSize: 14, fontFamily: "inherit", colorScheme: "dark" }}
@@ -1126,13 +1227,18 @@ export default function App() {
             </div>
 
             <div style={{ gridColumn: "1 / -1" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
+              <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: "rgba(243, 211, 122, 0.8)", marginBottom: 6, letterSpacing: 0.5 }}>
                 <span>📍</span> {t.fPob} *
               </label>
               <input
+                id="birth-pob"
+                name="pob"
                 type="text"
+                required
+                aria-required="true"
+                aria-label={t.fPob}
                 value={form.pob}
-                onChange={e => setForm({ ...form, pob: e.target.value })}
+                onChange={e => { setForm({ ...form, pob: e.target.value }); if (err) setErr(""); }}
                 placeholder={t.phPob}
                 style={{ width: "100%", background: "rgba(11, 8, 25, 0.6)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "12px 14px", color: "#FFF", fontSize: 14, fontFamily: "inherit", colorScheme: "dark" }}
               />
@@ -1782,10 +1888,12 @@ export default function App() {
 
                             {/* Preferred Delivery Time */}
                             <div>
-                              <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                              <label htmlFor="daily-delivery-time-select" style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
                                 {hi ? "प्राप्ति समय (Delivery Time):" : "Preferred Time:"}
                               </label>
                               <select
+                                id="daily-delivery-time-select"
+                                aria-label={t.deliveryTimeLabel}
                                 value={dailyTime}
                                 onChange={e => setDailyTime(e.target.value)}
                                 style={{
@@ -1800,9 +1908,9 @@ export default function App() {
                                   outline: "none"
                                 }}
                               >
-                                <option value="07:00 AM" style={{ background: "#0B0819" }}>🌅 07:00 AM (Morning Sunrise - Recommended)</option>
-                                <option value="06:00 AM" style={{ background: "#0B0819" }}>🌄 06:00 AM (Early Morning Riser)</option>
-                                <option value="08:00 PM" style={{ background: "#0B0819" }}>🌙 08:00 PM (Night Before Preview)</option>
+                                <option value="07:00 AM" style={{ background: "#0B0819" }}>{hi ? "🌅 07:00 AM (सूर्योदय - अनुशंसित)" : "🌅 07:00 AM (Morning Sunrise - Recommended)"}</option>
+                                <option value="06:00 AM" style={{ background: "#0B0819" }}>{hi ? "🌄 06:00 AM (प्रातः काल)" : "🌄 06:00 AM (Early Morning Riser)"}</option>
+                                <option value="08:00 PM" style={{ background: "#0B0819" }}>{hi ? "🌙 08:00 PM (एक शाम पूर्व पूर्वावलोकन)" : "🌙 08:00 PM (Night Before Preview)"}</option>
                               </select>
                             </div>
                           </div>
@@ -1968,24 +2076,58 @@ export default function App() {
                 {/* Partner Form */}
                 <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "18px 20px", marginBottom: 20 }}>
                   <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-                    {hi ? "द्वितीय जातक (Partner) का विवरण दर्ज करें:" : "Enter Partner's Details:"}
+                    {t.partnerFormTitle}
                   </h4>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Partner Name *</label>
-                      <input placeholder="e.g. Priya Sharma" value={partnerForm.name} onChange={e => setPartnerForm({ ...partnerForm, name: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13 }} />
+                      <label htmlFor="partner-name-input" style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", display: "block", marginBottom: 4, fontWeight: 600 }}>
+                        {t.partnerName} *
+                      </label>
+                      <input
+                        id="partner-name-input"
+                        name="partnerName"
+                        required
+                        aria-required="true"
+                        aria-label={t.partnerName}
+                        placeholder={hi ? "उदा. प्रिया शर्मा" : "e.g. Priya Sharma"}
+                        value={partnerForm.name}
+                        onChange={e => setPartnerForm({ ...partnerForm, name: e.target.value })}
+                        style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13 }}
+                      />
                     </div>
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Date of Birth *</label>
-                      <input type="date" value={partnerForm.dob} onChange={e => setPartnerForm({ ...partnerForm, dob: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }} />
+                      <label htmlFor="partner-dob-input" style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", display: "block", marginBottom: 4, fontWeight: 600 }}>
+                        {t.partnerDob} *
+                      </label>
+                      <input
+                        id="partner-dob-input"
+                        name="partnerDob"
+                        type="date"
+                        required
+                        aria-required="true"
+                        aria-label={t.partnerDob}
+                        value={partnerForm.dob}
+                        onChange={e => setPartnerForm({ ...partnerForm, dob: e.target.value })}
+                        style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }}
+                      />
                     </div>
                     <div>
-                      <label style={{ fontSize: 10, color: "rgba(243,211,122,0.8)", display: "block", marginBottom: 4 }}>Time of Birth</label>
-                      <input type="time" value={partnerForm.tob} onChange={e => setPartnerForm({ ...partnerForm, tob: e.target.value })} style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }} />
+                      <label htmlFor="partner-tob-input" style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", display: "block", marginBottom: 4, fontWeight: 600 }}>
+                        {t.partnerTob} <span style={{ fontSize: 10, color: "rgba(243,211,122,0.55)", fontWeight: 400 }}>{t.partnerTobHelp}</span>
+                      </label>
+                      <input
+                        id="partner-tob-input"
+                        name="partnerTob"
+                        type="time"
+                        aria-label={t.partnerTob}
+                        value={partnerForm.tob}
+                        onChange={e => setPartnerForm({ ...partnerForm, tob: e.target.value })}
+                        style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }}
+                      />
                     </div>
                   </div>
                   <button onClick={handleRunGunMilan} className="gold-cta-btn" style={{ marginTop: 14, padding: "10px 18px", fontSize: 13 }}>
-                    {hi ? "गुण मिलान गणना करें ✦" : "Calculate Gun Milan Compatibility ✦"}
+                    {t.calculateMatchBtn}
                   </button>
                 </div>
 
