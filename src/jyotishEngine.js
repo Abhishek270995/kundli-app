@@ -292,13 +292,13 @@ export function calculateGunMilan({ partner1, partner2 }) {
   const p2Manglik = [1, 4, 7, 8, 12].includes(mars2H);
 
   let matchVerdict = "Excellent Match (Uttam)";
-  let matchVerdictHi = "उत्कृष्ट एवं अत्यंत शुभ मिलान (Uttam)";
+  let matchVerdictHi = "उत्कृष्ट एवं अत्यंत शुभ मिलान (उत्तम)";
   if (totalGunas < 18) {
     matchVerdict = "Challenging Compatibility (Remedies Advised)";
-    matchVerdictHi = "सावधानी एवं वैदिक उपाय आवश्यक (Challenging)";
+    matchVerdictHi = "सावधानी एवं वैदिक उपाय आवश्यक (चुनौतीपूर्ण)";
   } else if (totalGunas <= 25) {
     matchVerdict = "Good & Harmonious Match (Madhyam)";
-    matchVerdictHi = "शुभ एवं सामंजस्यपूर्ण मिलान (Madhyam)";
+    matchVerdictHi = "शुभ एवं सामंजस्यपूर्ण मिलान (मध्यम)";
   }
 
   return {
@@ -310,18 +310,77 @@ export function calculateGunMilan({ partner1, partner2 }) {
     p1: { name: partner1.name, sign: sign1.name, signHi: sign1.sanskrit, nak: nak1.name, nakHi: nak1.hindi, pada: nak1.pada, manglik: p1Manglik },
     p2: { name: partner2.name, sign: sign2.name, signHi: sign2.sanskrit, nak: nak2.name, nakHi: nak2.hindi, pada: nak2.pada, manglik: p2Manglik },
     kootas: [
-      { name: "Varna Koota (Spiritual / Work Ego)", score: varnaScore, max: 1, desc: "Soul temperament and spiritual compatibility" },
-      { name: "Vashya Koota (Dominance / Harmony)", score: vashyaScore, max: 2, desc: "Mutual attraction, influence and emotional alignment" },
-      { name: "Tara Koota (Destiny / Health)", score: taraScore, max: 3, desc: "Longevity, health resilience and fortune bonding" },
-      { name: "Yoni Koota (Physical / Biology)", score: yoniScore, max: 4, desc: "Physical harmony, biological chemistry and intimacy" },
-      { name: "Graha Maitri (Psychological Bond)", score: maitriScore, max: 5, desc: "Intellectual friendship and daily worldview resonance" },
-      { name: "Gana Koota (Temperament / Behavior)", score: ganaScore, max: 6, desc: "Social behavior, core lifestyle and lifestyle values" },
-      { name: "Bhakoot Koota (Family / Prosperity)", score: bhakootScore, max: 7, desc: "Financial growth, emotional longevity and offspring" },
-      { name: "Nadi Koota (Genetic / Prana Resonance)", score: nadiScore, max: 8, desc: "Hereditary vitality, neurological harmony and progeny" }
+      {
+        name: "Varna Koota (Spiritual / Work Ego)",
+        nameHi: "वर्ण कूट (आत्मिक व कार्य स्वभाव)",
+        score: varnaScore,
+        max: 1,
+        desc: "Soul temperament and spiritual compatibility",
+        descHi: "आत्मिक स्वभाव एवं आध्यात्मिक अनुकूलता"
+      },
+      {
+        name: "Vashya Koota (Dominance / Harmony)",
+        nameHi: "वश्य कूट (परस्पर आकर्षण व नियंत्रण)",
+        score: vashyaScore,
+        max: 2,
+        desc: "Mutual attraction, influence and emotional alignment",
+        descHi: "परस्पर आकर्षण, भावनात्मक प्रभाव व संतुलन"
+      },
+      {
+        name: "Tara Koota (Destiny / Health)",
+        nameHi: "तारा कूट (भाग्य व स्वास्थ्य सुरक्षा)",
+        score: taraScore,
+        max: 3,
+        desc: "Longevity, health resilience and fortune bonding",
+        descHi: "दीर्घायु, आरोग्य एवं भाग्योदय का सम्बंध"
+      },
+      {
+        name: "Yoni Koota (Physical / Biology)",
+        nameHi: "योनि कूट (शारीरिक व जैविक आकर्षण)",
+        score: yoniScore,
+        max: 4,
+        desc: "Physical harmony, biological chemistry and intimacy",
+        descHi: "शारीरिक सामंजस्य, जैविक आकर्षण व अंतरंगता"
+      },
+      {
+        name: "Graha Maitri (Psychological Bond)",
+        nameHi: "ग्रह मैत्री (मानसिक व वैचारिक तालमेल)",
+        score: maitriScore,
+        max: 5,
+        desc: "Intellectual friendship and daily worldview resonance",
+        descHi: "बौद्धिक मित्रता एवं वैचारिक तालमेल"
+      },
+      {
+        name: "Gana Koota (Temperament / Behavior)",
+        nameHi: "गण कूट (स्वभाव व सामाजिक व्यवहार)",
+        score: ganaScore,
+        max: 6,
+        desc: "Social behavior, core lifestyle and lifestyle values",
+        descHi: "सामाजिक व्यवहार, स्वभाव व जीवन मूल्य"
+      },
+      {
+        name: "Bhakoot Koota (Family / Prosperity)",
+        nameHi: "भकूट कूट (पारिवारिक समृद्धि व संतान सुख)",
+        score: bhakootScore,
+        max: 7,
+        desc: "Financial growth, emotional longevity and offspring",
+        descHi: "आर्थिक उन्नति, भावनात्मक दीर्घायु व संतान सुख"
+      },
+      {
+        name: "Nadi Koota (Genetic / Prana Resonance)",
+        nameHi: "नाड़ी कूट (प्राण ऊर्जा व आनुवंशिक सामंजस्य)",
+        score: nadiScore,
+        max: 8,
+        desc: "Hereditary vitality, neurological harmony and progeny",
+        descHi: "आनुवंशिक आरोग्य, प्राण ऊर्जा व स्वस्थ संतति"
+      }
     ],
     manglikStatus: (p1Manglik === p2Manglik)
       ? "Both charts have matching Manglik energies — cancellation applies."
-      : "One partner is Manglik — simple Kumbh Vivah / Hanuman Chalisa remedies recommended for lasting harmony."
+      : "One partner is Manglik — simple Kumbh Vivah / Hanuman Chalisa remedies recommended for lasting harmony.",
+    manglikStatusHi: (p1Manglik === p2Manglik)
+      ? "दोनों कुंडलियों में समान मांगलिक ऊर्जा है — मांगलिक दोष का स्वतः परिहार (शमन) होता है।"
+      : "एक जातक मांगलिक है — वैवाहिक सुख व शांति हेतु सरल कुंभ विवाह / हनुमान चालीसा पाठ श्रेष्ठ है।"
   };
 }
 

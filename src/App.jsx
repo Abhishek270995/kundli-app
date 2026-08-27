@@ -1021,6 +1021,17 @@ export default function App() {
         console.error(e);
       }
     }
+    if (milanResult && partnerForm.name && partnerForm.dob) {
+      try {
+        const updatedMilan = calculateGunMilan({
+          partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
+          partner2: partnerForm
+        });
+        setMilanResult(updatedMilan);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   };
 
   return (
@@ -2778,7 +2789,7 @@ export default function App() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 16, marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
                       <div>
                         <div style={{ fontSize: 13, color: "rgba(241,231,208,0.8)" }}>
-                          {milanResult.p1.name} ({milanResult.p1.sign}) × {milanResult.p2.name} ({milanResult.p2.sign})
+                          {milanResult.p1.name} ({hi ? (milanResult.p1.signHi || milanResult.p1.sign) : milanResult.p1.sign}) × {milanResult.p2.name} ({hi ? (milanResult.p2.signHi || milanResult.p2.sign) : milanResult.p2.sign})
                         </div>
                         <h4 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, marginTop: 2 }}>
                           {hi ? milanResult.verdictHi : milanResult.verdict}
@@ -2788,7 +2799,9 @@ export default function App() {
                         <div style={{ fontSize: 26, fontWeight: 800, color: Number(milanResult.totalGunas) >= 18 ? "#34D399" : "#F87171" }}>
                           {milanResult.totalGunas} / {milanResult.maxGunas}
                         </div>
-                        <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>{milanResult.percentage}% Match Score</div>
+                        <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>
+                          {milanResult.percentage}% {hi ? "मिलान स्कोर" : "Match Score"}
+                        </div>
                       </div>
                     </div>
 
@@ -2797,17 +2810,19 @@ export default function App() {
                       {milanResult.kootas.map((k, idx) => (
                         <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 8, padding: "12px 14px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 800, color: "#FDE68A" }}>
-                            <span>{k.name}</span>
+                            <span>{hi ? (k.nameHi || k.name) : k.name}</span>
                             <span>{k.score}/{k.max}</span>
                           </div>
-                          <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.75)", marginTop: 3 }}>{k.desc}</div>
+                          <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.75)", marginTop: 3 }}>
+                            {hi ? (k.descHi || k.desc) : k.desc}
+                          </div>
                         </div>
                       ))}
                     </div>
 
                     {/* Manglik status */}
                     <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "12px 16px", fontSize: 13.5, color: "#FDE68A", marginBottom: 18 }}>
-                      🔥 <b>Manglik Alignment:</b> {milanResult.manglikStatus}
+                      🔥 <b>{hi ? "मांगलिक स्थिति व सामंजस्य:" : "Manglik Alignment:"}</b> {hi ? (milanResult.manglikStatusHi || milanResult.manglikStatus) : milanResult.manglikStatus}
                     </div>
 
                     {/* Pro compatibility report unlock */}
