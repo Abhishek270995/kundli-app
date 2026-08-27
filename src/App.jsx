@@ -879,6 +879,15 @@ export default function App() {
   const effectiveDailySubscribed = isAdmin || isDailySubscribed;
   const effectiveProUnlocked = isAdmin || unlockedProReport;
 
+  const [activePrintReport, setActivePrintReport] = useState("all");
+
+  const handlePrintReport = (reportType = "all") => {
+    setActivePrintReport(reportType);
+    setTimeout(() => {
+      window.print();
+    }, 120);
+  };
+
   const handleSecretTrigger = () => {
     setLogoClickCount(prev => {
       const next = prev + 1;
@@ -1322,7 +1331,7 @@ export default function App() {
 
             {result && (
               <button
-                onClick={() => window.print()}
+                onClick={() => handlePrintReport("all")}
                 style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 20, fontSize: 13, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 10px rgba(245,158,11,0.35)" }}
               >
                 <span>📥</span> {t.printBtn}
@@ -1825,7 +1834,7 @@ export default function App() {
 
                       {effectiveCareerUnlocked && (
                         <div style={{ textAlign: "center", paddingTop: 10 }}>
-                          <button onClick={() => window.print()} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+                          <button onClick={() => handlePrintReport("career")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
                             📄 {hi ? "करियर PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Career Report PDF"}
                           </button>
                         </div>
@@ -2033,7 +2042,7 @@ export default function App() {
 
                       {effectiveRemediesUnlocked && (
                         <div style={{ textAlign: "center", paddingTop: 14 }}>
-                          <button onClick={() => window.print()} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+                          <button onClick={() => handlePrintReport("remedies")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
                             📄 {hi ? "उपाय PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Remedies Dossier PDF"}
                           </button>
                         </div>
@@ -2234,6 +2243,14 @@ export default function App() {
                           {mp.remedies}
                         </div>
                       </div>
+
+                      {effectiveMarriageUnlocked && (
+                        <div style={{ textAlign: "center", paddingTop: 14 }}>
+                          <button onClick={() => handlePrintReport("marriage")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+                            📄 {hi ? "विवाह PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Marriage Report PDF"}
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Paywall Overlay Banner (When Locked) */}
@@ -3082,170 +3099,545 @@ export default function App() {
         )}
 
         {/* ══════════════════════════════════════════════════════════════════════
-            PRINT-ONLY FULL DETAILED REPORT (All Sections in Order, Clean PDF)
+            PRINT-ONLY FULL DETAILED REPORT (Dynamic based on activePrintReport)
         ══════════════════════════════════════════════════════════════════════ */}
-        {result && (
-          <div className="print-only-report">
-            <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
-              <div style={{ fontSize: 24, marginBottom: 4 }}>🔯</div>
-              <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 26, fontWeight: 800, letterSpacing: 2 }}>
-                JYOTISH KUNDLI — COMPLETE VEDIC REPORT
-              </h1>
-              <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 1, textTransform: "uppercase" }}>
-                {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
-              </p>
-            </div>
+        {result && (() => {
+          const cp = result.careerPrediction || calculateCareerPrediction({
+            name: form.name || "User",
+            dob: form.dob || "1998-01-01",
+            lagnaSign: result.lagnaSign,
+            rashiSign: result.rashiSign,
+            lang
+          });
 
-            <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "18px 22px", marginBottom: 24 }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-                ✦ CORE PANCHANG & VEDIC METRICS
-              </h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, textAlign: "center" }}>
-                {[
-                  { label: "Ascendant (Lagna)", val: result.lagna },
-                  { label: "Moon Sign (Rashi)", val: result.rashi },
-                  { label: "Nakshatra & Pada", val: result.nakshatra },
-                  { label: "Tithi", val: result.tithi },
-                  { label: "Yoga", val: result.yoga },
-                ].map((p, i) => (
-                  <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 12px" }}>
-                    <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 4, fontWeight: 600 }}>{p.label}</div>
-                    <div style={{ fontSize: 14, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
+          const mp = result.marriagePrediction || calculateMarriagePrediction({
+            name: form.name || "User",
+            dob: form.dob || "1998-01-01",
+            lagnaSign: result.lagnaSign,
+            rashiSign: result.rashiSign,
+            lang
+          });
+
+          return (
+            <div className="print-only-report">
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 1: DEDICATED 20-PAGE CAREER & BUSINESS BLUEPRINT DOSSIER
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "career" && (
+                <div>
+                  {/* Title Cover Header */}
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 26, marginBottom: 4 }}>💼 🔯</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
+                      {hi ? "सम्पूर्ण वैदिक करियर, पदोन्नति एवं व्यापार ब्लूप्रिंट" : "VEDIC CAREER, PROMOTION & BUSINESS GROWTH BLUEPRINT"}
+                    </h1>
+                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
+                      ✦ CONFIDENTIAL PARASHARI & D10 DASAMSA HOROSCOPIC DOSSIER ✦
+                    </div>
+                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
+                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="page-break-avoid" style={{ textAlign: "center", marginBottom: 28 }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
-                ✦ NATAL LAGNA KUNDLI CHART
-              </h3>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <NorthIndianChart houses={result.houses} lang={lang} />
-              </div>
-            </div>
+                  {/* Core Astrological Metrics Table */}
+                  <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                      ✦ CORE VEDIC HOROSCOPIC PARAMETERS
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, textAlign: "center" }}>
+                      {[
+                        { label: "Ascendant (Lagna)", val: result.lagna },
+                        { label: "Moon Sign (Rashi)", val: result.rashi },
+                        { label: "10th House (Karma)", val: `${cp.tenthSign} (${cp.tenthLord})` },
+                        { label: "Elevation Score", val: `${cp.scores.corporate}%` },
+                        { label: "Nakshatra & Pada", val: result.nakshatra },
+                      ].map((p, i) => (
+                        <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 10px" }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", marginBottom: 3, fontWeight: 600 }}>{p.label}</div>
+                          <div style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-            <div className="page-break-avoid" style={{ marginBottom: 28 }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
-                ✦ PLANETARY POSITIONS, HOUSES & DIGNITIES
-              </h3>
-              <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
-                <thead>
-                  <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Planet</th>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Sign</th>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>House</th>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Degree & Nakshatra</th>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Dignity</th>
-                    <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Astrological Effect</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PLANETS.map((p, idx) => {
-                    const pd = result.planetData?.[p.name] || {};
+                  {/* Chapter 1: 10th House Karma Sthana & D10 Dasamsa Analysis */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.7)" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>
+                      🏛️ CHAPTER 1: 10TH HOUSE (KARMA STHANA) & D10 DASAMSA SYNTHESIS
+                    </h3>
+                    <p style={{ lineHeight: 1.8, fontSize: 13.5, color: "rgba(241,231,208,0.92)", margin: "0 0 10px" }}>
+                      {hi
+                        ? `दशम भाव कर्म, मान-सम्मान, पदोन्नति एवं सामाजिक प्रतिष्ठा का प्रधान केंद्र है। आपकी कुंडली में दशम भाव ${cp.tenthSign} राशि में स्थित है, जिसके स्वामी ग्रह '${cp.tenthLord}' हैं। यह विन्यास आपके भीतर असाधारण रणनीतिक दृष्टि, संगठनात्मक प्रबंधन तथा जटिल समस्याओं को सुलझाने की स्वाभाविक क्षमता को दर्शाता है।`
+                        : `The 10th House (Karma Bhava) represents the pinnacle of executive authority, professional leadership, social status, and livelihood. In your natal chart, the 10th House falls in ${cp.tenthSign}, governed by Lord ${cp.tenthLord}. This stellar alignment bestows exceptional strategic vision, calculated risk tolerance, and sharp problem-solving intellect.`}
+                    </p>
+                    <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "10px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                      🌟 {hi ? "प्रधान करियर स्वभाव:" : "Primary Career Archetype:"} {cp.archetypeTitle}
+                    </div>
+                  </div>
+
+                  {/* Chapter 2: D10 Dasamsa Planetary Positions & Career Influence Table */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>
+                      📊 CHAPTER 2: D10 DASAMSA DIVISIONAL CHART PLANETARY INFLUENCES
+                    </h3>
+                    <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
+                      <thead>
+                        <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
+                          <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 12, textAlign: "left" }}>Planet</th>
+                          <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 12, textAlign: "left" }}>Sign & House</th>
+                          <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 12, textAlign: "left" }}>D10 Career Dignity</th>
+                          <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 12, textAlign: "left" }}>Direct Impact on Job, Promotion & CTC</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { name: "Sun (Surya)", sign: "Leo / Aries", dignity: "Digbala / Exalted", impact: hi ? "वरिष्ठ नेतृत्व, सरकारी मान्यता व निर्णय क्षमता" : "Executive command, government authority & leadership" },
+                          { name: "Saturn (Shani)", sign: "Capricorn / Aquarius", dignity: "Swakshetra / Strong", impact: hi ? "दीर्घकालिक स्थिरता, टीम प्रबंधन व निष्ठा" : "Long-term career resilience, deep focus & team loyalty" },
+                          { name: "Mercury (Budha)", sign: "Virgo / Gemini", dignity: "Exalted / Uchha", impact: hi ? "रणनीतिक बुद्धिमत्ता, डेटा एनालिटिक्स व संवाद" : "Sharp business acumen, systems logic & high communication" },
+                          { name: "Jupiter (Guru)", sign: "Sagittarius / Cancer", dignity: "Mitra / Auspicious", impact: hi ? "वरिष्ठ अधिकारियों का मार्गदर्शन, बोनस व सलाहकार पद" : "Mentorship from C-suite, wealth expansion & advisory status" },
+                          { name: "Mars (Mangal)", sign: "Capricorn / Scorpio", dignity: "Uchha / Powerful", impact: hi ? "परियोजना क्रियान्वयन, साहस व प्रतिस्पर्धा में विजय" : "Flawless execution, crisis management & competitive dominance" },
+                          { name: "Venus (Shukra)", sign: "Pisces / Taurus", dignity: "Subha / Creative", impact: hi ? "ब्रांड वैल्यू, क्लाइंट नेटवर्किंग व उच्च जीवनशैली" : "Executive presence, stakeholder persuasion & lucrative packages" },
+                          { name: "Rahu / Ketu", sign: "Gemini / Virgo", dignity: "Rajayoga Spark", impact: hi ? "विदेशी परियोजनाएं, आधुनिक तकनीक व अप्रत्याशित उछाल" : "Overseas projects, cutting-edge tech disruption & sudden hikes" },
+                        ].map((row, idx) => (
+                          <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                            <td style={{ padding: "8px 10px", fontWeight: 700, color: "#FDE68A", fontSize: 12.5 }}>{row.name}</td>
+                            <td style={{ padding: "8px 10px", fontSize: 12.5 }}>{row.sign}</td>
+                            <td style={{ padding: "8px 10px", color: "#34D399", fontWeight: 700, fontSize: 12.5 }}>{row.dignity}</td>
+                            <td style={{ padding: "8px 10px", fontSize: 12.5, color: "rgba(241,231,208,0.9)" }}>{row.impact}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="page-break-before" />
+
+                  {/* Chapter 3: 4-Domain Suitability Spectrum */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>
+                      📊 CHAPTER 3: DOMAIN SUITABILITY MATRIX & CAREER PATHWAYS
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+                      {[
+                        { title: hi ? "🏛️ प्रशासनिक व सरकारी सेवा (Govt/PSU)" : "🏛️ Government & Civil Administration", score: cp.scores.govt, desc: hi ? "UPSC, State PSC, सार्वजनिक उपक्रम एवं नीति निर्माण में उच्च सफलता योग।" : "Strong yogas for civil services, PSU leadership, and public sector governance." },
+                        { title: hi ? "💼 कॉर्पोरेट व उच्च-तकनीकी प्रबंधन (Corporate/Tech)" : "💼 Corporate High-Tech Leadership", score: cp.scores.corporate, desc: hi ? "क्लाउड, एआई, ग्लोबल प्रोडक्ट मैनेजमेंट एवं सी-लेवल एक्जीक्यूटिव संवर्ग।" : "High-velocity capability for Fortune 500 tech architecture, strategy & C-suite." },
+                        { title: hi ? "🚀 स्वतंत्र उद्यम व स्टार्टअप (Business/Startups)" : "🚀 Scalable Startups & Global Trade", score: cp.scores.business, desc: hi ? "ई-कॉमर्स, विनिर्माण, रियल एस्टेट एवं स्वतंत्र व्यापारिक उद्यम।" : "Favorable planetary support for self-built scalable enterprises and equity." },
+                        { title: hi ? "🎨 रिसर्च, मीडिया व कानूनी परामर्श (Creative/Legal)" : "🎨 Creative Media & Strategic Advisory", score: cp.scores.creative, desc: hi ? "डिजिटल मीडिया, बौद्धिक संपदा, डेटा साइंस एवं स्वतंत्र सलाहकार पद।" : "Strong affinity for high-impact media, analytics, research and corporate legal counsel." },
+                      ].map((item, i) => (
+                        <div key={i} style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "12px 14px", background: "rgba(15,10,32,0.65)" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                            <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>{item.title}</span>
+                            <span style={{ color: "#34D399", fontSize: 14, fontWeight: 800 }}>{item.score}%</span>
+                          </div>
+                          <p style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: 0, lineHeight: 1.6 }}>{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Chapter 4: Multi-Year Golden Timeline (2026–2030) */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>
+                      📅 CHAPTER 4: MULTI-YEAR PROMOTION, JOB SWITCH & EXPANSION CALENDAR (2026–2030)
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                      <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ color: "#34D399", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>📈 Next Promotion & Appraisal Window</div>
+                        <div style={{ color: "#FFF", fontSize: 13.5, fontWeight: 700 }}>{cp.appraisalWindow}</div>
+                        <p style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 6, lineHeight: 1.5 }}>
+                          {hi ? "गुरु व शनि का शुभ गोचर आपके कार्य मूल्यांकन को नई ऊंचाई प्रदान करेगा।" : "Aligned transit of Jupiter & 10th Lord brings executive elevation."}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>🔄 Senior Job Switch & Package Hike</div>
+                        <div style={{ color: "#FFF", fontSize: 13.5, fontWeight: 700 }}>{cp.jobChangeWindow}</div>
+                        <p style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 6, lineHeight: 1.5 }}>
+                          {hi ? "बुध एवं शुक्र का प्रभाव उच्च वेतनमान तथा पदोन्नति का मार्ग प्रशस्त करेगा।" : "Mercury-Venus trigger creates high CTC negotiation leverage."}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.35)", borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ color: "#60A5FA", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>🌐 Global Relocation & Business Phase</div>
+                        <div style={{ color: "#FFF", fontSize: 13.5, fontWeight: 700 }}>{cp.expansionWindow}</div>
+                        <p style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 6, lineHeight: 1.5 }}>
+                          {hi ? "नवम व द्वादश भाव सक्रिय होने से विदेश यात्रा तथा वैश्विक उद्यम का योग।" : "9th & 12th house activation supports overseas visa & foreign equity."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Chapter 5: Workplace Obstacles & Neutralization */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22, border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "16px 18px", background: "rgba(239,68,68,0.06)" }}>
+                    <h3 style={{ color: "#F87171", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>
+                      ⚠️ CHAPTER 5: WORKPLACE FRICTION, OFFICE POLITICS & OBSTACLE DIAGNOSTICS
+                    </h3>
+                    <p style={{ lineHeight: 1.75, fontSize: 13, color: "rgba(241,231,208,0.92)", margin: 0 }}>
+                      {cp.obstacleAnalysis}
+                    </p>
+                  </div>
+
+                  <div className="page-break-before" />
+
+                  {/* Chapter 6: Actionable Vedic Career Remedies */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22, border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10, padding: "18px 20px", background: "rgba(245,158,11,0.08)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                      <h3 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, margin: 0 }}>
+                        🛡️ CHAPTER 6: PRESCRIPTION OF VEDIC CAREER REMEDIES & SACRED PROTOCOLS
+                      </h3>
+                      <div style={{ color: "#34D399", fontSize: 12.5, fontWeight: 700 }}>☀️ {cp.dailyCareerMantra}</div>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
+                      {cp.remedies.map((rem, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                          <span style={{ color: "#FDE68A", fontSize: 15, marginTop: 2 }}>✦</span>
+                          <span style={{ color: "rgba(241,231,208,0.92)", fontSize: 13, lineHeight: 1.7 }}>{rem}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Chapter 7: 12 Houses Career Influence Table */}
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>
+                      🏠 CHAPTER 7: 12 HOUSES KARMA & WEALTH ACCELERATION MATRIX
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      {Array.from({ length: 12 }, (_, i) => {
+                        const n = i + 1;
+                        const d = result.houses?.[n] || {};
+                        return (
+                          <div key={n} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "10px 12px", background: "rgba(15,10,32,0.6)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                              <span style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800 }}>House {n}: {t.hnames[i]}</span>
+                              <span style={{ color: "#34D399", fontSize: 12 }}>{d.sign}</span>
+                            </div>
+                            <p style={{ fontSize: 12, lineHeight: 1.55, color: "rgba(241,231,208,0.85)", margin: 0 }}>{d.interpretation}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Sign-off verdict */}
+                  <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 18, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))", textAlign: "center" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 6 }}>✨ VEDIC ASTROLOGER BLESSING & FINAL VERDICT</h3>
+                    <p style={{ fontSize: 13.5, lineHeight: 1.8, color: "#FFF", margin: "0 0 10px" }}>{result.verdict}</p>
+                    <div style={{ color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
+                      ✦ OM SHANTI SHANTI SHANTI ✦ — JYOTISH KUNDLI CERTIFIED DOSSIER
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 2: DEDICATED ALL-IN-ONE VEDIC & LAL KITAB REMEDIAL DOSSIER
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "remedies" && (
+                <div>
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 26, marginBottom: 4 }}>🛡️ 🕉️</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
+                      {hi ? "सम्पूर्ण वैदिक दोष शांति एवं लाल किताब समस्या निवारण गाइड" : "COMPLETE VEDIC DOSHA SHANTI & LAL KITAB REMEDIAL DOSSIER"}
+                    </h1>
+                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
+                      ✦ CONFIDENTIAL TANTRA, MANTRA, YANTRA & VASTU SHIELD ✦
+                    </div>
+                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
+                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                    </p>
+                  </div>
+
+                  {/* All 7 Problems Remedial Breakdown */}
+                  {LIFE_PROBLEMS_LIST.map((prob, idx) => {
+                    const r = getLifeProblemRemedies({ problemId: prob.id, lagnaSign: result.lagnaSign, rashiSign: result.rashiSign, lang });
                     return (
-                      <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
-                        <td style={{ padding: "10px 12px", fontWeight: 700, color: p.color, fontSize: 13 }}>{p.symbol} {p.name} ({p.sanskrit})</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.sign} ({pd.signSanskrit})</td>
-                        <td style={{ padding: "10px 12px", fontWeight: 700, color: "#FDE68A", fontSize: 13 }}>House {pd.house}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.degree} · {pd.nakshatra} (P{pd.pada})</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.status}</td>
-                        <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.effect}</td>
-                      </tr>
+                      <div key={prob.id} className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: "16px 18px", background: "rgba(15,10,32,0.7)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 8, marginBottom: 10 }}>
+                          <h4 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, margin: 0 }}>
+                            {r.icon} SECTION {idx + 1}: {r.problemTitle}
+                          </h4>
+                          <span style={{ color: "#34D399", fontSize: 12, fontWeight: 700 }}>⏱️ {r.mantraCount}</span>
+                        </div>
+
+                        <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", lineHeight: 1.65, marginBottom: 10 }}>
+                          <b>🔍 Root Cause:</b> {r.rootCause}
+                        </div>
+
+                        <div style={{ background: "rgba(0,0,0,0.5)", border: "1px dashed rgba(245,158,11,0.35)", borderRadius: 8, padding: "8px 12px", color: "#FDE68A", fontSize: 13.5, fontWeight: 800, textAlign: "center", marginBottom: 10 }}>
+                          🕉️ {r.mantra}
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, padding: "6px 8px" }}>
+                            <b style={{ color: "#34D399" }}>🌿 Daily Upay:</b> {r.dailyUpay[0]}
+                          </div>
+                          <div style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "6px 8px" }}>
+                            <b style={{ color: "#FDE68A" }}>🤲 Charity:</b> {r.charity}
+                          </div>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12 }}>
+                          <div style={{ background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: "6px 8px" }}>
+                            <b style={{ color: "#FDE68A" }}>💎 Gem & Rudraksha:</b> {r.gemRudraksha}
+                          </div>
+                          <div style={{ background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: "6px 8px" }}>
+                            <b style={{ color: "#FDE68A" }}>🏡 Vastu Tip:</b> {r.vastuTip}
+                          </div>
+                        </div>
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
-            </div>
 
-            <div className="page-break-before" />
-
-            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 20, background: "rgba(15,10,32,0.6)" }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 10 }}>🌟 {t.sec.blueprint}</h3>
-              <p style={{ lineHeight: 1.85, fontSize: 14, color: "rgba(241,231,208,0.92)" }}>{result.overview}</p>
-            </div>
-
-            <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-              <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⚡ {t.sec.yogas}</h4>
-                <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.yogas}</div>
-              </div>
-              <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⏱️ {t.sec.dasha}</h4>
-                <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.dasha}</div>
-              </div>
-            </div>
-
-            <div className="page-break-avoid" style={{ marginBottom: 20 }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🏠 {t.htTitle}</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                {Array.from({ length: 12 }, (_, i) => {
-                  const n = i + 1;
-                  const d = result.houses?.[n] || {};
-                  return (
-                    <div key={n} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 12, background: "rgba(15,10,32,0.6)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                        <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>House {n}: {t.hnames[i]}</span>
-                        <span style={{ color: "#F3D37A", fontSize: 12 }}>{d.sign}</span>
-                      </div>
-                      <p style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(241,231,208,0.85)" }}>{d.interpretation}</p>
+                  {/* 21-Day Sankalp Ritual Page */}
+                  <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 18, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))", textAlign: "center", marginTop: 20 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>✨ २१-दिवसीय दैनिक संकल्प एवं अनुष्ठान नियम</h3>
+                    <p style={{ fontSize: 13, lineHeight: 1.75, color: "rgba(241,231,208,0.9)", margin: "0 0 10px" }}>
+                      {hi
+                        ? "उपरोक्त किसी भी एक मुख्य समस्या के मंत्र एवं उपाय को लगातार २१ दिनों तक ब्रह्म मुहूर्त में शुद्ध भाव से करने पर नकारात्मक ऊर्जा समाप्त होकर ईश्वरीय कृपा प्राप्त होती है।"
+                        : "Consistently practicing the prescribed beej mantra, charity, and daily upay for 21 days creates a powerful protective aura and clears long-standing karmic obstructions."}
+                    </p>
+                    <div style={{ color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
+                      ✦ SARVA MANOKAMNA SIDDHI ✦ — JYOTISH KUNDLI VEDIC DOSSIER
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="page-break-before" />
-
-            <div className="page-break-avoid" style={{ marginBottom: 20 }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🌿 LIFE DOMAIN ANALYSIS</h3>
-              {[
-                { title: t.sec.health, icon: "🌿", content: result.health },
-                { title: t.sec.wealth, icon: "💰", content: result.wealth },
-                { title: t.sec.education, icon: "📚", content: result.education },
-                { title: t.sec.career, icon: "🏆", content: result.career },
-                { title: t.sec.marriage, icon: "💑", content: result.marriage },
-              ].map(sec => (
-                <div key={sec.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 10, background: "rgba(15,10,32,0.6)" }}>
-                  <h4 style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 6 }}>{sec.icon} {sec.title}</h4>
-                  <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(241,231,208,0.9)" }}>{sec.content}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>🔮 {t.sec.pred}</h3>
-              <p style={{ lineHeight: 1.85, fontSize: 13, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.pred}</p>
-            </div>
-
-            <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>💎 {t.sec.gems}</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
-                {[
-                  { title: t.sec.colours, val: result.colours },
-                  { title: t.sec.numbers, val: result.numbers },
-                  { title: t.sec.days, val: result.days },
-                  { title: t.sec.rudraksha, val: result.rudraksha },
-                ].map(item => (
-                  <div key={item.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: 10, background: "rgba(11,8,25,0.7)" }}>
-                    <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>{item.title}</div>
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", marginTop: 2 }}>{item.val}</div>
                   </div>
-                ))}
-              </div>
-              <p style={{ fontSize: 13, lineHeight: 1.75, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.gems}</p>
-            </div>
+                </div>
+              )}
 
-            <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 18, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
-              <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>✨ {t.sec.verdict}</h3>
-              <p style={{ fontSize: 14, lineHeight: 1.85, color: "#FFF" }}>{result.verdict}</p>
-              <div style={{ textAlign: "center", marginTop: 16, color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
-                ✦ OM TAT SAT ✦ — {t.footer2}
-              </div>
-            </div>
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 3: DEDICATED VEDIC VIVAH & SPOUSE PREDICTION REPORT
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "marriage" && (
+                <div>
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 26, marginBottom: 4 }}>💍 💖</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
+                      {hi ? "वैदिक विवाह समय, आयु एवं जीवनसाथी सम्पूर्ण विश्लेषण" : "PARASHARI VEDIC VIVAH & SPOUSE PREDICTION REPORT"}
+                    </h1>
+                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
+                      ✦ 7TH HOUSE, NAVAMSHA (D9) & MATRIMONIAL MUHURAT DOSSIER ✦
+                    </div>
+                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
+                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                    </p>
+                  </div>
 
-          </div>
-        )}
+                  <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                      ✦ VIVAH TIMING & MARITAL ASTROLOGICAL PARAMETERS
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, textAlign: "center" }}>
+                      {[
+                        { label: "Vivah Score", val: `${mp.probabilityScore}%` },
+                        { label: "Probable Age", val: mp.ageRange },
+                        { label: "7th House Sign", val: mp.seventhSign },
+                        { label: "7th Lord", val: mp.seventhLord },
+                      ].map((p, i) => (
+                        <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 10px" }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", marginBottom: 3, fontWeight: 600 }}>{p.label}</div>
+                          <div style={{ fontSize: 14, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.7)" }}>
+                    <h4 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>📅 Auspicious Timing Windows & Peak Months</h4>
+                    <p style={{ fontSize: 13, lineHeight: 1.75, color: "rgba(241,231,208,0.92)", margin: "0 0 8px" }}>
+                      <b>Primary Window:</b> {mp.primaryWindow} | <b>Secondary Window:</b> {mp.secondaryWindow}
+                    </p>
+                    <p style={{ fontSize: 13, lineHeight: 1.75, color: "#34D399", margin: 0 }}>
+                      <b>Peak Favorable Months:</b> {mp.peakMonths}
+                    </p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.7)" }}>
+                    <h4 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>👰/🤵 Spouse Physical Traits, Profession & Direction</h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 13 }}>
+                      <div><b>Nature & Demeanor:</b> {mp.spousePersonality}</div>
+                      <div><b>Profession / Field:</b> {mp.spouseProfession}</div>
+                      <div><b>Birth Direction:</b> {mp.spouseDirection}</div>
+                      <div><b>Name Initial Letter:</b> {mp.spouseNameInitial}</div>
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: 18, background: "rgba(245,158,11,0.08)" }}>
+                    <h4 style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>🛡️ Prescribed Vivah Delay & Kalyana Remedies</h4>
+                    <div style={{ fontSize: 13, lineHeight: 1.75, color: "rgba(241,231,208,0.92)", whiteSpace: "pre-wrap" }}>
+                      {mp.remedies}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 4: COMPLETE DELUXE NATAL KUNDLI & LIFE REPORT (Default All)
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "all" && (
+                <div>
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 24, marginBottom: 4 }}>🔯</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 26, fontWeight: 800, letterSpacing: 2 }}>
+                      JYOTISH KUNDLI — COMPLETE VEDIC LIFE DOSSIER
+                    </h1>
+                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 1, textTransform: "uppercase" }}>
+                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                    </p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "18px 22px", marginBottom: 24 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                      ✦ CORE PANCHANG & VEDIC METRICS
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, textAlign: "center" }}>
+                      {[
+                        { label: "Ascendant (Lagna)", val: result.lagna },
+                        { label: "Moon Sign (Rashi)", val: result.rashi },
+                        { label: "Nakshatra & Pada", val: result.nakshatra },
+                        { label: "Tithi", val: result.tithi },
+                        { label: "Yoga", val: result.yoga },
+                      ].map((p, i) => (
+                        <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 12px" }}>
+                          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 4, fontWeight: 600 }}>{p.label}</div>
+                          <div style={{ fontSize: 14, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ textAlign: "center", marginBottom: 28 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
+                      ✦ NATAL LAGNA KUNDLI CHART
+                    </h3>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <NorthIndianChart houses={result.houses} lang={lang} />
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 28 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+                      ✦ PLANETARY POSITIONS, HOUSES & DIGNITIES
+                    </h3>
+                    <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
+                      <thead>
+                        <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Planet</th>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Sign</th>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>House</th>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Degree & Nakshatra</th>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Dignity</th>
+                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Astrological Effect</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {PLANETS.map((p, idx) => {
+                          const pd = result.planetData?.[p.name] || {};
+                          return (
+                            <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                              <td style={{ padding: "10px 12px", fontWeight: 700, color: p.color, fontSize: 13 }}>{p.symbol} {p.name} ({p.sanskrit})</td>
+                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.sign} ({pd.signSanskrit})</td>
+                              <td style={{ padding: "10px 12px", fontWeight: 700, color: "#FDE68A", fontSize: 13 }}>House {pd.house}</td>
+                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.degree} · {pd.nakshatra} (P{pd.pada})</td>
+                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.status}</td>
+                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.effect}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="page-break-before" />
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 20, background: "rgba(15,10,32,0.6)" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 10 }}>🌟 {t.sec.blueprint}</h3>
+                    <p style={{ lineHeight: 1.85, fontSize: 14, color: "rgba(241,231,208,0.92)" }}>{result.overview}</p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                    <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
+                      <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⚡ {t.sec.yogas}</h4>
+                      <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.yogas}</div>
+                    </div>
+                    <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
+                      <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⏱️ {t.sec.dasha}</h4>
+                      <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.dasha}</div>
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🏠 {t.htTitle}</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      {Array.from({ length: 12 }, (_, i) => {
+                        const n = i + 1;
+                        const d = result.houses?.[n] || {};
+                        return (
+                          <div key={n} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 12, background: "rgba(15,10,32,0.6)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>House {n}: {t.hnames[i]}</span>
+                              <span style={{ color: "#F3D37A", fontSize: 12 }}>{d.sign}</span>
+                            </div>
+                            <p style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(241,231,208,0.85)" }}>{d.interpretation}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="page-break-before" />
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🌿 LIFE DOMAIN ANALYSIS</h3>
+                    {[
+                      { title: t.sec.health, icon: "🌿", content: result.health },
+                      { title: t.sec.wealth, icon: "💰", content: result.wealth },
+                      { title: t.sec.education, icon: "📚", content: result.education },
+                      { title: t.sec.career, icon: "🏆", content: result.career },
+                      { title: t.sec.marriage, icon: "💑", content: result.marriage },
+                    ].map(sec => (
+                      <div key={sec.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 10, background: "rgba(15,10,32,0.6)" }}>
+                        <h4 style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 6 }}>{sec.icon} {sec.title}</h4>
+                        <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(241,231,208,0.9)" }}>{sec.content}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>🔮 {t.sec.pred}</h3>
+                    <p style={{ lineHeight: 1.85, fontSize: 13, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.pred}</p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>💎 {t.sec.gems}</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
+                      {[
+                        { title: t.sec.colours, val: result.colours },
+                        { title: t.sec.numbers, val: result.numbers },
+                        { title: t.sec.days, val: result.days },
+                        { title: t.sec.rudraksha, val: result.rudraksha },
+                      ].map(item => (
+                        <div key={item.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: 10, background: "rgba(11,8,25,0.7)" }}>
+                          <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>{item.title}</div>
+                          <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", marginTop: 2 }}>{item.val}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 13, lineHeight: 1.75, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.gems}</p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 18, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>✨ {t.sec.verdict}</h3>
+                    <p style={{ fontSize: 14, lineHeight: 1.85, color: "#FFF" }}>{result.verdict}</p>
+                    <div style={{ textAlign: "center", marginTop: 16, color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
+                      ✦ OM TAT SAT ✦ — {t.footer2}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
 
         {/* Screen Footer with Secret Admin Trigger */}
         <footer
