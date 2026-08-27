@@ -834,6 +834,70 @@ export default function App() {
     }
   });
 
+  // Admin VIP Bypass State (Dedicated for Owner Abhishek)
+  const [isAdmin, setIsAdmin] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const adminParam = urlParams.get("admin") || urlParams.get("vip");
+      if (adminParam && ["2709", "abhishek", "true", "owner"].includes(adminParam.toLowerCase())) {
+        localStorage.setItem("jyotish_admin_mode", "true");
+        return true;
+      }
+      return localStorage.getItem("jyotish_admin_mode") === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const [showAdminPinModal, setShowAdminPinModal] = useState(false);
+  const [adminPinInput, setAdminPinInput] = useState("");
+  const [adminPinErr, setAdminPinErr] = useState("");
+  const [logoClickCount, setLogoClickCount] = useState(0);
+
+  const effectiveMarriageUnlocked = isAdmin || unlockedMarriageReport;
+  const effectiveDailySubscribed = isAdmin || isDailySubscribed;
+  const effectiveProUnlocked = isAdmin || unlockedProReport;
+
+  const handleSecretTrigger = () => {
+    setLogoClickCount(prev => {
+      const next = prev + 1;
+      if (next >= 3) {
+        setShowAdminPinModal(true);
+        setAdminPinErr("");
+        return 0;
+      }
+      setTimeout(() => setLogoClickCount(0), 2500);
+      return next;
+    });
+  };
+
+  const handleVerifyAdminPin = () => {
+    const clean = adminPinInput.trim().toLowerCase();
+    if (clean === "2709" || clean === "abhishek" || clean === "admin") {
+      try {
+        localStorage.setItem("jyotish_admin_mode", "true");
+      } catch (e) {}
+      setIsAdmin(true);
+      setShowAdminPinModal(false);
+      setAdminPinInput("");
+      setAdminPinErr("");
+    } else {
+      setAdminPinErr(hi ? "अमान्य एडमिन पिन! कृपया सही पासकी दर्ज करें।" : "Invalid Admin PIN! Please enter the correct passkey.");
+    }
+  };
+
+  const handleToggleAdminMode = () => {
+    const nextState = !isAdmin;
+    setIsAdmin(nextState);
+    try {
+      if (nextState) {
+        localStorage.setItem("jyotish_admin_mode", "true");
+      } else {
+        localStorage.removeItem("jyotish_admin_mode");
+      }
+    } catch (e) {}
+  };
+
   const resultRef = useRef(null);
   const t = UI[lang];
   const hi = lang === "hi";
@@ -1076,10 +1140,82 @@ export default function App() {
         />
       )}
 
+      {/* Admin Secret PIN Modal */}
+      {showAdminPinModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 110, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)", padding: 20 }}>
+          <div className="glass-card" style={{ maxWidth: 420, width: "100%", padding: "28px 24px", position: "relative", border: "1.5px solid rgba(245,158,11,0.6)", background: "linear-gradient(135deg, rgba(26,18,48,0.98), rgba(11,8,25,0.99))" }}>
+            <button
+              onClick={() => setShowAdminPinModal(false)}
+              style={{ position: "absolute", top: 12, right: 14, background: "none", border: "none", color: "rgba(241,231,208,0.6)", fontSize: 20, cursor: "pointer" }}
+            >
+              ✕
+            </button>
+            <div style={{ textAlign: "center", marginBottom: 18 }}>
+              <div style={{ fontSize: 36 }}>👑</div>
+              <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, marginTop: 4 }}>
+                Admin VIP Access Portal
+              </h3>
+              <p style={{ color: "rgba(241,231,208,0.7)", fontSize: 12, marginTop: 4 }}>
+                {hi ? "वेबसाइट एडमिन हेतु सभी प्रीमियम फीचर्स की निःशुल्क पहुंच" : "Unlock all paid reports & VIP features for Owner/Admin without making payments"}
+              </p>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label htmlFor="admin-pin-input" style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                {hi ? "एडमिन गुप्त पासकी (Admin PIN):" : "Enter Admin Secret PIN / Passkey:"}
+              </label>
+              <input
+                id="admin-pin-input"
+                name="adminPin"
+                type="password"
+                aria-label="Admin PIN"
+                value={adminPinInput}
+                onChange={e => { setAdminPinInput(e.target.value); setAdminPinErr(""); }}
+                onKeyDown={e => e.key === "Enter" && handleVerifyAdminPin()}
+                placeholder="Enter PIN (e.g. 2709)"
+                style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.35)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 14, textAlign: "center", letterSpacing: 2 }}
+                autoFocus
+              />
+            </div>
+
+            {adminPinErr && (
+              <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 8, padding: "8px 12px", color: "#FCA5A5", fontSize: 11, marginBottom: 14, textAlign: "center" }}>
+                ⚠️ {adminPinErr}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={handleVerifyAdminPin}
+                className="gold-cta-btn"
+                style={{ flex: 1, padding: "11px 14px", fontSize: 13, fontWeight: 700 }}
+              >
+                👑 {hi ? "एडमिन मोड सक्रिय करें" : "Activate Admin VIP"}
+              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => { handleToggleAdminMode(); setShowAdminPinModal(false); }}
+                  style={{ background: "rgba(239,68,68,0.2)", border: "1px solid rgba(239,68,68,0.4)", color: "#FCA5A5", borderRadius: 10, padding: "11px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                >
+                  {hi ? "एडमिन बंद करें" : "Turn Off"}
+                </button>
+              )}
+            </div>
+            <div style={{ fontSize: 10, color: "rgba(243,211,122,0.45)", textAlign: "center", marginTop: 12 }}>
+              💡 Secret PIN is configured as <code style={{ color: "#FDE68A" }}>2709</code>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Header Bar */}
       <header className="no-print" style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(11, 8, 25, 0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(212, 175, 55, 0.15)", padding: "12px 24px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div
+            onClick={handleSecretTrigger}
+            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none" }}
+            title="Click 3 times to open Admin VIP access portal"
+          >
             <span style={{ fontSize: 22, animation: "pulseSlow 3s infinite" }}>🔯</span>
             <div>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 700, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH KUNDLI</div>
@@ -1088,6 +1224,27 @@ export default function App() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            {isAdmin && (
+              <div
+                onClick={() => setShowAdminPinModal(true)}
+                style={{
+                  background: "linear-gradient(135deg, #F59E0B, #D97706)",
+                  color: "#0B0819",
+                  padding: "4px 10px",
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  boxShadow: "0 2px 10px rgba(245,158,11,0.4)"
+                }}
+                title="Admin VIP Mode is Active - Click to Manage"
+              >
+                <span>👑</span> VIP Admin
+              </div>
+            )}
             {/* Currency Selector */}
             <select
               id="header-currency-select"
@@ -1561,12 +1718,19 @@ export default function App() {
 
                   {/* ── PREMIUM UNLOCKABLE / BLURRED DEEP REPORT SECTION ── */}
                   <div style={{ position: "relative", marginBottom: 24 }}>
-                    <div className="glass-card" style={{ padding: "26px 28px", filter: unlockedMarriageReport ? "none" : "blur(4px)", pointerEvents: unlockedMarriageReport ? "auto" : "none", userSelect: unlockedMarriageReport ? "auto" : "none", transition: "all 0.3s ease" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 18 }}>
-                        <span style={{ fontSize: 20 }}>📜</span>
-                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700 }}>
-                          {hi ? "विस्तृत विवाह कालखंड, जीवनसाथी का पेशा व उपाय (Confidential Report)" : "Pinpoint Marriage Windows, Spouse Identity & Vedic Remedies"}
-                        </h4>
+                    <div className="glass-card" style={{ padding: "26px 28px", filter: effectiveMarriageUnlocked ? "none" : "blur(4px)", pointerEvents: effectiveMarriageUnlocked ? "auto" : "none", userSelect: effectiveMarriageUnlocked ? "auto" : "none", transition: "all 0.3s ease" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 18, flexWrap: "wrap", gap: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ fontSize: 20 }}>📜</span>
+                          <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 700 }}>
+                            {hi ? "विस्तृत विवाह कालखंड, जीवनसाथी का पेशा व उपाय (Confidential Report)" : "Pinpoint Marriage Windows, Spouse Identity & Vedic Remedies"}
+                          </h4>
+                        </div>
+                        {isAdmin && (
+                          <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 8px", color: "#FDE68A", fontSize: 10.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 4 }}>
+                            <span>👑</span> {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Unlocked"}
+                          </div>
+                        )}
                       </div>
 
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 16 }}>
@@ -1620,7 +1784,7 @@ export default function App() {
                     </div>
 
                     {/* Paywall Overlay Banner (When Locked) */}
-                    {!unlockedMarriageReport && (
+                    {!effectiveMarriageUnlocked && (
                       <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(11,8,25,0.84)", backdropFilter: "blur(6px)", borderRadius: 16, border: "2px solid rgba(245,158,11,0.5)", padding: "24px 20px", textAlign: "center", zIndex: 10 }}>
                         <div style={{ fontSize: 36, marginBottom: 8 }}>🔒</div>
                         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "3px 12px", color: "#FDE68A", fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
@@ -1788,12 +1952,17 @@ export default function App() {
                   <div className="glass-card" style={{ padding: "26px 28px", background: "linear-gradient(135deg, rgba(26,18,48,0.95), rgba(11,8,25,0.98))", border: "1.5px solid rgba(245,158,11,0.5)", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, background: "radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)", pointerEvents: "none" }} />
 
-                    {isDailySubscribed ? (
+                    {effectiveDailySubscribed ? (
                       <div style={{ textAlign: "center", padding: "10px 0" }}>
                         <span style={{ fontSize: 40 }}>👑</span>
                         <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 800, marginTop: 6 }}>
                           {hi ? "आपकी दैनिक राशिफल सदस्यता सक्रिय है!" : "VIP Daily Horoscope Subscription Active!"}
                         </h3>
+                        {isAdmin && (
+                          <div style={{ display: "inline-block", background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 800, marginTop: 4 }}>
+                            👑 Admin VIP Pass Active
+                          </div>
+                        )}
                         <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13, marginTop: 4, maxWidth: 520, margin: "6px auto 16px" }}>
                           {hi
                             ? `आपकी राशि (${dailySign}) के लिए दैनिक अलर्ट, शुभ मुहूर्त व उपाय आपके चयनित मैसेंजर पर नित्य प्रातः 7:00 बजे भेजे जा रहे हैं।`
@@ -2623,11 +2792,58 @@ export default function App() {
           </div>
         )}
 
-        {/* Screen Footer */}
-        <footer className="no-print" style={{ textAlign: "center", marginTop: 56, color: "rgba(243, 211, 122, 0.35)", fontSize: 11, letterSpacing: 1.5 }}>
+        {/* Screen Footer with Secret Admin Trigger */}
+        <footer
+          onClick={handleSecretTrigger}
+          className="no-print"
+          style={{ textAlign: "center", marginTop: 56, color: "rgba(243, 211, 122, 0.35)", fontSize: 11, letterSpacing: 1.5, cursor: "pointer", userSelect: "none" }}
+          title="Click 3 times for Admin VIP Portal"
+        >
           <div style={{ marginBottom: 4, fontWeight: 600 }}>{t.footer1}</div>
           <div style={{ fontSize: 10, letterSpacing: 0.5 }}>{t.footer2}</div>
         </footer>
+
+        {/* Floating Admin Switcher Widget (When in Admin Mode) */}
+        {isAdmin && (
+          <aside
+            aria-label="Admin Mode Controls"
+            className="no-print"
+            style={{
+              position: "fixed",
+              bottom: 18,
+              right: 18,
+              zIndex: 90,
+              background: "linear-gradient(135deg, rgba(35,22,65,0.95), rgba(18,12,38,0.98))",
+              border: "1.5px solid #F59E0B",
+              borderRadius: 30,
+              padding: "6px 14px",
+              boxShadow: "0 6px 20px rgba(0,0,0,0.7), 0 0 12px rgba(245,158,11,0.35)",
+              display: "flex",
+              alignItems: "center",
+              gap: 8
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 800, color: "#FDE68A", display: "flex", alignItems: "center", gap: 5 }}>
+              <span>👑</span> VIP Admin Mode
+            </div>
+            <button
+              onClick={handleToggleAdminMode}
+              style={{
+                background: "rgba(245,158,11,0.15)",
+                border: "1px solid rgba(245,158,11,0.4)",
+                color: "#F3D37A",
+                borderRadius: 20,
+                padding: "3px 8px",
+                fontSize: 10.5,
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+              title="Click to test regular user paywalls"
+            >
+              Test User View
+            </button>
+          </aside>
+        )}
 
       </main>
     </div>
