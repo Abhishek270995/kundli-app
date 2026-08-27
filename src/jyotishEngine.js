@@ -674,6 +674,14 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     lang
   });
 
+  const careerPrediction = calculateCareerPrediction({
+    name,
+    dob,
+    lagnaSign: ascSign.name,
+    rashiSign: moonSign.name,
+    lang
+  });
+
   return {
     lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
     lagnaSign: ascSign.name,
@@ -704,7 +712,8 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     houses,
     planetData,
     annualTransit,
-    marriagePrediction
+    marriagePrediction,
+    careerPrediction
   };
 }
 
@@ -1001,5 +1010,378 @@ export function generateDailyHoroscope(signName = "Aries", lang = "en") {
     luckyColor,
     luckyNumber,
     auspiciousWindow
+  };
+}
+
+/* -------------------------------------------------------------
+   CAREER, JOB & BUSINESS PREDICTION ENGINE (PARASHARI & D10)
+------------------------------------------------------------- */
+export function calculateCareerPrediction({ name, dob, lagnaSign = "Aries", rashiSign = "Aries", lang = "en" }) {
+  const isHi = lang === "hi";
+  const birthDate = new Date(dob || "1998-01-01");
+  const birthYear = isNaN(birthDate.getFullYear()) ? 1998 : birthDate.getFullYear();
+  const currentYear = new Date().getFullYear();
+
+  const lagnaIndex = Math.max(0, SIGNS.findIndex(s => s.name.toLowerCase() === lagnaSign.toLowerCase()));
+  const rashiIndex = Math.max(0, SIGNS.findIndex(s => s.name.toLowerCase() === rashiSign.toLowerCase()));
+
+  // 10th House (Karma Sthana) & 6th/11th House dynamics
+  const tenthHouseIndex = (lagnaIndex + 9) % 12;
+  const tenthSign = SIGNS[tenthHouseIndex];
+  const tenthLord = tenthSign.lord;
+
+  // Deterministic seed
+  const seed = (birthYear * 11 + (birthDate.getMonth() + 1) * 17 + lagnaIndex * 23 + rashiIndex * 29) % 100;
+
+  // Archetypes based on 10th sign & lord
+  const archetypes = [
+    {
+      titleEn: "Strategic Executive & Technology Architect",
+      titleHi: "रणनीतिक प्रबंधन, आईटी व तकनीकी नेतृत्व",
+      sectorsEn: ["Cloud Architecture, AI & Systems Engineering", "Corporate Strategy & Digital Product Leadership", "FinTech & Data-Driven Operations"],
+      sectorsHi: ["क्लाउड आर्किटेक्चर, एआई व सॉफ्टवेयर इंजीनियरिंग", "कॉर्पोरेट रणनीति एवं डिजिटल उत्पाद प्रबंधन", "फिनटेक, एनालिटिक्स व डेटा ऑपरेशंस"]
+    },
+    {
+      titleEn: "Financial Strategist, Wealth & Advisory Leader",
+      titleHi: "वित्तीय विश्लेषक, बैंकिंग व रणनीतिक सलाहकार",
+      sectorsEn: ["Investment Banking & Equity Research", "Chartered Financial Consulting & Audit", "Fintech Ventures & Corporate Governance"],
+      sectorsHi: ["इन्वेस्टमेंट बैंकिंग एवं इक्विटी रिसर्च", "वित्तीय ऑडिट, सीए व कॉर्पोरेट गवर्नेंस", "व्यापारिक वित्त प्रबंधन व वेल्थ कंसल्टिंग"]
+    },
+    {
+      titleEn: "Public Policy, Civil Governance & Administrative Authority",
+      titleHi: "प्रशासनिक सेवा, राजपत्रित पद व जननीति प्रबंधन",
+      sectorsEn: ["UPSC / State PSC Civil & Administrative Cadres", "Judiciary, Corporate Law & Compliance", "Public Sector Enterprises (PSU) & Defense Engineering"],
+      sectorsHi: ["सिविल सेवा (IAS/IPS/State PSC) व प्रशासनिक संवर्ग", "न्यायिक सेवा, कॉर्पोरेट विधि (Law) व अनुपालन", "सार्वजनिक क्षेत्र (PSU), रेलवे व रक्षा प्रबंधन"]
+    },
+    {
+      titleEn: "Global Entrepreneur, Commerce & Brand Pioneer",
+      titleHi: "वैश्विक उद्यमी, व्यापारिक नेतृत्व व ई-कॉमर्स",
+      sectorsEn: ["Global Trade, E-Commerce & Supply Chains", "Industrial Manufacturing & Real Estate Ventures", "Direct-to-Consumer & Scalable Consumer Brands"],
+      sectorsHi: ["अंतरराष्ट्रीय व्यापार, ई-कॉमर्स व लॉजिस्टिक्स", "औद्योगिक विनिर्माण, रियल एस्टेट व इंफ्रास्ट्रक्चर", "स्वतंत्र व्यवसाय, फ्रेंचाइजी व स्टार्टअप्स"]
+    },
+    {
+      titleEn: "Medical, Healthcare & Scientific Innovation Leader",
+      titleHi: "चिकित्सा, स्वास्थ्य सेवा, शोध व जैव-प्रौद्योगिकी",
+      sectorsEn: ["Specialized Clinical Medicine & Surgery", "Pharmaceutical Research & Biotechnology", "HealthTech Platforms & Hospital Administration"],
+      sectorsHi: ["विशिष्ट चिकित्सा (Medicine), शल्यक्रिया व क्लीनिकल रिसर्च", "फार्मास्युटिकल व जैव-प्रौद्योगिकी अनुसंधान", "हेल्थटेक, डायग्नोस्टिक्स व अस्पताल प्रबंधन"]
+    },
+    {
+      titleEn: "Creative Director, Media & Digital Influence Pioneer",
+      titleHi: "क्रिएटिव डायरेक्टर, मीडिया, डिजाइन व स्वतंत्र विचारक",
+      sectorsEn: ["Visual Media, Film Direction & Content Ecosystems", "Architecture, Urban Aesthetics & Luxury Design", "High-Reach Digital Media & Brand Marketing"],
+      sectorsHi: ["सिनेमा, विजुअल मीडिया, एनिमेशन व डिजिटल कंटेंट", "आर्किटेक्चर, इंटीरियर व लग्जरी लाइफस्टाइल डिजाइन", "ब्रांड स्ट्रैटेजी, एडवरटाइजिंग व मास कम्युनिकेशन"]
+    }
+  ];
+
+  const selectedArch = archetypes[tenthHouseIndex % archetypes.length];
+
+  // Suitability percentage scores
+  const govtScore = Math.min(95, Math.max(62, 70 + ((seed * 3) % 26)));
+  const corporateScore = Math.min(96, Math.max(68, 76 + ((seed * 7) % 21)));
+  const businessScore = Math.min(94, Math.max(64, 72 + ((seed * 5) % 23)));
+  const creativeScore = Math.min(95, Math.max(65, 74 + ((seed * 9) % 22)));
+
+  // Growth & Promotion Windows
+  const startPromYr = currentYear;
+  const endPromYr = currentYear + 1;
+  const appraisalWindow = isHi
+    ? `${startPromYr} की अंतिम तिमाही से ${endPromYr} के मध्य तक (अत्यंत फलदायी काल)`
+    : `Q4 ${startPromYr} – Mid ${endPromYr} (High Velocity Promotion Yog)`;
+
+  const jobChangeWindow = isHi
+    ? `${endPromYr} के पूर्वार्ध में (वेतन वृद्धि एवं पद परिवर्तन)`
+    : `Early–Mid ${endPromYr} (Favorable for lucrative package & senior designation)`;
+
+  const expansionWindow = isHi
+    ? `${endPromYr + 1} – ${endPromYr + 2} (स्वतंत्र व्यापार व वैश्विक विस्तार)`
+    : `${endPromYr + 1} – ${endPromYr + 2} (Ideal for business launch & global equity)`;
+
+  // Workplace obstacle diagnosis
+  const obstacleEn = tenthLord === "Saturn" || seed % 3 === 0
+    ? "Saturnian karmic test: Work achievements may be recognized after slight delays, or office politics might test your patience. Cultivating disciplined documentation and emotional neutrality will turn adversaries into stepping stones."
+    : "Solar-Mercurial velocity: Quick recognition from superiors, but guard against burnout and impatience during hierarchical reorganizations. Focus on strategic high-visibility deliverables.";
+  
+  const obstacleHi = tenthLord === "Saturn" || seed % 3 === 0
+    ? "शनि के कर्म प्रभाव के कारण परिश्रम का फल थोड़ा धैर्य रखने पर मिलता है। सहकर्मियों की ईर्ष्या या कार्यालयी राजनीति से विचलित न हों। निष्ठापूर्वक अपने दायित्व निभाएं, उच्च पद व सम्मान सुनिश्चित है।"
+    : "सूर्य-बुध के शुभ प्रभाव से अधिकारियों से शीघ्र प्रशंसा मिलेगी। काम के अति-दबाव से बचें और महत्वपूर्ण व्यावसायिक योजनाओं को गोपनीय रखकर क्रियान्वित करें।";
+
+  // Actionable remedies for Career Elevation
+  const careerRemediesEn = [
+    "• Surya Arghya & Gayatri Power: Offer clean water in a copper vessel facing East within 1 hour of sunrise. Chant 'Om Suryaya Namah' 12 times to activate leadership charisma.",
+    "• Workspace Vastu: Position your primary work desk facing North or East. Keep a clean crystal pyramid or brass Kuber Yantra on the north-east corner of your desk.",
+    "• Thursday Jupiter Boost: Chant 'Om Gram Greem Grom Sah Gurave Namah' 108 times on Thursdays for career mentorship, appraisals, and ethical success.",
+    "• Saturday Shani Alignment: Light a mustard oil lamp near a Peepal tree or feed black sesame sweets to stray dogs on Saturdays to neutralize workplace obstacles."
+  ];
+
+  const careerRemediesHi = [
+    "• सूर्य उपासना व अर्घ्य: नित्य प्रातः सूर्योदय के समय तांबे के लोटे से जल में रोली व अक्षत मिलाकर सूर्य देव को अर्घ्य दें। 'ॐ सूर्याय नमः' का जप तेज व नेतृत्व क्षमता बढ़ाता है।",
+    "• कार्यस्थल वास्तु शुद्धि: काम करते समय मुख उत्तर अथवा पूर्व दिशा में रखें। अपने कार्यक्षेत्र (डेस्क) के ईशान कोण (North-East) को हमेशा स्वच्छ व प्रकाशित रखें।",
+    "• गुरु ग्रह संवर्धन: गुरुवार को 'ॐ ग्रां ग्रीं ग्रौं सः गुरुवे नमः' का १०८ बार जप करें। पदोन्नति एवं वरिष्ठों से अनुकूलता के लिए पीली वस्तुओं का दान करें।",
+    "• शनि देव शांति: शनिवार की शाम पीपल के वृक्ष के पास सरसों के तेल का दीपक जलाएं और जरूरतमंदों की सेवा करें, कार्यक्षेत्र के गुप्त अवरोध समाप्त होंगे।"
+  ];
+
+  return {
+    tenthSign: `${tenthSign.name} (${tenthSign.sanskrit})`,
+    tenthLord,
+    archetypeTitle: isHi ? selectedArch.titleHi : selectedArch.titleEn,
+    primarySectors: isHi ? selectedArch.sectorsHi : selectedArch.sectorsEn,
+    scores: {
+      govt: govtScore,
+      corporate: corporateScore,
+      business: businessScore,
+      creative: creativeScore,
+      dominantPath: corporateScore >= govtScore && corporateScore >= businessScore 
+        ? (isHi ? "कॉर्पोरेट व तकनीकी नेतृत्व (Corporate Leadership)" : "Corporate Executive & Tech Leadership")
+        : govtScore >= businessScore 
+        ? (isHi ? "राजकीय सेवा व प्रशासनिक अधिकार (Govt & Public Admin)" : "Government & Administrative Authority")
+        : (isHi ? "स्वतंत्र व्यापार व वैश्विक उद्यम (Business & Entrepreneurship)" : "Independent Business & Entrepreneurship")
+    },
+    appraisalWindow,
+    jobChangeWindow,
+    expansionWindow,
+    obstacleAnalysis: isHi ? obstacleHi : obstacleEn,
+    remedies: isHi ? careerRemediesHi : careerRemediesEn,
+    dailyCareerMantra: isHi
+      ? "ॐ ह्रीं सूर्याय नमः (नित्य प्रातः १०८ बार)"
+      : "Om Hreem Suryaya Namah (108 times at sunrise)"
+  };
+}
+
+/* -------------------------------------------------------------
+   DAILY LIFE PROBLEM SOLVER & VEDIC REMEDY DATABASE
+------------------------------------------------------------- */
+export const LIFE_PROBLEMS_LIST = [
+  {
+    id: "career_job",
+    icon: "💼",
+    labelEn: "Career Stagnation, Appraisal Delay & Workplace Politics",
+    labelHi: "करियर अवरोध, पदोन्नति में विलंब व ऑफिस की राजनीति",
+    shortEn: "Career & Job Stagnation",
+    shortHi: "नौकरी व करियर समस्या"
+  },
+  {
+    id: "money_debt",
+    icon: "💰",
+    labelEn: "Financial Instability, Stuck Money & Debt/Loan Pressure",
+    labelHi: "धन हानि, अटका हुआ पैसा व कर्ज से मुक्ति",
+    shortEn: "Money & Debt Relief",
+    shortHi: "धन व कर्ज मुक्ति"
+  },
+  {
+    id: "mental_stress",
+    icon: "🧠",
+    labelEn: "Anxiety, Overthinking, Insomnia & Rahu-Moon Afflictions",
+    labelHi: "मानसिक अशांति, अनिद्रा, तनाव व राहु-चंद्र दोष",
+    shortEn: "Stress & Anxiety Relief",
+    shortHi: "तनाव व मानसिक शांति"
+  },
+  {
+    id: "relationship_family",
+    icon: "💔",
+    labelEn: "Marital Discord, Communication Gap & Family Harmony",
+    labelHi: "दांपत्य कलह, वैचारिक मतभेद व पारिवारिक अशांति",
+    shortEn: "Relationship Harmony",
+    shortHi: "दांपत्य व परिवार शांति"
+  },
+  {
+    id: "health_energy",
+    icon: "🏥",
+    labelEn: "Chronic Fatigue, Low Immunity & Vitality Recovery",
+    labelHi: "शारीरिक दुर्बलता, ऊर्जा की कमी व स्वास्थ्य रक्षा",
+    shortEn: "Health & Vitality",
+    shortHi: "स्वास्थ्य व आरोग्य"
+  },
+  {
+    id: "legal_enemies",
+    icon: "⚖️",
+    labelEn: "Hidden Enemies, Competition & Legal/Property Disputes",
+    labelHi: "गुप्त शत्रु, ईर्ष्या, मुकदमेबाजी व विवाद निवारण",
+    shortEn: "Legal & Enemy Protection",
+    shortHi: "शत्रु व विवाद निवारण"
+  },
+  {
+    id: "nazar_energy",
+    icon: "🧿",
+    labelEn: "Evil Eye (Buri Nazar), Home Heaviness & Aura Cleansing",
+    labelHi: "बुरी नजर (दोष), घर में भारीपन व नकारात्मक ऊर्जा निवारण",
+    shortEn: "Evil Eye & Aura Cleanse",
+    shortHi: "नजर दोष व शुद्धि"
+  }
+];
+
+export function getLifeProblemRemedies({ problemId = "career_job", lagnaSign = "Aries", rashiSign = "Aries", lang = "en" }) {
+  const isHi = lang === "hi";
+
+  const problemDatabase = {
+    career_job: {
+      rootCauseEn: `Affliction of the 10th lord, Saturn's harsh 3rd/7th/10th aspect on the Sun/Karma Bhava, or an active Rahu Antardasha creating illusions and friction with authorities.`,
+      rootCauseHi: `दशमेश (कर्म भाव के स्वामी) का कमजोर होना, सूर्य पर राहु अथवा शनि की दृष्टि या कार्यक्षेत्र में षष्ठ भाव (प्रतिस्पर्धा) का सक्रिय होना।`,
+      mantra: "ॐ घृणिः सूर्याय नमः (Om Ghrinih Suryaya Namah)",
+      mantraCount: "108 times every morning facing East",
+      mantraCountHi: "नित्य प्रातः पूर्व दिशा की ओर मुख करके १०८ बार",
+      dailyUpayEn: [
+        "Offer water mixed with red vermilion (kumkum) and a pinch of sugar to Lord Surya in a copper vessel at sunrise.",
+        "Keep a solid brass or copper sun symbol on the eastern wall of your workspace.",
+        "Avoid sitting with your back facing the main entry door in your office or study cabin."
+      ],
+      dailyUpayHi: [
+        "प्रातः सूर्योदय के समय तांबे के लोटे में जल, कुमकुम व थोड़े अक्षत डालकर सूर्य देव को अर्घ्य दें।",
+        "अपने कार्यस्थल अथवा अध्ययन कक्ष की पूर्वी दीवार पर तांबे का सूर्य यंत्र लगाएं।",
+        "ऑफिस में मुख्य प्रवेश द्वार की तरफ पीठ करके बैठने से बचें।"
+      ],
+      charityEn: "Donate jaggery (gur), wheat grains, or copper utensils to an elderly scholar on Sunday afternoon.",
+      charityHi: "रविवार को किसी वृद्ध ब्राह्मण या जरूरतमंद को गेहूं, गुड़ अथवा तांबे के बर्तन का दान करें।",
+      gemRudraksha: isHi ? "१ मुखी अथवा १२ मुखी रुद्राक्ष / माणिक्य रत्न (रत्न ज्योतिषी परामर्श अनुसार)" : "1-Mukhi or 12-Mukhi Rudraksha / Natural Ruby",
+      vastuTipEn: "Ensure the North-East (Ishanya) corner of your living room or office has zero heavy scrap or footwear.",
+      vastuTipHi: "घर अथवा ऑफिस के ईशान कोण (North-East) में कोई भारी कबाड़ या जूते-चप्पल न रखें, इसे सदा स्वच्छ रखें।"
+    },
+    money_debt: {
+      rootCauseEn: `Blockage in the 2nd House (Dhana Bhava) or 11th House (Labha Bhava), afflicted Jupiter/Venus, or 12th House expenditure overload causing wealth leakage.`,
+      rootCauseHi: `द्वितीय (धन भाव) अथवा एकादश (लाभ भाव) पर पापक ग्रहों का प्रभाव, गुरु-शुक्र की दुर्बलता अथवा व्यय भाव (१२वें भाव) की अधिकता।`,
+      mantra: "ॐ श्रीं ह्रीं क्लीं त्रिभुवन महालक्ष्म्यै अस्मांक दारिद्र्य नाशय प्रचुर धन देहि देहि क्लीं ह्रीं श्रीं ॐ",
+      mantraCount: "108 times on Friday evening with cow ghee lamp",
+      mantraCountHi: "शुक्रवार की शाम शुद्ध गाय के घी का दीपक जलाकर १०८ बार",
+      dailyUpayEn: [
+        "Keep a small clean silver square piece or silver coin wrapped in red silk cloth inside your cash locker or wallet.",
+        "Feed green fodder or spinach to cows every Wednesday morning.",
+        "Never leave open dripping taps or leaky plumbing in the house as it signifies steady financial drain."
+      ],
+      dailyUpayHi: [
+        "अपनी तिजोरी अथवा पर्स में लाल रेशमी कपड़े में लिपटा हुआ चांदी का चौकोर टुकड़ा या सिक्का रखें।",
+        "प्रत्येक बुधवार को गाय को हरा चारा या पालक खिलाएं।",
+        "घर में किसी भी नल से पानी टपकने न दें, यह धन की निरंतर बर्बादी का वास्तु दोष माना जाता है।"
+      ],
+      charityEn: "Donate white rice, sugar, or dairy products to underprivileged women or spiritual shrines on Fridays.",
+      charityHi: "शुक्रवार के दिन जरूरतमंद कन्याओं या महिलाओं को चावल, मिश्री अथवा दूध से बनी मिठाई का दान करें।",
+      gemRudraksha: isHi ? "७ मुखी रुद्राक्ष (महालक्ष्मी स्वरूप) अथवा श्री कनकधारा यंत्र" : "7-Mukhi Rudraksha (Goddess Lakshmi) & Shri Kanakadhara Yantra",
+      vastuTipEn: "Place a Kubera Yantra or healthy money plant in the North zone of your residence to attract liquid wealth.",
+      vastuTipHi: "घर की उत्तर दिशा (कुबेर स्थान) में कनकधारा यंत्र स्थापित करें या मनी प्लांट लगाएं।"
+    },
+    mental_stress: {
+      rootCauseEn: `Affliction of the Moon (Chandra Dosha / Kemadruma / Rahu-Chandra Grahan Yog) or Mercury combust, leading to racing thoughts, restlessness, and nighttime anxiety.`,
+      rootCauseHi: `चंद्रमा का राहु/केतु या शनि से पीड़ित होना (ग्रहण अथवा विष योग), बुध की निर्बलता एवं छठे/आठवें भाव की अशांति।`,
+      mantra: "ॐ सोम सोमाय नमः / ॐ नमः शिवाय (Om Som Somaya Namah / Om Namah Shivaya)",
+      mantraCount: "108 times at twilight with gentle deep breathing",
+      mantraCountHi: "संध्याकाल में शांत बैठकर १०८ बार जप करें",
+      dailyUpayEn: [
+        "Drink water from a pure silver cup or keep water in a silver vessel overnight before drinking.",
+        "Apply a tiny spot of natural white sandalwood (Chandan) paste to the center of your forehead before meditation/sleep.",
+        "Avoid keeping footwear, electronics, or clutter beneath your bed."
+      ],
+      dailyUpayHi: [
+        "चांदी के गिलास में जल पिएं अथवा रात भर चांदी के बर्तन में रखा जल प्रातः ग्रहण करें।",
+        "माथे के केंद्र में शुद्ध सफेद चंदन का तिलक लगाएं, इससे मन को तुरंत शांति मिलती है।",
+        "अपने बिस्तर के नीचे कोई इलेक्ट्रॉनिक सामान, जूते-चप्पल अथवा कबाड़ न रखें।"
+      ],
+      charityEn: "Offer milk, white flowers, or rice to a Shiva temple on Mondays, and feed stray animals.",
+      charityHi: "सोमवार के दिन शिवलिंग पर कच्चा दूध व श्वेत पुष्प अर्पित करें और बेसहारा पशुओं को भोजन कराएं।",
+      gemRudraksha: isHi ? "२ मुखी रुद्राक्ष (शिव-पार्वती स्वरूप) / प्राकृतिक मोती" : "2-Mukhi Rudraksha (Ardhanarishvara) / Natural South Sea Pearl",
+      vastuTipEn: "Burn pure camphor (Kapur) in your bedroom for 5 minutes in the evening to clear mental fatigue and negative air.",
+      vastuTipHi: "संध्या समय शयनकक्ष में शुद्ध भीमसेनी कपूर जलाएं, इससे तनाव और अनिद्रा में तुरंत राहत मिलती है।"
+    },
+    relationship_family: {
+      rootCauseEn: `7th House (Partnership Bhava) afflicted by Mars (Mangal Dosha), Sun's ego aspect, or Rahu's illusion causing sudden misunderstandings and communication breakdowns.`,
+      rootCauseHi: `सप्तम भाव अथवा शुक्र/गुरु पर मंगल (मांगलिक प्रभाव), सूर्य का अहंकार अथवा राहु का भ्रम उत्पन्न करने वाला प्रभाव।`,
+      mantra: "ॐ गौरीशंकराय नमः / ॐ क्लीं कृष्णाय नमः (Om Gaurishankaraya Namah)",
+      mantraCount: "108 times in the morning for marital harmony",
+      mantraCountHi: "नित्य प्रातः १०८ बार श्रद्धापूर्वक जप करें",
+      dailyUpayEn: [
+        "Offer prayers to Lord Shiva and Goddess Parvati together with a single garland on Pradosh or Mondays.",
+        "Keep a pair of lovebirds or Radha-Krishna image in the South-West zone of your home.",
+        "Avoid eating food while arguing or keeping footwear near the dining area."
+      ],
+      dailyUpayHi: [
+        "शिव-पार्वती की संयुक्त प्रतिमा पर एक साथ पुष्पमाला अर्पित करें और सुखद दांपत्य की प्रार्थना करें।",
+        "घर के नैऋत्य कोण (South-West) में राधा-कृष्ण की प्रेममयी तस्वीर लगाएं।",
+        "भोजन करते समय मौन रहें या केवल सकारात्मक बातें करें, भोजन की थाली में हाथ न धोएं।"
+      ],
+      charityEn: "Donate red clothes, fruits, or sweets to married women or temple priests on Tuesdays/Fridays.",
+      charityHi: "मंगलवार अथवा शुक्रवार को सुहागिन स्त्रियों को सुहाग सामग्री या मीठे फल भेंट करें।",
+      gemRudraksha: isHi ? "गौरी-शंकर रुद्राक्ष (अखंड दांपत्य सुख हेतु)" : "Gauri-Shankar Rudraksha (Supreme Harmonic Union)",
+      vastuTipEn: "Ensure the bedroom has no mirrors directly reflecting the sleeping bed; cover mirrors at night.",
+      vastuTipHi: "शयनकक्ष में ऐसा कोई शीशा न हो जिसमें सोते समय शरीर का प्रतिबिंब दिखे, रात्रि में शीशे को ढक दें।"
+    },
+    health_energy: {
+      rootCauseEn: `Affliction of the Lagna Lord (Physical Vitality) or 6th/8th house distress, weakening the immune matrix and causing chronic lethargy or digestive fire imbalance.`,
+      rootCauseHi: `लग्नेश (शरीर बल) का निर्बल होना, षष्ठ भाव (रोग) की प्रबलता अथवा सूर्य-मंगल के तेज में कमी।`,
+      mantra: "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् । उर्वारुकमिव बन्धनान्मृ त्योर्मुक्षीय मामृतात् ॥",
+      mantraCount: "11 or 108 times facing East (Maha Mrityunjaya Mantra)",
+      mantraCountHi: "महामृत्युंजय मंत्र का नित्य प्रातः ११ या १०८ बार जप करें",
+      dailyUpayEn: [
+        "Drink a glass of warm water infused with a pinch of turmeric and honey in the morning.",
+        "Perform Surya Namaskar and take at least 15 minutes of direct morning sunlight on your back.",
+        "Do not skip morning meals or consume stale/reheated oily meals late at night."
+      ],
+      dailyUpayHi: [
+        "प्रातः काल तांबे के बर्तन में रखा जल पिएं और गुनगुने पानी में हल्की हल्दी लें।",
+        "सूर्योदय के समय १५ मिनट धूप का सेवन करें और हल्का प्राणायाम करें।",
+        "बासी अथवा अत्यधिक तैलीय भोजन से परहेज करें और समय पर भोजन करें।"
+      ],
+      charityEn: "Donate medicines, fresh seasonal fruits, or warm clothes to hospital patients or elderly shelters.",
+      charityHi: "अस्पतालों में जरूरतमंद मरीजों को दवाइयां अथवा ताजे मौसमी फल वितरित करें।",
+      gemRudraksha: isHi ? "३ मुखी अथवा ५ मुखी रुद्राक्ष (अग्नि तत्व व आरोग्य वर्धक)" : "3-Mukhi (Agni) or 5-Mukhi Rudraksha / Copper Bracelet",
+      vastuTipEn: "Sleep with your head pointing towards the South or East to align with the Earth's geomagnetic health field.",
+      vastuTipHi: "सोते समय सिर हमेशा दक्षिण (South) या पूर्व (East) दिशा में रखें, इससे गहरी नींद व स्वास्थ्य लाभ होता है।"
+    },
+    legal_enemies: {
+      rootCauseEn: `6th House (Shatru & Rina Bhava) activated with hostile aspects, or strong Mars-Rahu transit creating unwarranted disputes, jealousy, or institutional resistance.`,
+      rootCauseHi: `षष्ठ भाव (शत्रु व विवाद) का जाग्रत होना अथवा मंगल-राहु की युति से अकारण ईर्ष्या व विरोधी सक्रिय होना।`,
+      mantra: "ॐ हं हनुमते रुद्रात्मकाय हुं फट् (Om Ham Hanumate Rudratmakaya Hum Phat)",
+      mantraCount: "108 times on Tuesday/Saturday in front of Hanuman idol",
+      mantraCountHi: "मंगलवार व शनिवार को हनुमान जी के समक्ष १०८ बार",
+      dailyUpayEn: [
+        "Recite the Bajrang Baan or Hanuman Chalisa with full devotion on Tuesdays and Saturdays.",
+        "Apply a small tilak of orange Sindoor from Lord Hanuman's right shoulder onto your forehead before court hearings or negotiations.",
+        "Keep your important legal documents in a yellow or red folder in the North-East zone."
+      ],
+      dailyUpayHi: [
+        "मंगलवार और शनिवार को बजरंग बाण अथवा श्री हनुमान चालीसा का श्रद्धापूर्वक पाठ करें।",
+        "हनुमान जी के चरणों का सिंदूर माथे पर लगाकर महत्वपूर्ण वार्ता अथवा कार्य हेतु प्रस्थान करें।",
+        "कानूनी कागजात व महत्वपूर्ण दस्तावेज लाल या पीले फोल्डर में उत्तर दिशा में रखें।"
+      ],
+      charityEn: "Distribute roasted grams (chana) and jaggery (gur) to monkeys or poor children on Tuesdays.",
+      charityHi: "मंगलवार को बंदरों अथवा जरूरतमंद बालकों को भुने चने व गुड़ का प्रसाद बांटें।",
+      gemRudraksha: isHi ? "११ मुखी रुद्राक्ष (श्री हनुमान स्वरूप) / बगलामुखी यंत्र" : "11-Mukhi Rudraksha (Lord Hanuman) & Baglamukhi Yantra",
+      vastuTipEn: "Light a mustard oil lamp with 2 whole cloves (laung) facing South-East in the evening.",
+      vastuTipHi: "संध्या समय दक्षिण दिशा की ओर मुख करके सरसों के तेल के दीपक में २ लौंग डालकर जलाएं।"
+    },
+    nazar_energy: {
+      rootCauseEn: `Auric field vulnerability due to weak Ascendant aura or Rahu-Ketu shadow influence, leading to sudden domestic friction, lethargy, or unexplained recurring hitches.`,
+      rootCauseHi: `आभामंडल (Aura) की दुर्बलता, राहु-केतु की छाया दृष्टि अथवा गृह वास्तु में नकारात्मक ऊर्जा का संचय।`,
+      mantra: "ॐ नमो भगवते वासुदेवाय / ॐ दुं दुर्गायै नमः (Om Dum Durgayai Namah)",
+      mantraCount: "108 times with incense lighting",
+      mantraCountHi: "नित्य १०८ बार जप करें और धूप-दीप प्रज्वलित करें",
+      dailyUpayEn: [
+        "Wipe the floors of your house with rock salt (Sendha Namak) mixed in mop water twice a week (Tuesdays and Saturdays).",
+        "Circulate a whole lemon 7 times around the affected person/home from head to toe and dispose of it at a four-way crossroad or running water.",
+        "Hang a string of 7 green chilies and 1 fresh lemon outside your main entrance every Saturday."
+      ],
+      dailyUpayHi: [
+        "सप्ताह में दो बार (मंगलवार व शनिवार) घर के पोछे के पानी में थोड़ा सेंधा नमक मिलाकर पोछा लगाएं।",
+        "एक साबुत नींबू को प्रभावित व्यक्ति के सिर से पैर तक ७ बार वार कर किसी निर्जन स्थान पर रख दें।",
+        "घर के मुख्य द्वार पर शनिवार को ७ हरी मिर्च और १ नींबू की माला लगाएं।"
+      ],
+      charityEn: "Feed black sesame seeds and cooked food to stray dogs, crows, or fish on Saturday evening.",
+      charityHi: "शनिवार की शाम काले कुत्तों या कौवों को सरसों के तेल से चुपड़ी रोटी खिलाएं।",
+      gemRudraksha: isHi ? "काला धागा / नजर रक्षा कवच / महामृत्युंजय यंत्र" : "Evil Eye Protection Thread / 10-Mukhi Rudraksha (Lord Vishnu)",
+      vastuTipEn: "Burn dry neem leaves, guggul, and yellow mustard seeds (Peeli Sarson) in a clay bowl across all rooms once a week.",
+      vastuTipHi: "सप्ताह में एक बार घर में गुग्गल, लोबान और पीली सरसों की धूनी दें, इससे सभी नकारात्मक ऊर्जाएं तुरंत समाप्त होती हैं।"
+    }
+  };
+
+  const item = problemDatabase[problemId] || problemDatabase.career_job;
+  const problemMeta = LIFE_PROBLEMS_LIST.find(p => p.id === problemId) || LIFE_PROBLEMS_LIST[0];
+
+  return {
+    problemId,
+    problemTitle: isHi ? problemMeta.labelHi : problemMeta.labelEn,
+    icon: problemMeta.icon,
+    rootCause: isHi ? item.rootCauseHi : item.rootCauseEn,
+    mantra: item.mantra,
+    mantraCount: isHi ? item.mantraCountHi : item.mantraCount,
+    dailyUpay: isHi ? item.dailyUpayHi : item.dailyUpayEn,
+    charity: isHi ? item.charityHi : item.charityEn,
+    gemRudraksha: item.gemRudraksha,
+    vastuTip: isHi ? item.vastuTipHi : item.vastuTipEn
   };
 }

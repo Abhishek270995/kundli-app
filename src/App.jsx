@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, calculateMarriagePrediction, SIGNS } from "./jyotishEngine";
+import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, calculateMarriagePrediction, calculateCareerPrediction, getLifeProblemRemedies, LIFE_PROBLEMS_LIST, SIGNS } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
@@ -32,6 +32,8 @@ const PLANETS = [
 const TABS = [
   { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "चार्ट" },
   { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "careerTiming", icon: "💼", labelEn: "Career & Job", labelHi: "करियर व नौकरी" },
+  { id: "lifeProblems", icon: "🛡️", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण व उपाय" },
   { id: "marriageTiming", icon: "💍", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
   { id: "daily", icon: "☀️", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
   { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
@@ -412,6 +414,8 @@ const PRODUCT_PRICES = {
   annualReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   matchmakingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   marriageTimingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+  careerReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
+  remediesReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
   dailyMonthly: { INR: "₹49", USD: "$0.99", EUR: "€0.99", GBP: "£0.79", CAD: "CA$1.29", AUD: "AU$1.49", AED: "AED 4" },
   dailyYearly: { INR: "₹299", USD: "$4.99", EUR: "€4.99", GBP: "£3.99", CAD: "CA$6.99", AUD: "AU$7.99", AED: "AED 22" },
 };
@@ -833,6 +837,21 @@ export default function App() {
       return false;
     }
   });
+  const [unlockedCareerReport, setUnlockedCareerReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_unlocked_career");
+    } catch {
+      return false;
+    }
+  });
+  const [unlockedRemediesReport, setUnlockedRemediesReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_unlocked_remedies");
+    } catch {
+      return false;
+    }
+  });
+  const [activeProblemId, setActiveProblemId] = useState("career_job");
 
   // Admin VIP Bypass State (Dedicated for Owner Abhishek)
   const [isAdmin, setIsAdmin] = useState(() => {
@@ -855,6 +874,8 @@ export default function App() {
   const [logoClickCount, setLogoClickCount] = useState(0);
 
   const effectiveMarriageUnlocked = isAdmin || unlockedMarriageReport;
+  const effectiveCareerUnlocked = isAdmin || unlockedCareerReport;
+  const effectiveRemediesUnlocked = isAdmin || unlockedRemediesReport;
   const effectiveDailySubscribed = isAdmin || isDailySubscribed;
   const effectiveProUnlocked = isAdmin || unlockedProReport;
 
@@ -1115,6 +1136,22 @@ export default function App() {
               try {
                 localStorage.setItem("jyotish_unlocked_marriage", "true");
                 setUnlockedMarriageReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            if (activeCheckout?.isCareerUnlock) {
+              try {
+                localStorage.setItem("jyotish_unlocked_career", "true");
+                setUnlockedCareerReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            if (activeCheckout?.isRemediesUnlock) {
+              try {
+                localStorage.setItem("jyotish_unlocked_remedies", "true");
+                setUnlockedRemediesReport(true);
               } catch (e) {
                 console.error(e);
               }
@@ -1626,6 +1663,474 @@ export default function App() {
                 <SectionCard icon="✨" title={t.sec.verdict} content={result.verdict} highlight />
               </div>
             )}
+
+            {/* ── TAB: CAREER, JOB & BUSINESS PREDICTION (FREEMIUM + PAID GATE) ── */}
+            {tab === "careerTiming" && (() => {
+              const cp = result.careerPrediction || calculateCareerPrediction({
+                name: form.name || "User",
+                dob: form.dob || "1998-01-01",
+                lagnaSign: result.lagnaSign,
+                rashiSign: result.rashiSign,
+                lang
+              });
+              const unlockPrice = PRODUCT_PRICES.careerReport[currency];
+
+              return (
+                <div>
+                  {/* Top Free Career Overview Card */}
+                  <div className="glass-card" style={{ padding: "28px 30px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 16, marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 12, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 4 }}>
+                          <span>💼</span> {hi ? "दशम भाव कर्म स्थान एवं डी-१० दशांश विश्लेषण" : "10TH HOUSE KARMA & D10 ANALYSIS"}
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 800, marginTop: 4 }}>
+                          {form.name || "Native"} — {hi ? "करियर, नौकरी व व्यावसायिक मार्गदर्शन" : "Career, Job & Business Growth Blueprint"}
+                        </h3>
+                        <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, marginTop: 3 }}>
+                          {hi ? `दशम भाव राशि: ${cp.tenthSign} | कर्मेश: ${cp.tenthLord}` : `10th House Sign: ${cp.tenthSign} | 10th Lord: ${cp.tenthLord}`}
+                        </p>
+                      </div>
+
+                      <div style={{ textAlign: "right", background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "10px 18px" }}>
+                        <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>{hi ? "करियर सफलता योग" : "Career Elevation Index"}</div>
+                        <div style={{ fontSize: 24, fontWeight: 800, color: "#34D399" }}>{cp.scores.corporate}%</div>
+                      </div>
+                    </div>
+
+                    {/* Primary Archetype & Recommended Streams */}
+                    <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.12), rgba(11,8,25,0.8))", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 14, padding: "20px 22px", marginBottom: 20 }}>
+                      <div style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8 }}>
+                        🌟 {hi ? "आपका प्रधान करियर स्वभाव (Primary Career Archetype)" : "Dominant Professional Archetype"}
+                      </div>
+                      <h4 style={{ color: "#FFF", fontSize: 18, fontWeight: 800, marginTop: 4, marginBottom: 12 }}>
+                        {cp.archetypeTitle}
+                      </h4>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+                        {cp.primarySectors.map((sector, idx) => (
+                          <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ color: "#34D399", fontSize: 16 }}>✦</span>
+                            <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 600 }}>{sector}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 4 Domain Suitability Spectrum (Govt vs Corporate vs Business vs Creative) */}
+                    <div style={{ marginBottom: 22 }}>
+                      <h4 style={{ color: "#F3D37A", fontSize: 15.5, fontWeight: 800, marginBottom: 14 }}>
+                        📊 {hi ? "क्षेत्र-वार अनुकूलता सूचकांक (Domain Suitability Spectrum)" : "Career Domain Suitability Spectrum"}
+                      </h4>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 12 }}>
+                        {[
+                          { name: hi ? "सरकारी व प्रशासनिक सेवा (Govt/PSU)" : "Government & Civil Administration", score: cp.scores.govt, icon: "🏛️", color: "#F59E0B" },
+                          { name: hi ? "कॉर्पोरेट व आईटी नेतृत्व (Corporate/Tech)" : "Corporate & High-Tech Leadership", score: cp.scores.corporate, icon: "💼", color: "#60A5FA" },
+                          { name: hi ? "स्वतंत्र व्यापार व उद्यम (Business/Startups)" : "Business & Scalable Startups", score: cp.scores.business, icon: "🚀", color: "#34D399" },
+                          { name: hi ? "रिसर्च, मीडिया व कला (Creative/Research)" : "Creative Media & Advisory", score: cp.scores.creative, icon: "🎨", color: "#F472B6" },
+                        ].map((domain, i) => (
+                          <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "14px 16px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>{domain.icon} {domain.name}</span>
+                              <span style={{ color: domain.color, fontSize: 14, fontWeight: 800 }}>{domain.score}%</span>
+                            </div>
+                            <div style={{ width: "100%", height: 7, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+                              <div style={{ width: `${domain.score}%`, height: "100%", background: domain.color, borderRadius: 4 }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Golden Career Timeline */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 14, marginBottom: 20 }}>
+                      <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                        <div style={{ color: "#34D399", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          📈 {hi ? "पदोन्नति व अप्रेजल काल" : "Next Promotion & Appraisal Window"}
+                        </div>
+                        <div style={{ color: "#FFF", fontSize: 14, fontWeight: 700 }}>
+                          {cp.appraisalWindow}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          🔄 {hi ? "नौकरी परिवर्तन व वेतन वृद्धि" : "Job Switch & High-Package Timing"}
+                        </div>
+                        <div style={{ color: "#FFF", fontSize: 14, fontWeight: 700 }}>
+                          {cp.jobChangeWindow}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.35)", borderRadius: 12, padding: "16px 18px" }}>
+                        <div style={{ color: "#60A5FA", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          🌐 {hi ? "व्यापार विस्तार व वैश्विक अवसर" : "Business Launch & Expansion Phase"}
+                        </div>
+                        <div style={{ color: "#FFF", fontSize: 14, fontWeight: 700 }}>
+                          {cp.expansionWindow}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Workplace Obstacles & Doshas */}
+                    <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 18px", marginBottom: 20 }}>
+                      <div style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>
+                        ⚠️ {hi ? "कार्यक्षेत्र में आने वाले अवरोध व उनका ज्योतिषीय कारण" : "Workplace Friction & Astrological Diagnostics"}
+                      </div>
+                      <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 13.5, lineHeight: 1.7, margin: 0 }}>
+                        {cp.obstacleAnalysis}
+                      </p>
+                    </div>
+
+                    {/* Actionable Remedies & Daily Mantra */}
+                    <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 12, padding: "18px 20px" }}>
+                      <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+                        <span>🛡️ {hi ? "करियर उन्नति के अचूक वैदिक उपाय व बीज मंत्र" : "Actionable Vedic Remedies for Rapid Career Elevation"}</span>
+                        <span style={{ fontSize: 12, color: "#34D399", fontWeight: 700 }}>☀️ {cp.dailyCareerMantra}</span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
+                        {cp.remedies.map((rem, i) => (
+                          <p key={i} style={{ color: "rgba(241,231,208,0.92)", fontSize: 13.5, lineHeight: 1.7, margin: 0 }}>
+                            {rem}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── FREEMIUM GATE: 20-PAGE COMPREHENSIVE CAREER & BUSINESS BLUEPRINT ── */}
+                  <div className="glass-card" style={{ padding: "28px 30px", border: "1.5px solid rgba(245,158,11,0.45)", background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))", position: "relative", overflow: "hidden" }}>
+                    {effectiveCareerUnlocked ? (
+                      <div style={{ textAlign: "center", padding: "10px 0" }}>
+                        <span style={{ fontSize: 40 }}>👑</span>
+                        <h3 style={{ color: "#34D399", fontSize: 20, fontWeight: 800, marginTop: 4 }}>
+                          {hi ? "आपकी सम्पूर्ण करियर ब्लूप्रिंट रिपोर्ट अनलॉक है!" : "Complete 20-Page Career & Business Blueprint Unlocked!"}
+                        </h3>
+                        {isAdmin && (
+                          <div style={{ display: "inline-block", background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 800, marginTop: 4 }}>
+                            👑 Admin VIP Access Active
+                          </div>
+                        )}
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 14, maxWidth: 540, margin: "8px auto 16px" }}>
+                          {hi
+                            ? "आपकी विस्तृत पदोन्नति तिथियां, विदेश योग, व्यापारिक साझेदारी विश्लेषण एवं डी-१० दशांश चार्ट की सम्पूर्ण प्रति तैयार है।"
+                            : "Your in-depth month-by-month appraisal forecast, foreign work settlement yogas, and business partnership analysis are fully unlocked."}
+                        </p>
+                        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                          <button onClick={() => window.print()} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+                            📄 {hi ? "करियर PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Career Report PDF"}
+                          </button>
+                          <a
+                            href={`https://wa.me/918094199663?text=${encodeURIComponent(`Hi Jyotish Kundli, I have unlocked my Career Blueprint for ${form.name}. Please provide astrologer verification.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              background: "#25D366",
+                              color: "#0F0A1E",
+                              padding: "10px 20px",
+                              borderRadius: 10,
+                              fontSize: 13.5,
+                              fontWeight: 700,
+                              textDecoration: "none"
+                            }}
+                          >
+                            <span>💬</span> {hi ? "व्हाट्सएप पर ज्योतिषी से पूछें" : "Consult on WhatsApp"}
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+                          <div>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
+                              <span>🔒</span> {hi ? "प्रीमियम करियर रिपोर्ट" : "PREMIUM CAREER & WEALTH DOSSIER"}
+                            </div>
+                            <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800 }}>
+                              {hi ? "संपूर्ण २०-पृष्ठीय करियर, पदोन्नति एवं व्यापार PDF रिपोर्ट अनलॉक करें" : "Unlock Complete 20-Page Career, Promotion & Business Blueprint PDF"}
+                            </h3>
+                            <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 14, marginTop: 4, maxWidth: 660 }}>
+                              {hi
+                                ? "अपनी कुंडली के डी-१० दशांश चार्ट का सूक्ष्म विश्लेषण, आगामी ५ वर्षों के वित्तीय चक्र, विदेश में नौकरी के योग, और सरकारी परीक्षा में सफलता के अचूक समय को विस्तार से जानें।"
+                                : "Deep dive into your D10 Dasamsa chart, multi-year financial wealth cycles, foreign relocation & overseas job yogas, and business partnership compatibility."}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Feature bullets */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginBottom: 18 }}>
+                          {[
+                            { icon: "📅", titleEn: "Month-by-Month 2026-2028 Appraisal Windows", titleHi: "माह-दर-माह पदोन्नति व इन्क्रीमेंट कैलेंडर" },
+                            { icon: "✈️", titleEn: "Foreign Job & Overseas Settlement Yogas", titleHi: "विदेश में नौकरी व बसने के विशेष योग" },
+                            { icon: "🏛️", titleEn: "Govt / Competitive Exam Success Probability", titleHi: "सरकारी नौकरी व प्रतियोगी परीक्षा सफलता काल" },
+                            { icon: "🤝", titleEn: "Business Partnership & Startup Risk Analysis", titleHi: "व्यापारिक साझेदारी व स्टार्टअप जोखिम विश्लेषण" },
+                          ].map((f, i) => (
+                            <div key={i} style={{ background: "rgba(11,8,25,0.65)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 18 }}>{f.icon}</span>
+                              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>{hi ? f.titleHi : f.titleEn}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Unlock CTA Button */}
+                        <div style={{ textAlign: "center", paddingTop: 8 }}>
+                          <button
+                            onClick={() => setActiveCheckout({
+                              title: "Complete 20-Page Career & Business Growth Blueprint PDF",
+                              priceKey: "careerReport",
+                              price: unlockPrice,
+                              desc: "Detailed D10 Dasamsa analysis, promotion calendar, and wealth timing",
+                              icon: "💼",
+                              isCareerUnlock: true
+                            })}
+                            className="gold-cta-btn"
+                            style={{ padding: "14px 28px", fontSize: 15, fontWeight: 800 }}
+                          >
+                            {hi ? `करियर ब्लूप्रिंट अनलॉक करें (${unlockPrice}) ✦` : `Unlock Complete Career Blueprint (${unlockPrice}) ✦`}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ── TAB: DAILY LIFE PROBLEMS & VEDIC REMEDIAL SOLVER (INTERACTIVE) ── */}
+            {tab === "lifeProblems" && (() => {
+              const activeRemedy = getLifeProblemRemedies({
+                problemId: activeProblemId,
+                lagnaSign: result.lagnaSign,
+                rashiSign: result.rashiSign,
+                lang
+              });
+              const unlockPrice = PRODUCT_PRICES.remediesReport[currency];
+
+              return (
+                <div>
+                  {/* Category Pill Selector */}
+                  <div className="glass-card" style={{ padding: "16px 20px", marginBottom: 20, overflowX: "auto" }}>
+                    <div style={{ fontSize: 13, color: "rgba(243,211,122,0.85)", fontWeight: 700, marginBottom: 10 }}>
+                      ⚡ {hi ? "अपनी वर्तमान समस्या अथवा चिंता का विषय चुनें:" : "Select Your Current Active Challenge or Concern:"}
+                    </div>
+                    <div style={{ display: "flex", gap: 10, minWidth: "max-content", flexWrap: "wrap" }}>
+                      {LIFE_PROBLEMS_LIST.map(p => {
+                        const isSelected = activeProblemId === p.id;
+                        return (
+                          <button
+                            key={p.id}
+                            onClick={() => setActiveProblemId(p.id)}
+                            style={{
+                              background: isSelected ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(15,10,32,0.65)",
+                              border: `1px solid ${isSelected ? "#F59E0B" : "rgba(212,175,55,0.25)"}`,
+                              color: isSelected ? "#0F0A1E" : "#FDE68A",
+                              padding: "10px 16px",
+                              borderRadius: 12,
+                              fontSize: 13.5,
+                              fontWeight: isSelected ? 800 : 700,
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <span style={{ fontSize: 18 }}>{p.icon}</span>
+                            <span>{hi ? p.shortHi : p.shortEn}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Main Problem Deep-Dive & Remedial Plan */}
+                  <div className="glass-card" style={{ padding: "28px 30px", marginBottom: 20 }}>
+                    {/* Header */}
+                    <div style={{ borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 16, marginBottom: 20 }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 12, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
+                        <span>🛡️</span> {hi ? "वैदिक व लाल किताब समस्या निवारण पद्धति" : "VEDIC & LAL KITAB REMEDY DOSSIER"}
+                      </div>
+                      <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, marginTop: 2 }}>
+                        {activeRemedy.icon} {activeRemedy.problemTitle}
+                      </h3>
+                    </div>
+
+                    {/* Astrological Root Cause Diagnostic */}
+                    <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 12, padding: "18px 20px", marginBottom: 20 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#F87171", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>
+                        <span>🔍</span> {hi ? "ज्योतिषीय मूल कारण (Astrological Root Cause Diagnostic)" : "Astrological Root Cause Diagnostic"}
+                      </div>
+                      <p style={{ color: "rgba(241,231,208,0.92)", fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+                        {activeRemedy.rootCause}
+                      </p>
+                    </div>
+
+                    {/* Sacred Beej Mantra & Japa Count */}
+                    <div style={{ background: "linear-gradient(135deg, rgba(35,22,65,0.85), rgba(15,10,32,0.95))", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 14, padding: "20px 22px", marginBottom: 20 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                        <div style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
+                          🕉️ {hi ? "सिद्ध बीज मंत्र एवं जप विधि" : "Prescribed Sacred Beej Mantra & Timing"}
+                        </div>
+                        <div style={{ color: "#34D399", fontSize: 12.5, fontWeight: 700, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 8, padding: "3px 10px" }}>
+                          ⏱️ {activeRemedy.mantraCount}
+                        </div>
+                      </div>
+                      <div style={{ background: "rgba(0,0,0,0.5)", border: "1px dashed rgba(245,158,11,0.35)", borderRadius: 10, padding: "14px 18px", color: "#F3D37A", fontSize: 16, fontWeight: 800, letterSpacing: 0.5, lineHeight: 1.7, textAlign: "center" }}>
+                        {activeRemedy.mantra}
+                      </div>
+                    </div>
+
+                    {/* 3 Practical Daily Lal Kitab & Vedic Upay */}
+                    <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "18px 20px", marginBottom: 20 }}>
+                      <div style={{ color: "#34D399", fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>
+                        🌿 {hi ? "नित्य सरल लाल किताब व वैदिक उपाय (Daily Action Steps)" : "3 Simple Daily Action Steps (Lal Kitab & Vedic)"}
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
+                        {activeRemedy.dailyUpay.map((upay, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                            <span style={{ color: "#FDE68A", fontSize: 16, marginTop: 1 }}>✦</span>
+                            <span style={{ color: "rgba(241,231,208,0.92)", fontSize: 13.5, lineHeight: 1.7 }}>{upay}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Charity, Gem/Rudraksha & Vastu Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 18 }}>
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          🤲 {hi ? "दान एवं सेवा संकल्प (Charity & Daan)" : "Prescribed Charity & Daan"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                          {activeRemedy.charity}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          💎 {hi ? "रत्न, रुद्राक्ष एवं सुरक्षा कवच" : "Gemstone & Rudraksha Shield"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                          {activeRemedy.gemRudraksha}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
+                        <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, marginBottom: 4 }}>
+                          🏡 {hi ? "वास्तु एवं ऊर्जा शुद्धि (Vastu & Aura)" : "Home & Workplace Energy Alignment"}
+                        </div>
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                          {activeRemedy.vastuTip}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 21-Day Sankalp Ritual Note */}
+                    <div style={{ background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.35)", borderRadius: 10, padding: "14px 16px", textAlign: "center", color: "rgba(241,231,208,0.9)", fontSize: 13 }}>
+                      ✨ <b>{hi ? "२१-दिवसीय संकल्प नियम:" : "21-Day Sankalp Protocol:"}</b> {hi ? "उपरोक्त मंत्र व उपाय को लगातार २१ दिनों तक निष्ठापूर्वक करने से नकारात्मक ऊर्जा का शमन होकर शुभ फल प्रकट होने लगते हैं।" : "Practicing the prescribed mantra and daily upay consistently for 21 days creates a powerful protective aura and clears karmic obstructions."}
+                    </div>
+                  </div>
+
+                  {/* ── FREEMIUM GATE: COMPLETE REMEDIAL DOSSIER ── */}
+                  <div className="glass-card" style={{ padding: "28px 30px", border: "1.5px solid rgba(245,158,11,0.45)", background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
+                    {effectiveRemediesUnlocked ? (
+                      <div style={{ textAlign: "center", padding: "10px 0" }}>
+                        <span style={{ fontSize: 40 }}>👑</span>
+                        <h3 style={{ color: "#34D399", fontSize: 20, fontWeight: 800, marginTop: 4 }}>
+                          {hi ? "आपकी संपूर्ण समस्या निवारण व उपाय गाइड अनलॉक है!" : "Complete Vedic Remedial Dossier Unlocked!"}
+                        </h3>
+                        {isAdmin && (
+                          <div style={{ display: "inline-block", background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11, fontWeight: 800, marginTop: 4 }}>
+                            👑 Admin VIP Access Active
+                          </div>
+                        )}
+                        <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 14, maxWidth: 540, margin: "8px auto 16px" }}>
+                          {hi
+                            ? "सभी ७ प्रमुख जीवन समस्याओं के तांत्रिक व वैदिक निवारण, महामृत्युंजय अनुष्ठान एवं व्यक्तिगत रत्न संस्तुति की विस्तृत प्रति तैयार है।"
+                            : "Your complete all-7 life challenge remedies, custom yantra instructions, and personalized protection guide are active."}
+                        </p>
+                        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                          <button onClick={() => window.print()} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+                            📄 {hi ? "उपाय PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Remedies Dossier PDF"}
+                          </button>
+                          <a
+                            href={`https://wa.me/918094199663?text=${encodeURIComponent(`Hi Jyotish Kundli, I have unlocked my Vedic Remedies Dossier for ${form.name}. Please guide me on priority remedy.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              background: "#25D366",
+                              color: "#0F0A1E",
+                              padding: "10px 20px",
+                              borderRadius: 10,
+                              fontSize: 13.5,
+                              fontWeight: 700,
+                              textDecoration: "none"
+                            }}
+                          >
+                            <span>💬</span> {hi ? "व्हाट्सएप सहायता प्राप्त करें" : "Ask Astrologer on WhatsApp"}
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
+                          <div>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
+                              <span>🔒</span> {hi ? "विस्तृत वैदिक दोष एवं शांति रिपोर्ट" : "COMPLETE VEDIC DOSHA & REMEDIAL DOSSIER"}
+                            </div>
+                            <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800 }}>
+                              {hi ? "सभी ७ प्रमुख जीवन समस्याओं की संपूर्ण वैदिक निवारण PDF अनलॉक करें" : "Unlock Complete All-in-One Vedic & Lal Kitab Remedial Dossier PDF"}
+                            </h3>
+                            <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 14, marginTop: 4, maxWidth: 660 }}>
+                              {hi
+                                ? "कालसर्प दोष, साढ़ेसाती, मांगलिक दोष, पितृ दोष निवारण, धन आकर्षण कनकधारा प्रयोग, एवं मानसिक शांति के लिए सिद्ध वैदिक अनुष्ठान विधि।"
+                                : "Complete remedial instructions for Sade Sati, Manglik, Pitra Dosha, Kuber wealth attraction rituals, and home vastu purification."}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Feature bullets */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginBottom: 18 }}>
+                          {[
+                            { icon: "🪐", titleEn: "Sade Sati, Dhaiya & Rahu-Ketu Shanti Protocols", titleHi: "साढ़ेसाती, ढैय्या व राहु-केतु शांति अनुष्ठान" },
+                            { icon: "💰", titleEn: "Kuber & Kanakadhara Wealth Flow Yantra Setup", titleHi: "कुबेर व कनकधारा धन आकर्षण यंत्र स्थापना" },
+                            { icon: "🛡️", titleEn: "Buri Nazar & Negative Energy Shields", titleHi: "बुरी नजर व नकारात्मक ऊर्जा सुरक्षा कवच" },
+                            { icon: "📜", titleEn: "Personalized 21-Day Ritual Chart & Vows", titleHi: "व्यक्तिगत २१-दिवसीय दैनिक संकल्प चार्ट" },
+                          ].map((f, i) => (
+                            <div key={i} style={{ background: "rgba(11,8,25,0.65)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 18 }}>{f.icon}</span>
+                              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>{hi ? f.titleHi : f.titleEn}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Unlock CTA Button */}
+                        <div style={{ textAlign: "center", paddingTop: 8 }}>
+                          <button
+                            onClick={() => setActiveCheckout({
+                              title: "Complete All-in-One Vedic & Lal Kitab Remedial Dossier PDF",
+                              priceKey: "remediesReport",
+                              price: unlockPrice,
+                              desc: "Complete 7-issue remedial plans, Sade Sati peace rituals, and Yantra guidelines",
+                              icon: "🛡️",
+                              isRemediesUnlock: true
+                            })}
+                            className="gold-cta-btn"
+                            style={{ padding: "14px 28px", fontSize: 15, fontWeight: 800 }}
+                          >
+                            {hi ? `संपूर्ण उपाय गाइड अनलॉक करें (${unlockPrice}) ✦` : `Unlock Complete Remedies Dossier (${unlockPrice}) ✦`}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* ── TAB: MARRIAGE AGE, TIMING & SPOUSE PREDICTION (FREEMIUM + PAID GATE) ── */}
             {tab === "marriageTiming" && (() => {
