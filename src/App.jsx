@@ -1514,7 +1514,7 @@ export default function App() {
   // ── RENDER HELPER: DAILY HOROSCOPE & ALERTS ───────────────────────
   const renderDailyHoroscopeContent = () => {
     const daily = generateDailyHoroscope(dailySign, lang);
-    const stars = (num) => "★".repeat(num) + "☆".repeat(5 - num);
+    const stars = (num) => "★".repeat(num || 3) + "☆".repeat(Math.max(0, 5 - (num || 3)));
     const activePrice = dailyPlan === "yearly" ? PRODUCT_PRICES.dailyYearly[currency] : PRODUCT_PRICES.dailyMonthly[currency];
     const activePriceKey = dailyPlan === "yearly" ? "dailyYearly" : "dailyMonthly";
 
@@ -1567,93 +1567,72 @@ export default function App() {
 
             <div style={{ textAlign: "right", background: "rgba(11,8,25,0.6)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "10px 18px" }}>
               <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>{hi ? "दैनिक ग्रहीय अनुकूलता" : "Cosmic Harmony Score"}</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#34D399" }}>{daily.luckyRating}%</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#34D399" }}>{daily.overallScore}%</div>
             </div>
           </div>
 
-          {/* Core Prediction Narrative */}
-          <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "20px 22px", marginBottom: 20, lineHeight: 1.8, fontSize: 15, color: "rgba(241,231,208,0.95)" }}>
-            <span style={{ color: "#FDE68A", fontWeight: 700 }}>✨ {hi ? "आज का ग्रह गोचर फल:" : "Today's Cosmic Atmosphere:"} </span>
-            {daily.prediction}
+          {/* 4 Category Ratings Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 22 }}>
+            {[
+              { name: hi ? "करियर व व्यवसाय" : "Career & Work", score: daily.careerScore, icon: "💼", color: "#60A5FA" },
+              { name: hi ? "प्रेम व दांपत्य" : "Love & Family", score: daily.loveScore, icon: "❤️", color: "#F472B6" },
+              { name: hi ? "धन व समृद्धि" : "Wealth & Gains", score: daily.wealthScore, icon: "💰", color: "#FBBF24" },
+              { name: hi ? "स्वास्थ्य व ऊर्जा" : "Health & Vitality", score: daily.healthScore, icon: "🌿", color: "#34D399" },
+            ].map((cat, idx) => (
+              <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "12px 14px", textAlign: "center" }}>
+                <div style={{ fontSize: 18 }}>{cat.icon}</div>
+                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#FDE68A", marginTop: 3 }}>{cat.name}</div>
+                <div style={{ fontSize: 15, color: cat.color, marginTop: 4 }}>{stars(cat.score)}</div>
+              </div>
+            ))}
           </div>
 
-          {/* 4 Pillars Breakdown (Career, Love, Wealth, Health) */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
-            {/* Career */}
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>💼 {hi ? "करियर व व्यवसाय" : "Career & Work"}</span>
-                <span style={{ color: "#F59E0B", fontSize: 13 }}>{stars(daily.scores.career)}</span>
+          {/* What Will Go Good & What to be Cautious About (2 Column Split) */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 20 }}>
+            {/* 🟢 Positive / Opportunities */}
+            <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "18px 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>
+                <span>🟢</span> {hi ? "आज क्या शुभ रहेगा (Opportunities & Wins)" : "What Will Go Good Today"}
               </div>
-              <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                {daily.aspects.career}
+              <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+                {daily.good}
               </p>
             </div>
 
-            {/* Love & Relations */}
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>❤️ {hi ? "प्रेम व पारिवारिक संबंध" : "Love & Relations"}</span>
-                <span style={{ color: "#F59E0B", fontSize: 13 }}>{stars(daily.scores.love)}</span>
+            {/* 🔴 Cautionary Advice / Pitfalls */}
+            <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 12, padding: "18px 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#F87171", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>
+                <span>🔴</span> {hi ? "सावधानियां व चेतावनी (Alerts & Caution)" : "What to Watch Out For & Avoid"}
               </div>
-              <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                {daily.aspects.love}
-              </p>
-            </div>
-
-            {/* Wealth & Finance */}
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>💰 {hi ? "वित्त व धन लाभ" : "Money & Wealth"}</span>
-                <span style={{ color: "#F59E0B", fontSize: 13 }}>{stars(daily.scores.wealth)}</span>
-              </div>
-              <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                {daily.aspects.wealth}
-              </p>
-            </div>
-
-            {/* Health & Energy */}
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: "16px 18px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>🌿 {hi ? "स्वास्थ्य व ऊर्जा" : "Health & Energy"}</span>
-                <span style={{ color: "#F59E0B", fontSize: 13 }}>{stars(daily.scores.health)}</span>
-              </div>
-              <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                {daily.aspects.health}
+              <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+                {daily.caution}
               </p>
             </div>
           </div>
 
-          {/* Quick Vedic Actionable Parameters Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginBottom: 20 }}>
-            <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>🎨 {hi ? "आज का शुभ रंग" : "Lucky Colour"}</div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "#FDE68A", marginTop: 2 }}>{daily.luckyColor}</div>
+          {/* 🛡️ Daily Vedic Remedy & Sacred Mantra */}
+          <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 12, padding: "18px 20px", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#FDE68A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>
+              <span>🛡️</span> {hi ? "आज का अचूक वैदिक उपाय (Daily Upay)" : "Prescribed Vedic Remedy of the Day"}
             </div>
-            <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>🔢 {hi ? "आज का शुभ अंक" : "Lucky Number"}</div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "#FDE68A", marginTop: 2 }}>{daily.luckyNumber}</div>
-            </div>
-            <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>⏱️ {hi ? "शुभ समय / अभिजीत" : "Auspicious Time"}</div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "#34D399", marginTop: 2 }}>{daily.luckyTime}</div>
-            </div>
-            <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
-              <div style={{ fontSize: 12, color: "rgba(252,165,165,0.85)", fontWeight: 600 }}>⚠️ {hi ? "अशुभ राहु काल" : "Inauspicious Time"}</div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: "#F87171", marginTop: 2 }}>{daily.unfavorableTime}</div>
-            </div>
-          </div>
-
-          {/* Daily Lal Kitab Upay & Mantra Box */}
-          <div style={{ background: "linear-gradient(135deg, rgba(35,22,65,0.85), rgba(15,10,32,0.95))", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "18px 20px" }}>
-            <div style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 6 }}>
-              📿 {hi ? "आज का अचूक वैदिक उपाय व बीज मंत्र:" : "Today's Sacred Vedic Remedy & Beej Mantra:"}
-            </div>
-            <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 13.5, lineHeight: 1.6, marginBottom: 10 }}>
-              {daily.dailyRemedy}
+            <p style={{ color: "rgba(241,231,208,0.92)", fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+              {daily.remedy}
             </p>
-            <div style={{ background: "rgba(0,0,0,0.5)", border: "1px dashed rgba(245,158,11,0.3)", borderRadius: 8, padding: "10px 14px", color: "#F3D37A", fontSize: 14, fontWeight: 700, textAlign: "center" }}>
-              {daily.mantra}
+          </div>
+
+          {/* 🎨 Daily Micro-Muhurat Card */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "16px 18px" }}>
+            <div>
+              <div style={{ fontSize: 12.5, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>🎨 {hi ? "भाग्यशाली रंग" : "Lucky Color"}</div>
+              <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, marginTop: 2 }}>{daily.luckyColor}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12.5, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>🔢 {hi ? "भाग्यशाली अंक" : "Lucky Number"}</div>
+              <div style={{ color: "#34D399", fontSize: 15, fontWeight: 800, marginTop: 2 }}>{daily.luckyNumber}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12.5, color: "rgba(243,211,122,0.85)", fontWeight: 600 }}>⏳ {hi ? "शुभ मुहूर्त" : "Auspicious Window"}</div>
+              <div style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginTop: 2 }}>{daily.auspiciousWindow}</div>
             </div>
           </div>
         </div>
