@@ -1047,6 +1047,41 @@ export default function App() {
     setMilanResult(res);
   };
 
+  const handleLangToggle = () => {
+    const newLang = lang === "en" ? "hi" : "en";
+    setLang(newLang);
+    if (err) {
+      setErr(UI[newLang].errFields);
+    }
+    if (result && form.dob && form.pob) {
+      try {
+        const updated = generateVedicKundliData({
+          name: form.name,
+          dob: form.dob,
+          tob: form.tob,
+          pob: form.pob,
+          lat: lastCoords.lat,
+          lon: lastCoords.lon,
+          lang: newLang
+        });
+        setResult(updated);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    if (milanResult && partnerForm.name && partnerForm.dob) {
+      try {
+        const updatedMilan = calculateGunMilan({
+          partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
+          partner2: partnerForm
+        });
+        setMilanResult(updatedMilan);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   // ── RENDER HELPER: HINDU PANCHANG ────────────────────────────────
   const renderPanchangContent = () => (
     <div className="glass-card" style={{ padding: "28px 26px", marginBottom: 26, animation: "fadeInCard 0.4s ease" }}>
