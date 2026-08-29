@@ -1444,3 +1444,994 @@ export function getLifeProblemRemedies({ problemId = "career_job", lagnaSign = "
     vastuTip: isHi ? item.vastuTipHi : item.vastuTipEn
   };
 }
+
+/* -------------------------------------------------------------
+   HINDU PANCHANG ENGINE (दैनिक हिंदू पंचांग)
+------------------------------------------------------------- */
+export const HINDU_MASAS = [
+  { name: "Chaitra", hindi: "चैत्र" },
+  { name: "Vaishakha", hindi: "वैशाख" },
+  { name: "Jyeshtha", hindi: "ज्येष्ठ" },
+  { name: "Ashadha", hindi: "आषाढ़" },
+  { name: "Shravana", hindi: "श्रावण" },
+  { name: "Bhadrapada", hindi: "भाद्रपद" },
+  { name: "Ashwin", hindi: "आश्विन" },
+  { name: "Kartika", hindi: "कार्तिक" },
+  { name: "Margashirsha", hindi: "मार्गशीर्ष" },
+  { name: "Pausha", hindi: "पौष" },
+  { name: "Magha", hindi: "माघ" },
+  { name: "Phalguna", hindi: "फाल्गुन" }
+];
+
+export const KARANAS = [
+  { name: "Bava", hindi: "बव", ruler: "Sun" },
+  { name: "Balava", hindi: "बालव", ruler: "Moon" },
+  { name: "Kaulava", hindi: "कौलव", ruler: "Mars" },
+  { name: "Taitila", hindi: "तैतिल", ruler: "Mercury" },
+  { name: "Garija", hindi: "गरिज", ruler: "Jupiter" },
+  { name: "Vanija", hindi: "वणिज", ruler: "Venus" },
+  { name: "Vishti (Bhadra)", hindi: "विष्टि (भद्रा)", ruler: "Saturn" },
+  { name: "Shakuni", hindi: "शकुनि", ruler: "Rahu" },
+  { name: "Chatushpada", hindi: "चतुष्पद", ruler: "Ketu" },
+  { name: "Naga", hindi: "नाग", ruler: "Rahu" },
+  { name: "Kimstughna", hindi: "किंस्तुघ्न", ruler: "Ketu" }
+];
+
+export const MAJOR_INDIAN_CITIES = [
+  { name: "New Delhi", nameHi: "नई दिल्ली", lat: 28.6139, lon: 77.2090, tz: 5.5 },
+  { name: "Varanasi (Kashi)", nameHi: "वाराणसी (काशी)", lat: 25.3176, lon: 82.9739, tz: 5.5 },
+  { name: "Ayodhya", nameHi: "अयोध्या", lat: 26.7922, lon: 82.1998, tz: 5.5 },
+  { name: "Ujjain", nameHi: "उज्जैन", lat: 23.1765, lon: 75.7885, tz: 5.5 },
+  { name: "Haridwar", nameHi: "हरिद्वार", lat: 29.9457, lon: 78.1642, tz: 5.5 },
+  { name: "Prayagraj", nameHi: "प्रयागराज", lat: 25.4358, lon: 81.8463, tz: 5.5 },
+  { name: "Mumbai", nameHi: "मुंबई", lat: 19.0760, lon: 72.8777, tz: 5.5 },
+  { name: "Bengaluru", nameHi: "बेंगलुरु", lat: 12.9716, lon: 77.5946, tz: 5.5 },
+  { name: "Kolkata", nameHi: "कोलकाता", lat: 22.5726, lon: 88.3639, tz: 5.5 },
+  { name: "Jaipur", nameHi: "जयपुर", lat: 26.9124, lon: 75.7873, tz: 5.5 },
+  { name: "Patna", nameHi: "पटना", lat: 25.5941, lon: 85.1376, tz: 5.5 },
+  { name: "Lucknow", nameHi: "लखनऊ", lat: 26.8467, lon: 80.9462, tz: 5.5 },
+  { name: "Hyderabad", nameHi: "हैदराबाद", lat: 17.3850, lon: 78.4867, tz: 5.5 },
+  { name: "Chennai", nameHi: "चेन्नई", lat: 13.0827, lon: 80.2707, tz: 5.5 },
+  { name: "Ahmedabad", nameHi: "अहमदाबाद", lat: 23.0225, lon: 72.5714, tz: 5.5 },
+  { name: "London", nameHi: "लंदन (UK)", lat: 51.5074, lon: -0.1278, tz: 1 },
+  { name: "New York", nameHi: "न्यूयॉर्क (USA)", lat: 40.7128, lon: -74.0060, tz: -4 },
+  { name: "Dubai", nameHi: "दुबई (UAE)", lat: 25.2048, lon: 55.2708, tz: 4 },
+  { name: "Singapore", nameHi: "सिंगापुर", lat: 1.3521, lon: 103.8198, tz: 8 }
+];
+
+export function calculateDailyPanchang({ dateStr, lat = 28.6139, lon = 77.2090, cityName = "New Delhi", lang = "hi" }) {
+  const isHi = lang === "hi";
+  const targetDate = dateStr ? new Date(`${dateStr}T12:00:00Z`) : new Date();
+  const time = new AstroTime(targetDate);
+  const ayanamsa = calculateLahiriAyanamsa(time);
+
+  // Planetary ecliptic calculations
+  const sunPos = Ecliptic(GeoVector(Body.Sun, time, false));
+  const moonPos = Ecliptic(GeoVector(Body.Moon, time, false));
+
+  const sunNirayana = ((sunPos.elon - ayanamsa) % 360 + 360) % 360;
+  const moonNirayana = ((moonPos.elon - ayanamsa) % 360 + 360) % 360;
+
+  // 1. Tithi Calculation
+  const diffDeg = ((moonPos.elon - sunPos.elon) % 360 + 360) % 360;
+  const tithiIndex = Math.floor(diffDeg / 12);
+  const tithiNameEn = TITHIS_EN[tithiIndex] || TITHIS_EN[0];
+  const tithiNameHi = TITHIS_HI[tithiIndex] || TITHIS_HI[0];
+  const paksha = tithiIndex < 15 ? (isHi ? "शुक्ल पक्ष" : "Shukla Paksha") : (isHi ? "कृष्ण पक्ष" : "Krishna Paksha");
+
+  // 2. Nakshatra Calculation
+  const nakInfo = getNakshatraInfo(moonNirayana);
+
+  // 3. Yoga Calculation
+  const sumDeg = ((sunNirayana + moonNirayana) % 360 + 360) % 360;
+  const yogaIndex = Math.floor(sumDeg / (360 / 27));
+  const yogaName = YOGAS_LIST[yogaIndex] || YOGAS_LIST[0];
+
+  // 4. Karana Calculation
+  const karanaIdx = Math.floor(diffDeg / 6);
+  let karanaObj;
+  if (karanaIdx === 0) karanaObj = KARANAS[10]; // Kimstughna
+  else if (karanaIdx >= 57) karanaObj = KARANAS[7 + (karanaIdx - 57)]; // Shakuni, Chatushpada, Naga
+  else karanaObj = KARANAS[(karanaIdx - 1) % 7];
+
+  // 5. Weekday (Vaar)
+  const dayOfWeek = targetDate.getUTCDay();
+  const VAARS = [
+    { en: "Sunday (Ravivasara)", hi: "रविवार (भानुवासर)", lord: "Sun", color: "#F59E0B" },
+    { en: "Monday (Somavasara)", hi: "सोमवार (इंदुवासर)", lord: "Moon", color: "#E2E8F0" },
+    { en: "Tuesday (Mangalavasara)", hi: "मंगलवार (भौमवासर)", lord: "Mars", color: "#EF4444" },
+    { en: "Wednesday (Budhavasara)", hi: "बुधवार (सौम्यवासर)", lord: "Mercury", color: "#10B981" },
+    { en: "Thursday (Guruvasara)", hi: "गुरुवार (बृहस्पतिवासर)", lord: "Jupiter", color: "#FBBF24" },
+    { en: "Friday (Shukravasara)", hi: "शुक्रवार (भृगुवासर)", lord: "Venus", color: "#EC4899" },
+    { en: "Saturday (Shanivasara)", hi: "शनिवार (स्थिरवासर)", lord: "Saturn", color: "#6366F1" }
+  ];
+  const vaar = VAARS[dayOfWeek];
+
+  // 6. Hindu Calendar Era (Samvat & Masa)
+  const currentYear = targetDate.getUTCFullYear();
+  const vikramSamvat = currentYear + 57;
+  const shakaSamvat = currentYear - 78;
+
+  // Approximate Hindu Masa from Sun's sign
+  const sunSignIdx = getSignIndex(sunNirayana);
+  const moonSignIdx = getSignIndex(moonNirayana);
+  const sunSign = SIGNS[sunSignIdx];
+  const moonSign = SIGNS[moonSignIdx];
+
+  const masaIdx = (sunSignIdx + 11) % 12;
+  const masa = HINDU_MASAS[masaIdx];
+
+  // Ritu (Season)
+  const RITUS = [
+    { en: "Vasant (Spring)", hi: "वसंत ऋतु" },
+    { en: "Grishma (Summer)", hi: "ग्रीष्म ऋतु" },
+    { en: "Varsha (Monsoon)", hi: "वर्षा ऋतु" },
+    { en: "Sharad (Autumn)", hi: "शरद ऋतु" },
+    { en: "Hemant (Pre-Winter)", hi: "हेमंत ऋतु" },
+    { en: "Shishir (Winter)", hi: "शिशिर ऋतु" }
+  ];
+  const ritu = RITUS[Math.floor(sunSignIdx / 2) % 6];
+
+  // 7. Sun & Moon Timings (Standardized local solar time model)
+  const sunriseBaseMinutes = 360 + Math.round(Math.sin((targetDate.getMonth() - 2) * Math.PI / 6) * 35);
+  const sunsetBaseMinutes = 1110 - Math.round(Math.sin((targetDate.getMonth() - 2) * Math.PI / 6) * 35);
+
+  const formatMinutes = (totalMins) => {
+    const norm = (totalMins + 1440) % 1440;
+    const h = Math.floor(norm / 60);
+    const m = Math.floor(norm % 60);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const displayH = h % 12 === 0 ? 12 : h % 12;
+    return `${displayH.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${ampm}`;
+  };
+
+  const sunrise = formatMinutes(sunriseBaseMinutes);
+  const sunset = formatMinutes(sunsetBaseMinutes);
+  const moonrise = formatMinutes(sunriseBaseMinutes + (tithiIndex * 48) % 1440);
+  const moonset = formatMinutes(sunsetBaseMinutes + (tithiIndex * 48) % 1440);
+
+  const dayLengthMins = sunsetBaseMinutes - sunriseBaseMinutes;
+  const partMins = dayLengthMins / 8;
+
+  // 8. Auspicious Muhurats (शुभ मुहूर्त)
+  const brahmaMuhuratStart = formatMinutes(sunriseBaseMinutes - 96);
+  const brahmaMuhuratEnd = formatMinutes(sunriseBaseMinutes - 48);
+
+  const abhijitStart = formatMinutes(sunriseBaseMinutes + Math.round(dayLengthMins / 2) - 24);
+  const abhijitEnd = formatMinutes(sunriseBaseMinutes + Math.round(dayLengthMins / 2) + 24);
+
+  const amritKaalStart = formatMinutes(sunriseBaseMinutes + 120 + (tithiIndex * 15) % 360);
+  const amritKaalEnd = formatMinutes(sunriseBaseMinutes + 210 + (tithiIndex * 15) % 360);
+
+  const vijayMuhuratStart = formatMinutes(sunriseBaseMinutes + Math.round(dayLengthMins * 0.65));
+  const vijayMuhuratEnd = formatMinutes(sunriseBaseMinutes + Math.round(dayLengthMins * 0.65) + 50);
+
+  const godhuliStart = formatMinutes(sunsetBaseMinutes - 15);
+  const godhuliEnd = formatMinutes(sunsetBaseMinutes + 15);
+
+  // 9. Inauspicious Timings (अशुभ काल)
+  // Rahu Kaal slot (Sun=8, Mon=2, Tue=7, Wed=5, Thu=6, Fri=4, Sat=3)
+  const rahuSlots = [7, 1, 6, 4, 5, 3, 2];
+  const rahuSlotIdx = rahuSlots[dayOfWeek];
+  const rahuKaalStart = formatMinutes(sunriseBaseMinutes + Math.round(rahuSlotIdx * partMins));
+  const rahuKaalEnd = formatMinutes(sunriseBaseMinutes + Math.round((rahuSlotIdx + 1) * partMins));
+
+  // Yamaganda slot
+  const yamaSlots = [4, 3, 2, 1, 0, 6, 5];
+  const yamaSlotIdx = yamaSlots[dayOfWeek];
+  const yamaKaalStart = formatMinutes(sunriseBaseMinutes + Math.round(yamaSlotIdx * partMins));
+  const yamaKaalEnd = formatMinutes(sunriseBaseMinutes + Math.round((yamaSlotIdx + 1) * partMins));
+
+  // Gulika Kaal slot
+  const gulikaSlots = [6, 5, 4, 3, 2, 1, 0];
+  const gulikaSlotIdx = gulikaSlots[dayOfWeek];
+  const gulikaKaalStart = formatMinutes(sunriseBaseMinutes + Math.round(gulikaSlotIdx * partMins));
+  const gulikaKaalEnd = formatMinutes(sunriseBaseMinutes + Math.round((gulikaSlotIdx + 1) * partMins));
+
+  // 10. Choghadiya (Day & Night)
+  const CHOGHADIYA_TYPES = {
+    Amrit: { nameEn: "Amrit", nameHi: "अमृत", quality: isHi ? "अति शुभ (Best)" : "Most Auspicious", color: "#10B981" },
+    Shubh: { nameEn: "Shubh", nameHi: "शुभ", quality: isHi ? "शुभ (Good)" : "Auspicious", color: "#34D399" },
+    Labh: { nameEn: "Labh", nameHi: "लाभ", quality: isHi ? "उन्नति व लाभ (Gain)" : "Prosperous", color: "#F59E0B" },
+    Char: { nameEn: "Char", nameHi: "चर", quality: isHi ? "सामान्य (Neutral/Travel)" : "Good for Travel", color: "#60A5FA" },
+    Rog: { nameEn: "Rog", nameHi: "रोग", quality: isHi ? "अशुभ (Avoid)" : "Inauspicious", color: "#F87171" },
+    Kaal: { nameEn: "Kaal", nameHi: "काल", quality: isHi ? "हानिकारक (Avoid)" : "Harmful", color: "#EF4444" },
+    Udveg: { nameEn: "Udveg", nameHi: "उद्वेग", quality: isHi ? "चिंताजनक (Avoid)" : "Stressful", color: "#FB923C" }
+  };
+
+  const DAY_CHOGHADIYA_PATTERNS = [
+    ["Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg"], // Sun
+    ["Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Char", "Labh", "Amrit"], // Mon
+    ["Rog", "Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog"],   // Tue
+    ["Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Char", "Labh"],   // Wed
+    ["Shubh", "Rog", "Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh"], // Thu
+    ["Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog", "Udveg", "Char"],  // Fri
+    ["Kaal", "Shubh", "Rog", "Udveg", "Char", "Labh", "Amrit", "Kaal"]   // Sat
+  ];
+
+  const NIGHT_CHOGHADIYA_PATTERNS = [
+    ["Shubh", "Amrit", "Char", "Rog", "Kaal", "Labh", "Udveg", "Shubh"], // Sun
+    ["Char", "Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Char"],  // Mon
+    ["Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Char", "Rog", "Kaal"],  // Tue
+    ["Udveg", "Shubh", "Amrit", "Char", "Rog", "Kaal", "Labh", "Udveg"], // Wed
+    ["Amrit", "Char", "Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit"], // Thu
+    ["Rog", "Kaal", "Labh", "Udveg", "Shubh", "Amrit", "Char", "Rog"],   // Fri
+    ["Labh", "Udveg", "Shubh", "Amrit", "Char", "Rog", "Kaal", "Labh"]   // Sat
+  ];
+
+  const dayChoghadiya = DAY_CHOGHADIYA_PATTERNS[dayOfWeek].map((type, i) => {
+    const st = sunriseBaseMinutes + Math.round(i * partMins);
+    const et = sunriseBaseMinutes + Math.round((i + 1) * partMins);
+    return {
+      type,
+      name: isHi ? CHOGHADIYA_TYPES[type].nameHi : CHOGHADIYA_TYPES[type].nameEn,
+      quality: CHOGHADIYA_TYPES[type].quality,
+      color: CHOGHADIYA_TYPES[type].color,
+      time: `${formatMinutes(st)} - ${formatMinutes(et)}`
+    };
+  });
+
+  const nightPartMins = (1440 - dayLengthMins) / 8;
+  const nightChoghadiya = NIGHT_CHOGHADIYA_PATTERNS[dayOfWeek].map((type, i) => {
+    const st = sunsetBaseMinutes + Math.round(i * nightPartMins);
+    const et = sunsetBaseMinutes + Math.round((i + 1) * nightPartMins);
+    return {
+      type,
+      name: isHi ? CHOGHADIYA_TYPES[type].nameHi : CHOGHADIYA_TYPES[type].nameEn,
+      quality: CHOGHADIYA_TYPES[type].quality,
+      color: CHOGHADIYA_TYPES[type].color,
+      time: `${formatMinutes(st)} - ${formatMinutes(et)}`
+    };
+  });
+
+  // 11. Dishashool & Upay
+  const DISHASHOOL_DATA = [
+    { dirEn: "West", dirHi: "पश्चिम दिशा", remedyEn: "Eat Paan (betel leaf) or Ghee before travel", remedyHi: "पान अथवा घी खाकर यात्रा करें" },
+    { dirEn: "East", dirHi: "पूर्व दिशा", remedyEn: "Look into a mirror or eat Curd before travel", remedyHi: "दर्पण में मुख देखकर अथवा दही खाकर निकलें" },
+    { dirEn: "North", dirHi: "उत्तर दिशा", remedyEn: "Eat Jaggery (Gur) or Coriander seeds before travel", remedyHi: "गुड़ अथवा धनिया खाकर प्रस्थान करें" },
+    { dirEn: "North", dirHi: "उत्तर दिशा", remedyEn: "Eat Sesame seeds or Mustard before travel", remedyHi: "तिल अथवा पीली सरसों खाकर निकलें" },
+    { dirEn: "South", dirHi: "दक्षिण दिशा", remedyEn: "Eat Curd or Cumin (Jeera) before travel", remedyHi: "दही अथवा जीरा खाकर यात्रा प्रारंभ करें" },
+    { dirEn: "West", dirHi: "पश्चिम दिशा", remedyEn: "Eat Barley or sweet Curd before travel", remedyHi: "जौ अथवा मीठी दही खाकर प्रस्थान करें" },
+    { dirEn: "East", dirHi: "पूर्व दिशा", remedyEn: "Eat Ginger (Adrak) or Mustard oil food before travel", remedyHi: "अदरक अथवा उड़द का सेवन करके निकलें" }
+  ];
+  const dishashool = DISHASHOOL_DATA[dayOfWeek];
+
+  return {
+    date: targetDate.toISOString().split("T")[0],
+    displayDate: targetDate.toLocaleDateString(isHi ? "hi-IN" : "en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
+    cityName,
+    lat,
+    lon,
+    tithi: isHi ? tithiNameHi : tithiNameEn,
+    paksha,
+    nakshatra: isHi ? nakInfo.hindi : nakInfo.name,
+    nakshatraLord: nakInfo.lord,
+    pada: nakInfo.pada,
+    yoga: yogaName,
+    karana: isHi ? karanaObj.hindi : karanaObj.name,
+    karanaRuler: karanaObj.ruler,
+    vaar: isHi ? vaar.hi : vaar.en,
+    vaarLord: vaar.lord,
+    vikramSamvat,
+    shakaSamvat,
+    masa: isHi ? masa.hindi : masa.name,
+    ritu: isHi ? ritu.hi : ritu.en,
+    sunSign: isHi ? sunSign.sanskrit : sunSign.name,
+    moonSign: isHi ? moonSign.sanskrit : moonSign.name,
+    sunrise,
+    sunset,
+    moonrise,
+    moonset,
+    muhurats: {
+      brahma: `${brahmaMuhuratStart} - ${brahmaMuhuratEnd}`,
+      abhijit: `${abhijitStart} - ${abhijitEnd}`,
+      amritKaal: `${amritKaalStart} - ${amritKaalEnd}`,
+      vijay: `${vijayMuhuratStart} - ${vijayMuhuratEnd}`,
+      godhuli: `${godhuliStart} - ${godhuliEnd}`
+    },
+    inauspicious: {
+      rahuKaal: `${rahuKaalStart} - ${rahuKaalEnd}`,
+      yamaganda: `${yamaKaalStart} - ${yamaKaalEnd}`,
+      gulika: `${gulikaKaalStart} - ${gulikaKaalEnd}`
+    },
+    dishashool: isHi ? dishashool.dirHi : dishashool.dirEn,
+    dishashoolRemedy: isHi ? dishashool.remedyHi : dishashool.remedyEn,
+    dayChoghadiya,
+    nightChoghadiya
+  };
+}
+
+/* -------------------------------------------------------------
+   UPCOMING SHUBH MUHURATS DIRECTORY (शुभ मुहूर्त)
+------------------------------------------------------------- */
+export const SHUBH_MUHURAT_CATEGORIES = [
+  { id: "all", labelEn: "All Auspicious Works", labelHi: "सभी शुभ मुहूर्त", icon: "✨" },
+  { id: "vivah", labelEn: "Marriage (Vivah)", labelHi: "विवाह मुहूर्त", icon: "💍" },
+  { id: "griha_pravesh", labelEn: "Housewarming (Griha Pravesh)", labelHi: "गृह प्रवेश मुहूर्त", icon: "🏡" },
+  { id: "vahan", labelEn: "Vehicle Purchase (Vahan)", labelHi: "वाहन खरीद मुहूर्त", icon: "🚗" },
+  { id: "property", labelEn: "Property & Land Purchase", labelHi: "भूमि व संपत्ति क्रय", icon: "🪙" },
+  { id: "vyapar", labelEn: "New Business / Shop Opening", labelHi: "नवीन व्यापार व प्रतिष्ठान", icon: "💼" },
+  { id: "namkaran", labelEn: "Namkaran & Mundan", labelHi: "नामकरण व मुंडन संस्कार", icon: "👶" }
+];
+
+export const UPCOMING_SHUBH_MUHURATS = [
+  // Vivah Muhurats
+  {
+    category: "vivah",
+    date: "2026-11-18",
+    dayEn: "Wednesday",
+    dayHi: "बुधवार",
+    month: "November 2026",
+    tithiEn: "Shukla Navami",
+    tithiHi: "शुक्ल नवमी",
+    nakshatraEn: "Uttara Bhadrapada",
+    nakshatraHi: "उत्तरभाद्रपदा",
+    timeEn: "06:45 PM to 07:12 AM (Nov 19)",
+    timeHi: "शाम 06:45 से अगली सुबह 07:12 तक",
+    yogaEn: "Sarvartha Siddhi Yoga",
+    yogaHi: "सर्वार्थ सिद्धि योग",
+    noteEn: "Highly auspicious Vivah Lagna with Jupiter aspect on 7th house.",
+    noteHi: "गुरु की शुभ दृष्टि युक्त अत्यंत कल्याणकारी विवाह लग्न।"
+  },
+  {
+    category: "vivah",
+    date: "2026-11-22",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "November 2026",
+    tithiEn: "Shukla Trayodashi",
+    tithiHi: "शुक्ल त्रयोदशी",
+    nakshatraEn: "Revati & Ashwini",
+    nakshatraHi: "रेवती व अश्विनी",
+    timeEn: "10:15 PM to 06:50 AM (Nov 23)",
+    timeHi: "रात 10:15 से सुबह 06:50 तक",
+    yogaEn: "Amrit Siddhi Yoga",
+    yogaHi: "अमृत सिद्धि योग",
+    noteEn: "Exceptional matrimonial harmony and wealth growth.",
+    noteHi: "दांपत्य सुख, दीर्घायु एवं संतान वृद्धि हेतु उत्तम मुहूर्त।"
+  },
+  {
+    category: "vivah",
+    date: "2026-12-04",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "December 2026",
+    tithiEn: "Krishna Ekadashi",
+    tithiHi: "कृष्ण एकादशी",
+    nakshatraEn: "Hasta",
+    nakshatraHi: "हस्त",
+    timeEn: "07:05 PM to 04:15 AM (Dec 05)",
+    timeHi: "शाम 07:05 से रात 04:15 तक",
+    yogaEn: "Shubha Yoga",
+    yogaHi: "शुभ योग",
+    noteEn: "Venus in Kendra, ideal for grand weddings.",
+    noteHi: "शुक्र केंद्र में स्थित, वैभवशाली वैवाहिक आयोजन हेतु श्रेष्ठ।"
+  },
+  {
+    category: "vivah",
+    date: "2026-12-11",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "December 2026",
+    tithiEn: "Shukla Dwitiya",
+    tithiHi: "शुक्ल द्वितीया",
+    nakshatraEn: "Mula & Purva Ashadha",
+    nakshatraHi: "मूल व पूर्वाषाढ़ा",
+    timeEn: "08:20 PM to 07:05 AM (Dec 12)",
+    timeHi: "रात 08:20 से अगली सुबह 07:05 तक",
+    yogaEn: "Siddhi Yoga",
+    yogaHi: "सिद्धि योग",
+    noteEn: "Auspicious matrimonial bond and spiritual peace.",
+    noteHi: "पारस्परिक प्रेम एवं पारिवारिक सौहार्द हेतु श्रेष्ठ मुहूर्त।"
+  },
+  {
+    category: "vivah",
+    date: "2027-01-18",
+    dayEn: "Monday",
+    dayHi: "सोमवार",
+    month: "January 2027",
+    tithiEn: "Shukla Ekadashi (Putrada)",
+    tithiHi: "शुक्ल एकादशी (पुत्रदा)",
+    nakshatraEn: "Rohini",
+    nakshatraHi: "रोहिणी",
+    timeEn: "06:30 PM to 06:10 AM (Jan 19)",
+    timeHi: "शाम 06:30 से सुबह 06:10 तक",
+    yogaEn: "Sarvartha Siddhi Yoga",
+    yogaHi: "सर्वार्थ सिद्धि योग",
+    noteEn: "Rohini Nakshatra brings lifelong prosperity and affection.",
+    noteHi: "रोहिणी नक्षत्र में विवाह से अखंड सौभाग्य व ऐश्वर्य की प्राप्ति।"
+  },
+
+  // Griha Pravesh Muhurats
+  {
+    category: "griha_pravesh",
+    date: "2026-10-24",
+    dayEn: "Saturday",
+    dayHi: "शनिवार",
+    month: "October 2026",
+    tithiEn: "Shukla Trayodashi",
+    tithiHi: "शुक्ल त्रयोदशी",
+    nakshatraEn: "Uttara Bhadrapada",
+    nakshatraHi: "उत्तरभाद्रपदा",
+    timeEn: "06:28 AM to 12:40 PM",
+    timeHi: "सुबह 06:28 से दोपहर 12:40 तक",
+    yogaEn: "Shubha Yoga",
+    yogaHi: "शुभ योग",
+    noteEn: "Ideal for new home purchase and peaceful family entry.",
+    noteHi: "नवीन गृह प्रवेश एवं वास्तु शुद्धि हेतु परम कल्याणकारी।"
+  },
+  {
+    category: "griha_pravesh",
+    date: "2026-11-20",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "November 2026",
+    tithiEn: "Shukla Ekadashi (Devuthani)",
+    tithiHi: "देवउठनी एकादशी",
+    nakshatraEn: "Revati",
+    nakshatraHi: "रेवती",
+    timeEn: "07:15 AM to 02:30 PM",
+    timeHi: "सुबह 07:15 से दोपहर 02:30 तक",
+    yogaEn: "Sarvartha Siddhi & Amrit Yoga",
+    yogaHi: "सर्वार्थ सिद्धि व अमृत योग",
+    noteEn: "Devuthani Ekadashi opens divine cosmic blessings for residence.",
+    noteHi: "देव प्रबोधिनी एकादशी पर गृह प्रवेश से चिरस्थायी सुख-शांति।"
+  },
+  {
+    category: "griha_pravesh",
+    date: "2026-12-07",
+    dayEn: "Monday",
+    dayHi: "सोमवार",
+    month: "December 2026",
+    tithiEn: "Krishna Trayodashi",
+    tithiHi: "कृष्ण त्रयोदशी (प्रदोष)",
+    nakshatraEn: "Swati",
+    nakshatraHi: "स्वाति",
+    timeEn: "08:10 AM to 01:15 PM",
+    timeHi: "सुबह 08:10 से दोपहर 01:15 तक",
+    yogaEn: "Siddha Yoga",
+    yogaHi: "सिद्ध योग",
+    noteEn: "Brings rapid financial accumulation in the new residence.",
+    noteHi: "गृह में धन-धान्य एवं लक्ष्मी के स्थायी वास हेतु उत्तम।"
+  },
+
+  // Vehicle Purchase (Vahan Kharidari)
+  {
+    category: "vahan",
+    date: "2026-09-17",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "September 2026",
+    tithiEn: "Shukla Shashthi",
+    tithiHi: "शुक्ल षष्ठी",
+    nakshatraEn: "Anuradha",
+    nakshatraHi: "अनुराधा",
+    timeEn: "09:30 AM to 03:15 PM",
+    timeHi: "सुबह 09:30 से दोपहर 03:15 तक",
+    yogaEn: "Guru-Pushya Align",
+    yogaHi: "गुरु-पुष्य संरेखण",
+    noteEn: "Safeguards journeys and ensures mechanical durability.",
+    noteHi: "दुर्घटना से रक्षा व वाहन की दीर्घायु हेतु श्रेष्ठ मुहूर्त।"
+  },
+  {
+    category: "vahan",
+    date: "2026-10-18",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "October 2026",
+    tithiEn: "Shukla Ashtami (Navratri)",
+    tithiHi: "महाष्टमी (नवरात्रि)",
+    nakshatraEn: "Shravana",
+    nakshatraHi: "श्रवण",
+    timeEn: "08:00 AM to 05:45 PM",
+    timeHi: "सुबह 08:00 से शाम 05:45 तक",
+    yogaEn: "Sarvartha Siddhi Yoga",
+    yogaHi: "सर्वार्थ सिद्धि योग",
+    noteEn: "Navratri day ensures divine protection and prestige.",
+    noteHi: "मां भगवती की कृपा से मान-सम्मान व वैभव में वृद्धि।"
+  },
+  {
+    category: "vahan",
+    date: "2026-11-08",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "November 2026",
+    tithiEn: "Dhanteras",
+    tithiHi: "धनतेरस",
+    nakshatraEn: "Hasta",
+    nakshatraHi: "हस्त",
+    timeEn: "06:15 AM to 08:30 PM",
+    timeHi: "सुबह 06:15 से रात 08:30 तक",
+    yogaEn: "Amrit Siddhi & Kuber Yoga",
+    yogaHi: "अमृत सिद्धि व कुबेर योग",
+    noteEn: "Dhanteras vehicle purchase is auspicious for commercial and family cars.",
+    noteHi: "धनतेरस पर वाहन क्रय व्यवसाय व परिवार दोनों के लिए शुभ।"
+  },
+
+  // Property & Land Purchase
+  {
+    category: "property",
+    date: "2026-09-24",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "September 2026",
+    tithiEn: "Shukla Trayodashi",
+    tithiHi: "शुक्ल त्रयोदशी",
+    nakshatraEn: "Shatabhisha",
+    nakshatraHi: "शतभिषा",
+    timeEn: "10:20 AM to 02:40 PM",
+    timeHi: "सुबह 10:20 से दोपहर 02:40 तक",
+    yogaEn: "Siddhi Yoga",
+    yogaHi: "सिद्धि योग",
+    noteEn: "Clear registry, dispute-free title, and fast appreciation.",
+    noteHi: "भूमि रजिस्ट्री, फ्लैट क्रय व टोकन मनी देने हेतु श्रेष्ठ।"
+  },
+  {
+    category: "property",
+    date: "2026-10-29",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "October 2026",
+    tithiEn: "Krishna Chaturthi",
+    tithiHi: "करवा चौथ",
+    nakshatraEn: "Rohini",
+    nakshatraHi: "रोहिणी",
+    timeEn: "07:30 AM to 01:10 PM",
+    timeHi: "सुबह 07:30 से दोपहर 01:10 तक",
+    yogaEn: "Sarvartha Siddhi Yoga",
+    yogaHi: "सर्वार्थ सिद्धि योग",
+    noteEn: "Favorable for commercial real estate & agricultural land.",
+    noteHi: "व्यावसायिक भवन व आवासीय भूमि निवेश हेतु अति शुभ।"
+  },
+
+  // New Business / Shop Opening
+  {
+    category: "vyapar",
+    date: "2026-10-09",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "October 2026",
+    tithiEn: "Krishna Chaturdashi",
+    tithiHi: "सर्वपितृ अमावस्या पूर्व",
+    nakshatraEn: "Uttara Phalguni",
+    nakshatraHi: "उत्तराफाल्गुनी",
+    timeEn: "09:15 AM to 11:45 AM",
+    timeHi: "सुबह 09:15 से 11:45 तक",
+    yogaEn: "Amrit Choghadiya",
+    yogaHi: "अमृत चौघड़िया",
+    noteEn: "High customer footfall, lucrative contracts, and brand expansion.",
+    noteHi: "दुकान, शोरूम, स्टार्टअप व कार्यालय के शुभारंभ हेतु मंगलकारी।"
+  },
+  {
+    category: "vyapar",
+    date: "2026-11-08",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "November 2026",
+    tithiEn: "Dhanteras (Dhan Trayodashi)",
+    tithiHi: "धनतेरस (धन त्रयोदशी)",
+    nakshatraEn: "Hasta",
+    nakshatraHi: "हस्त",
+    timeEn: "08:45 AM to 01:30 PM",
+    timeHi: "सुबह 08:45 से दोपहर 01:30 तक",
+    yogaEn: "Kuber Siddhi Yoga",
+    yogaHi: "कुबेर सिद्धि योग",
+    noteEn: "Best day of the year for commercial ventures and ledgers.",
+    noteHi: "नवीन बहीखाता, प्रतिष्ठान व व्यापारिक साझेदारी हेतु सर्वोत्तम।"
+  },
+
+  // Namkaran & Mundan Sanskar
+  {
+    category: "namkaran",
+    date: "2026-09-20",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "September 2026",
+    tithiEn: "Shukla Navami",
+    tithiHi: "शुक्ल नवमी",
+    nakshatraEn: "Mula",
+    nakshatraHi: "मूल",
+    timeEn: "07:45 AM to 11:30 AM",
+    timeHi: "सुबह 07:45 से 11:30 तक",
+    yogaEn: "Shubha Yoga",
+    yogaHi: "शुभ योग",
+    noteEn: "Fosters radiant intellect, health, and bright destiny.",
+    noteHi: "शिशु के दीर्घायु, कुशाग्र बुद्धि व आरोग्य हेतु नामकरण।"
+  },
+  {
+    category: "namkaran",
+    date: "2026-11-25",
+    dayEn: "Wednesday",
+    dayHi: "बुधवार",
+    month: "November 2026",
+    tithiEn: "Krishna Pratipada",
+    tithiHi: "कृष्ण प्रतिपदा",
+    nakshatraEn: "Rohini",
+    nakshatraHi: "रोहिणी",
+    timeEn: "08:30 AM to 01:00 PM",
+    timeHi: "सुबह 08:30 से दोपहर 01:00 तक",
+    yogaEn: "Sarvartha Siddhi Yoga",
+    yogaHi: "सर्वार्थ सिद्धि योग",
+    noteEn: "Ideal for Mundan Sanskar (Tonsure) and intellectual vows.",
+    noteHi: "मुंडन संस्कार एवं कान छेदन (कर्णवेध) हेतु उत्तम मुहूर्त।"
+  }
+];
+
+export function getUpcomingShubhMuhurats({ category = "all", lang = "hi" }) {
+  if (category === "all") return UPCOMING_SHUBH_MUHURATS;
+  return UPCOMING_SHUBH_MUHURATS.filter(m => m.category === category);
+}
+
+/* -------------------------------------------------------------
+   UPCOMING HINDU FESTIVALS & VRAT CALENDAR (व्रत एवं त्यौहार)
+------------------------------------------------------------- */
+export const HINDU_FESTIVALS_CALENDAR = [
+  // 2026 Major Festivals
+  {
+    id: "ganesh_chaturthi",
+    category: "major",
+    nameEn: "Ganesh Chaturthi (Vinayaka Chavithi)",
+    nameHi: "गणेश चतुर्थी (विनायक उत्सव)",
+    date: "2026-09-14",
+    dayEn: "Monday",
+    dayHi: "सोमवार",
+    month: "September 2026",
+    tithiEn: "Bhadrapada Shukla Chaturthi",
+    tithiHi: "भाद्रपद शुक्ल चतुर्थी",
+    significanceEn: "Grand celebration of Lord Ganesha's descent. Brings removal of hurdles (Vighnaharta) and wisdom.",
+    significanceHi: "विघ्नहर्ता भगवान श्री गणेश का प्राकट्य दिवस। रिद्धि-सिद्धि व समस्त विघ्नों के नाश का महापर्व।",
+    pujaMuhuratEn: "11:03 AM to 01:32 PM (Abhijit & Madhyahna)",
+    pujaMuhuratHi: "सुबह 11:03 से दोपहर 01:32 तक (मध्याह्न मुहूर्त)",
+    fastingRulesEn: "Observe fast until Madhyahna puja. Offer 21 Modaks and fresh Durva grass.",
+    fastingRulesHi: "मध्याह्न पूजन तक व्रत रखें। भगवान को २१ मोदक व दुर्वा अर्पित करें।"
+  },
+  {
+    id: "anant_chaturdashi",
+    category: "major",
+    nameEn: "Anant Chaturdashi (Ganesh Visarjan)",
+    nameHi: "अनंत चतुर्दशी (गणेश विसर्जन)",
+    date: "2026-09-24",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "September 2026",
+    tithiEn: "Bhadrapada Shukla Chaturdashi",
+    tithiHi: "भाद्रपद शुक्ल चतुर्दशी",
+    significanceEn: "Sacred 14-knot thread ritual for Lord Vishnu and emotional farewell to Lord Ganesha.",
+    significanceHi: "भगवान अनंत (श्री हरि विष्णु) का पूजन तथा १४ गांठों का अनंत सूत्र धारण।",
+    pujaMuhuratEn: "06:10 AM to 06:15 PM",
+    pujaMuhuratHi: "सुबह 06:10 से शाम 06:15 तक",
+    fastingRulesEn: "Tie 14-knot sacred thread on right wrist (men) or left wrist (women).",
+    fastingRulesHi: "पुरुष दाहिने और महिलाएं बाएं हाथ में १४ गांठों वाला अनंत सूत्र बांधें।"
+  },
+  {
+    id: "pitrupaksha_start",
+    category: "vrat",
+    nameEn: "Pitru Paksha Begins (Shraddha Paksha)",
+    nameHi: "पितृ पक्ष प्रारंभ (श्राद्ध पक्ष)",
+    date: "2026-09-26",
+    dayEn: "Saturday",
+    dayHi: "शनिवार",
+    month: "September 2026",
+    tithiEn: "Bhadrapada Purnima / Pratipada",
+    tithiHi: "भाद्रपद पूर्णिमा / प्रतिपदा",
+    significanceEn: "16-day sacred period to perform Tarpan, Pind Daan, and receive ancestors' blessings (Pitra Kripa).",
+    significanceHi: "पूर्वजों (पितरों) के तर्पण, पिंडदान व शांति हेतु समर्पित १६ दिवसीय पुण्यकाल।",
+    pujaMuhuratEn: "11:36 AM to 03:45 PM (Kutup & Rohina Muhurat)",
+    pujaMuhuratHi: "सुबह 11:36 से दोपहर 03:45 तक (कुतुप व रोहिणी काल)",
+    fastingRulesEn: "Perform Tarpan with black sesame seeds, water, and feed cows, crows, and dogs daily.",
+    fastingRulesHi: "काले तिल व जल से तर्पण करें। नित्य गाय, कौवे और कुत्ते को ग्रास दें।"
+  },
+  {
+    id: "sarvapitri_amavasya",
+    category: "purnima_amavasya",
+    nameEn: "Sarva Pitru Amavasya (Mahalaya)",
+    nameHi: "सर्वपितृ अमावस्या (महालया)",
+    date: "2026-10-10",
+    dayEn: "Saturday",
+    dayHi: "शनिवार",
+    month: "October 2026",
+    tithiEn: "Ashwin Krishna Amavasya",
+    tithiHi: "आश्विन कृष्ण अमावस्या",
+    significanceEn: "Culmination of Pitru Paksha. Shraddha for all known and unknown ancestors.",
+    significanceHi: "सभी ज्ञात-अज्ञात पितरों के निमित्त श्राद्ध व तर्पण का अंतिम व सर्वश्रेष्ठ दिन।",
+    pujaMuhuratEn: "11:45 AM to 03:30 PM",
+    pujaMuhuratHi: "सुबह 11:45 से दोपहर 03:30 तक",
+    fastingRulesEn: "Perform grand Brahmin Bhojan and light a lamp under Peepal tree in the evening.",
+    fastingRulesHi: "ब्राह्मण भोजन कराएं तथा संध्या समय पीपल वृक्ष के नीचे दीपक प्रज्वलित करें।"
+  },
+  {
+    id: "navratri_start",
+    category: "major",
+    nameEn: "Sharad Navratri (Ghatasthapana)",
+    nameHi: "शारदीय नवरात्रि प्रारंभ (घटस्थापना)",
+    date: "2026-10-11",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "October 2026",
+    tithiEn: "Ashwin Shukla Pratipada",
+    tithiHi: "आश्विन शुक्ल प्रतिपदा",
+    significanceEn: "9 divine nights worshipping Maa Durga's 9 avatars. Awakening of Shakti & prosperity.",
+    significanceHi: "मां जगदम्बा के नौ दिव्य स्वरूपों की आराधना। अखंड ज्योति व कलश स्थापना।",
+    pujaMuhuratEn: "06:20 AM to 10:14 AM (Ghatasthapana)",
+    pujaMuhuratHi: "सुबह 06:20 से 10:14 तक (घटस्थापना व कलश पूजन)",
+    fastingRulesEn: "Strict Satvik diet, fruit fast, daily Durga Saptashati path.",
+    fastingRulesHi: "सात्विक फलाहार, अखंड दीप प्रज्वलन व दुर्गा सप्तशती का पाठ।"
+  },
+  {
+    id: "durga_ashtami",
+    category: "major",
+    nameEn: "Maha Ashtami & Kanya Pujan",
+    nameHi: "महाष्टमी एवं कन्या पूजन",
+    date: "2026-10-18",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "October 2026",
+    tithiEn: "Ashwin Shukla Ashtami",
+    tithiHi: "आश्विन शुक्ल अष्टमी",
+    significanceEn: "Worship of Maa Mahagauri and Sandhi Puja. Bestows immense spiritual power.",
+    significanceHi: "मां महागौरी की उपासना व संधि पूजा। कन्याओं को भोजन व दक्षिणा अर्पण।",
+    pujaMuhuratEn: "Full Day (Sandhi Puja: 07:18 PM to 08:06 PM)",
+    pujaMuhuratHi: "संधि पूजा: शाम 07:18 से 08:06 तक",
+    fastingRulesEn: "Worship 9 young girls (Kanya) as living avatars of Navadurga with Halwa-Puri.",
+    fastingRulesHi: "९ कन्याओं का पाद प्रक्षालन कर हलवा, चना व पूड़ी का भोग लगाएं।"
+  },
+  {
+    id: "dussehra",
+    category: "major",
+    nameEn: "Vijayadashami (Dussehra)",
+    nameHi: "विजयादशमी (दशहरा / रावण दहन)",
+    date: "2026-10-20",
+    dayEn: "Tuesday",
+    dayHi: "मंगलवार",
+    month: "October 2026",
+    tithiEn: "Ashwin Shukla Dashami",
+    tithiHi: "आश्विन शुक्ल दशमी",
+    significanceEn: "Triumph of Lord Rama over Ravana and Goddess Durga over Mahishasura. Shami Puja.",
+    significanceHi: "धर्म की अधर्म पर विजय का प्रतीक। शमी वृक्ष व शस्त्र पूजन का पावन दिन।",
+    pujaMuhuratEn: "01:58 PM to 02:44 PM (Vijay Muhurat)",
+    pujaMuhuratHi: "दोपहर 01:58 से 02:44 तक (विजय मुहूर्त)",
+    fastingRulesEn: "Perform Shami tree worship and distribute golden leaves for wealth and victory.",
+    fastingRulesHi: "शमी पत्र एक-दूसरे को भेंट कर बड़ों का आशीर्वाद लें।"
+  },
+  {
+    id: "karwa_chauth",
+    category: "vrat",
+    nameEn: "Karwa Chauth (Karak Chaturthi)",
+    nameHi: "करवा चौथ (करक चतुर्थी व्रत)",
+    date: "2026-10-29",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "October 2026",
+    tithiEn: "Kartik Krishna Chaturthi",
+    tithiHi: "कार्तिक कृष्ण चतुर्थी",
+    significanceEn: "Sacred waterless fast observed by married women for spouse's longevity and prosperity.",
+    significanceHi: "अखंड सौभाग्य, पति की दीर्घायु एवं दांपत्य प्रेम हेतु निर्जला व्रत।",
+    pujaMuhuratEn: "05:40 PM to 06:58 PM (Moonrise: 08:14 PM)",
+    pujaMuhuratHi: "शाम 05:40 से 06:58 तक (चंद्रोदय: रात 08:14 बजे)",
+    fastingRulesEn: "Waterless fast from sunrise until offering Arghya to the rising Moon through a sieve.",
+    fastingRulesHi: "सूर्योदय से चंद्रोदय तक निर्जला व्रत। छलनी से चंद्रमा व पति का दर्शन कर जल ग्रहण।"
+  },
+  {
+    id: "dhanteras",
+    category: "major",
+    nameEn: "Dhanteras (Dhanvantari Jayanti)",
+    nameHi: "धनतेरस (भगवान धन्वंतरि जयंती)",
+    date: "2026-11-06",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "November 2026",
+    tithiEn: "Kartik Krishna Trayodashi",
+    tithiHi: "कार्तिक कृष्ण त्रयोदशी",
+    significanceEn: "Appearance of Lord Dhanvantari with Amrit Kalash. Buying gold, brass, and utensils.",
+    significanceHi: "आयुर्वेद के देवता धन्वंतरि व कुबेर देव का पूजन। सोना, चांदी व बर्तनों का क्रय।",
+    pujaMuhuratEn: "05:32 PM to 07:28 PM (Pradosh Kaal)",
+    pujaMuhuratHi: "शाम 05:32 से 07:28 तक (प्रदोष काल मुहूर्त)",
+    fastingRulesEn: "Light a four-wick oil lamp (Yama Deepam) facing South in the evening.",
+    fastingRulesHi: "संध्या समय दक्षिण दिशा में चार मुखी यम दीपक प्रज्वलित करें।"
+  },
+  {
+    id: "diwali",
+    category: "major",
+    nameEn: "Diwali (Lakshmi Puja & Deepawali)",
+    nameHi: "दीपावली (महालक्ष्मी एवं गणेश पूजन)",
+    date: "2026-11-08",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "November 2026",
+    tithiEn: "Kartik Krishna Amavasya",
+    tithiHi: "कार्तिक कृष्ण अमावस्या",
+    significanceEn: "Grand festival of lights. Invocation of Goddess Lakshmi, Lord Ganesha, and Kuber.",
+    significanceHi: "अंधकार पर प्रकाश की विजय का महापर्व। महालक्ष्मी व श्री गणेश जी का अभिषेक व पूजन।",
+    pujaMuhuratEn: "05:27 PM to 07:23 PM (Pradosh Kaal) | 11:38 PM to 12:31 AM (Maha Nishita Kaal)",
+    pujaMuhuratHi: "शाम 05:27 से 07:23 तक (प्रदोष काल) | रात 11:38 से 12:31 तक (महानिशीथ काल)",
+    fastingRulesEn: "Keep home illuminated with mustard and ghee diyas; chant Sri Suktam and Lakshmi Stotram.",
+    fastingRulesHi: "घर में घी व तेल के दीपक जलाएं, कनकधारा व श्री सूक्त का पाठ करें।"
+  },
+  {
+    id: "govardhan_puja",
+    category: "major",
+    nameEn: "Govardhan Puja (Annakoot)",
+    nameHi: "गोवर्धन पूजा (अन्नकूट महोत्सव)",
+    date: "2026-11-09",
+    dayEn: "Monday",
+    dayHi: "सोमवार",
+    month: "November 2026",
+    tithiEn: "Kartik Shukla Pratipada",
+    tithiHi: "कार्तिक शुक्ल प्रतिपदा",
+    significanceEn: "Worship of Govardhan Hill and cows, commemorating Lord Krishna lifting Mount Govardhan.",
+    significanceHi: "भगवान श्रीकृष्ण द्वारा गोवर्धन पर्वत धारण करने की स्मृति। ५६ भोग व अन्नकूट अर्पण।",
+    pujaMuhuratEn: "06:38 AM to 08:49 AM",
+    pujaMuhuratHi: "सुबह 06:38 से 08:49 तक",
+    fastingRulesEn: "Prepare cow dung Govardhan deity, offer 56 Bhog and perform Gau Mata Parikrama.",
+    fastingRulesHi: "गाय के गोबर से गोवर्धन बनाएं तथा ५६ प्रकार के व्यंजनों का भोग लगाएं।"
+  },
+  {
+    id: "bhai_dooj",
+    category: "major",
+    nameEn: "Bhai Dooj (Yama Dwitiya)",
+    nameHi: "भाई दूज (यम द्वितीया)",
+    date: "2026-11-11",
+    dayEn: "Wednesday",
+    dayHi: "बुधवार",
+    month: "November 2026",
+    tithiEn: "Kartik Shukla Dwitiya",
+    tithiHi: "कार्तिक शुक्ल द्वितीया",
+    significanceEn: "Sacred bond of brothers and sisters. Yama Raj blessed his sister Yamuna on this day.",
+    significanceHi: "भाई-बहन के अगाध स्नेह का पर्व। यमराज ने बहन यमुना के घर भोजन ग्रहण किया था।",
+    pujaMuhuratEn: "01:10 PM to 03:22 PM",
+    pujaMuhuratHi: "दोपहर 01:10 से 03:22 तक",
+    fastingRulesEn: "Sisters apply Tilak to brothers, feed sweets, and pray for their long and prosperous life.",
+    fastingRulesHi: "बहनें भाई के माथे पर तिलक लगाकर आरती उतारें व दीर्घायु की कामना करें।"
+  },
+  {
+    id: "chhath_puja",
+    category: "major",
+    nameEn: "Chhath Puja (Sandhya & Usha Arghya)",
+    nameHi: "छठ महापर्व (संध्या व उषा अर्घ्य)",
+    date: "2026-11-15",
+    dayEn: "Sunday",
+    dayHi: "रविवार",
+    month: "November 2026",
+    tithiEn: "Kartik Shukla Shashthi",
+    tithiHi: "कार्तिक शुक्ल षष्ठी",
+    significanceEn: "36-hour waterless Mahavrat dedicated to Lord Surya (Sun God) and Chhathi Maiya.",
+    significanceHi: "भगवान सूर्य एवं षष्ठी देवी को समर्पित ३६ घंटे का अखंड निर्जला महापर्व।",
+    pujaMuhuratEn: "Sunset Arghya (Nov 15: 05:27 PM) | Sunrise Arghya (Nov 16: 06:44 AM)",
+    pujaMuhuratHi: "संध्या अर्घ्य (१५ नव.: शाम 05:27) | प्रातः अर्घ्य (१६ नव.: सुबह 06:44)",
+    fastingRulesEn: "36-hour strict waterless fast, standing in sacred river water to offer milk and Ganga Jal Arghya.",
+    fastingRulesHi: "नदी/सरोवर के जल में खड़े होकर अस्ताचलगामी व उदीयमान सूर्य को अर्घ्य दें।"
+  },
+  {
+    id: "devuthani_ekadashi",
+    category: "ekadashi",
+    nameEn: "Devuthani Ekadashi (Tulsi Vivah)",
+    nameHi: "देवउठनी एकादशी (तुलसी विवाह)",
+    date: "2026-11-20",
+    dayEn: "Friday",
+    dayHi: "शुक्रवार",
+    month: "November 2026",
+    tithiEn: "Kartik Shukla Ekadashi",
+    tithiHi: "कार्तिक शुक्ल एकादशी",
+    significanceEn: "Lord Vishnu awakens from 4-month Yoga Nidra (Chaturmas). Auspicious ceremonies resume.",
+    significanceHi: "भगवान विष्णु चार माह की योगनिद्रा से जागते हैं। तुलसी-शालिग्राम विवाह व मांगलिक कार्य प्रारंभ।",
+    pujaMuhuratEn: "Full Day (Parana Nov 21: 06:48 AM to 08:55 AM)",
+    pujaMuhuratHi: "पारण (२१ नव.): सुबह 06:48 से 08:55 तक",
+    fastingRulesEn: "Grainless Ekadashi fast. Perform grand Tulsi Vivah with Sugarcane Mandap.",
+    fastingRulesHi: "अन्न वर्जित रखें। गन्ने के मंडप में शालिग्राम व तुलसी का विवाह संपन्न कराएं।"
+  },
+  {
+    id: "dev_deepawali",
+    category: "purnima_amavasya",
+    nameEn: "Dev Deepawali (Kartik Purnima)",
+    nameHi: "देव दीपावली (कार्तिक पूर्णिमा / त्रिपुरारी पूर्णिमा)",
+    date: "2026-11-24",
+    dayEn: "Tuesday",
+    dayHi: "मंगलवार",
+    month: "November 2026",
+    tithiEn: "Kartik Purnima",
+    tithiHi: "कार्तिक पूर्णिमा",
+    significanceEn: "Gods descend to Varanasi Ghats to celebrate Diwali. Lord Shiva vanquished Tripurasura.",
+    significanceHi: "देवताओं की दीपावली। गंगा स्नान व काशी के घाटों पर लाखों दीपदान का दिव्य पर्व।",
+    pujaMuhuratEn: "05:08 PM to 07:46 PM (Pradosh Deep Daan)",
+    pujaMuhuratHi: "शाम 05:08 से 07:46 तक (प्रदोष दीपदान)",
+    fastingRulesEn: "Ganga Snan, Satyanarayan Katha, lighting lamps at rivers, temples, and under Peepal tree.",
+    fastingRulesHi: "पवित्र नदी में स्नान, श्री सत्यनारायण कथा व देवालयों में दीपदान।"
+  },
+
+  // 2027 Upcoming Major Highlights
+  {
+    id: "makar_sankranti",
+    category: "major",
+    nameEn: "Makar Sankranti (Uttarayan)",
+    nameHi: "मकर संक्रांति (उत्तरायण / पोंगल / माघी)",
+    date: "2027-01-14",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "January 2027",
+    tithiEn: "Pausha Shukla Saptami",
+    tithiHi: "पौष शुक्ल सप्तमी",
+    significanceEn: "Sun transits into Capricorn (Makara). Auspicious period of Uttarayan begins.",
+    significanceHi: "सूर्य देव का मकर राशि में प्रवेश। देवताओं के दिन (उत्तरायण) का शुभारंभ।",
+    pujaMuhuratEn: "07:15 AM to 12:45 PM (Maha Punya Kaal)",
+    pujaMuhuratHi: "सुबह 07:15 से दोपहर 12:45 तक (महापुण्य काल)",
+    fastingRulesEn: "Holy dip in sacred waters, charity of sesame, jaggery, blankets, and Khichdi.",
+    fastingRulesHi: "तिल, गुड़, कंबल व खिचड़ी का दान करें। पवित्र नदियों में स्नान।"
+  },
+  {
+    id: "vasant_panchami",
+    category: "major",
+    nameEn: "Vasant Panchami (Saraswati Puja)",
+    nameHi: "बसंत पंचमी (मां सरस्वती पूजन)",
+    date: "2027-02-11",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "February 2027",
+    tithiEn: "Magha Shukla Panchami",
+    tithiHi: "माघ शुक्ल पंचमी",
+    significanceEn: "Appearance of Goddess Saraswati (Goddess of Knowledge, Music, and Arts).",
+    significanceHi: "विद्या व ज्ञान की देवी मां सरस्वती का प्राकट्योत्सव। विद्यारंभ संस्कार।",
+    pujaMuhuratEn: "07:03 AM to 12:35 PM",
+    pujaMuhuratHi: "सुबह 07:03 से दोपहर 12:35 तक",
+    fastingRulesEn: "Wear yellow clothes, offer yellow flowers and saffron sweets to Goddess Saraswati.",
+    fastingRulesHi: "पीले वस्त्र धारण करें, मां सरस्वती को पीले पुष्प व केसरिया भात अर्पित करें।"
+  },
+  {
+    id: "maha_shivratri",
+    category: "major",
+    nameEn: "Maha Shivratri (Lord Shiva & Parvati Vivah)",
+    nameHi: "महाशिवरात्रि (देवों के देव महादेव पूजन)",
+    date: "2027-03-06",
+    dayEn: "Saturday",
+    dayHi: "शनिवार",
+    month: "March 2027",
+    tithiEn: "Phalguna Krishna Chaturdashi",
+    tithiHi: "फाल्गुन कृष्ण चतुर्दशी",
+    significanceEn: "Cosmic dance of Lord Shiva (Tandava) and divine marriage with Mata Parvati.",
+    significanceHi: "भगवान शिव व माता पार्वती का विवाह उत्सव। चार प्रहर की महापूजा से समस्त पापों का नाश।",
+    pujaMuhuratEn: "Nishita Kaal: 12:08 AM to 12:57 AM (Mar 07) | 4-Prahar Puja all night",
+    pujaMuhuratHi: "निशीथ काल: रात 12:08 से 12:57 तक | रात्रि के चारों प्रहर में रुद्राभिषेक",
+    fastingRulesEn: "Waterless or fruit fast. Offer Bilva leaves, milk, honey, Bhasma, and Dhatura to Shivalinga.",
+    fastingRulesHi: "बेलपत्र, भांग, धतूरा, गंगाजल व पंचामृत से शिवलिंग का अभिषेक करें।"
+  },
+  {
+    id: "holi",
+    category: "major",
+    nameEn: "Holi & Holika Dahan (Phalguna Purnima)",
+    nameHi: "होली एवं होलिका दहन (फाल्गुनी पूर्णिमा)",
+    date: "2027-03-22",
+    dayEn: "Monday",
+    dayHi: "सोमवार",
+    month: "March 2027",
+    tithiEn: "Phalguna Purnima",
+    tithiHi: "फाल्गुन पूर्णिमा",
+    significanceEn: "Triumph of devotee Prahlad's devotion over Holika. Spring festival of colors.",
+    significanceHi: "भक्त प्रह्लाद की भक्ति की विजय। रंगों व आनंद का अलौकिक उत्सव।",
+    pujaMuhuratEn: "Holika Dahan: 06:35 PM to 08:58 PM (Mar 22) | Dhulandi Colors: Mar 23",
+    pujaMuhuratHi: "होलिका दहन: शाम 06:35 से रात 08:58 तक | रंगोत्सव: २३ मार्च",
+    fastingRulesEn: "Offer raw cotton thread, grains, coconut, and water to Holika bonfire.",
+    fastingRulesHi: "होलिका में गोबर के बड़कूले, नई गेहूं की बालियां व नारियल अर्पित करें।"
+  },
+  {
+    id: "ram_navami",
+    category: "major",
+    nameEn: "Ram Navami (Lord Rama Janmotsav)",
+    nameHi: "रामनवमी (भगवान श्री राम जन्मोत्सव)",
+    date: "2027-04-15",
+    dayEn: "Thursday",
+    dayHi: "गुरुवार",
+    month: "April 2027",
+    tithiEn: "Chaitra Shukla Navami",
+    tithiHi: "चैत्र शुक्ल नवमी",
+    significanceEn: "Birth of Maryada Purushottam Lord Sri Rama at midday in Ayodhya.",
+    significanceHi: "मर्यादा पुरुषोत्तम प्रभु श्री राम का अयोध्या धाम में मध्याह्न प्राकट्य।",
+    pujaMuhuratEn: "11:04 AM to 01:38 PM (Madhyahna Janmotsav)",
+    pujaMuhuratHi: "सुबह 11:04 से दोपहर 01:38 तक (मध्याह्न मुहूर्त)",
+    fastingRulesEn: "Recite Ramcharitmanas / Sundarkand, observe fast until midday aarti.",
+    fastingRulesHi: "मध्याह्न १२ बजे 'भए प्रगट कृपाला' आरती व सुंदरकांड का पाठ करें।"
+  }
+];
+
+export function getUpcomingFestivalsAndVrats({ filter = "all", lang = "hi" }) {
+  if (filter === "all") return HINDU_FESTIVALS_CALENDAR;
+  return HINDU_FESTIVALS_CALENDAR.filter(f => f.category === filter);
+}

@@ -1,5 +1,19 @@
 import { useState, useRef, useEffect } from "react";
-import { generateVedicKundliData, calculateGunMilan, generateDailyHoroscope, calculateMarriagePrediction, calculateCareerPrediction, getLifeProblemRemedies, LIFE_PROBLEMS_LIST, SIGNS } from "./jyotishEngine";
+import {
+  generateVedicKundliData,
+  calculateGunMilan,
+  generateDailyHoroscope,
+  calculateMarriagePrediction,
+  calculateCareerPrediction,
+  getLifeProblemRemedies,
+  calculateDailyPanchang,
+  getUpcomingShubhMuhurats,
+  getUpcomingFestivalsAndVrats,
+  SHUBH_MUHURAT_CATEGORIES,
+  MAJOR_INDIAN_CITIES,
+  LIFE_PROBLEMS_LIST,
+  SIGNS
+} from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 
 const ZODIAC_SIGNS = [
@@ -35,6 +49,9 @@ const TABS = [
   { id: "careerTiming", icon: "💼", labelEn: "Career & Job", labelHi: "करियर व नौकरी" },
   { id: "lifeProblems", icon: "🛡️", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण व उपाय" },
   { id: "marriageTiming", icon: "💍", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
+  { id: "panchang", icon: "🕉️", labelEn: "Hindu Panchang", labelHi: "दैनिक पंचांग" },
+  { id: "muhurat", icon: "⏳", labelEn: "Shubh Muhurat", labelHi: "शुभ मुहूर्त" },
+  { id: "festivals", icon: "🪔", labelEn: "Festivals & Vrat", labelHi: "व्रत व त्यौहार" },
   { id: "daily", icon: "☀️", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
   { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
   { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
@@ -932,6 +949,37 @@ export default function App() {
   const t = UI[lang];
   const hi = lang === "hi";
 
+  // Standalone Feature State (Direct Access without Birth Details)
+  const [mainSection, setMainSection] = useState("kundli"); // "kundli", "panchang", "muhurat", "festivals", "daily"
+  const [panchangDate, setPanchangDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [panchangCity, setPanchangCity] = useState(MAJOR_INDIAN_CITIES[0]);
+  const [choghadiyaPeriod, setChoghadiyaPeriod] = useState("day");
+  const [muhuratCategory, setMuhuratCategory] = useState("all");
+  const [festivalFilter, setFestivalFilter] = useState("all");
+  const [festivalSearch, setFestivalSearch] = useState("");
+
+  const panchangData = calculateDailyPanchang({
+    dateStr: panchangDate,
+    lat: panchangCity.lat,
+    lon: panchangCity.lon,
+    cityName: hi ? panchangCity.nameHi : panchangCity.name,
+    lang
+  });
+
+  const filteredMuhurats = getUpcomingShubhMuhurats({
+    category: muhuratCategory,
+    lang
+  });
+
+  const filteredFestivals = getUpcomingFestivalsAndVrats({
+    filter: festivalFilter,
+    lang
+  }).filter(f => {
+    if (!festivalSearch.trim()) return true;
+    const q = festivalSearch.toLowerCase();
+    return f.nameEn.toLowerCase().includes(q) || f.nameHi.includes(q) || f.month.toLowerCase().includes(q);
+  });
+
   // Sync daily horoscope sign when Kundli result loads
   useEffect(() => {
     if (result?.rashiSign) {
@@ -999,40 +1047,434 @@ export default function App() {
     setMilanResult(res);
   };
 
-  const handleLangToggle = () => {
-    const newLang = lang === "en" ? "hi" : "en";
-    setLang(newLang);
-    if (err) {
-      setErr(UI[newLang].errFields);
-    }
-    if (result && form.dob && form.pob) {
-      try {
-        const updated = generateVedicKundliData({
-          name: form.name,
-          dob: form.dob,
-          tob: form.tob,
-          pob: form.pob,
-          lat: lastCoords.lat,
-          lon: lastCoords.lon,
-          lang: newLang
-        });
-        setResult(updated);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    if (milanResult && partnerForm.name && partnerForm.dob) {
-      try {
-        const updatedMilan = calculateGunMilan({
-          partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
-          partner2: partnerForm
-        });
-        setMilanResult(updatedMilan);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
+  // ── RENDER HELPER: HINDU PANCHANG ────────────────────────────────
+  const renderPanchangContent = () => (
+    <div className="glass-card" style={{ padding: "28px 26px", marginBottom: 26, animation: "fadeInCard 0.4s ease" }}>
+      {/* Panchang Header Controls */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 18, marginBottom: 20 }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, letterSpacing: 1 }}>
+            <span>🕉️</span> {hi ? "वैदिक पंचांग गणना" : "DAILY SIDEREAL PANCHANG"}
+          </div>
+          <h3 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, marginTop: 2 }}>
+            {panchangData.displayDate}
+          </h3>
+          <div style={{ fontSize: 13, color: "rgba(243,211,122,0.85)", marginTop: 2 }}>
+            {hi ? `विक्रम संवत ${panchangData.vikramSamvat} · शक संवत ${panchangData.shakaSamvat} · ${panchangData.masa} मास · ${panchangData.ritu}` : `Vikram Samvat ${panchangData.vikramSamvat} · Shaka ${panchangData.shakaSamvat} · ${panchangData.masa} Masa · ${panchangData.ritu}`}
+          </div>
+        </div>
+
+        {/* Date & Location Switchers */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          {/* Quick Date Switcher */}
+          <div style={{ display: "flex", gap: 6, background: "rgba(0,0,0,0.4)", padding: "4px", borderRadius: 20, border: "1px solid rgba(212,175,55,0.2)" }}>
+            <button
+              onClick={() => {
+                const d = new Date(panchangDate);
+                d.setDate(d.getDate() - 1);
+                setPanchangDate(d.toISOString().split("T")[0]);
+              }}
+              style={{ background: "transparent", border: "none", color: "#FDE68A", padding: "4px 10px", borderRadius: 14, fontSize: 12, cursor: "pointer" }}
+              title="Yesterday"
+            >
+              ◀ {hi ? "कल" : "Prev"}
+            </button>
+            <button
+              onClick={() => setPanchangDate(new Date().toISOString().split("T")[0])}
+              style={{ background: "rgba(245,158,11,0.25)", border: "1px solid rgba(245,158,11,0.4)", color: "#FFF", padding: "4px 12px", borderRadius: 14, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+            >
+              {hi ? "आज" : "Today"}
+            </button>
+            <button
+              onClick={() => {
+                const d = new Date(panchangDate);
+                d.setDate(d.getDate() + 1);
+                setPanchangDate(d.toISOString().split("T")[0]);
+              }}
+              style={{ background: "transparent", border: "none", color: "#FDE68A", padding: "4px 10px", borderRadius: 14, fontSize: 12, cursor: "pointer" }}
+              title="Tomorrow"
+            >
+              {hi ? "कल" : "Next"} ▶
+            </button>
+          </div>
+
+          {/* Date Picker */}
+          <input
+            type="date"
+            aria-label="Panchang Date"
+            value={panchangDate}
+            onChange={e => setPanchangDate(e.target.value)}
+            style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: "7px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }}
+          />
+
+          {/* City Selector */}
+          <select
+            aria-label="Panchang City"
+            value={panchangCity.name}
+            onChange={e => {
+              const c = MAJOR_INDIAN_CITIES.find(city => city.name === e.target.value);
+              if (c) setPanchangCity(c);
+            }}
+            style={{ background: "rgba(26,18,48,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: "8px 12px", color: "#FDE68A", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+          >
+            {MAJOR_INDIAN_CITIES.map(c => (
+              <option key={c.name} value={c.name} style={{ background: "#0F0A1E", color: "#FFF" }}>
+                📍 {hi ? c.nameHi : c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Core 4-Box Metric Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 24 }}>
+        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 700 }}>🌙 {hi ? "तिथि एवं पक्ष" : "Tithi & Paksha"}</div>
+          <div style={{ fontSize: 16.5, color: "#FDE68A", fontWeight: 800, marginTop: 4 }}>{panchangData.tithi}</div>
+          <div style={{ fontSize: 12, color: "#34D399", fontWeight: 600, marginTop: 2 }}>{panchangData.paksha}</div>
+        </div>
+
+        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 700 }}>🌟 {hi ? "नक्षत्र एवं पद" : "Nakshatra & Pada"}</div>
+          <div style={{ fontSize: 16.5, color: "#FDE68A", fontWeight: 800, marginTop: 4 }}>{panchangData.nakshatra}</div>
+          <div style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+            {hi ? `पद ${panchangData.pada} · स्वामी: ${panchangData.nakshatraLord}` : `Pada ${panchangData.pada} · Lord: ${panchangData.nakshatraLord}`}
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 700 }}>⚡ {hi ? "योग एवं करण" : "Yoga & Karana"}</div>
+          <div style={{ fontSize: 16.5, color: "#FDE68A", fontWeight: 800, marginTop: 4 }}>{panchangData.yoga} {hi ? "योग" : "Yoga"}</div>
+          <div style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+            {hi ? `${panchangData.karana} करण (स्वामी: ${panchangData.karanaRuler})` : `${panchangData.karana} Karana (${panchangData.karanaRuler})`}
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "16px 18px" }}>
+          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", fontWeight: 700 }}>☀️ {hi ? "वार एवं राशि स्थिति" : "Weekday & Moon/Sun"}</div>
+          <div style={{ fontSize: 16.5, color: "#FDE68A", fontWeight: 800, marginTop: 4 }}>{panchangData.vaar}</div>
+          <div style={{ fontSize: 12, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+            {hi ? `सूर्य: ${panchangData.sunSign} · चंद्र: ${panchangData.moonSign}` : `Sun: ${panchangData.sunSign} · Moon: ${panchangData.moonSign}`}
+          </div>
+        </div>
+      </div>
+
+      {/* 2 Columns: Auspicious Timings vs Inauspicious & Disha Shool */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18, marginBottom: 24 }}>
+        {/* Auspicious Timings Card */}
+        <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 14, padding: "20px 22px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: "1px solid rgba(16,185,129,0.2)", paddingBottom: 8 }}>
+            <h4 style={{ color: "#34D399", fontSize: 15, fontWeight: 800, margin: 0 }}>
+              ✨ {hi ? "शुभ काल एवं सूर्य-चंद्र चक्र" : "Auspicious Timings & Solar Cycle"}
+            </h4>
+            <span style={{ fontSize: 12, color: "rgba(241,231,208,0.8)" }}>📍 {panchangData.cityName}</span>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14, background: "rgba(0,0,0,0.3)", borderRadius: 8, padding: "10px 12px" }}>
+            <div>
+              <div style={{ fontSize: 11.5, color: "#FDE68A" }}>🌅 {hi ? "सूर्योदय" : "Sunrise"}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF" }}>{panchangData.sunrise}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: "#FDE68A" }}>🌇 {hi ? "सूर्यास्त" : "Sunset"}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF" }}>{panchangData.sunset}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: "#FDE68A" }}>🌙 {hi ? "चंद्रोदय" : "Moonrise"}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF" }}>{panchangData.moonrise}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 11.5, color: "#FDE68A" }}>🌚 {hi ? "चंद्रास्त" : "Moonset"}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF" }}>{panchangData.moonset}</div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(16,185,129,0.1)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A" }}>🌟 {hi ? "अभिजीत मुहूर्त (सर्वश्रेष्ठ)" : "Abhijit Muhurat"}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: "#34D399" }}>{panchangData.muhurats.abhijit}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>🪷 {hi ? "ब्रह्म मुहूर्त (साधना)" : "Brahma Muhurat"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A" }}>{panchangData.muhurats.brahma}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>✨ {hi ? "अमृत काल" : "Amrit Kaal"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A" }}>{panchangData.muhurats.amritKaal}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>🏆 {hi ? "विजय मुहूर्त" : "Vijay Muhurat"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A" }}>{panchangData.muhurats.vijay}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>🌅 {hi ? "गोधूलि मुहूर्त" : "Godhuli Muhurat"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A" }}>{panchangData.muhurats.godhuli}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Inauspicious & Disha Shool Card */}
+        <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 14, padding: "20px 22px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, borderBottom: "1px solid rgba(239,68,68,0.2)", paddingBottom: 8 }}>
+            <h4 style={{ color: "#F87171", fontSize: 15, fontWeight: 800, margin: 0 }}>
+              ⚠️ {hi ? "अशुभ काल व दिशाशूल (त्याज्य समय)" : "Inauspicious Timings & Disha Shool"}
+            </h4>
+            <span style={{ fontSize: 12, color: "#FCA5A5" }}>{hi ? "नए कार्य न करें" : "Avoid Key Launches"}</span>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 12px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.25)", borderRadius: 8 }}>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#FCA5A5" }}>⚠️ {hi ? "राहु काल (अति त्याज्य)" : "Rahu Kaal"}</div>
+                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.75)" }}>{hi ? "शुभ कार्य व यात्रा पूर्णतः वर्जित" : "Avoid any new auspicious beginnings"}</div>
+              </div>
+              <span style={{ fontSize: 14.5, fontWeight: 800, color: "#EF4444", alignSelf: "center" }}>{panchangData.inauspicious.rahuKaal}</span>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>⛔ {hi ? "यमगण्ड काल" : "Yamaganda"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#F87171" }}>{panchangData.inauspicious.yamaganda}</span>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 10px", background: "rgba(255,255,255,0.03)", borderRadius: 6 }}>
+              <span style={{ fontSize: 13, color: "rgba(241,231,208,0.9)" }}>🛑 {hi ? "गुलिक काल" : "Gulika Kaal"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#F87171" }}>{panchangData.inauspicious.gulika}</span>
+            </div>
+          </div>
+
+          {/* Disha Shool Banner */}
+          <div style={{ background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.35)", borderRadius: 8, padding: "12px 14px" }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#FDE68A", marginBottom: 4 }}>
+              🧭 {hi ? `आज का दिशाशूल: ${panchangData.dishashool}` : `Today's Disha Shool: ${panchangData.dishashool}`}
+            </div>
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", lineHeight: 1.5 }}>
+              <b>{hi ? "निवारण उपाय:" : "Remedy:"}</b> {panchangData.dishashoolRemedy}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Full Daily Choghadiya Table */}
+      <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "20px 22px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 16 }}>
+          <div>
+            <h4 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: 0 }}>
+              ⏱️ {hi ? "दैनिक चौघड़िया चक्र (Choghadiya Muhurat)" : "Daily Choghadiya Planetary Clock"}
+            </h4>
+            <p style={{ fontSize: 12, color: "rgba(243,211,122,0.8)", margin: "2px 0 0" }}>
+              {hi ? "यात्रा, क्रय-विक्रय व व्यावसायिक कार्यों हेतु समय का सटीक विभाजन" : "Classical 8-part astrological timing divisions"}
+            </p>
+          </div>
+
+          <div style={{ display: "flex", background: "rgba(0,0,0,0.5)", borderRadius: 20, padding: 3, border: "1px solid rgba(212,175,55,0.25)" }}>
+            <button
+              onClick={() => setChoghadiyaPeriod("day")}
+              style={{ background: choghadiyaPeriod === "day" ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent", border: "none", color: choghadiyaPeriod === "day" ? "#0F0A1E" : "#FDE68A", padding: "6px 16px", borderRadius: 16, fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+            >
+              ☀️ {hi ? "दिन का चौघड़िया" : "Day Choghadiya"}
+            </button>
+            <button
+              onClick={() => setChoghadiyaPeriod("night")}
+              style={{ background: choghadiyaPeriod === "night" ? "linear-gradient(135deg, #A78BFA, #6366F1)" : "transparent", border: "none", color: choghadiyaPeriod === "night" ? "#0F0A1E" : "#FDE68A", padding: "6px 16px", borderRadius: 16, fontSize: 12.5, fontWeight: 800, cursor: "pointer" }}
+            >
+              🌙 {hi ? "रात का चौघड़िया" : "Night Choghadiya"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
+          {(choghadiyaPeriod === "day" ? panchangData.dayChoghadiya : panchangData.nightChoghadiya).map((slot, i) => (
+            <div key={i} style={{ background: "rgba(0,0,0,0.35)", border: `1px solid ${slot.color}35`, borderRadius: 8, padding: "10px 12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: slot.color }}>{slot.name}</span>
+                <span style={{ fontSize: 11, background: `${slot.color}20`, color: slot.color, padding: "2px 8px", borderRadius: 10, fontWeight: 700 }}>
+                  {slot.quality}
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: "#FFF", fontWeight: 600 }}>{slot.time}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── RENDER HELPER: SHUBH MUHURAT DIRECTORY ────────────────────────
+  const renderMuhuratContent = () => (
+    <div className="glass-card" style={{ padding: "28px 26px", marginBottom: 26, animation: "fadeInCard 0.4s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 22 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, letterSpacing: 1 }}>
+          <span>⏳</span> {hi ? "प्रामाणिक वैदिक मुहूर्त" : "AUTHENTIC AUSPICIOUS TIMINGS"}
+        </div>
+        <h3 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, marginTop: 4 }}>
+          {hi ? "आगामी सर्व शुभ मुहूर्त डायरेक्टरी (2026–2027)" : "Upcoming Auspicious Muhurats Directory"}
+        </h3>
+        <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13.5, maxWidth: 640, margin: "4px auto 0" }}>
+          {hi ? "विवाह, गृह प्रवेश, वाहन क्रय, भूमि रजिस्ट्री, नवीन व्यापार व संस्कारों के शास्त्रीय मुहूर्त" : "Parashari certified timings for Weddings, Housewarmings, Vehicles, Property & Commercial Launches"}
+        </p>
+      </div>
+
+      {/* Category Filter Pills */}
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 22 }}>
+        {SHUBH_MUHURAT_CATEGORIES.map(cat => {
+          const isSel = muhuratCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setMuhuratCategory(cat.id)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: isSel ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(11,8,25,0.7)",
+                border: isSel ? "none" : "1px solid rgba(212,175,55,0.25)",
+                color: isSel ? "#0F0A1E" : "#FDE68A",
+                padding: "7px 14px",
+                borderRadius: 20,
+                fontSize: 12.5,
+                fontWeight: isSel ? 800 : 600,
+                cursor: "pointer"
+              }}
+            >
+              <span>{cat.icon}</span>
+              <span>{hi ? cat.labelHi : cat.labelEn}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Muhurats Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+        {filteredMuhurats.map((m, idx) => (
+          <div key={idx} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "18px 20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, borderBottom: "1px solid rgba(212,175,55,0.18)", paddingBottom: 8 }}>
+              <span style={{ fontSize: 12, background: "rgba(245,158,11,0.18)", color: "#FDE68A", padding: "3px 10px", borderRadius: 12, fontWeight: 800 }}>
+                {SHUBH_MUHURAT_CATEGORIES.find(c => c.id === m.category)?.[hi ? "labelHi" : "labelEn"] || m.category}
+              </span>
+              <span style={{ fontSize: 12, color: "#34D399", fontWeight: 700 }}>
+                ✨ {hi ? m.yogaHi : m.yogaEn}
+              </span>
+            </div>
+
+            <h4 style={{ color: "#FFF", fontSize: 17, fontWeight: 800, margin: "0 0 4px" }}>
+              {new Date(m.date).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "long", year: "numeric" })}, {hi ? m.dayHi : m.dayEn}
+            </h4>
+
+            <div style={{ fontSize: 12.5, color: "rgba(243,211,122,0.9)", marginBottom: 8 }}>
+              🌙 {hi ? m.tithiHi : m.tithiEn} · 🌟 {hi ? m.nakshatraHi : m.nakshatraEn}
+            </div>
+
+            <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: 8, padding: "8px 12px", color: "#34D399", fontSize: 13, fontWeight: 800, marginBottom: 10 }}>
+              ⏱️ {hi ? m.timeHi : m.timeEn}
+            </div>
+
+            <p style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", lineHeight: 1.6, margin: 0 }}>
+              {hi ? m.noteHi : m.noteEn}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ── RENDER HELPER: HINDU FESTIVALS & VRAT CALENDAR ───────────────
+  const renderFestivalsContent = () => (
+    <div className="glass-card" style={{ padding: "28px 26px", marginBottom: 26, animation: "fadeInCard 0.4s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 22 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, letterSpacing: 1 }}>
+          <span>🪔</span> {hi ? "सनातन धर्म के पावन पर्व" : "HINDU FESTIVALS & FASTING CALENDAR"}
+        </div>
+        <h3 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, marginTop: 4 }}>
+          {hi ? "हिंदू व्रत, पर्व एवं त्यौहार कैलेंडर (2026–2027)" : "Hindu Festivals, Fasting & Vrat Calendar"}
+        </h3>
+        <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13.5, maxWidth: 640, margin: "4px auto 0" }}>
+          {hi ? "एकादशी, प्रदोष, दीपावली, छठ, नवरात्रि, शिवरात्रि, होली व समस्त व्रत तिथियां व पूजा मुहूर्त" : "Comprehensive Hindu calendar for Major Festivals, Ekadashis, Pradosh, Purnima & Sacred Fasts"}
+        </p>
+      </div>
+
+      {/* Search & Filter Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
+        {/* Category Pills */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {[
+            { id: "all", label: hi ? "समस्त पर्व (All)" : "All Festivals" },
+            { id: "major", label: hi ? "🌟 प्रमुख त्यौहार" : "Major Festivals" },
+            { id: "ekadashi", label: hi ? "🌸 एकादशी व्रत" : "Ekadashi Vrats" },
+            { id: "purnima_amavasya", label: hi ? "🌕 पूर्णिमा/अमावस्या" : "Purnima & Amavasya" },
+            { id: "vrat", label: hi ? "📿 उपवास व अन्य व्रत" : "Fasts & Vrats" },
+          ].map(f => {
+            const isSel = festivalFilter === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setFestivalFilter(f.id)}
+                style={{
+                  background: isSel ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(11,8,25,0.7)",
+                  border: isSel ? "none" : "1px solid rgba(212,175,55,0.25)",
+                  color: isSel ? "#0F0A1E" : "#FDE68A",
+                  padding: "7px 14px",
+                  borderRadius: 20,
+                  fontSize: 12.5,
+                  fontWeight: isSel ? 800 : 600,
+                  cursor: "pointer"
+                }}
+              >
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search input */}
+        <input
+          type="text"
+          placeholder={hi ? "त्यौहार या व्रत खोजें..." : "Search festival (e.g. Diwali, Ekadashi)..."}
+          value={festivalSearch}
+          onChange={e => setFestivalSearch(e.target.value)}
+          style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 20, padding: "8px 16px", color: "#FFF", fontSize: 13, minWidth: 220 }}
+        />
+      </div>
+
+      {/* Festivals Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 16 }}>
+        {filteredFestivals.map((fest) => (
+          <div key={fest.id} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "20px 22px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 12, color: "#34D399", fontWeight: 800 }}>
+                  📅 {new Date(fest.date).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric" })} ({hi ? fest.dayHi : fest.dayEn})
+                </span>
+                <span style={{ fontSize: 11, background: "rgba(245,158,11,0.2)", color: "#FDE68A", padding: "2px 8px", borderRadius: 10, fontWeight: 700 }}>
+                  {fest.month}
+                </span>
+              </div>
+
+              <h4 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: "0 0 4px" }}>
+                {hi ? fest.nameHi : fest.nameEn}
+              </h4>
+
+              <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 10 }}>
+                🌙 {hi ? fest.tithiHi : fest.tithiEn}
+              </div>
+
+              <p style={{ fontSize: 13, color: "rgba(241,231,208,0.9)", lineHeight: 1.6, marginBottom: 12 }}>
+                {hi ? fest.significanceHi : fest.significanceEn}
+              </p>
+            </div>
+
+            <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10 }}>
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "6px 10px", color: "#FDE68A", fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+                🪔 <b>{hi ? "शुभ पूजा मुहूर्त:" : "Puja Muhurat:"}</b> {hi ? fest.pujaMuhuratHi : fest.pujaMuhuratEn}
+              </div>
+              <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", lineHeight: 1.5 }}>
+                <b>{hi ? "व्रत व पूजा नियम:" : "Fasting Rules:"}</b> {hi ? fest.fastingRulesHi : fest.fastingRulesEn}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ minHeight: "100vh", background: "#0B0819", color: "#F1E7D0", fontFamily: hi ? "'Noto Sans Devanagari', 'Outfit', sans-serif" : "'Outfit', sans-serif", position: "relative", overflowX: "hidden" }}>
@@ -1361,161 +1803,404 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "32px 20px 80px" }}>
+      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "28px 20px 80px" }}>
 
-        {/* Hero Section */}
-        <section className="no-print" style={{ textAlign: "center", marginBottom: 34 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "7px 18px", marginBottom: 14 }}>
-            <span style={{ fontSize: 15 }}>✨</span>
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: "#FDE68A", letterSpacing: 1.5 }}>
-              {hi ? "प्रामाणिक पराशरी गणना" : "AUTHENTIC SIDEREAL VEDIC COMPUTATION"}
-            </span>
-          </div>
-
-          <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(24px, 5.5vw, 42px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 3, fontWeight: 800, marginBottom: 8 }}>
-            {t.title}
-          </h1>
-          <p style={{ color: "#FDE68A", fontSize: hi ? 14 : 13.5, letterSpacing: hi ? 0 : 3, textTransform: "uppercase", fontWeight: 700 }}>
-            {t.subtitle}
-          </p>
-          <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent)", margin: "16px auto", maxWidth: 300 }} />
-          <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 14.5, fontStyle: "italic", lineHeight: 1.6 }}>{t.tagline}</p>
-        </section>
-
-        {/* Input Form Card */}
-        <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
-          <div style={{ marginBottom: 24, textAlign: "center" }}>
-            <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
-            <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5 }}>{t.formSub}</p>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label htmlFor="birth-name" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                <span>👤</span> {t.fName} *
-              </label>
-              <input
-                id="birth-name"
-                name="name"
-                type="text"
-                required
-                aria-required="true"
-                aria-label={t.fName}
-                value={form.name}
-                onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
-                placeholder={t.phName}
-                style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="birth-dob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                <span>📅</span> {t.fDob} *
-              </label>
-              <input
-                id="birth-dob"
-                name="dob"
-                type="date"
-                required
-                aria-required="true"
-                aria-label={t.fDob}
-                value={form.dob}
-                onChange={e => { setForm({ ...form, dob: e.target.value }); if (err) setErr(""); }}
-                style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="birth-tob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                <span>⏰</span> {t.fTob} <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.8)", fontWeight: 500 }}>{t.fTobHelp}</span>
-              </label>
-              <input
-                id="birth-tob"
-                name="tob"
-                type="time"
-                aria-label={t.fTob}
-                value={form.tob}
-                onChange={e => setForm({ ...form, tob: e.target.value })}
-                style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
-              />
-            </div>
-
-            <div style={{ gridColumn: "1 / -1" }}>
-              <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                <span>📍</span> {t.fPob} *
-              </label>
-              <input
-                id="birth-pob"
-                name="pob"
-                type="text"
-                required
-                aria-required="true"
-                aria-label={t.fPob}
-                value={form.pob}
-                onChange={e => { setForm({ ...form, pob: e.target.value }); if (err) setErr(""); }}
-                placeholder={t.phPob}
-                style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
-              />
-            </div>
-          </div>
-
-          {err && (
-            <div style={{ background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.35)", borderRadius: 8, padding: "12px 16px", color: "#FCA5A5", fontSize: 13.5, textAlign: "center", marginTop: 18 }}>
-              ⚠️ {err}
-            </div>
-          )}
-
-          <button onClick={run} disabled={step > 0} className="gold-cta-btn" style={{ marginTop: 24, fontSize: 16 }}>
-            {step > 0 ? t.btnWait : t.btnGo}
-          </button>
-
-          {/* Quick Daily Horoscope Access */}
-          {!result && (
-            <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 16 }}>
-              <span style={{ fontSize: 13.5, color: "rgba(241,231,208,0.85)" }}>
-                {hi ? "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:"}
-              </span>
+        {/* ── TOP GLOBAL FEATURE NAVIGATION BAR (Instant Access Without Birth Details) ── */}
+        <nav className="no-print" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, marginBottom: 28 }}>
+          {[
+            { id: "kundli", icon: "🔯", label: hi ? "जन्म कुंडली" : "Natal Kundli" },
+            { id: "panchang", icon: "🕉️", label: hi ? "दैनिक पंचांग" : "Today's Panchang" },
+            { id: "muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Shubh Muhurat" },
+            { id: "festivals", icon: "🪔", label: hi ? "व्रत व त्यौहार" : "Festivals & Vrat" },
+            { id: "daily", icon: "☀️", label: hi ? "दैनिक राशिफल" : "Daily Horoscope" },
+          ].map(feat => {
+            const isSelected = mainSection === feat.id;
+            return (
               <button
-                type="button"
+                key={feat.id}
                 onClick={() => {
-                  if (!result) {
-                    const fallback = generateVedicKundliData({ name: form.name || "Guest", dob: form.dob || "2000-01-01", tob: form.tob || "12:00", lat: 26.8467, lon: 80.9462, lang });
-                    setResult(fallback);
+                  setMainSection(feat.id);
+                  if (result && ["chart", "panchang", "muhurat", "festivals", "daily"].includes(feat.id)) {
+                    setTab(feat.id === "kundli" ? "chart" : feat.id);
                   }
-                  setTab("daily");
                 }}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 6,
-                  background: "rgba(245,158,11,0.18)",
-                  border: "1px solid rgba(245,158,11,0.4)",
-                  borderRadius: 20,
-                  padding: "7px 18px",
-                  color: "#FDE68A",
-                  fontSize: 13,
-                  fontWeight: 700,
+                  gap: 8,
+                  background: isSelected
+                    ? "linear-gradient(135deg, rgba(245,158,11,0.35), rgba(217,119,6,0.45))"
+                    : "rgba(26,18,48,0.85)",
+                  border: isSelected ? "1.5px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
+                  borderRadius: 24,
+                  padding: "10px 18px",
+                  color: isSelected ? "#FDE68A" : "rgba(241,231,208,0.9)",
+                  fontSize: 13.5,
+                  fontWeight: isSelected ? 800 : 600,
                   cursor: "pointer",
-                  marginLeft: 10,
-                  marginTop: 6
+                  boxShadow: isSelected ? "0 0 16px rgba(245,158,11,0.35)" : "none",
+                  transition: "all 0.2s ease"
                 }}
               >
-                <span>☀️</span> {hi ? "दैनिक राशिफल (Daily Horoscope)" : "Daily Horoscope"} →
+                <span style={{ fontSize: 16 }}>{feat.icon}</span>
+                <span>{feat.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* ── STANDALONE PANCHANG VIEW ── */}
+        {mainSection === "panchang" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <button
+                onClick={() => setMainSection("kundli")}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
               </button>
             </div>
-          )}
-        </div>
-
-        {/* Loading Progress */}
-        {step > 0 && (
-          <div className="glass-card no-print" style={{ padding: "36px 20px", textAlign: "center", marginBottom: 32 }}>
-            <div style={{ display: "inline-block", position: "relative", width: 80, height: 80, marginBottom: 16 }}>
-              <div style={{ position: "absolute", inset: 0, border: "2px solid rgba(245, 158, 11, 0.3)", borderRadius: "50%", borderTopColor: "#F59E0B", animation: "spin 1.2s linear infinite" }} />
-              <div style={{ position: "absolute", inset: 8, border: "2px solid rgba(245, 158, 11, 0.15)", borderRadius: "50%", borderBottomColor: "#FDE68A", animation: "spin 2s linear infinite reverse" }} />
-              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, animation: "pulseSlow 1.5s infinite" }}>🔯</div>
-            </div>
-            <p style={{ color: "#F3D37A", fontSize: 14, fontWeight: 600, letterSpacing: 0.5 }}>{step === 1 ? t.s1 : t.s2}</p>
+            {renderPanchangContent()}
           </div>
+        )}
+
+        {/* ── STANDALONE SHUBH MUHURAT VIEW ── */}
+        {mainSection === "muhurat" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <button
+                onClick={() => setMainSection("kundli")}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
+              </button>
+            </div>
+            {renderMuhuratContent()}
+          </div>
+        )}
+
+        {/* ── STANDALONE FESTIVALS & VRAT VIEW ── */}
+        {mainSection === "festivals" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <button
+                onClick={() => setMainSection("kundli")}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
+              </button>
+            </div>
+            {renderFestivalsContent()}
+          </div>
+        )}
+
+        {/* ── STANDALONE DAILY HOROSCOPE VIEW ── */}
+        {mainSection === "daily" && !result && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <button
+                onClick={() => setMainSection("kundli")}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
+              </button>
+            </div>
+            <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+              <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, marginBottom: 6 }}>
+                ☀️ {hi ? "दैनिक वैदिक राशिफल" : "Daily Vedic Horoscope"}
+              </h3>
+              <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13.5, marginBottom: 18 }}>
+                {hi ? "अपनी चंद्र या सूर्य राशि चुनें और आज का सटीक वैदिक भविष्यफल प्राप्त करें:" : "Select your Moon / Sun sign for today's astrological guidance:"}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
+                {SIGNS.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setDailySign(s)}
+                    style={{
+                      background: dailySign === s ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(11,8,25,0.7)",
+                      border: dailySign === s ? "none" : "1px solid rgba(212,175,55,0.3)",
+                      color: dailySign === s ? "#0F0A1E" : "#FDE68A",
+                      padding: "8px 14px",
+                      borderRadius: 16,
+                      fontSize: 13,
+                      fontWeight: dailySign === s ? 800 : 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              {(() => {
+                const daily = generateDailyHoroscope(dailySign, lang);
+                return (
+                  <div style={{ background: "rgba(0,0,0,0.4)", borderRadius: 12, padding: "20px 22px", border: "1px solid rgba(212,175,55,0.2)" }}>
+                    <h4 style={{ color: "#FDE68A", fontSize: 18, fontWeight: 800, marginBottom: 8 }}>
+                      {daily.sign} — {daily.prediction}
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginTop: 14 }}>
+                      <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 8, padding: "10px 14px" }}>
+                        <span style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700 }}>🎨 {hi ? "शुभ रंग:" : "Lucky Color:"}</span>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF", marginTop: 2 }}>{daily.luckyColor}</div>
+                      </div>
+                      <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 8, padding: "10px 14px" }}>
+                        <span style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700 }}>🔢 {hi ? "शुभ अंक:" : "Lucky Number:"}</span>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF", marginTop: 2 }}>{daily.luckyNumber}</div>
+                      </div>
+                      <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 8, padding: "10px 14px" }}>
+                        <span style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700 }}>⏱️ {hi ? "शुभ समय:" : "Auspicious Time:"}</span>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: "#FFF", marginTop: 2 }}>{daily.luckyTime}</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* ── KUNDLI GENERATOR SECTION ── */}
+        {mainSection === "kundli" && (
+          <>
+            {/* Hero Section */}
+            <section className="no-print" style={{ textAlign: "center", marginBottom: 30 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "7px 18px", marginBottom: 14 }}>
+                <span style={{ fontSize: 15 }}>✨</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color: "#FDE68A", letterSpacing: 1.5 }}>
+                  {hi ? "प्रामाणिक पराशरी गणना" : "AUTHENTIC SIDEREAL VEDIC COMPUTATION"}
+                </span>
+              </div>
+
+              <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(24px, 5.5vw, 42px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 3, fontWeight: 800, marginBottom: 8 }}>
+                {t.title}
+              </h1>
+              <p style={{ color: "#FDE68A", fontSize: hi ? 14 : 13.5, letterSpacing: hi ? 0 : 3, textTransform: "uppercase", fontWeight: 700 }}>
+                {t.subtitle}
+              </p>
+              <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent)", margin: "16px auto", maxWidth: 300 }} />
+              <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 14.5, fontStyle: "italic", lineHeight: 1.6 }}>{t.tagline}</p>
+            </section>
+
+            {/* Standalone Feature Spotlight Cards (Direct 1-Click Access) */}
+            {!result && (
+              <div className="no-print" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 28 }}>
+                {/* 1. Panchang Card */}
+                <div
+                  onClick={() => setMainSection("panchang")}
+                  style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "transform 0.2s ease, border-color 0.2s ease" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ fontSize: 22 }}>🕉️</span>
+                    <span style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700, background: "rgba(16,185,129,0.15)", padding: "2px 8px", borderRadius: 10 }}>
+                      {hi ? "लाइव पंचांग" : "Live Daily"}
+                    </span>
+                  </div>
+                  <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: "4px 0" }}>
+                    {hi ? "दैनिक हिंदू पंचांग" : "Today's Hindu Panchang"}
+                  </h3>
+                  <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginBottom: 8 }}>
+                    {panchangData.tithi} · {panchangData.nakshatra}
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+                    <span>🌟 {hi ? "अभिजीत:" : "Abhijit:"} {panchangData.muhurats.abhijit.split("-")[0]}</span>
+                    <span>⚠️ {hi ? "राहुकाल:" : "Rahu:"} {panchangData.inauspicious.rahuKaal.split("-")[0]}</span>
+                  </div>
+                  <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right" }}>
+                    {hi ? "चौघड़िया व पंचांग देखें →" : "View Full Panchang →"}
+                  </div>
+                </div>
+
+                {/* 2. Shubh Muhurat Card */}
+                <div
+                  onClick={() => setMainSection("muhurat")}
+                  style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "transform 0.2s ease, border-color 0.2s ease" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ fontSize: 22 }}>⏳</span>
+                    <span style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, background: "rgba(245,158,11,0.18)", padding: "2px 8px", borderRadius: 10 }}>
+                      2026–2027
+                    </span>
+                  </div>
+                  <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: "4px 0" }}>
+                    {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी" : "Auspicious Muhurats"}
+                  </h3>
+                  <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginBottom: 8 }}>
+                    {hi ? "विवाह, गृह प्रवेश, वाहन, संपत्ति व व्यापार" : "Weddings, Housewarming, Vehicles & Business"}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#34D399", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+                    ✨ {hi ? "सर्वार्थ सिद्धि व अमृत योग सहित" : "Certified Vedic Muhurat Windows"}
+                  </div>
+                  <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right" }}>
+                    {hi ? "शुभ मुहूर्त सूची देखें →" : "View All Muhurats →"}
+                  </div>
+                </div>
+
+                {/* 3. Festivals & Vrat Card */}
+                <div
+                  onClick={() => setMainSection("festivals")}
+                  style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "transform 0.2s ease, border-color 0.2s ease" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-3px)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ fontSize: 22 }}>🪔</span>
+                    <span style={{ fontSize: 11.5, color: "#F472B6", fontWeight: 700, background: "rgba(244,114,182,0.15)", padding: "2px 8px", borderRadius: 10 }}>
+                      {hi ? "पर्व व उपवास" : "Festivals"}
+                    </span>
+                  </div>
+                  <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: "4px 0" }}>
+                    {hi ? "हिंदू व्रत एवं त्यौहार कैलेंडर" : "Festivals & Vrat Calendar"}
+                  </h3>
+                  <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginBottom: 8 }}>
+                    {hi ? "एकादशी, प्रदोष, दीपावली, छठ, शिवरात्रि" : "Ekadashis, Pradosh, Diwali, Chhath & Fasts"}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+                    📿 {hi ? "पूजा मुहूर्त व पारण समय सहित" : "With Puja Muhurat & Fasting Rules"}
+                  </div>
+                  <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right" }}>
+                    {hi ? "कैलेंडर देखें →" : "View Calendar →"}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Input Form Card */}
+            <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
+              <div style={{ marginBottom: 24, textAlign: "center" }}>
+                <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
+                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5 }}>{t.formSub}</p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="birth-name" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
+                    <span>👤</span> {t.fName} *
+                  </label>
+                  <input
+                    id="birth-name"
+                    name="name"
+                    type="text"
+                    required
+                    aria-required="true"
+                    aria-label={t.fName}
+                    value={form.name}
+                    onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
+                    placeholder={t.phName}
+                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="birth-dob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
+                    <span>📅</span> {t.fDob} *
+                  </label>
+                  <input
+                    id="birth-dob"
+                    name="dob"
+                    type="date"
+                    required
+                    aria-required="true"
+                    aria-label={t.fDob}
+                    value={form.dob}
+                    onChange={e => { setForm({ ...form, dob: e.target.value }); if (err) setErr(""); }}
+                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="birth-tob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
+                    <span>⏰</span> {t.fTob} <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.8)", fontWeight: 500 }}>{t.fTobHelp}</span>
+                  </label>
+                  <input
+                    id="birth-tob"
+                    name="tob"
+                    type="time"
+                    aria-label={t.fTob}
+                    value={form.tob}
+                    onChange={e => setForm({ ...form, tob: e.target.value })}
+                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
+                    <span>📍</span> {t.fPob} *
+                  </label>
+                  <input
+                    id="birth-pob"
+                    name="pob"
+                    type="text"
+                    required
+                    aria-required="true"
+                    aria-label={t.fPob}
+                    value={form.pob}
+                    onChange={e => { setForm({ ...form, pob: e.target.value }); if (err) setErr(""); }}
+                    placeholder={t.phPob}
+                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                  />
+                </div>
+              </div>
+
+              {err && (
+                <div style={{ background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.35)", borderRadius: 8, padding: "12px 16px", color: "#FCA5A5", fontSize: 13.5, textAlign: "center", marginTop: 18 }}>
+                  ⚠️ {err}
+                </div>
+              )}
+
+              <button onClick={run} disabled={step > 0} className="gold-cta-btn" style={{ marginTop: 24, fontSize: 16 }}>
+                {step > 0 ? t.btnWait : t.btnGo}
+              </button>
+
+              {/* Quick Daily Horoscope Access */}
+              {!result && (
+                <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 16 }}>
+                  <span style={{ fontSize: 13.5, color: "rgba(241,231,208,0.85)" }}>
+                    {hi ? "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMainSection("daily");
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      background: "rgba(245,158,11,0.18)",
+                      border: "1px solid rgba(245,158,11,0.4)",
+                      borderRadius: 20,
+                      padding: "7px 18px",
+                      color: "#FDE68A",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      marginLeft: 10,
+                      marginTop: 6
+                    }}
+                  >
+                    <span>☀️</span> {hi ? "दैनिक राशिफल (Daily Horoscope)" : "Daily Horoscope"} →
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Loading Progress */}
+            {step > 0 && (
+              <div className="glass-card no-print" style={{ padding: "36px 20px", textAlign: "center", marginBottom: 32 }}>
+                <div style={{ display: "inline-block", position: "relative", width: 80, height: 80, marginBottom: 16 }}>
+                  <div style={{ position: "absolute", inset: 0, border: "2px solid rgba(245, 158, 11, 0.3)", borderRadius: "50%", borderTopColor: "#F59E0B", animation: "spin 1.2s linear infinite" }} />
+                  <div style={{ position: "absolute", inset: 8, border: "2px solid rgba(245, 158, 11, 0.15)", borderRadius: "50%", borderBottomColor: "#FDE68A", animation: "spin 2s linear infinite reverse" }} />
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, animation: "pulseSlow 1.5s infinite" }}>🔯</div>
+                </div>
+                <p style={{ color: "#F3D37A", fontSize: 14, fontWeight: 600, letterSpacing: 0.5 }}>{step === 1 ? t.s1 : t.s2}</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* ══════════════════════════════════════════════════════════════════════
@@ -2303,7 +2988,14 @@ export default function App() {
               );
             })()}
 
+            {/* ── TAB: HINDU PANCHANG ── */}
+            {tab === "panchang" && renderPanchangContent()}
 
+            {/* ── TAB: SHUBH MUHURAT ── */}
+            {tab === "muhurat" && renderMuhuratContent()}
+
+            {/* ── TAB: FESTIVALS & VRAT ── */}
+            {tab === "festivals" && renderFestivalsContent()}
 
             {/* ── TAB: DAILY HOROSCOPE & RECURRING MESSENGER SUBSCRIPTION ── */}
             {tab === "daily" && (() => {
