@@ -1503,7 +1503,7 @@ export function calculateDailyPanchang({ dateStr, lat = 28.6139, lon = 77.2090, 
   const isHi = lang === "hi";
   const targetDate = dateStr ? new Date(`${dateStr}T12:00:00Z`) : new Date();
   const time = new AstroTime(targetDate);
-  const ayanamsa = calculateLahiriAyanamsa(time);
+  const ayanamsa = getLahiriAyanamsa(targetDate);
 
   // Planetary ecliptic calculations
   const sunPos = Ecliptic(GeoVector(Body.Sun, time, false));
