@@ -119,10 +119,12 @@ const UI = {
     calculateMatchBtn: "Calculate Gun Milan Compatibility ✦",
     currencyLabel: "Select Currency",
     deliveryTimeLabel: "Preferred Delivery Time",
-    checkoutWhatsAppLabel: "Your WhatsApp / Mobile Number",
-    checkoutWhatsAppHelp: "PDF report & confirmation will be sent here.",
-    checkoutUtrLabel: "12-Digit UPI Ref / UTR No.",
-    checkoutUtrHelp: "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt.",
+    checkoutEmailLabel: "Your Email Address (For PDF Report & Receipt) *",
+    checkoutEmailHelp: "Your unlocked high-resolution report and invoice will be sent here.",
+    checkoutTxIdLabel: "PayPal Transaction ID / Order Ref (Optional)",
+    checkoutTxIdHelp: "Found in your PayPal confirmation email or activity receipt.",
+    checkoutPhoneLabel: "WhatsApp / Phone Number (Optional)",
+    checkoutPhoneHelp: "Optional for instant mobile alerts and PDF dispatch.",
     cardNumberLabel: "Card Number",
     cardExpiryLabel: "Card Expiry (MM/YY)",
     cardCvvLabel: "Security Code (CVV)",
@@ -184,10 +186,12 @@ const UI = {
     calculateMatchBtn: "गुण मिलान गणना करें ✦",
     currencyLabel: "मुद्रा चुनें (Select Currency)",
     deliveryTimeLabel: "प्राप्ति समय (Delivery Time)",
-    checkoutWhatsAppLabel: "आपका व्हाट्सएप / मोबाइल नंबर",
-    checkoutWhatsAppHelp: "PDF रिपोर्ट व पुष्टि इस नंबर पर भेजी जाएगी।",
-    checkoutUtrLabel: "12-अंकों का UPI UTR / Ref No.",
-    checkoutUtrHelp: "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।",
+    checkoutEmailLabel: "आपका ईमेल पता (PDF रिपोर्ट व रसीद हेतु) *",
+    checkoutEmailHelp: "अनलॉक की गई विस्तृत PDF रिपोर्ट एवं रसीद इस ईमेल पर भेजी जाएगी।",
+    checkoutTxIdLabel: "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)",
+    checkoutTxIdHelp: "पेपैल रसीद / ईमेल में दी गई ट्रांजैक्शन आईडी दर्ज करें।",
+    checkoutPhoneLabel: "व्हाट्सएप / फोन नंबर (वैकल्पिक)",
+    checkoutPhoneHelp: "व्हाट्सएप पर तुरंत रिपोर्ट व अलर्ट्स प्राप्त करने हेतु (वैकल्पिक)।",
     cardNumberLabel: "कार्ड नंबर (Card Number)",
     cardExpiryLabel: "समाप्ति तिथि (MM/YY)",
     cardCvvLabel: "सुरक्षा कोड (CVV)",
@@ -416,68 +420,63 @@ const CosmicBackdrop = () => (
 );
 
 const CURRENCIES = {
-  INR: { code: "INR", symbol: "₹", name: "INR (₹)", flag: "🇮🇳", baseRate: 1 },
-  USD: { code: "USD", symbol: "$", name: "USD ($)", flag: "🇺🇸", baseRate: 0.012 },
-  EUR: { code: "EUR", symbol: "€", name: "EUR (€)", flag: "🇪🇺", baseRate: 0.011 },
-  GBP: { code: "GBP", symbol: "£", name: "GBP (£)", flag: "🇬🇧", baseRate: 0.0095 },
-  CAD: { code: "CAD", symbol: "CA$", name: "CAD (CA$)", flag: "🇨🇦", baseRate: 0.016 },
-  AUD: { code: "AUD", symbol: "AU$", name: "AUD (AU$)", flag: "🇦🇺", baseRate: 0.018 },
-  AED: { code: "AED", symbol: "AED ", name: "AED (د.إ)", flag: "🇦🇪", baseRate: 0.044 },
+  USD: { code: "USD", symbol: "$", name: "USD ($)", flag: "🇺🇸", baseRate: 1 },
+  EUR: { code: "EUR", symbol: "€", name: "EUR (€)", flag: "🇪🇺", baseRate: 0.92 },
+  GBP: { code: "GBP", symbol: "£", name: "GBP (£)", flag: "🇬🇧", baseRate: 0.79 },
+  CAD: { code: "CAD", symbol: "CA$", name: "CAD (CA$)", flag: "🇨🇦", baseRate: 1.36 },
+  AUD: { code: "AUD", symbol: "AU$", name: "AUD (AU$)", flag: "🇦🇺", baseRate: 1.52 },
+  AED: { code: "AED", symbol: "AED ", name: "AED (د.إ)", flag: "🇦🇪", baseRate: 3.67 },
+  INR: { code: "INR", symbol: "₹", name: "INR (₹)", flag: "🇮🇳", baseRate: 83.5 },
 };
 
 const PRODUCT_PRICES = {
-  dakshina: { INR: "₹108", USD: "$1.99", EUR: "€1.99", GBP: "£1.49", CAD: "CA$2.49", AUD: "AU$2.99", AED: "AED 9" },
-  deluxeReport: { INR: "₹199", USD: "$2.99", EUR: "€2.99", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 14" },
-  annualReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
-  matchmakingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
-  marriageTimingReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
-  careerReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
-  remediesReport: { INR: "₹149", USD: "$1.99", EUR: "€1.99", GBP: "£1.79", CAD: "CA$2.99", AUD: "AU$3.49", AED: "AED 10" },
-  dailyMonthly: { INR: "₹49", USD: "$0.99", EUR: "€0.99", GBP: "£0.79", CAD: "CA$1.29", AUD: "AU$1.49", AED: "AED 4" },
-  dailyYearly: { INR: "₹299", USD: "$4.99", EUR: "€4.99", GBP: "£3.99", CAD: "CA$6.99", AUD: "AU$7.99", AED: "AED 22" },
+  dakshina: { USD: "$1.99", EUR: "€1.99", GBP: "£1.49", CAD: "CA$2.49", AUD: "AU$2.99", AED: "AED 9", INR: "₹149" },
+  deluxeReport: { USD: "$4.99", EUR: "€4.49", GBP: "£3.99", CAD: "CA$6.49", AUD: "AU$7.49", AED: "AED 19", INR: "₹399" },
+  annualReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
+  matchmakingReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
+  marriageTimingReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
+  careerReport: { USD: "$3.99", EUR: "€3.49", GBP: "£2.99", CAD: "CA$4.99", AUD: "AU$5.99", AED: "AED 15", INR: "₹299" },
+  remediesReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
+  dailyMonthly: { USD: "$0.99", EUR: "€0.99", GBP: "£0.79", CAD: "CA$1.29", AUD: "AU$1.49", AED: "AED 4", INR: "₹79" },
+  dailyYearly: { USD: "$4.99", EUR: "€4.99", GBP: "£3.99", CAD: "CA$6.99", AUD: "AU$7.99", AED: "AED 22", INR: "₹399" },
 };
 
 const detectDefaultCurrency = () => {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
     const navLang = navigator.language || "";
-    if (tz.includes("Calcutta") || tz.includes("Kolkata") || navLang.includes("en-IN") || navLang.includes("hi")) {
-      return "INR";
-    }
     if (tz.includes("Europe/London") || navLang.includes("en-GB")) return "GBP";
     if (tz.includes("Europe/")) return "EUR";
     if (tz.includes("Canada") || tz.includes("Toronto") || tz.includes("Vancouver")) return "CAD";
     if (tz.includes("Australia") || tz.includes("Sydney") || tz.includes("Melbourne")) return "AUD";
-    if (tz.includes("Dubai")) return "AED";
+    if (tz.includes("Dubai") || tz.includes("Asia/Dubai")) return "AED";
     return "USD";
   } catch (e) {
-    return "INR";
+    return "USD";
   }
 };
 
 // ── MONETIZATION CHECKOUT MODAL ──────────────────────────────────
-const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) => {
-  const [method, setMethod] = useState(currency === "INR" ? "upi" : "card");
+const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurrency }) => {
+  const [method, setMethod] = useState("paypal"); // "paypal" | "card"
   const [checkoutStep, setCheckoutStep] = useState("pay"); // "pay" | "verify" | "success"
-  const [utr, setUtr] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
+  const [paypalTxId, setPaypalTxId] = useState("");
+  const [phone, setPhone] = useState("");
   const [verifyErr, setVerifyErr] = useState("");
   const [orderId, setOrderId] = useState("");
   const hi = lang === "hi";
 
-  // Dynamic price formatted for the current currency
+  // Dynamic price formatted for current currency
   const displayPrice = item.priceKey && PRODUCT_PRICES[item.priceKey]
     ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
     : item.price;
 
-  // Inr numerical value for UPI URL
-  const inrPriceVal = item.priceKey && PRODUCT_PRICES[item.priceKey]
-    ? (PRODUCT_PRICES[item.priceKey].INR.match(/₹([0-9,]+)/)?.[1] || "199").replace(/,/g, "")
-    : (item.price.match(/₹([0-9,]+)/)?.[1] || "199").replace(/,/g, "");
-
-  // Dynamic NPCI-compliant UPI Intent URL with pre-filled locked amount and note
-  const upiIntentUrl = `upi://pay?pa=8094199663@upi&pn=ABHISHEK%20KUMAR%20SINGH&am=${inrPriceVal}.00&cu=INR&tn=${encodeURIComponent(item.title)}`;
-  const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(upiIntentUrl)}&margin=10`;
+  // Numerical value for PayPal
+  const cleanNumericVal = (displayPrice || "4.99").replace(/[^0-9.]/g, "") || "4.99";
+  const currCode = currency || "USD";
+  const paypalUrl = `https://www.paypal.com/paypalme/abhishek270995/${cleanNumericVal}${currCode}`;
+  const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(paypalUrl)}&margin=10`;
 
   const handleProceedToVerify = () => {
     setCheckoutStep("verify");
@@ -485,15 +484,9 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
   };
 
   const handleConfirmPayment = () => {
-    const cleanPhone = whatsapp.trim().replace(/\D/g, "");
-
-    if (cleanPhone.length < 10) {
-      setVerifyErr(hi ? "कृपया मान्य व्हाट्सएप नंबर दर्ज करें।" : "Please enter a valid WhatsApp / Mobile number.");
-      return;
-    }
-
-    if (currency === "INR" && method === "upi" && utr.trim().length < 6) {
-      setVerifyErr(hi ? "कृपया बैंक रसीद से 12-अंकों का UPI UTR / Ref No. दर्ज करें।" : "Please enter the 12-digit UPI Reference / UTR Number from your payment receipt.");
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !cleanEmail.includes("@") || !cleanEmail.includes(".")) {
+      setVerifyErr(hi ? "कृपया मान्य ईमेल पता दर्ज करें (PDF व रसीद हेतु)।" : "Please enter a valid email address for instant PDF report delivery.");
       return;
     }
 
@@ -508,52 +501,53 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
 
   const getWhatsAppShareLink = () => {
     const text = encodeURIComponent(
-      `🙏 *Jyotish Kundli Payment Confirmation*\n\n` +
+      `🙏 *Jyotish Kundli International Order Confirmation*\n\n` +
       `📦 *Item:* ${item.title}\n` +
-      `💰 *Amount:* ${displayPrice}\n` +
+      `💰 *Amount Paid:* ${displayPrice}\n` +
       `🧾 *Order ID:* ${orderId || "Pending"}\n` +
-      `${currency === "INR" && utr ? `🔢 *UPI UTR / Ref No:* ${utr}\n` : ""}` +
-      `📱 *Customer WhatsApp:* ${whatsapp || "N/A"}\n\n` +
-      `Please verify and activate my order. Thank you!`
+      `📧 *Customer Email:* ${email || "N/A"}\n` +
+      `${paypalTxId ? `🅿️ *PayPal Tx ID / Ref:* ${paypalTxId}\n` : ""}` +
+      `${phone ? `📱 *Phone / WhatsApp:* ${phone}\n` : ""}\n` +
+      `Please verify and activate my complete detailed reading. Thank you!`
     );
     return `https://wa.me/918094199663?text=${text}`;
   };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", padding: 20 }}>
-      <div className="glass-card" style={{ maxWidth: 460, width: "100%", padding: "26px 24px", position: "relative", maxHeight: "92vh", overflowY: "auto" }}>
+      <div className="glass-card" style={{ maxWidth: 470, width: "100%", padding: "26px 24px", position: "relative", maxHeight: "92vh", overflowY: "auto", border: "1px solid rgba(212,175,55,0.3)" }}>
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 20, cursor: "pointer" }}>✕</button>
 
         {/* ── STEP 3: SUCCESS ── */}
         {checkoutStep === "success" && (
           <div style={{ textAlign: "center", padding: "20px 10px" }}>
-            <div style={{ fontSize: 44, marginBottom: 10 }}>🎉</div>
-            <h3 style={{ color: "#34D399", fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
-              {hi ? "भुगतान विवरण दर्ज हो गया!" : "Payment & Order Confirmed!"}
+            <div style={{ fontSize: 48, marginBottom: 10 }}>🎉</div>
+            <h3 style={{ color: "#34D399", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
+              {hi ? "भुगतान एवं ऑर्डर सफल!" : "Payment & Order Confirmed!"}
             </h3>
-            <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, marginBottom: 14 }}>
-              {hi ? `ऑर्डर आईडी: ${orderId} · सेवा अनलॉक कर दी गई है।` : `Order ID: ${orderId} · Your access is now activated.`}
+            <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13.5, marginBottom: 16 }}>
+              {hi ? `ऑर्डर आईडी: ${orderId} · सेवा अनलॉक कर दी गई है।` : `Order ID: ${orderId} · Your premium access is now activated.`}
             </p>
 
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14, textAlign: "left", fontSize: 12, marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+            <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14, textAlign: "left", fontSize: 13, marginBottom: 18 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                 <span style={{ color: "rgba(241,231,208,0.6)" }}>Item:</span>
                 <span style={{ color: "#F3D37A", fontWeight: 700 }}>{item.title}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                 <span style={{ color: "rgba(241,231,208,0.6)" }}>Amount Paid:</span>
                 <span style={{ color: "#34D399", fontWeight: 700 }}>{displayPrice}</span>
               </div>
-              {currency === "INR" && utr && (
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <span style={{ color: "rgba(241,231,208,0.6)" }}>UPI UTR:</span>
-                  <span style={{ color: "#FDE68A", fontWeight: 600 }}>{utr}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>Delivery Email:</span>
+                <span style={{ color: "#FFF", fontWeight: 600 }}>{email}</span>
+              </div>
+              {paypalTxId && (
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ color: "rgba(241,231,208,0.6)" }}>PayPal Tx ID:</span>
+                  <span style={{ color: "#93C5FD", fontWeight: 600 }}>{paypalTxId}</span>
                 </div>
               )}
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "rgba(241,231,208,0.6)" }}>WhatsApp:</span>
-                <span style={{ color: "#FFF" }}>{whatsapp}</span>
-              </div>
             </div>
 
             <a
@@ -564,104 +558,116 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 6,
+                gap: 8,
                 width: "100%",
                 background: "#25D366",
                 color: "#0F0A1E",
-                padding: "10px 16px",
+                padding: "11px 16px",
                 borderRadius: 8,
-                fontSize: 13,
+                fontSize: 13.5,
                 fontWeight: 700,
                 textDecoration: "none",
                 marginBottom: 10
               }}
             >
-              <span>💬</span> Send Receipt on WhatsApp
+              <span>💬</span> Send Receipt on WhatsApp / Support
             </a>
 
-            <button onClick={onClose} className="gold-cta-btn" style={{ padding: "10px 18px", fontSize: 13 }}>
-              {hi ? "पूर्ण (Close)" : "Done / Continue"}
+            <button onClick={onClose} className="gold-cta-btn" style={{ padding: "10px 18px", fontSize: 13.5, width: "100%" }}>
+              {hi ? "पूर्ण करें (Done)" : "Done / Continue"}
             </button>
           </div>
         )}
 
-        {/* ── STEP 2: VERIFY (UTR & WHATSAPP) ── */}
+        {/* ── STEP 2: VERIFY (EMAIL & PAYPAL TX ID) ── */}
         {checkoutStep === "verify" && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <span style={{ fontSize: 30 }}>📝</span>
-              <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 700, marginTop: 4 }}>
-                {hi ? "भुगतान सत्यापन विवरण" : "Confirm Payment Details"}
+              <span style={{ fontSize: 32 }}>📝</span>
+              <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>
+                {hi ? "ऑर्डर एवं रिपोर्ट प्राप्ति विवरण" : "Confirm Delivery Details"}
               </h3>
-              <p style={{ color: "rgba(241,231,208,0.6)", fontSize: 12, marginTop: 2 }}>
+              <p style={{ color: "rgba(241,231,208,0.7)", fontSize: 13, marginTop: 2 }}>
                 {item.title} — <b style={{ color: "#FDE68A" }}>{displayPrice}</b>
               </p>
             </div>
 
-            <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "18px 16px", marginBottom: 16 }}>
-              {/* WhatsApp Number Field */}
-              <div style={{ marginBottom: currency === "INR" && method === "upi" ? 14 : 0 }}>
-                <label htmlFor="checkout-whatsapp-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8 }}>
-                  <span>📱</span> {hi ? "आपका व्हाट्सएप / मोबाइल नंबर *" : "Your WhatsApp / Mobile Number *"}
+            <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "18px 16px", marginBottom: 16 }}>
+              {/* Customer Email Address */}
+              <div style={{ marginBottom: 14 }}>
+                <label htmlFor="checkout-email-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <span>📧</span> {hi ? "आपका ईमेल पता (PDF रिपोर्ट व रसीद हेतु) *" : "Your Email Address (For PDF Report & Receipt) *"}
+                </label>
+                <input
+                  id="checkout-email-input"
+                  name="email"
+                  type="email"
+                  required
+                  aria-required="true"
+                  aria-label={hi ? "ईमेल पता" : "Email Address"}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="e.g. yourname@example.com"
+                  style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14 }}
+                />
+                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 4 }}>
+                  {hi ? "अनलॉक की गई विस्तृत PDF रिपोर्ट एवं रसीद इस ईमेल पर भेजी जाएगी।" : "Your unlocked high-resolution report and invoice will be sent here."}
+                </div>
+              </div>
+
+              {/* PayPal Transaction ID / Order Ref */}
+              <div style={{ marginBottom: 14 }}>
+                <label htmlFor="checkout-txid-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <span>🅿️</span> {hi ? "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)" : "PayPal Transaction ID / Order Ref (Optional)"}
+                </label>
+                <input
+                  id="checkout-txid-input"
+                  name="paypalTxId"
+                  type="text"
+                  aria-label={hi ? "पेपैल ट्रांजैक्शन आईडी" : "PayPal Transaction ID"}
+                  value={paypalTxId}
+                  onChange={e => setPaypalTxId(e.target.value)}
+                  placeholder="e.g. 9XY12345678901234"
+                  style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14, letterSpacing: 0.5 }}
+                />
+                <div style={{ fontSize: 11.5, color: "rgba(243,211,122,0.75)", marginTop: 4 }}>
+                  💡 {hi ? "पेपैल रसीद / ईमेल में दी गई Transaction ID दर्ज करें।" : "Found in your PayPal confirmation email or activity receipt."}
+                </div>
+              </div>
+
+              {/* Optional WhatsApp/Phone */}
+              <div>
+                <label htmlFor="checkout-phone-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
+                  <span>📱</span> {hi ? "व्हाट्सएप / फोन नंबर (वैकल्पिक)" : "WhatsApp / Phone Number (Optional)"}
                 </label>
                 <div style={{ display: "flex", gap: 6 }}>
                   <div style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "rgba(241,231,208,0.9)", fontSize: 14, fontWeight: 600 }}>
                     {CURRENCIES[currency]?.flag || "🌐"}
                   </div>
                   <input
-                    id="checkout-whatsapp-input"
-                    name="whatsapp"
+                    id="checkout-phone-input"
+                    name="phone"
                     type="tel"
-                    required
-                    aria-required="true"
-                    aria-label={hi ? "व्हाट्सएप या मोबाइल नंबर" : "WhatsApp or Mobile Number"}
-                    value={whatsapp}
-                    onChange={e => setWhatsapp(e.target.value)}
-                    placeholder="e.g. +91 9876543210"
-                    style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14.5 }}
+                    aria-label={hi ? "व्हाट्सएप या फोन नंबर" : "WhatsApp or Phone Number"}
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="e.g. +1 (555) 019-2834"
+                    style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14 }}
                   />
-                </div>
-                <div style={{ fontSize: 12, color: "rgba(241,231,208,0.7)", marginTop: 5 }}>
-                  {hi ? "PDF रिपोर्ट व पुष्टि इस नंबर पर भेजी जाएगी।" : "PDF report & confirmation will be sent here."}
                 </div>
               </div>
-
-              {/* 12-Digit UTR Field (Shown for Indian UPI payments) */}
-              {currency === "INR" && method === "upi" && (
-                <div>
-                  <label htmlFor="checkout-utr-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8 }}>
-                    <span>🔢</span> {hi ? "12-अंकों का UPI UTR / Ref No. *" : "12-Digit UPI Ref / UTR No. *"}
-                  </label>
-                  <input
-                    id="checkout-utr-input"
-                    name="utr"
-                    type="text"
-                    required
-                    aria-required="true"
-                    aria-label={hi ? "12-अंकों का UPI UTR अथवा रेफरेंस नंबर" : "12-digit UPI UTR or Reference Number"}
-                    maxLength={16}
-                    value={utr}
-                    onChange={e => setUtr(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
-                    placeholder="e.g. 423819283746"
-                    style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14.5, letterSpacing: 1 }}
-                  />
-                  <div style={{ fontSize: 12, color: "rgba(243,211,122,0.8)", marginTop: 5 }}>
-                    💡 {hi ? "GPay / PhonePe / Paytm रसीद में 'UPI Ref No' या 'UTR' देखें।" : "Found as 'UPI Ref No' or 'UTR' on your GPay/PhonePe receipt."}
-                  </div>
-                </div>
-              )}
             </div>
 
             {verifyErr && (
-              <div style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.35)", borderRadius: 8, padding: "10px 14px", color: "#FCA5A5", fontSize: 12.5, marginBottom: 14 }}>
+              <div style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.4)", borderRadius: 8, padding: "10px 14px", color: "#FCA5A5", fontSize: 13, marginBottom: 14 }}>
                 ⚠️ {verifyErr}
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 10 }}>
               <button
                 onClick={() => setCheckoutStep("pay")}
-                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, color: "rgba(241,231,208,0.9)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, color: "rgba(241,231,208,0.9)", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
               >
                 ← {hi ? "पीछे (Back)" : "Back"}
               </button>
@@ -672,91 +678,101 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
           </div>
         )}
 
-        {/* ── STEP 1: PAYMENT ── */}
+        {/* ── STEP 1: PAYMENT (PAYPAL & CARDS) ── */}
         {checkoutStep === "pay" && (
           <div>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
-              <span style={{ fontSize: 34 }}>{item.icon || "💎"}</span>
-              <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
-              <div style={{ color: "#FDE68A", fontSize: 28, fontWeight: 800, marginTop: 4 }}>{displayPrice}</div>
+              <span style={{ fontSize: 36 }}>{item.icon || "💎"}</span>
+              <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
+              <div style={{ color: "#FDE68A", fontSize: 30, fontWeight: 800, marginTop: 4 }}>{displayPrice}</div>
               <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, marginTop: 4 }}>{item.desc}</p>
             </div>
 
             {/* Payment Mode Selector */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
               {[
-                { id: "upi", name: currency === "INR" ? (hi ? "UPI / क्यूआर कोड" : "UPI / QR Code") : "UPI (INR Only)", icon: "📱" },
-                { id: "card", name: hi ? "कार्ड्स / नेटबैंकिंग" : "Cards / NetBanking", icon: "💳" },
+                { id: "paypal", name: "PayPal", icon: "🅿️", badge: "Instant" },
+                { id: "card", name: hi ? "डेबिट / क्रेडिट कार्ड" : "Debit / Credit Card", icon: "💳", badge: "Visa/MC" },
               ].map(m => (
                 <button
                   key={m.id}
-                  onClick={() => {
-                    if (m.id === "upi" && currency !== "INR" && setCurrency) {
-                      setCurrency("INR");
-                    }
-                    setMethod(m.id);
-                  }}
+                  onClick={() => setMethod(m.id)}
                   style={{
-                    background: method === m.id ? "rgba(245,158,11,0.2)" : "rgba(11,8,25,0.6)",
-                    border: `1px solid ${method === m.id ? "#F59E0B" : "rgba(212,175,55,0.2)"}`,
-                    color: method === m.id ? "#FDE68A" : "#FFF",
+                    background: method === m.id ? "rgba(0,112,186,0.25)" : "rgba(11,8,25,0.6)",
+                    border: `1.5px solid ${method === m.id ? "#0070BA" : "rgba(212,175,55,0.2)"}`,
+                    color: method === m.id ? "#93C5FD" : "#FFF",
                     borderRadius: 10,
                     padding: "11px 10px",
-                    fontSize: 13,
+                    fontSize: 13.5,
                     fontWeight: 700,
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
                   }}
                 >
-                  <div>{m.icon}</div>
+                  <div style={{ fontSize: 18, marginBottom: 2 }}>{m.icon}</div>
                   <div>{m.name}</div>
+                  <div style={{ fontSize: 10.5, color: "rgba(241,231,208,0.6)", marginTop: 2 }}>{m.badge}</div>
                 </button>
               ))}
             </div>
 
-            {method === "upi" ? (
-              <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "18px 16px", textAlign: "center", marginBottom: 16 }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: 12, padding: "4px 12px", color: "#34D399", fontSize: 12, fontWeight: 700, marginBottom: 12 }}>
-                  <span>🔒</span> {hi ? `निर्धारित राशि: ₹${inrPriceVal}.00` : `Amount Locked: ₹${inrPriceVal}.00`}
+            {method === "paypal" ? (
+              <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(0,112,186,0.4)", borderRadius: 12, padding: "18px 16px", textAlign: "center", marginBottom: 16 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(0,112,186,0.2)", border: "1px solid rgba(0,112,186,0.5)", borderRadius: 12, padding: "4px 14px", color: "#60A5FA", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
+                  <span>🔒</span> {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (${currCode})`}
                 </div>
 
                 {/* Amount-Enforced High-Contrast QR Code */}
-                <div style={{ width: 195, height: 195, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #F59E0B", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
+                <div style={{ width: 195, height: 195, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #0070BA", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
                   <img
                     src={dynamicQrCodeUrl}
-                    alt="Amount-Locked Dynamic UPI QR"
+                    alt="PayPal Payment QR Code"
                     style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 4 }}
                   />
                 </div>
 
                 <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#F3D37A" }}>{hi ? "प्राप्तकर्ता:" : "Payee:"} ABHISHEK KUMAR SINGH</div>
-                  <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginTop: 2 }}>UPI ID: <code style={{ color: "#FDE68A", fontWeight: 700 }}>8094199663@upi</code></div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD" }}>Payee: Abhishek Kumar Singh</div>
+                  <div style={{ fontSize: 12, color: "rgba(241,231,208,0.85)", marginTop: 2 }}>PayPal: <code style={{ color: "#FDE68A", fontWeight: 700 }}>paypal.me/abhishek270995</code></div>
                 </div>
 
-                {/* Direct 1-Tap Mobile UPI Intent Link */}
+                {/* Direct 1-Tap Mobile / Web PayPal Link */}
                 <a
-                  href={upiIntentUrl}
+                  href={paypalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     display: "block",
                     width: "100%",
                     marginTop: 14,
-                    background: "rgba(245,158,11,0.15)",
-                    border: "1px solid rgba(245,158,11,0.4)",
-                    color: "#FDE68A",
-                    padding: "11px 14px",
+                    background: "linear-gradient(135deg, #0070BA 0%, #003087 100%)",
+                    border: "1px solid #60A5FA",
+                    color: "#FFFFFF",
+                    padding: "12px 14px",
                     borderRadius: 8,
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 700,
-                    textDecoration: "none"
+                    textDecoration: "none",
+                    boxShadow: "0 4px 14px rgba(0,112,186,0.4)"
                   }}
                 >
-                  🚀 {hi ? `GPay / PhonePe / Paytm से ₹${inrPriceVal} का भुगतान करें` : `Tap to Open GPay / PhonePe / Paytm (₹${inrPriceVal})`}
+                  🅿️ {hi ? `पेपैल से ${displayPrice} का भुगतान करें` : `Pay with PayPal (${displayPrice})`}
                 </a>
+                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 8 }}>
+                  {hi ? "पेपैल बैलेंस या क्रेडिट/डेबिट कार्ड से सुरक्षित भुगतान करें।" : "Pay via PayPal balance, linked bank, or guest debit/credit card."}
+                </div>
               </div>
             ) : (
-              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 16, marginBottom: 16 }}>
-                <div style={{ fontSize: 13, color: "rgba(243,211,122,0.9)", marginBottom: 10, fontWeight: 600 }}>
-                  {hi ? `क्रेडिट / डेबिट कार्ड से भुगतान करें (${displayPrice})` : `Pay with Credit / Debit Card (${displayPrice})`}
+              <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 16, marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ fontSize: 13, color: "rgba(243,211,122,0.9)", fontWeight: 600 }}>
+                    {hi ? `क्रेडिट / डेबिट कार्ड (${displayPrice})` : `Credit or Debit Card (${displayPrice})`}
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(241,231,208,0.6)", display: "flex", gap: 4 }}>
+                    <span>💳 Visa</span>
+                    <span>• MC</span>
+                    <span>• Amex</span>
+                  </div>
                 </div>
                 <div style={{ marginBottom: 10 }}>
                   <label htmlFor="checkout-card-num" style={{ display: "block", fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 4, fontWeight: 600 }}>
@@ -766,7 +782,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
                     id="checkout-card-num"
                     name="cardNumber"
                     aria-label={hi ? "कार्ड नंबर" : "Card Number"}
-                    placeholder="0000 0000 0000 0000"
+                    placeholder="4000 1234 5678 9010"
                     style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 6, padding: "10px 12px", color: "#FFF", fontSize: 13.5 }}
                   />
                 </div>
@@ -801,11 +817,11 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency, setCurrency }) =
               </div>
             )}
 
-            <button onClick={handleProceedToVerify} className="gold-cta-btn" style={{ padding: "14px 20px", fontSize: 15 }}>
+            <button onClick={handleProceedToVerify} className="gold-cta-btn" style={{ padding: "14px 20px", fontSize: 15, width: "100%" }}>
               {hi ? `मैंने भुगतान कर दिया है (${displayPrice}) →` : `I Have Made the Payment (${displayPrice}) →`}
             </button>
-            <div style={{ textAlign: "center", fontSize: 12, color: "rgba(243,211,122,0.6)", marginTop: 10 }}>
-              🔒 256-Bit Bank Grade SSL Encrypted Checkout
+            <div style={{ textAlign: "center", fontSize: 12, color: "rgba(243,211,122,0.65)", marginTop: 10 }}>
+              🔒 256-Bit Bank Grade SSL Encrypted Global Checkout
             </div>
           </div>
         )}
