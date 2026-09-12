@@ -717,9 +717,14 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
             </div>
 
             {method === "paypal" ? (
-              <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(0,112,186,0.4)", borderRadius: 12, padding: "18px 16px", textAlign: "center", marginBottom: 16 }}>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(0,112,186,0.2)", border: "1px solid rgba(0,112,186,0.5)", borderRadius: 12, padding: "4px 14px", color: "#60A5FA", fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>
-                  <span>🔒</span> {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (${currCode})`}
+              <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(0,112,186,0.45)", borderRadius: 14, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                  <span style={{ background: "rgba(0,112,186,0.2)", border: "1px solid rgba(0,112,186,0.5)", borderRadius: 12, padding: "4px 14px", color: "#60A5FA", fontSize: 12.5, fontWeight: 700 }}>
+                    🔒 {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (${currCode})`}
+                  </span>
+                  <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 12, padding: "4px 10px", color: "#34D399", fontSize: 12, fontWeight: 700 }}>
+                    ✓ {hi ? "सत्यापित मर्चेंट" : "Verified Merchant"}
+                  </span>
                 </div>
 
                 {/* Amount-Enforced High-Contrast QR Code */}
@@ -732,8 +737,12 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 </div>
 
                 <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD" }}>Payee: Abhishek Kumar Singh</div>
-                  <div style={{ fontSize: 12, color: "rgba(241,231,208,0.85)", marginTop: 2 }}>PayPal: <code style={{ color: "#FDE68A", fontWeight: 700 }}>paypal.me/abhishek270995</code></div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                    <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष कुंडली™ वैदिक रिसर्च" : "Merchant: Jyotish Kundli™ Vedic Services"}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+                    {hi ? "आधिकारिक पेपैल गेटवे · 100% सुरक्षित एवं गोपनीय" : "Official PayPal Gateway · 100% Buyer Protected"}
+                  </div>
                 </div>
 
                 {/* Direct 1-Tap Mobile / Web PayPal Link */}
@@ -742,24 +751,27 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    display: "block",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
                     width: "100%",
                     marginTop: 14,
                     background: "linear-gradient(135deg, #0070BA 0%, #003087 100%)",
                     border: "1px solid #60A5FA",
                     color: "#FFFFFF",
-                    padding: "12px 14px",
+                    padding: "13px 14px",
                     borderRadius: 8,
-                    fontSize: 14,
+                    fontSize: 14.5,
                     fontWeight: 700,
                     textDecoration: "none",
-                    boxShadow: "0 4px 14px rgba(0,112,186,0.4)"
+                    boxShadow: "0 4px 14px rgba(0,112,186,0.45)"
                   }}
                 >
-                  🅿️ {hi ? `पेपैल से ${displayPrice} का भुगतान करें` : `Pay with PayPal (${displayPrice})`}
+                  <span style={{ fontSize: 16 }}>🅿️</span> {hi ? `पेपैल से ${displayPrice} का भुगतान करें` : `Pay with PayPal (${displayPrice})`}
                 </a>
                 <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 8 }}>
-                  {hi ? "पेपैल बैलेंस या क्रेडिट/डेबिट कार्ड से सुरक्षित भुगतान करें।" : "Pay via PayPal balance, linked bank, or guest debit/credit card."}
+                  {hi ? "पेपैल बैलेंस, बैंक खाते या कार्ड्स से सुरक्षित भुगतान करें।" : "Supports PayPal Balance, Bank Transfer & Guest Cards."}
                 </div>
               </div>
             ) : (
