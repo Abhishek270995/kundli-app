@@ -247,12 +247,13 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         <polygon
           key={`poly-${n}`}
           points={path}
-          fill={hoveredHouse === n ? "rgba(212,175,55,0.2)" : "transparent"}
-          stroke={hoveredHouse === n ? "#F3D37A" : "none"}
-          strokeWidth={hoveredHouse === n ? "1.5" : "0"}
-          style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
+          fill={hoveredHouse === n ? "rgba(245, 158, 11, 0.28)" : "transparent"}
+          stroke={hoveredHouse === n ? "#FBBF24" : "rgba(212,175,55,0.25)"}
+          strokeWidth={hoveredHouse === n ? "2.5" : "0.6"}
+          style={{ cursor: "pointer", transition: "all 0.2s ease", filter: hoveredHouse === n ? "drop-shadow(0 0 6px rgba(245, 158, 11, 0.6))" : "none" }}
           onMouseEnter={() => setHoveredHouse && setHoveredHouse(n)}
           onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}
+          onClick={() => setHoveredHouse && setHoveredHouse(hoveredHouse === n ? null : n)}
         />
       ))}
 
@@ -261,8 +262,10 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
       <line x1={x1} y1={y0} x2={x0} y2={y1} stroke="rgba(212,175,55,0.6)" strokeWidth="1.6" />
       <polygon points={`${xc},${y0} ${x1},${yc} ${xc},${y1} ${x0},${yc}`} fill="none" stroke="rgba(212,175,55,0.65)" strokeWidth="1.6" />
 
-      <circle cx={xc} cy={yc} r="32" fill="rgba(15,10,30,0.85)" stroke="rgba(212,175,55,0.4)" strokeWidth="1" />
-      <text x={xc} y={yc - 6} textAnchor="middle" fill="#F3D37A" fontSize="11" letterSpacing="1.5" fontWeight="700" opacity="0.9">LAGNA</text>
+      <circle cx={xc} cy={yc} r={hoveredHouse ? "34" : "32"} fill="rgba(15,10,30,0.9)" stroke={hoveredHouse ? "#F59E0B" : "rgba(212,175,55,0.4)"} strokeWidth={hoveredHouse ? "1.8" : "1"} style={{ transition: "all 0.2s ease" }} />
+      <text x={xc} y={yc - 6} textAnchor="middle" fill="#F3D37A" fontSize="11" letterSpacing="1.5" fontWeight="700" opacity="0.9">
+        {hoveredHouse ? `H${hoveredHouse}` : "LAGNA"}
+      </text>
       <text x={xc} y={yc + 14} textAnchor="middle" fill="#F3D37A" fontSize="20" fontFamily="serif">ॐ</text>
 
       {houseLayout.map(({ n, cx, cy, isLagna }) => {
@@ -350,16 +353,21 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         }
 
         return (
-          <g key={box.signNum} onMouseEnter={() => houseNum && setHoveredHouse && setHoveredHouse(houseNum)} onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}>
+          <g
+            key={box.signNum}
+            onMouseEnter={() => houseNum && setHoveredHouse && setHoveredHouse(houseNum)}
+            onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}
+            onClick={() => houseNum && setHoveredHouse && setHoveredHouse(hoveredHouse === houseNum ? null : houseNum)}
+          >
             <rect
               x={bx}
               y={by}
               width={W}
               height={W}
-              fill={hoveredHouse === houseNum ? "rgba(212,175,55,0.2)" : "rgba(15,10,32,0.85)"}
-              stroke="rgba(212,175,55,0.5)"
-              strokeWidth="1.2"
-              style={{ cursor: "pointer", transition: "fill 0.2s ease" }}
+              fill={hoveredHouse === houseNum ? "rgba(245, 158, 11, 0.28)" : "rgba(15,10,32,0.85)"}
+              stroke={hoveredHouse === houseNum ? "#FBBF24" : "rgba(212,175,55,0.5)"}
+              strokeWidth={hoveredHouse === houseNum ? "2.5" : "1.2"}
+              style={{ cursor: "pointer", transition: "all 0.2s ease", filter: hoveredHouse === houseNum ? "drop-shadow(0 0 6px rgba(245, 158, 11, 0.6))" : "none" }}
             />
 
             <text x={bx + 8} y={by + 16} fill="rgba(212,175,55,0.7)" fontSize="10" fontWeight="600">
@@ -1900,6 +1908,28 @@ export default function App() {
           animation: shimmerBtn 4s linear infinite;
         }
 
+        .city-chip {
+          transition: all 0.18s ease;
+          cursor: pointer;
+        }
+        .city-chip:hover {
+          transform: translateY(-2px);
+          background: rgba(245, 158, 11, 0.22) !important;
+          border-color: rgba(245, 158, 11, 0.6) !important;
+          color: #FFF !important;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+        }
+
+        .house-card-interactive {
+          transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: pointer;
+        }
+        .house-card-interactive:hover {
+          transform: translateY(-3px);
+          border-color: rgba(245, 158, 11, 0.55) !important;
+          box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18) !important;
+        }
+
         .print-only-report {
           display: none;
         }
@@ -2441,6 +2471,47 @@ export default function App() {
                     placeholder={t.phPob}
                     style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
                   />
+
+                  {/* Quick Global City Chips */}
+                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.8)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                      <span>⚡</span> {hi ? "त्वरित चयन:" : "Popular Cities:"}
+                    </span>
+                    {[
+                      { label: "🇺🇸 New York", val: "New York, USA" },
+                      { label: "🇬🇧 London", val: "London, UK" },
+                      { label: "🇨🇦 Toronto", val: "Toronto, Canada" },
+                      { label: "🇦🇺 Sydney", val: "Sydney, Australia" },
+                      { label: "🇦🇪 Dubai", val: "Dubai, UAE" },
+                      { label: "🇮🇳 New Delhi", val: "New Delhi, India" },
+                      { label: "🇮🇳 Mumbai", val: "Mumbai, India" },
+                      { label: "🇮🇳 Bengaluru", val: "Bengaluru, India" },
+                    ].map(city => (
+                      <button
+                        key={city.val}
+                        type="button"
+                        className="city-chip"
+                        onClick={() => {
+                          setForm({ ...form, pob: city.val });
+                          if (err) setErr("");
+                        }}
+                        style={{
+                          background: form.pob === city.val ? "rgba(245, 158, 11, 0.28)" : "rgba(255, 255, 255, 0.05)",
+                          border: form.pob === city.val ? "1px solid rgba(245, 158, 11, 0.8)" : "1px solid rgba(212, 175, 55, 0.2)",
+                          borderRadius: 14,
+                          padding: "4px 10px",
+                          fontSize: 12,
+                          color: form.pob === city.val ? "#FDE68A" : "rgba(241, 231, 208, 0.9)",
+                          cursor: "pointer",
+                          backdropFilter: "blur(6px)",
+                          fontWeight: form.pob === city.val ? 700 : 500,
+                          boxShadow: form.pob === city.val ? "0 0 10px rgba(245, 158, 11, 0.3)" : "none"
+                        }}
+                      >
+                        {city.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -3625,90 +3696,247 @@ export default function App() {
             )}
 
             {/* ── TAB 7: PLANETS ── */}
-            {tab === "planets" && (
-              <div>
-                <div className="glass-card" style={{ padding: "26px 24px", marginBottom: 20 }}>
-                  <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, marginBottom: 16 }}>{t.ptTitle}</h3>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
-                      <thead>
-                        <tr style={{ background: "rgba(245, 158, 11, 0.12)", borderBottom: "1px solid rgba(212, 175, 55, 0.3)" }}>
-                          {t.pcols.map(col => (
-                            <th key={col} style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left", letterSpacing: 0.5 }}>{col}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {PLANETS.map((p, idx) => {
-                          const pd = result.planetData?.[p.name] || {};
-                          const isExalted = pd.status?.includes("Exalted") || pd.status?.includes("उच्च");
-                          const isDebilitated = pd.status?.includes("Debilitated") || pd.status?.includes("नीच");
-                          const isOwn = pd.status?.includes("Own") || pd.status?.includes("स्वगृही");
+            {tab === "planets" && (() => {
+              const getPlanetStrength = (status = "") => {
+                if (status.includes("Exalted") || status.includes("उच्च")) return { pct: 96, label: hi ? "उच्च (सर्वश्रेष्ठ)" : "Exalted (Supreme)", color: "#10B981", glow: "rgba(16,185,129,0.5)" };
+                if (status.includes("Moolatrikona") || status.includes("मूलत्रिकोण")) return { pct: 90, label: hi ? "मूलत्रिकोण (अति बली)" : "Moolatrikona (Very Strong)", color: "#F59E0B", glow: "rgba(245,158,11,0.5)" };
+                if (status.includes("Own") || status.includes("स्वगृही") || status.includes("स्वराशि")) return { pct: 84, label: hi ? "स्वगृही (शक्तिशाली)" : "Own Sign (Strong)", color: "#FBBF24", glow: "rgba(251,191,36,0.5)" };
+                if (status.includes("Great Friend") || status.includes("अधिमित्र")) return { pct: 76, label: hi ? "अधिमित्र (शुभ)" : "Great Friend (Benefic)", color: "#60A5FA", glow: "rgba(96,165,250,0.5)" };
+                if (status.includes("Friendly") || status.includes("मित्र")) return { pct: 68, label: hi ? "मित्र राशि (सकारात्मक)" : "Friendly (Positive)", color: "#38BDF8", glow: "rgba(56,189,248,0.5)" };
+                if (status.includes("Neutral") || status.includes("सम")) return { pct: 52, label: hi ? "सम राशि (संतुलित)" : "Neutral (Balanced)", color: "#FDE68A", glow: "rgba(253,230,138,0.4)" };
+                if (status.includes("Enemy") || status.includes("शत्रु") || status.includes("अधिशत्रु")) return { pct: 36, label: hi ? "शत्रु राशि (चुनौतीपूर्ण)" : "Enemy (Challenging)", color: "#FB923C", glow: "rgba(251,146,60,0.4)" };
+                if (status.includes("Debilitated") || status.includes("नीच")) return { pct: 22, label: hi ? "नीच राशि (अशुभ/कमजोर)" : "Debilitated (Afflicted)", color: "#F87171", glow: "rgba(248,113,113,0.5)" };
+                return { pct: 55, label: hi ? "सामान्य (सक्रिय)" : "Active", color: "#F3D37A", glow: "rgba(243,211,122,0.3)" };
+              };
 
-                          return (
-                            <tr key={p.name} style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.1)", background: idx % 2 ? "rgba(255, 255, 255, 0.02)" : "transparent" }}>
-                              <td style={{ padding: "12px 14px" }}>
-                                <span style={{ color: p.color, fontWeight: "bold", fontSize: 14 }}>{p.symbol} {p.name}</span>
-                                <div style={{ fontSize: 12, color: "rgba(241, 231, 208, 0.8)", marginTop: 2 }}>{p.sanskrit}</div>
-                              </td>
-                              <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.95)", fontSize: 14, fontWeight: 600 }}>
-                                {pd.sign} <span style={{ fontSize: 12.5, color: "rgba(243, 211, 122, 0.85)" }}>({pd.signSanskrit})</span>
-                              </td>
-                              <td style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
-                                House {pd.house}
-                              </td>
-                              <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5 }}>
-                                {pd.degree}
-                                <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", marginTop: 2 }}>{pd.nakshatra} (P{pd.pada})</div>
-                              </td>
-                              <td style={{ padding: "12px 14px" }}>
-                                <span style={{
-                                  padding: "4px 11px",
-                                  borderRadius: 14,
-                                  fontSize: 12,
-                                  fontWeight: 700,
-                                  background: isExalted ? "rgba(16, 185, 129, 0.18)" : isDebilitated ? "rgba(239, 68, 68, 0.18)" : isOwn ? "rgba(245, 158, 11, 0.18)" : "rgba(212, 175, 55, 0.12)",
-                                  color: isExalted ? "#34D399" : isDebilitated ? "#F87171" : isOwn ? "#FBBF24" : "#F3D37A",
-                                  border: `1px solid ${isExalted ? "rgba(16, 185, 129, 0.4)" : isDebilitated ? "rgba(239, 68, 68, 0.4)" : isOwn ? "rgba(245, 158, 11, 0.4)" : "rgba(212, 175, 55, 0.25)"}`
-                                }}>
-                                  {pd.status || "—"}
-                                </span>
-                              </td>
-                              <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.6 }}>
-                                {pd.effect || "—"}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+              let exaltedCount = 0;
+              let strongCount = 0;
+              let debilitatedCount = 0;
+
+              PLANETS.forEach(p => {
+                const pd = result.planetData?.[p.name] || {};
+                const st = pd.status || "";
+                if (st.includes("Exalted") || st.includes("उच्च")) exaltedCount++;
+                else if (st.includes("Own") || st.includes("Moolatrikona") || st.includes("स्वगृही") || st.includes("मूलत्रिकोण") || st.includes("Friend") || st.includes("मित्र")) strongCount++;
+                else if (st.includes("Debilitated") || st.includes("नीच")) debilitatedCount++;
+              });
+
+              return (
+                <div>
+                  {/* Planetary Power Summary Cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+                    <div style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 28 }}>🌟</span>
+                      <div>
+                        <div style={{ color: "#34D399", fontSize: 18, fontWeight: 800 }}>{exaltedCount + strongCount} {hi ? "शुभ व बली ग्रह" : "Benefic & Strong"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "उच्च व स्वराशि बल" : "Exalted & Own Sign Placements"}</div>
+                      </div>
+                    </div>
+                    <div style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 28 }}>⚡</span>
+                      <div>
+                        <div style={{ color: "#FDE68A", fontSize: 18, fontWeight: 800 }}>9 {hi ? "ग्रह सक्रिय" : "Planets Analyzed"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "षड्बल व दिग्बल गणना" : "Dignity & Shadbala Mapping"}</div>
+                      </div>
+                    </div>
+                    <div style={{ background: debilitatedCount > 0 ? "rgba(239, 68, 68, 0.1)" : "rgba(59, 130, 246, 0.1)", border: `1px solid ${debilitatedCount > 0 ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`, borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 28 }}>{debilitatedCount > 0 ? "⚠️" : "🛡️"}</span>
+                      <div>
+                        <div style={{ color: debilitatedCount > 0 ? "#FCA5A5" : "#93C5FD", fontSize: 18, fontWeight: 800 }}>{debilitatedCount} {hi ? "नीच ग्रह" : "Debilitated Placements"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{debilitatedCount > 0 ? (hi ? "विशिष्ट वैदिक उपाय सुझाए गए" : "Remedies recommended") : (hi ? "कोई गंभीर दोष नहीं" : "Well fortified chart")}</div>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <SectionCard icon="🪐" title={t.sec.pa} content={result.pa} />
-              </div>
-            )}
+                  <div className="glass-card" style={{ padding: "26px 24px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                      <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, margin: 0 }}>{t.ptTitle}</h3>
+                      <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.75)", background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 12, padding: "4px 10px" }}>
+                        ✨ {hi ? "चमकदार शक्ति मीटर (Planetary Strength)" : "Glowing Strength Meters Active"}
+                      </div>
+                    </div>
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+                        <thead>
+                          <tr style={{ background: "rgba(245, 158, 11, 0.12)", borderBottom: "1px solid rgba(212, 175, 55, 0.3)" }}>
+                            {t.pcols.map(col => (
+                              <th key={col} style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left", letterSpacing: 0.5 }}>{col}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {PLANETS.map((p, idx) => {
+                            const pd = result.planetData?.[p.name] || {};
+                            const strength = getPlanetStrength(pd.status);
+
+                            return (
+                              <tr key={p.name} style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.1)", background: idx % 2 ? "rgba(255, 255, 255, 0.02)" : "transparent" }}>
+                                <td style={{ padding: "12px 14px" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255, 255, 255, 0.05)", border: `1px solid ${p.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: p.color, fontWeight: "bold" }}>
+                                      {p.symbol}
+                                    </div>
+                                    <div>
+                                      <span style={{ color: p.color, fontWeight: "bold", fontSize: 14 }}>{p.name}</span>
+                                      <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.75)", marginTop: 1 }}>{p.sanskrit}</div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.95)", fontSize: 14, fontWeight: 600 }}>
+                                  {pd.sign} <span style={{ fontSize: 12.5, color: "rgba(243, 211, 122, 0.85)" }}>({pd.signSanskrit})</span>
+                                </td>
+                                <td style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
+                                  House {pd.house}
+                                </td>
+                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5 }}>
+                                  {pd.degree}
+                                  <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", marginTop: 2 }}>{pd.nakshatra} (P{pd.pada})</div>
+                                </td>
+                                <td style={{ padding: "12px 14px", minWidth: 170 }}>
+                                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                                    <span style={{
+                                      padding: "3px 9px",
+                                      borderRadius: 12,
+                                      fontSize: 11.5,
+                                      fontWeight: 700,
+                                      background: `${strength.color}22`,
+                                      color: strength.color,
+                                      border: `1px solid ${strength.color}55`
+                                    }}>
+                                      {pd.status || "—"}
+                                    </span>
+                                    <span style={{ fontSize: 11.5, fontWeight: 800, color: strength.color }}>
+                                      {strength.pct}%
+                                    </span>
+                                  </div>
+                                  {/* Glowing Progress Bar */}
+                                  <div style={{
+                                    width: "100%",
+                                    height: 7,
+                                    background: "rgba(255, 255, 255, 0.08)",
+                                    borderRadius: 999,
+                                    overflow: "hidden",
+                                    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)"
+                                  }}>
+                                    <div style={{
+                                      width: `${strength.pct}%`,
+                                      height: "100%",
+                                      borderRadius: 999,
+                                      background: `linear-gradient(90deg, ${strength.color}88, ${strength.color})`,
+                                      boxShadow: `0 0 10px ${strength.glow}`,
+                                      transition: "width 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+                                    }} />
+                                  </div>
+                                </td>
+                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.6 }}>
+                                  {pd.effect || "—"}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <SectionCard icon="🪐" title={t.sec.pa} content={result.pa} />
+                </div>
+              );
+            })()}
 
             {/* ── TAB 8: HOUSES ── */}
             {tab === "houses" && (
               <div>
                 <div className="glass-card" style={{ padding: "26px 22px", marginBottom: 20 }}>
-                  <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, marginBottom: 16 }}>{t.htTitle}</h3>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                    <div>
+                      <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, margin: 0 }}>{t.htTitle}</h3>
+                      <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12.5, marginTop: 4 }}>
+                        {hi ? "किसी भी भाव पर क्लिक या होवर करके कुंडली चक्र के साथ सिंक देखें:" : "Click or hover any house to interactively sync with your Vedic Kundli Chart:"}
+                      </p>
+                    </div>
+                    {hoveredHouse && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 12, color: "#FDE68A", background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.5)", borderRadius: 20, padding: "4px 12px", fontWeight: 700 }}>
+                          ✨ {hi ? `भाव ${hoveredHouse} चयनित` : `House ${hoveredHouse} Active`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setHoveredHouse(null)}
+                          style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 14, padding: "3px 8px", color: "rgba(241,231,208,0.8)", fontSize: 11, cursor: "pointer" }}
+                        >
+                          ✕ {hi ? "रीसेट" : "Reset"}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick House Jumper Pills */}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(212,175,55,0.15)" }}>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const hn = i + 1;
+                      const isSel = hoveredHouse === hn;
+                      return (
+                        <button
+                          key={hn}
+                          type="button"
+                          onClick={() => setHoveredHouse(isSel ? null : hn)}
+                          style={{
+                            background: isSel ? "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)" : "rgba(255, 255, 255, 0.05)",
+                            color: isSel ? "#0F0A1E" : "rgba(241, 231, 208, 0.85)",
+                            border: isSel ? "1px solid #FCD34D" : "1px solid rgba(212, 175, 55, 0.2)",
+                            borderRadius: 12,
+                            padding: "5px 10px",
+                            fontSize: 12,
+                            fontWeight: isSel ? 800 : 600,
+                            cursor: "pointer",
+                            transition: "all 0.15s ease",
+                            boxShadow: isSel ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
+                          }}
+                        >
+                          H{hn} <span style={{ fontSize: 10, opacity: 0.85 }}>({t.hnames[i].split(" ")[0]})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
                     {Array.from({ length: 12 }, (_, i) => {
                       const n = i + 1;
                       const d = result.houses?.[n] || {};
                       const sg = ZODIAC_SIGNS.find(z => z.name === d.sign || z.sanskrit === d.sign) || ZODIAC_SIGNS[i];
                       const pl = d.planets || [];
+                      const isHovered = hoveredHouse === n;
 
                       return (
-                        <div key={n} style={{ background: "rgba(15, 10, 32, 0.75)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 12, padding: "16px 18px", borderLeft: "4px solid #F59E0B" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                        <div
+                          key={n}
+                          className="house-card-interactive"
+                          onMouseEnter={() => setHoveredHouse(n)}
+                          onMouseLeave={() => setHoveredHouse(null)}
+                          onClick={() => setHoveredHouse(isHovered ? null : n)}
+                          style={{
+                            background: isHovered ? "linear-gradient(135deg, rgba(40, 26, 75, 0.9) 0%, rgba(20, 14, 45, 0.95) 100%)" : "rgba(15, 10, 32, 0.75)",
+                            border: isHovered ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.2)",
+                            borderRadius: 14,
+                            padding: "18px 20px",
+                            borderLeft: isHovered ? "4px solid #FCD34D" : "4px solid #F59E0B",
+                            boxShadow: isHovered ? "0 8px 30px rgba(245, 158, 11, 0.25)" : "none",
+                            transform: isHovered ? "translateY(-3px)" : "none",
+                            position: "relative"
+                          }}
+                        >
+                          {isHovered && (
+                            <div style={{ position: "absolute", top: 8, right: 10, fontSize: 10, color: "#FDE68A", background: "rgba(245,158,11,0.25)", borderRadius: 8, padding: "2px 6px", fontWeight: 700 }}>
+                              SYNCED ✦
+                            </div>
+                          )}
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8, paddingRight: isHovered ? 60 : 0 }}>
                             <div>
-                              <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+                              <span style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
                                 {hi ? `भाव ${n}` : `House ${n}`}
                               </span>
-                              <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", marginTop: 2 }}>{t.hnames[i]}</div>
+                              <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", marginTop: 2, fontWeight: 600 }}>{t.hnames[i]}</div>
                             </div>
                             <div style={{ textAlign: "right" }}>
                               <div style={{ fontSize: 20, color: "#F3D37A", lineHeight: 1 }}>{sg.symbol}</div>
@@ -3721,8 +3949,8 @@ export default function App() {
                               {pl.map((p, j) => {
                                 const pd = PLANETS.find(x => x.name === p);
                                 return (
-                                  <span key={j} style={{ padding: "3px 10px", borderRadius: 8, fontSize: 12, fontWeight: "bold", background: "rgba(245, 158, 11, 0.15)", color: pd?.color || "#F3D37A", border: "1px solid rgba(245, 158, 11, 0.3)" }}>
-                                    {p}
+                                  <span key={j} style={{ padding: "3px 10px", borderRadius: 8, fontSize: 12, fontWeight: "bold", background: "rgba(245, 158, 11, 0.18)", color: pd?.color || "#F3D37A", border: "1px solid rgba(245, 158, 11, 0.35)" }}>
+                                    {pd?.symbol || "✦"} {p}
                                   </span>
                                 );
                               })}
@@ -4363,22 +4591,70 @@ export default function App() {
   );
 }
 
-// ── REUSABLE SECTION CARD ─────────────────────────────────────────
-const SectionCard = ({ icon, title, content, highlight = false }) => (
-  <div
-    className="glass-card"
-    style={{
-      padding: "26px 30px",
-      marginBottom: 20,
-      border: highlight ? "1px solid rgba(245, 158, 11, 0.45)" : "1px solid rgba(212, 175, 55, 0.22)",
-      background: highlight ? "linear-gradient(135deg, rgba(35, 22, 65, 0.8) 0%, rgba(18, 12, 38, 0.95) 100%)" : undefined,
-    }}
-  >
-    <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-      <span style={{ fontSize: 20 }}>{icon}</span> {title}
-    </h3>
-    <div style={{ color: "rgba(241, 231, 208, 0.94)", fontSize: 15, lineHeight: 1.9, whiteSpace: "pre-wrap" }}>
-      {content}
+// ── REUSABLE MODERN ACCORDION GLASS CARD ────────────────────────────
+const SectionCard = ({ icon, title, content, highlight = false, defaultOpen = true }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div
+      className="glass-card"
+      style={{
+        padding: "20px 24px",
+        marginBottom: 18,
+        border: highlight ? "1px solid rgba(245, 158, 11, 0.5)" : "1px solid rgba(212, 175, 55, 0.22)",
+        background: highlight ? "linear-gradient(135deg, rgba(38, 24, 70, 0.85) 0%, rgba(18, 12, 38, 0.95) 100%)" : undefined,
+        boxShadow: highlight ? "0 10px 30px rgba(245, 158, 11, 0.15)" : undefined,
+        transition: "all 0.2s ease"
+      }}
+    >
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          cursor: "pointer",
+          userSelect: "none"
+        }}
+      >
+        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: 0, display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 20 }}>{icon}</span>
+          <span>{title}</span>
+        </h3>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.7)", fontWeight: 600, background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "2px 8px" }}>
+            {isOpen ? "Collapse" : "Expand"}
+          </span>
+          <span
+            style={{
+              color: "#F59E0B",
+              fontSize: 13,
+              fontWeight: "bold",
+              display: "inline-block",
+              transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.2s ease"
+            }}
+          >
+            ▼
+          </span>
+        </div>
+      </div>
+      {isOpen && (
+        <div
+          style={{
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: "1px solid rgba(212, 175, 55, 0.15)",
+            color: "rgba(241, 231, 208, 0.94)",
+            fontSize: 15,
+            lineHeight: 1.9,
+            whiteSpace: "pre-wrap",
+            animation: "fadeInCard 0.25s ease"
+          }}
+        >
+          {content}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
