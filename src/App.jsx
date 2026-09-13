@@ -72,7 +72,7 @@ const UI = {
     formSub: "Accurate planetary calculations according to traditional Parashari Vedic Astrology",
     fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth",
     fTobHelp: "(12:00 PM if unsure)",
-    phName: "e.g. Abhishek Kumar Singh", phPob: "e.g. Kanpur, Uttar Pradesh, India",
+    phName: "Enter your full name", phPob: "Enter birth city, state / country",
     btnGo: "Reveal My Kundli ✦", btnWait: "Consulting the Stars...",
     errFields: "Please fill in your Name, Date of Birth, and Place of Birth.",
     errPartnerFields: "Please enter partner name and date of birth.",
@@ -139,7 +139,7 @@ const UI = {
     formSub: "पराशरी वैदिक ज्योतिष के प्रामाणिक सिद्धांतों पर आधारित सटीक गणना",
     fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान",
     fTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
-    phName: "उदा. अभिषेक कुमार सिंह", phPob: "उदा. कानपुर, उत्तर प्रदेश, भारत",
+    phName: "अपना पूरा नाम दर्ज करें", phPob: "जन्म का शहर, राज्य / देश दर्ज करें",
     btnGo: "मेरी कुंडली प्रकट करें ✦", btnWait: "ग्रहों से परामर्श जारी है...",
     errFields: "कृपया अपना पूरा नाम, जन्म तिथि और जन्म स्थान भरें।",
     errPartnerFields: "कृपया जीवनसाथी का नाम और जन्म तिथि दर्ज करें।",
@@ -3451,7 +3451,7 @@ export default function App() {
                         required
                         aria-required="true"
                         aria-label={t.partnerName}
-                        placeholder={hi ? "उदा. प्रिया शर्मा" : "e.g. Priya Sharma"}
+                        placeholder={hi ? "जीवनसाथी का नाम दर्ज करें" : "Enter partner's full name"}
                         value={partnerForm.name}
                         onChange={e => setPartnerForm({ ...partnerForm, name: e.target.value })}
                         style={{ width: "100%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 14 }}
