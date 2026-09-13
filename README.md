@@ -1,16 +1,19 @@
-# React + Vite
+# Jyotish Paramarsh — Authentic Vedic Astrology Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Official web application for **[jyotishparamash.com](https://jyotishparamash.com)**.
 
-Currently, two official plugins are available:
+## 🌟 Key Features
+- **Natal Kundli (Lagna & Navamsha Chart)**: North & South Indian interactive diamond/box charts with house synchronization.
+- **Planetary Strength & Dignity Matrix**: Real-time Shadbala & Dignity progress bars across 9 Grahas.
+- **Panchang & Muhurat**: Tithi, Nakshatra, Yoga, Karana, Abhijit & Choghadiya calculators.
+- **Hindu Festivals & Vrat**: Complete Vedic fasting calendar including all monthly Ekadashis.
+- **Daily Horoscope**: Automated email delivery to subscriber inboxes every morning at 7:00 AM.
+- **Kundli Milan**: 36 Gunas Ashtakoot matchmaking with Nadi/Bhakoot dosha checks.
+- **1-on-1 Astrologer Waitlist**: Direct inquiries to `teamjyotishparamarsh@gmail.com`.
+- **Global Currency & Checkout**: PayPal & International card support with multi-currency pricing.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Tech Stack
+- **Framework**: React 18 + Vite
+- **Astrology Engine**: Astronomy Engine + Parashari Calculations (`jyotishEngine.js`)
+- **Styling**: Modern Glassmorphic CSS with gold/cosmic night palette
+- **Deployment**: Vercel (`main` branch auto-deploy) with custom domain `jyotishparamash.com`

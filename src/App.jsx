@@ -65,7 +65,7 @@ const TABS = [
 
 const UI = {
   en: {
-    title: "JYOTISH KUNDLI",
+    title: "JYOTISH PARAMARSH",
     subtitle: "VEDIC BIRTH CHART & COSMIC LIFE READING",
     tagline: '"As above, so below — the stars illuminate the path of your soul"',
     formTitle: "Enter Your Birth Details",
@@ -132,7 +132,7 @@ const UI = {
     quickDailyBtn: "Daily Horoscope",
   },
   hi: {
-    title: "ज्योतिष कुंडली",
+    title: "ज्योतिष परामर्श",
     subtitle: "वैदिक जन्म कुंडली एवं ब्रह्मांडीय जीवन विश्लेषण",
     tagline: '"जैसा ऊपर, वैसा नीचे — नक्षत्र आपकी आत्मा के दिव्य मार्ग को प्रकाशित करते हैं"',
     formTitle: "अपना जन्म विवरण दर्ज करें",
@@ -508,10 +508,10 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
   };
 
   const getEmailSupportLink = () => {
-    const subject = encodeURIComponent(`Jyotish Kundli Order Confirmation — ${orderId || item.title}`);
+    const subject = encodeURIComponent(`Jyotish Paramarsh Order Confirmation — ${orderId || item.title}`);
     const body = encodeURIComponent(
       `Namaste Team Jyotish Paramarsh,\n\n` +
-      `I have placed an order on Jyotish Kundli:\n\n` +
+      `I have placed an order on Jyotish Paramarsh:\n\n` +
       `• Item: ${item.title}\n` +
       `• Amount Paid: ${displayPrice}\n` +
       `• Order ID: ${orderId || "Pending"}\n` +
@@ -748,7 +748,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
 
                 <div style={{ marginTop: 12 }}>
                   <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                    <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष कुंडली™ वैदिक रिसर्च" : "Merchant: Jyotish Kundli™ Vedic Services"}
+                    <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™ वैदिक रिसर्च" : "Merchant: Jyotish Paramarsh™ Vedic Services"}
                   </div>
                   <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
                     {hi ? "आधिकारिक पेपैल गेटवे · 100% सुरक्षित एवं गोपनीय" : "Official PayPal Gateway · 100% Buyer Protected"}
@@ -2084,7 +2084,7 @@ export default function App() {
           >
             <span style={{ fontSize: 24, animation: "pulseSlow 3s infinite" }}>🔯</span>
             <div>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH KUNDLI</div>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH PARAMARSH</div>
               <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 500 }}>{hi ? "वैदिक ज्योतिष एवं कुंडली मिलान" : "Vedic Astrology & Matchmaking"}</div>
             </div>
           </div>
@@ -3591,7 +3591,7 @@ export default function App() {
 
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                   <a
-                    href={`mailto:teamjyotishparamarsh@gmail.com?subject=${encodeURIComponent("Priority Waitlist for 1-on-1 Vedic Astrologer Consultation")}&body=${encodeURIComponent("Namaste Team Jyotish Paramarsh,\n\nI would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Kundli.\n\nPlease notify me when booking slots open.\n\nThank you!")}`}
+                    href={`mailto:teamjyotishparamarsh@gmail.com?subject=${encodeURIComponent("Priority Waitlist for 1-on-1 Vedic Astrologer Consultation")}&body=${encodeURIComponent("Namaste Team Jyotish Paramarsh,\n\nI would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Paramarsh.\n\nPlease notify me when booking slots open.\n\nThank you!")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
