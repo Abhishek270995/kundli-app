@@ -123,12 +123,12 @@ const UI = {
     checkoutEmailHelp: "Your unlocked high-resolution report and invoice will be sent here.",
     checkoutTxIdLabel: "PayPal Transaction ID / Order Ref (Optional)",
     checkoutTxIdHelp: "Found in your PayPal confirmation email or activity receipt.",
-    checkoutPhoneLabel: "WhatsApp / Phone Number (Optional)",
-    checkoutPhoneHelp: "Optional for instant mobile alerts and PDF dispatch.",
+    checkoutPhoneLabel: "Phone Number (Optional)",
+    checkoutPhoneHelp: "Optional for order reference and dispatch notification.",
     cardNumberLabel: "Card Number",
     cardExpiryLabel: "Card Expiry (MM/YY)",
     cardCvvLabel: "Security Code (CVV)",
-    quickDailyPrompt: "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:",
+    quickDailyPrompt: "Or check Today's Daily Vedic Horoscope & Email Alerts:",
     quickDailyBtn: "Daily Horoscope",
   },
   hi: {
@@ -190,12 +190,12 @@ const UI = {
     checkoutEmailHelp: "अनलॉक की गई विस्तृत PDF रिपोर्ट एवं रसीद इस ईमेल पर भेजी जाएगी।",
     checkoutTxIdLabel: "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)",
     checkoutTxIdHelp: "पेपैल रसीद / ईमेल में दी गई ट्रांजैक्शन आईडी दर्ज करें।",
-    checkoutPhoneLabel: "व्हाट्सएप / फोन नंबर (वैकल्पिक)",
-    checkoutPhoneHelp: "व्हाट्सएप पर तुरंत रिपोर्ट व अलर्ट्स प्राप्त करने हेतु (वैकल्पिक)।",
+    checkoutPhoneLabel: "फोन / मोबाइल नंबर (वैकल्पिक)",
+    checkoutPhoneHelp: "तुरंत ऑर्डर संदर्भ व सूचना हेतु (वैकल्पिक)।",
     cardNumberLabel: "कार्ड नंबर (Card Number)",
     cardExpiryLabel: "समाप्ति तिथि (MM/YY)",
     cardCvvLabel: "सुरक्षा कोड (CVV)",
-    quickDailyPrompt: "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:",
+    quickDailyPrompt: "या आज का दैनिक राशिफल व ईमेल अलर्ट्स देखें:",
     quickDailyBtn: "दैनिक राशिफल (Daily Horoscope)",
   }
 };
@@ -507,18 +507,20 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
     }, 1200);
   };
 
-  const getWhatsAppShareLink = () => {
-    const text = encodeURIComponent(
-      `🙏 *Jyotish Kundli International Order Confirmation*\n\n` +
-      `📦 *Item:* ${item.title}\n` +
-      `💰 *Amount Paid:* ${displayPrice}\n` +
-      `🧾 *Order ID:* ${orderId || "Pending"}\n` +
-      `📧 *Customer Email:* ${email || "N/A"}\n` +
-      `${paypalTxId ? `🅿️ *PayPal Tx ID / Ref:* ${paypalTxId}\n` : ""}` +
-      `${phone ? `📱 *Phone / WhatsApp:* ${phone}\n` : ""}\n` +
-      `Please verify and activate my complete detailed reading. Thank you!`
+  const getEmailSupportLink = () => {
+    const subject = encodeURIComponent(`Jyotish Kundli Order Confirmation — ${orderId || item.title}`);
+    const body = encodeURIComponent(
+      `Namaste Team Jyotish Paramarsh,\n\n` +
+      `I have placed an order on Jyotish Kundli:\n\n` +
+      `• Item: ${item.title}\n` +
+      `• Amount Paid: ${displayPrice}\n` +
+      `• Order ID: ${orderId || "Pending"}\n` +
+      `• Delivery Email: ${email || "N/A"}\n` +
+      `${paypalTxId ? `• PayPal Tx ID / Ref: ${paypalTxId}\n` : ""}` +
+      `${phone ? `• Contact Phone: ${phone}\n` : ""}\n` +
+      `Please verify and send my complete astrological report & reading.\n\nThank you!`
     );
-    return `https://wa.me/918094199663?text=${text}`;
+    return `mailto:teamjyotishparamarsh@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -559,7 +561,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
             </div>
 
             <a
-              href={getWhatsAppShareLink()}
+              href={getEmailSupportLink()}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -568,7 +570,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 justifyContent: "center",
                 gap: 8,
                 width: "100%",
-                background: "#25D366",
+                background: "linear-gradient(90deg, #F59E0B, #D97706)",
                 color: "#0F0A1E",
                 padding: "11px 16px",
                 borderRadius: 8,
@@ -578,7 +580,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 marginBottom: 10
               }}
             >
-              <span>💬</span> Send Receipt on WhatsApp / Support
+              <span>✉️</span> {hi ? "ईमेल पर रसीद भेजें / संपर्क करें" : "Send Receipt via Email / Contact Support"}
             </a>
 
             <button onClick={onClose} className="gold-cta-btn" style={{ padding: "10px 18px", fontSize: 13.5, width: "100%" }}>
@@ -643,10 +645,10 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 </div>
               </div>
 
-              {/* Optional WhatsApp/Phone */}
+              {/* Optional Phone */}
               <div>
                 <label htmlFor="checkout-phone-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                  <span>📱</span> {hi ? "व्हाट्सएप / फोन नंबर (वैकल्पिक)" : "WhatsApp / Phone Number (Optional)"}
+                  <span>📞</span> {hi ? "फोन / संपर्क नंबर (वैकल्पिक)" : "Phone / Contact Number (Optional)"}
                 </label>
                 <div style={{ display: "flex", gap: 6 }}>
                   <div style={{ background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "rgba(241,231,208,0.9)", fontSize: 14, fontWeight: 600 }}>
@@ -656,7 +658,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                     id="checkout-phone-input"
                     name="phone"
                     type="tel"
-                    aria-label={hi ? "व्हाट्सएप या फोन नंबर" : "WhatsApp or Phone Number"}
+                    aria-label={hi ? "फोन नंबर" : "Phone Number"}
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="e.g. +1 (555) 019-2834"
@@ -869,7 +871,8 @@ export default function App() {
 
   // Daily Horoscope State
   const [dailySign, setDailySign] = useState("Aries");
-  const [dailyChannel, setDailyChannel] = useState("whatsapp");
+  const [dailyChannel, setDailyChannel] = useState("email");
+  const [dailyContact, setDailyContact] = useState("");
   const [dailyPlan, setDailyPlan] = useState("yearly");
   const [dailyTime, setDailyTime] = useState("07:00 AM");
   const [isDailySubscribed, setIsDailySubscribed] = useState(() => {
@@ -1673,18 +1676,18 @@ export default function App() {
           </div>
         </div>
 
-        {/* ── DAILY HOROSCOPE MESSENGER SUBSCRIPTION BOX ── */}
+        {/* ── DAILY HOROSCOPE EMAIL INBOX SUBSCRIPTION BOX ── */}
         <div className="glass-card" style={{ padding: "28px 30px", marginBottom: 24, border: "1.5px solid rgba(245,158,11,0.45)", background: "linear-gradient(135deg, rgba(30,18,55,0.92), rgba(16,10,32,0.98))" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 18, marginBottom: 20 }}>
             <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(34,197,94,0.18)", border: "1px solid rgba(34,197,94,0.4)", borderRadius: 14, padding: "4px 12px", color: "#4ADE80", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
-                <span>📲</span> {hi ? "व्हाट्सएप व टेलीग्राम दैनिक अलर्ट्स" : "DAILY HOROSCOPE TO YOUR MESSENGER"}
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.18)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 14, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
+                <span>📧</span> {hi ? "दैनिक ईमेल राशिफल सेवा" : "DAILY HOROSCOPE TO YOUR INBOX"}
               </div>
               <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800 }}>
-                {hi ? "नित्य प्रातः 7:00 बजे अपनी राशि का सटीक राशिफल प्राप्त करें" : "Receive Daily Horoscope & Shubh Muhurat on WhatsApp Every Morning"}
+                {hi ? "नित्य प्रातः 7:00 बजे अपनी राशि का सटीक राशिफल ईमेल पर प्राप्त करें" : "Receive Daily Horoscope & Shubh Muhurat in Your Email Every Morning"}
               </h3>
               <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13.5, margin: "4px 0 0" }}>
-                {hi ? "दैनिक ग्रहीय गोचर, शुभ समय, राहुकाल व अचूक लाल किताब उपाय सीधे आपके फोन पर।" : "Start each day with favorable planetary timings, Rahu Kaal warnings & Vedic remedies."}
+                {hi ? "दैनिक ग्रहीय गोचर, शुभ समय, राहुकाल व अचूक लाल किताब उपाय सीधे आपके ईमेल इनबॉक्स पर।" : "Start each day with favorable planetary timings, Rahu Kaal warnings & Vedic remedies delivered directly to your inbox."}
               </p>
             </div>
           </div>
@@ -1693,43 +1696,28 @@ export default function App() {
             <div style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 12, padding: "18px 20px", textAlign: "center" }}>
               <div style={{ fontSize: 24, marginBottom: 4 }}>🎉</div>
               <h4 style={{ color: "#34D399", fontSize: 16, fontWeight: 800, margin: "0 0 6px" }}>
-                {hi ? "आपकी दैनिक राशिफल सेवा सक्रिय है!" : "Your Daily Horoscope Service is Active!"}
+                {hi ? "आपकी दैनिक राशिफल ईमेल सेवा सक्रिय है!" : "Your Daily Horoscope Email Service is Active!"}
               </h4>
               <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 13.5, margin: 0 }}>
                 {hi
-                  ? `आपकी राशि (${dailySign}) के लिए दैनिक अलर्ट, शुभ मुहूर्त व उपाय आपके चयनित मैसेंजर पर नित्य प्रातः 7:00 बजे भेजे जा रहे हैं।`
-                  : `Personalized daily alerts, favorable muhurats & remedies for ${dailySign} are scheduled to your messenger every morning at 7:00 AM.`}
+                  ? `आपकी राशि (${dailySign}) के लिए दैनिक अलर्ट, शुभ मुहूर्त व उपाय आपके ईमेल पर नित्य प्रातः 7:00 बजे भेजे जा रहे हैं।`
+                  : `Personalized daily alerts, favorable muhurats & remedies for ${dailySign} are scheduled to your email inbox every morning at 7:00 AM.`}
               </p>
             </div>
           ) : (
             <div>
               {/* Delivery Preferences Form */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
-                <div>
-                  <label htmlFor="daily-platform-select" style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                    {hi ? "डिलीवरी माध्यम (Delivery App)" : "Delivery Channel"}
-                  </label>
-                  <select
-                    id="daily-platform-select"
-                    aria-label="Delivery Channel"
-                    value={dailyChannel}
-                    onChange={e => setDailyChannel(e.target.value)}
-                    style={{ width: "100%", background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 13.5 }}
-                  >
-                    <option value="whatsapp">🟢 WhatsApp</option>
-                    <option value="telegram">🔵 Telegram</option>
-                  </select>
-                </div>
-
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
                 <div>
                   <label htmlFor="daily-contact-input" style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                    {hi ? "मोबाइल नंबर (WhatsApp No.)" : "Mobile / WhatsApp Number"}
+                    <span>📧</span> {hi ? "आपका ईमेल पता (Email Address) *" : "Your Email Address (For Daily Delivery) *"}
                   </label>
                   <input
                     id="daily-contact-input"
-                    aria-label="Mobile or WhatsApp Number"
-                    type="tel"
-                    placeholder="+91 98765 43210"
+                    aria-label="Email Address for Daily Horoscope"
+                    type="email"
+                    required
+                    placeholder="e.g. yourname@example.com"
                     value={dailyContact}
                     onChange={e => setDailyContact(e.target.value)}
                     style={{ width: "100%", background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 13.5 }}
@@ -1738,7 +1726,7 @@ export default function App() {
 
                 <div>
                   <label htmlFor="daily-time-select" style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                    {hi ? "प्राप्ति समय (Delivery Time)" : "Preferred Morning Time"}
+                    <span>⏰</span> {hi ? "प्राप्ति समय (Delivery Time)" : "Preferred Morning Time"}
                   </label>
                   <select
                     id="daily-time-select"
@@ -1779,7 +1767,7 @@ export default function App() {
                     {PRODUCT_PRICES.dailyYearly[currency]} <span style={{ fontSize: 12, color: "rgba(241,231,208,0.7)", fontWeight: 500 }}>/ year</span>
                   </div>
                   <div style={{ fontSize: 12, color: "rgba(241,231,208,0.75)", marginTop: 3 }}>
-                    {hi ? "पूरे 365 दिन दैनिक मार्गदर्शन" : "365 Days of daily alerts & remedies"}
+                    {hi ? "पूरे 365 दिन दैनिक मार्गदर्शन सीधे ईमेल पर" : "365 Days of daily alerts & remedies directly to email"}
                   </div>
                 </div>
 
@@ -1811,11 +1799,11 @@ export default function App() {
               <button
                 onClick={() => setActiveCheckout({
                   title: dailyPlan === "yearly"
-                    ? `${dailySign} — 1-Year Daily Horoscope Subscription (${dailyChannel.toUpperCase()})`
-                    : `${dailySign} — Monthly Daily Horoscope Subscription (${dailyChannel.toUpperCase()})`,
+                    ? `${dailySign} — 1-Year Daily Horoscope Subscription (EMAIL)`
+                    : `${dailySign} — Monthly Daily Horoscope Subscription (EMAIL)`,
                   priceKey: activePriceKey,
                   price: activePrice,
-                  desc: `Daily delivery to ${dailyChannel.toUpperCase()} at ${dailyTime} with custom remedies & alerts`,
+                  desc: `Daily delivery to Email at ${dailyTime} with custom remedies & alerts`,
                   icon: "☀️",
                   isDailySub: true
                 })}
@@ -1823,8 +1811,8 @@ export default function App() {
                 style={{ width: "100%", padding: "15px 22px", fontSize: 15, fontWeight: 800 }}
               >
                 {hi
-                  ? `सदस्यता लें (${activePrice}) — व्हाट्सएप पर शुरू करें ✦`
-                  : `Subscribe Now (${activePrice}) — Start Daily Delivery ✦`}
+                  ? `सदस्यता लें (${activePrice}) — ईमेल पर शुरू करें ✦`
+                  : `Subscribe Now (${activePrice}) — Start Daily Email Delivery ✦`}
               </button>
             </div>
           )}
@@ -2529,7 +2517,7 @@ export default function App() {
               {!result && (
                 <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 16 }}>
                   <span style={{ fontSize: 13.5, color: "rgba(241,231,208,0.85)" }}>
-                    {hi ? "या आज का दैनिक राशिफल व व्हाट्सएप अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & WhatsApp Alerts:"}
+                    {hi ? "या आज का दैनिक राशिफल व ईमेल अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & Email Alerts:"}
                   </span>
                   <button
                     type="button"
@@ -3583,15 +3571,15 @@ export default function App() {
                 </h3>
                 <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 14, maxWidth: 560, margin: "0 auto 26px", lineHeight: 1.75 }}>
                   {hi 
-                    ? "हम वर्तमान में उच्च योग्यता प्राप्त, अनुभवी एवं प्रामाणिक वैदिक विद्वानों को जोड़ रहे हैं। शीघ्र ही आप करियर, विवाह, स्वास्थ्य एवं व्यक्तिगत प्रश्नों पर सीधे ऑडियो/व्हाट्सएप परामर्श प्राप्त कर सकेंगे।" 
-                    : "We are currently curating and verifying top-tier Vedic Astrologers and PhD scholars. Direct private 1-on-1 audio/video consultations for Career, Marriage & Life Guidance will be live shortly."}
+                    ? "हम वर्तमान में उच्च योग्यता प्राप्त, अनुभवी एवं प्रामाणिक वैदिक विद्वानों को जोड़ रहे हैं। शीघ्र ही आप करियर, विवाह, स्वास्थ्य एवं व्यक्तिगत प्रश्नों पर सीधे ईमेल व वीडियो परामर्श प्राप्त कर सकेंगे।" 
+                    : "We are currently curating and verifying top-tier Vedic Astrologers and PhD scholars. Direct private 1-on-1 consultations for Career, Marriage & Life Guidance will be live shortly."}
                 </p>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, maxWidth: 720, margin: "0 auto 28px", textAlign: "left" }}>
                   {[
                     { icon: "🛡️", title: hi ? "100% गोपनीय व सुरक्षित" : "100% Confidential", desc: hi ? "निजी परामर्श और पूर्ण गोपनीयता" : "Private & encrypted discussions" },
                     { icon: "📜", title: hi ? "सटीक पराशरी गणना" : "Parashari Principles", desc: hi ? "प्रामाणिक शास्त्रीय पद्धति" : "Classical Vedic astrological analysis" },
-                    { icon: "⏱️", title: hi ? "कॉल व व्हाट्सएप सुविधा" : "Instant Audio / Chat", desc: hi ? "सुविधाजनक समय स्लॉट बुकिंग" : "Flexible scheduling & instant booking" },
+                    { icon: "✉️", title: hi ? "ईमेल व ऑडियो परामर्श" : "Direct Email & Audio Booking", desc: hi ? "सुविधाजनक स्लॉट व त्वरित ईमेल उत्तर" : "Priority scheduling & direct email support" },
                   ].map((feat, idx) => (
                     <div key={idx} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 16 }}>
                       <div style={{ fontSize: 22, marginBottom: 6 }}>{feat.icon}</div>
@@ -3601,26 +3589,36 @@ export default function App() {
                   ))}
                 </div>
 
-                <a
-                  href={`https://wa.me/918094199663?text=${encodeURIComponent("Namaste, I would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Kundli.")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                    background: "linear-gradient(90deg, #F59E0B, #D97706)",
-                    color: "#0F0A1E",
-                    padding: "14px 28px",
-                    borderRadius: 10,
-                    fontSize: 14.5,
-                    fontWeight: 800,
-                    textDecoration: "none",
-                    boxShadow: "0 4px 16px rgba(245,158,11,0.3)"
-                  }}
-                >
-                  <span>💬</span> {hi ? "प्राथमिकता प्रतीक्षा सूची (Waitlist) में जुड़ें" : "Join Priority Waitlist on WhatsApp"}
-                </a>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                  <a
+                    href={`mailto:teamjyotishparamarsh@gmail.com?subject=${encodeURIComponent("Priority Waitlist for 1-on-1 Vedic Astrologer Consultation")}&body=${encodeURIComponent("Namaste Team Jyotish Paramarsh,\n\nI would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Kundli.\n\nPlease notify me when booking slots open.\n\nThank you!")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "linear-gradient(90deg, #F59E0B, #D97706)",
+                      color: "#0F0A1E",
+                      padding: "14px 28px",
+                      borderRadius: 10,
+                      fontSize: 14.5,
+                      fontWeight: 800,
+                      textDecoration: "none",
+                      boxShadow: "0 4px 16px rgba(245,158,11,0.3)"
+                    }}
+                  >
+                    <span>✉️</span> {hi ? "प्राथमिकता प्रतीक्षा सूची में जुड़ें (Email Waitlist)" : "Join Priority Waitlist via Email"}
+                  </a>
+
+                  <div style={{ fontSize: 13, color: "rgba(243, 211, 122, 0.9)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>📧</span>
+                    <span>{hi ? "सीधे संपर्क करें:" : "Direct Astrologer Inquiries:"}</span>
+                    <a href="mailto:teamjyotishparamarsh@gmail.com" style={{ color: "#FDE68A", fontWeight: 700, textDecoration: "underline" }}>
+                      teamjyotishparamarsh@gmail.com
+                    </a>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -4542,6 +4540,16 @@ export default function App() {
         >
           <div style={{ marginBottom: 6, fontWeight: 700, fontSize: 14 }}>{t.footer1}</div>
           <div style={{ fontSize: 12.5, letterSpacing: 0.5, color: "rgba(241, 231, 208, 0.75)" }}>{t.footer2}</div>
+          <div style={{ marginTop: 10, fontSize: 12, letterSpacing: 0.3, color: "rgba(243, 211, 122, 0.9)" }}>
+            📧 {hi ? "सहायता एवं परामर्श ईमेल:" : "Official Support & Astrologer Desk:"}{" "}
+            <a
+              href="mailto:teamjyotishparamarsh@gmail.com"
+              onClick={e => e.stopPropagation()}
+              style={{ color: "#FDE68A", textDecoration: "underline", fontWeight: 700 }}
+            >
+              teamjyotishparamarsh@gmail.com
+            </a>
+          </div>
         </footer>
 
         {/* Floating Admin Switcher Widget (When in Admin Mode) */}
