@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jyotishparamash.com/sitemap.xml
+Sitemap: https://www.jyotishparamash.com/sitemap.xml
