@@ -844,8 +844,8 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                     <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.5)", borderRadius: 12, padding: "4px 14px", color: "#34D399", fontSize: 12.5, fontWeight: 700 }}>
                       🔒 {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (INR)`}
                     </span>
-                    <span style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "4px 10px", color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>
-                      ✓ 8094199663@upi
+                    <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 12, padding: "4px 10px", color: "#34D399", fontSize: 12, fontWeight: 700 }}>
+                      ✓ {hi ? "सत्यापित मर्चेंट" : "Verified Merchant"}
                     </span>
                   </div>
 
@@ -859,8 +859,8 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                   </div>
 
                   <div style={{ marginTop: 12 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#6EE7B7", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                      <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™ (8094199663@upi)" : "Merchant: Jyotish Paramarsh™ (8094199663@upi)"}
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#6EE7B7", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                      <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™" : "Merchant: Jyotish Paramarsh™"}
                     </div>
                     <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
                       Google Pay • PhonePe • Paytm • BHIM • Cred UPI • Any Banking App
