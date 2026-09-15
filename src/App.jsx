@@ -15,6 +15,7 @@ import {
   SIGNS
 } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
+import DeluxeLifeReportDossier from "./DeluxeLifeReportDossier";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -2035,8 +2036,8 @@ export default function App() {
 
         @media print {
           @page {
-            size: A4;
-            margin: 1.2cm;
+            size: A4 portrait;
+            margin: 10mm;
           }
           body, html, #root {
             background: #0B0819 !important;
@@ -2060,6 +2061,23 @@ export default function App() {
           .page-break-before {
             page-break-before: always !important;
             break-before: always !important;
+          }
+          .print-page {
+            page-break-after: always !important;
+            break-after: page !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            min-height: 265mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            padding: 8px 0;
+          }
+          .print-page:last-child {
+            page-break-after: auto !important;
+            break-after: auto !important;
           }
         }
       `}</style>
@@ -4863,166 +4881,19 @@ export default function App() {
               {/* ══════════════════════════════════════════════════════════════════════
                   CASE 4: COMPLETE DELUXE NATAL KUNDLI & LIFE REPORT (Default All)
               ══════════════════════════════════════════════════════════════════════ */}
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 4: COMPLETE DELUXE NATAL KUNDLI & LIFE REPORT (45-PAGE DOSSIER)
+              ══════════════════════════════════════════════════════════════════════ */}
               {activePrintReport === "all" && (
-                <div>
-                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
-                    <div style={{ fontSize: 24, marginBottom: 4 }}>🔯</div>
-                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 26, fontWeight: 800, letterSpacing: 2 }}>
-                      JYOTISH KUNDLI — COMPLETE VEDIC LIFE DOSSIER
-                    </h1>
-                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 1, textTransform: "uppercase" }}>
-                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
-                    </p>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "18px 22px", marginBottom: 24 }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-                      ✦ CORE PANCHANG & VEDIC METRICS
-                    </h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, textAlign: "center" }}>
-                      {[
-                        { label: "Ascendant (Lagna)", val: result.lagna },
-                        { label: "Moon Sign (Rashi)", val: result.rashi },
-                        { label: "Nakshatra & Pada", val: result.nakshatra },
-                        { label: "Tithi", val: result.tithi },
-                        { label: "Yoga", val: result.yoga },
-                      ].map((p, i) => (
-                        <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 12px" }}>
-                          <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 4, fontWeight: 600 }}>{p.label}</div>
-                          <div style={{ fontSize: 14, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ textAlign: "center", marginBottom: 28 }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
-                      ✦ NATAL LAGNA KUNDLI CHART
-                    </h3>
-                    <div style={{ display: "flex", justifyContent: "center" }}>
-                      <NorthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} />
-                    </div>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ marginBottom: 28 }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
-                      ✦ PLANETARY POSITIONS, HOUSES & DIGNITIES
-                    </h3>
-                    <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
-                      <thead>
-                        <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Planet</th>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Sign</th>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>House</th>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Degree & Nakshatra</th>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Dignity</th>
-                          <th style={{ padding: "10px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Astrological Effect</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {PLANETS.map((p, idx) => {
-                          const pd = result.planetData?.[p.name] || {};
-                          return (
-                            <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
-                              <td style={{ padding: "10px 12px", fontWeight: 700, color: p.color, fontSize: 13 }}>{p.symbol} {p.name} ({p.sanskrit})</td>
-                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.sign} ({pd.signSanskrit})</td>
-                              <td style={{ padding: "10px 12px", fontWeight: 700, color: "#FDE68A", fontSize: 13 }}>House {pd.house}</td>
-                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.degree} · {pd.nakshatra} (P{pd.pada})</td>
-                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.status}</td>
-                              <td style={{ padding: "10px 12px", fontSize: 13 }}>{pd.effect}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="page-break-before" />
-
-                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 20, background: "rgba(15,10,32,0.6)" }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 10 }}>🌟 {t.sec.blueprint}</h3>
-                    <p style={{ lineHeight: 1.85, fontSize: 14, color: "rgba(241,231,208,0.92)" }}>{result.overview}</p>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-                    <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                      <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⚡ {t.sec.yogas}</h4>
-                      <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.yogas}</div>
-                    </div>
-                    <div style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                      <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>⏱️ {t.sec.dasha}</h4>
-                      <div style={{ lineHeight: 1.8, fontSize: 13.5, whiteSpace: "pre-wrap" }}>{result.dasha}</div>
-                    </div>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ marginBottom: 20 }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🏠 {t.htTitle}</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                      {Array.from({ length: 12 }, (_, i) => {
-                        const n = i + 1;
-                        const d = result.houses?.[n] || {};
-                        return (
-                          <div key={n} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 12, background: "rgba(15,10,32,0.6)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>House {n}: {t.hnames[i]}</span>
-                              <span style={{ color: "#F3D37A", fontSize: 12 }}>{d.sign}</span>
-                            </div>
-                            <p style={{ fontSize: 12.5, lineHeight: 1.6, color: "rgba(241,231,208,0.85)" }}>{d.interpretation}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="page-break-before" />
-
-                  <div className="page-break-avoid" style={{ marginBottom: 20 }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>🌿 LIFE DOMAIN ANALYSIS</h3>
-                    {[
-                      { title: t.sec.health, icon: "🌿", content: result.health },
-                      { title: t.sec.wealth, icon: "💰", content: result.wealth },
-                      { title: t.sec.education, icon: "📚", content: result.education },
-                      { title: t.sec.career, icon: "🏆", content: result.career },
-                      { title: t.sec.marriage, icon: "💑", content: result.marriage },
-                    ].map(sec => (
-                      <div key={sec.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "14px 16px", marginBottom: 10, background: "rgba(15,10,32,0.6)" }}>
-                        <h4 style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 6 }}>{sec.icon} {sec.title}</h4>
-                        <p style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(241,231,208,0.9)" }}>{sec.content}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>🔮 {t.sec.pred}</h3>
-                    <p style={{ lineHeight: 1.85, fontSize: 13, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.pred}</p>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 18, background: "rgba(15,10,32,0.6)" }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>💎 {t.sec.gems}</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
-                      {[
-                        { title: t.sec.colours, val: result.colours },
-                        { title: t.sec.numbers, val: result.numbers },
-                        { title: t.sec.days, val: result.days },
-                        { title: t.sec.rudraksha, val: result.rudraksha },
-                      ].map(item => (
-                        <div key={item.title} style={{ border: "1px solid rgba(212,175,55,0.2)", borderRadius: 6, padding: 10, background: "rgba(11,8,25,0.7)" }}>
-                          <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>{item.title}</div>
-                          <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", marginTop: 2 }}>{item.val}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <p style={{ fontSize: 13, lineHeight: 1.75, whiteSpace: "pre-wrap", color: "rgba(241,231,208,0.9)" }}>{result.gems}</p>
-                  </div>
-
-                  <div className="page-break-avoid" style={{ border: "1px solid rgba(245,158,11,0.5)", borderRadius: 10, padding: 18, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))" }}>
-                    <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 8 }}>✨ {t.sec.verdict}</h3>
-                    <p style={{ fontSize: 14, lineHeight: 1.85, color: "#FFF" }}>{result.verdict}</p>
-                    <div style={{ textAlign: "center", marginTop: 16, color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
-                      ✦ OM TAT SAT ✦ — {t.footer2}
-                    </div>
-                  </div>
-                </div>
+                <DeluxeLifeReportDossier
+                  result={result}
+                  form={form}
+                  lang={lang}
+                  NorthIndianChart={NorthIndianChart}
+                  SouthIndianChart={SouthIndianChart}
+                  careerPrediction={cp}
+                  marriagePrediction={mp}
+                />
               )}
 
             </div>
