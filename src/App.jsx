@@ -201,7 +201,30 @@ const UI = {
 };
 
 // ── NORTH INDIAN KUNDLI CHART ─────────────────────────────────────
-const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
+// Helper to extract formatted degree for a planet inside chart
+const getPlanetDegree = (pName, houseData, planetData) => {
+  if (houseData?.planetDetails) {
+    const detail = houseData.planetDetails.find(d => d.name === pName);
+    if (detail?.degree) return detail.degree;
+  }
+  const p = planetData?.[pName];
+  if (p) {
+    if (p.formattedDegree) return p.formattedDegree;
+    if (p.degree) {
+      const num = parseFloat(p.degree);
+      if (!isNaN(num)) {
+        const degInt = Math.floor(num);
+        const mins = Math.floor((num - degInt) * 60);
+        return mins > 0 ? `${degInt}°${mins < 10 ? "0" : ""}${mins}'` : `${degInt}°`;
+      }
+      return p.degree;
+    }
+  }
+  return "";
+};
+
+// ── NORTH INDIAN KUNDLI CHART ─────────────────────────────────────
+const NorthIndianChart = ({ houses, planetData, lang, hoveredHouse, setHoveredHouse }) => {
   const SIZE = 520;
   const PAD = 20;
   const W = SIZE - 2 * PAD;
@@ -272,14 +295,15 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         const houseData = houses?.[n] || {};
         const signNum = getSignNum(houseData.sign);
         const planetsInHouse = houseData.planets || [];
+        const totalPlanets = planetsInHouse.length;
 
         return (
           <g key={n} style={{ pointerEvents: "none" }}>
             {isLagna && (
               <g>
-                <rect x={cx - 26} y={cy - 38} width="52" height="17" rx="4" fill="rgba(245,158,11,0.28)" stroke="#F59E0B" strokeWidth="1" />
-                <text x={cx} y={cy - 26} textAnchor="middle" fill="#FDE68A" fontSize="12" fontWeight="800" letterSpacing="0.8">
-                  {lang === "hi" ? "लग्न १" : "LAGNA 1"}
+                <rect x={cx - 36} y={cy - 40} width="72" height="18" rx="4" fill="rgba(245,158,11,0.28)" stroke="#F59E0B" strokeWidth="1" />
+                <text x={cx} y={cy - 27} textAnchor="middle" fill="#FDE68A" fontSize="11" fontWeight="800" letterSpacing="0.6">
+                  {lang === "hi" ? "लग्न १" : "LAGNA 1"}{houses?.[1]?.ascDegree ? ` ${houses[1].ascDegree}` : ""}
                 </text>
               </g>
             )}
@@ -290,10 +314,22 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 
             {planetsInHouse.map((pName, idx) => {
               const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37" };
-              const yOffset = (isLagna ? cy + 14 : cy + 6) + idx * 15;
+              const degStr = getPlanetDegree(pName, houseData, planetData);
+              const yBase = isLagna 
+                ? (totalPlanets <= 2 ? cy + 12 : cy + 6)
+                : (totalPlanets <= 2 ? cy + 6 : cy + 1);
+              const yOffset = yBase + idx * 16;
+
               return (
-                <text key={idx} x={cx} y={yOffset} textAnchor="middle" fill={pObj.color} fontSize="14" fontWeight="800">
-                  {pObj.symbol}
+                <text key={idx} x={cx} y={yOffset} textAnchor="middle" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.85))" }}>
+                  <tspan fill={pObj.color} fontSize="13" fontWeight="800" letterSpacing="0.4">
+                    {pObj.symbol}
+                  </tspan>
+                  {degStr && (
+                    <tspan fill="#FDE68A" fontSize="10.5" fontWeight="600" opacity="0.95">
+                      {" " + degStr}
+                    </tspan>
+                  )}
                 </text>
               );
             })}
@@ -305,7 +341,7 @@ const NorthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 };
 
 // ── SOUTH INDIAN KUNDLI CHART ─────────────────────────────────────
-const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
+const SouthIndianChart = ({ houses, planetData, lang, hoveredHouse, setHoveredHouse }) => {
   const SIZE = 520;
   const PAD = 20;
   const W = (SIZE - 2 * PAD) / 4;
@@ -342,10 +378,12 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
         let houseNum = null;
         let isLagna = false;
         let planetsInBox = [];
+        let houseData = null;
 
         for (let h = 1; h <= 12; h++) {
           if (houses?.[h]?.sign === box.signName) {
             houseNum = h;
+            houseData = houses[h];
             if (h === 1) isLagna = true;
             planetsInBox = houses[h].planets || [];
             break;
@@ -377,8 +415,10 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
             {isLagna && (
               <g>
                 <line x1={bx} y1={by} x2={bx + W} y2={by + W} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                <rect x={bx + W - 32} y={by + 5} width="26" height="13" rx="3" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" strokeWidth="0.8" />
-                <text x={bx + W - 19} y={by + 14} textAnchor="middle" fill="#FDE68A" fontSize="7.5" fontWeight="700">ASC</text>
+                <rect x={bx + W - 44} y={by + 5} width="38" height="14" rx="3" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" strokeWidth="0.8" />
+                <text x={bx + W - 25} y={by + 15} textAnchor="middle" fill="#FDE68A" fontSize="7.5" fontWeight="700">
+                  ASC{houses?.[1]?.ascDegree ? ` ${houses[1].ascDegree}` : ""}
+                </text>
               </g>
             )}
 
@@ -390,9 +430,17 @@ const SouthIndianChart = ({ houses, lang, hoveredHouse, setHoveredHouse }) => {
 
             {planetsInBox.map((pName, idx) => {
               const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37" };
+              const degStr = getPlanetDegree(pName, houseData, planetData);
               return (
-                <text key={idx} x={bx + W / 2} y={by + 36 + idx * 14} textAnchor="middle" fill={pObj.color} fontSize="12" fontWeight="700">
-                  {pObj.symbol}
+                <text key={idx} x={bx + W / 2} y={by + 34 + idx * 15} textAnchor="middle" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.85))" }}>
+                  <tspan fill={pObj.color} fontSize="12.5" fontWeight="800">
+                    {pObj.symbol}
+                  </tspan>
+                  {degStr && (
+                    <tspan fill="#FDE68A" fontSize="10" fontWeight="600" opacity="0.95">
+                      {" " + degStr}
+                    </tspan>
+                  )}
                 </text>
               );
             })}
@@ -2664,9 +2712,9 @@ export default function App() {
 
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
                   {chartStyle === "north" ? (
-                    <NorthIndianChart houses={result.houses} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
+                    <NorthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
                   ) : (
-                    <SouthIndianChart houses={result.houses} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
+                    <SouthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
                   )}
                 </div>
 
@@ -2687,12 +2735,17 @@ export default function App() {
                 )}
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 24 }}>
-                  {PLANETS.map(p => (
-                    <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(15, 10, 32, 0.8)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 8, padding: "6px 12px" }}>
-                      <span style={{ color: p.color, fontWeight: "bold", fontSize: 13.5 }}>{p.symbol}</span>
-                      <span style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, fontWeight: 600 }}>{hi ? p.sanskrit : p.name}</span>
-                    </div>
-                  ))}
+                  {PLANETS.map(p => {
+                    const pData = result.planetData?.[p.name];
+                    const degText = pData?.formattedDegree || pData?.degree || "";
+                    return (
+                      <div key={p.name} style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(15, 10, 32, 0.8)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 8, padding: "6px 12px" }}>
+                        <span style={{ color: p.color, fontWeight: "bold", fontSize: 13.5 }}>{p.symbol}</span>
+                        <span style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, fontWeight: 600 }}>{hi ? p.sanskrit : p.name}</span>
+                        {degText && <span style={{ color: "#FDE68A", fontSize: 11.5, fontWeight: 700, marginLeft: 2 }}>{degText}</span>}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
@@ -4568,7 +4621,7 @@ export default function App() {
                       ✦ NATAL LAGNA KUNDLI CHART
                     </h3>
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                      <NorthIndianChart houses={result.houses} lang={lang} />
+                      <NorthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} />
                     </div>
                   </div>
 

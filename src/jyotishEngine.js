@@ -483,8 +483,16 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
       signSanskrit: SIGNS[currentSignIdx].sanskrit,
       lord: SIGNS[currentSignIdx].lord,
       planets: [],
+      planetDetails: [],
       interpretation: ""
     };
+  }
+
+  const ascDegInSign = ascDeg % 30;
+  const ascDegInt = Math.floor(ascDegInSign);
+  const ascMins = Math.floor((ascDegInSign - ascDegInt) * 60);
+  if (houses[1]) {
+    houses[1].ascDegree = `${ascDegInt}°${ascMins < 10 ? "0" : ""}${ascMins}'`;
   }
 
   const planetData = {};
@@ -496,8 +504,16 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     const nakInfo = getNakshatraInfo(deg);
     const evalData = evaluatePlanetStatus(planet, deg);
 
+    const degInSign = deg % 30;
+    const degInt = Math.floor(degInSign);
+    const mins = Math.floor((degInSign - degInt) * 60);
+    const formattedDeg = `${degInt}°${mins < 10 ? "0" : ""}${mins}'`;
+
     planetData[planet] = {
       degree: (deg % 30).toFixed(2) + "°",
+      formattedDegree: formattedDeg,
+      degInt,
+      mins,
       totalDegree: deg.toFixed(2),
       sign: SIGNS[pSignIdx].name,
       signSanskrit: SIGNS[pSignIdx].sanskrit,
@@ -511,6 +527,11 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
 
     planetHouseMap[planet] = houseNum;
     houses[houseNum].planets.push(planet);
+    houses[houseNum].planetDetails.push({
+      name: planet,
+      deg: degInSign,
+      degree: formattedDeg
+    });
   });
 
   const houseMeaningsEn = [
