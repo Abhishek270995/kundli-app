@@ -2312,7 +2312,11 @@ export default function App() {
             style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none" }}
             title="Click 3 times to open Admin VIP access portal"
           >
-            <span style={{ fontSize: 24, animation: "pulseSlow 3s infinite" }}>🔯</span>
+            <img
+              src="/logo.png"
+              alt="Jyotish Paramarsh Logo"
+              style={{ width: 36, height: 36, borderRadius: "50%", border: "1.5px solid rgba(245,158,11,0.7)", boxShadow: "0 0 12px rgba(245,158,11,0.4)", objectFit: "cover" }}
+            />
             <div>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH PARAMARSH</div>
               <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 500 }}>{hi ? "वैदिक ज्योतिष एवं कुंडली मिलान" : "Vedic Astrology & Matchmaking"}</div>
