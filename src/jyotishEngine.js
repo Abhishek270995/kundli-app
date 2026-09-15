@@ -730,7 +730,9 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     dob,
     lagnaSign: ascSign.name,
     rashiSign: moonSign.name,
-    lang
+    lang,
+    planetData,
+    houses
   });
 
   const careerPrediction = calculateCareerPrediction({
@@ -779,7 +781,7 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
 /* -------------------------------------------------------------
    MARRIAGE AGE, TIMING & SPOUSE PREDICTION ENGINE
 ------------------------------------------------------------- */
-export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", rashiSign = "Aries", lang = "en" }) {
+export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", rashiSign = "Aries", lang = "en", planetData = null, houses = null }) {
   const isHi = lang === "hi";
   const birthDate = new Date(dob || "1998-01-01");
   const birthYear = isNaN(birthDate.getFullYear()) ? 1998 : birthDate.getFullYear();
@@ -793,6 +795,17 @@ export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", ra
   const seventhHouseIndex = (lagnaIndex + 6) % 12;
   const seventhSign = SIGNS[seventhHouseIndex];
   const seventhLord = seventhSign.lord;
+
+  // 5th House from Lagna (Romance, Purva Punya, Heart's Desire)
+  const fifthHouseIndex = (lagnaIndex + 4) % 12;
+  const fifthSign = SIGNS[fifthHouseIndex];
+  const fifthLord = fifthSign.lord;
+
+  // 2nd House (Kutumba / Family) & 9th House (Dharma / Traditional Blessing)
+  const secondSign = SIGNS[(lagnaIndex + 1) % 12];
+  const secondLord = secondSign.lord;
+  const ninthSign = SIGNS[(lagnaIndex + 8) % 12];
+  const ninthLord = ninthSign.lord;
 
   // Base marriage age window derived deterministically
   const seed = (birthYear * 7 + (birthDate.getMonth() + 1) * 13 + lagnaIndex * 19 + rashiIndex * 23) % 100;
@@ -896,6 +909,196 @@ export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", ra
   const remedyEn = `• Sacred Recitation: Chant the Swayamvara Parvati Mantra or "Om Namah Shivaya" 108 times on Mondays.\n• Jupiter Blessing: Offer water to a Peepal or Banana tree on Thursdays and donate yellow lentils (Chana Dal).\n• Gauri-Shankar Harmony: Fast or perform peaceful Shiva-Parvati puja on Pradosh Vrat for an auspicious life partner.`;
   const remedyHi = `• मंत्र जप: नित्य प्रातः "ॐ गौरीशंकराय नमः" अथवा स्वयंवर पार्वती मंत्र का १०८ बार जप करें।\n• गुरु ग्रह का आशीर्वाद: गुरुवार को केले अथवा पीपल के वृक्ष में जल अर्पित करें और चने की दाल या पीली वस्तुओं का दान करें।\n• शिव-पार्वती आराधना: प्रदोष काल में शिवलिंग पर कच्चा दूध व बेलपत्र अर्पित करें, शीघ्र व सुयोग्य जीवनसाथी का योग बनेगा।`;
 
+  // -------------------------------------------------------------
+  // LOVE MARRIAGE VS ARRANGE MARRIAGE PREDICTION ENGINE
+  // -------------------------------------------------------------
+  let lovePoints = 35;
+  let arrangePoints = 35;
+  const detectedYogasEn = [];
+  const detectedYogasHi = [];
+
+  // Extract planet placements if planetData available
+  const pMap = {};
+  if (planetData) {
+    Object.entries(planetData).forEach(([pName, pObj]) => {
+      pMap[pName] = pObj.house;
+    });
+  } else {
+    // Deterministic fallback house positions using birth seed
+    pMap.Sun = ((seed + 1) % 12) + 1;
+    pMap.Moon = ((seed + 4) % 12) + 1;
+    pMap.Mars = ((seed + 7) % 12) + 1;
+    pMap.Mercury = ((seed + 2) % 12) + 1;
+    pMap.Jupiter = ((seed + 9) % 12) + 1;
+    pMap.Venus = ((seed + 5) % 12) + 1;
+    pMap.Saturn = ((seed + 10) % 12) + 1;
+    pMap.Rahu = ((seed + 3) % 12) + 1;
+    pMap.Ketu = ((pMap.Rahu + 5) % 12) + 1;
+  }
+
+  const fifthLordHouse = pMap[fifthLord] || 5;
+  const seventhLordHouse = pMap[seventhLord] || 7;
+  const ninthLordHouse = pMap[ninthLord] || 9;
+  const secondLordHouse = pMap[secondLord] || 2;
+  const venusHouse = pMap.Venus || 7;
+  const marsHouse = pMap.Mars || 1;
+  const jupiterHouse = pMap.Jupiter || 9;
+  const rahuHouse = pMap.Rahu || 11;
+  const saturnHouse = pMap.Saturn || 10;
+
+  // 1. Panchamesh (5th Lord) & Saptamesh (7th Lord) connection
+  if (fifthLordHouse === 7 || seventhLordHouse === 5) {
+    lovePoints += 30;
+    detectedYogasEn.push("Panchamesh-Saptamesh Mutual Placement: Lord of 5th (love & emotion) and 7th (marriage) connect directly, generating a classical Gandharva / Prem Vivah Yog.");
+    detectedYogasHi.push("पंचमेश-सप्तमेश परस्पर भाव संबंध: पंचम भाव (प्रेम व भावना) और सप्तम भाव (विवाह) के स्वामियों का सीधा संबंध अत्यंत प्रबल प्रेम विवाह का योग निर्मित करता है।");
+  } else if (fifthLordHouse === seventhLordHouse) {
+    lovePoints += 28;
+    detectedYogasEn.push(`Panchamesh-Saptamesh Conjunction in House ${fifthLordHouse}: Marriage and romance lords sit together, confirming partnership chosen through deep personal bonding.`);
+    detectedYogasHi.push(`पंचमेश एवं सप्तमेश की भाव ${fifthLordHouse} में युति: दोनों प्रमुख ग्रहों का एक साथ स्थित होना दिल से चुने हुए जीवनसाथी की पुष्टि करता है।`);
+  } else if (Math.abs(fifthLordHouse - seventhLordHouse) === 6) {
+    lovePoints += 20;
+    detectedYogasEn.push("Mutual 7th Aspect between 5th & 7th Lords: Direct mutual planetary gaze stimulates emotional attraction and love culmination.");
+    detectedYogasHi.push("पंचमेश व सप्तमेश का समसप्तक दृष्टि संबंध: ग्रहों की परस्पर दृष्टि प्रेम संबंध को परिणय सूत्र में बांधने में सहायक है।");
+  }
+
+  // 2. Venus (Shukra) & Mars (Mangal) / Rahu Influence
+  if (venusHouse === 5 || venusHouse === 7) {
+    lovePoints += 18;
+    detectedYogasEn.push(`Venus in House ${venusHouse}: Natural Karaka of love and charm blesses marital life with high mutual attraction and romance.`);
+    detectedYogasHi.push(`शुक्र ग्रह भाव ${venusHouse} में: प्रेम एवं आकर्षण के कारक शुक्र का संबंध प्रेम संबंध को वैवाहिक रूप देने में अत्यंत शुभ है।`);
+  }
+
+  if (venusHouse === marsHouse || Math.abs(venusHouse - marsHouse) === 6) {
+    lovePoints += 20;
+    detectedYogasEn.push("Venus-Mars Kama Connection: Dynamic energetic attraction and passion, creating strong impetus for self-chosen matrimonial union.");
+    detectedYogasHi.push("शुक्र-मंगल काम संबंध (आकर्षण योग): तीव्र मानसिक व भावनात्मक खिंचाव, जो व्यक्ति को अपनी पसंद से विवाह करने का साहस देता है।");
+  }
+
+  if (rahuHouse === 5 || rahuHouse === 7 || rahuHouse === venusHouse) {
+    lovePoints += 22;
+    detectedYogasEn.push("Rahu's Unconventional Touch: Rahu's association with 5th/7th house or Venus favors progressive, modern, or inter-cultural love marriage.");
+    detectedYogasHi.push("राहु का प्रभाव (आधुनिक व प्रगतिशील योग): पंचम/सप्तम या शुक्र से राहु का संबंध सामाजिक बंधनों से परे प्रेम विवाह की प्रबल संभावना दर्शाता है।");
+  }
+
+  // 3. Jupiter (Brihaspati) & Dharma / Kutumba (Arranged Marriage & Parental Consensus)
+  if (jupiterHouse === 7 || jupiterHouse === 1 || jupiterHouse === 3 || jupiterHouse === 11) {
+    arrangePoints += 26;
+    detectedYogasEn.push("Brihaspati's Sacred Drishti on 7th House: Jupiter's divine aspect brings high respect for traditional family values, elder approval, and dharmic marriage.");
+    detectedYogasHi.push("देवगुरु बृहस्पति की सप्तम भाव पर अमृत दृष्टि: गुरु का प्रभाव कुल-परंपरा, माता-पिता के आशीर्वाद और वैदिक रीति-रिवाजों से विवाह संपन्न कराता है।");
+  }
+
+  if (seventhLordHouse === 2 || seventhLordHouse === 9) {
+    arrangePoints += 24;
+    detectedYogasEn.push("Saptamesh in Kutumba / Dharma Bhava: 7th lord aligned with family/dharma houses indicates marriage arranged through respected family circles.");
+    detectedYogasHi.push("सप्तमेश का कुटुंब (द्वितीय) अथवा धर्म (नवम) भाव में वास: पारिवारिक प्रतिष्ठा और परिजनों की मध्यस्थता से सुयोग्य जीवनसाथी का आगमन।");
+  }
+
+  if (saturnHouse === 7 && !detectedYogasEn.some(y => y.includes("Panchamesh-Saptamesh"))) {
+    arrangePoints += 18;
+    detectedYogasEn.push("Saturn's Solemn Influence in 7th: Favors traditional, responsible, and structured arranged alliance with strong commitment.");
+    detectedYogasHi.push("शनि का सप्तम भाव पर प्रभाव: पारंपरिक, कर्तव्यनिष्ठ और पारिवारिक तालमेल पर आधारित सुदृढ़ वैवाहिक संबंध।");
+  }
+
+  if (pMap.Sun === 7 || ninthLordHouse === 7) {
+    arrangePoints += 18;
+    detectedYogasEn.push("Surya / 9th Lord Connection: Father and paternal elders play a pivotal and decisive role in matchmaking and wedding solemnization.");
+    detectedYogasHi.push("सूर्य अथवा नवमेश का प्रभाव: पिता एवं कुल के वरिष्ठ जनों की मुख्य भूमिका से विवाह का मार्ग प्रशस्त होता है।");
+  }
+
+  // Fallback if no specific yog was triggered
+  if (detectedYogasEn.length === 0) {
+    if (seed % 2 === 0) {
+      lovePoints += 25;
+      detectedYogasEn.push("5th-7th Sub-Harmonic Alignment: Subconscious desire for romantic resonance before matrimonial commitment.");
+      detectedYogasHi.push("पंचम-सप्तम भाव का आंतरिक तालमेल: विवाह से पूर्व एक-दूसरे को समझने और मानसिक मित्रता की चाह।");
+    } else {
+      arrangePoints += 25;
+      detectedYogasEn.push("9th House Bhagya Alignment: Respect for parental wisdom and family lineage in marital choices.");
+      detectedYogasHi.push("नवम भाव भाग्य योग: माता-पिता के मार्गदर्शन और पारिवारिक सहमति को सर्वोच्च प्राथमिकता।");
+    }
+  }
+
+  // Compute normalized percentage (constrained between 18% and 84%)
+  const totalPoints = lovePoints + arrangePoints;
+  let lovePct = Math.round((lovePoints / totalPoints) * 100);
+  lovePct = Math.min(84, Math.max(18, lovePct));
+  const arrangePct = 100 - lovePct;
+
+  let dominantType = "love";
+  let typeEn = "Love Marriage (Prem Vivah Yog)";
+  let typeHi = "प्रेम विवाह योग (Love Marriage)";
+  let verdictEn = "";
+  let verdictHi = "";
+  let meetingCircumstanceEn = "";
+  let meetingCircumstanceHi = "";
+  let familyAcceptanceEn = "";
+  let familyAcceptanceHi = "";
+  let successFormulaEn = "";
+  let successFormulaHi = "";
+
+  if (lovePct >= 64) {
+    dominantType = "love";
+    typeEn = "Love Marriage (Prem Vivah Yog)";
+    typeHi = "प्रेम विवाह योग (Love Marriage)";
+    verdictEn = `High probability (${lovePct}%) of self-chosen love marriage driven by deep emotional, mental, and personal bonding.`;
+    verdictHi = `आपकी कुंडली में ${lovePct}% प्रबल प्रेम विवाह का योग है। आपका विवाह व्यक्तिगत पसंद, भावनात्मक निकटता और मानसिक तालमेल से होगा।`;
+    meetingCircumstanceEn = "High likelihood of meeting your life partner through college/university education, corporate workplace, joint professional projects, or a shared circle of mutual friends.";
+    meetingCircumstanceHi = "जीवनसाथी से प्रथम परिचय उच्च शिक्षा, कार्यक्षेत्र (Workplace/MNC), साझा प्रोफेशनल प्रोजेक्ट अथवा करीबी मित्रों के माध्यम से होने की सर्वाधिक संभावना है।";
+    familyAcceptanceEn = "Initial hesitation or cultural/background discussions may arise from family elders, but patience, transparent dialogue, and Jupiter's benefic transit will turn family resistance into supportive blessings.";
+    familyAcceptanceHi = "प्रारंभ में पारिवारिक मतभेद या रीति-रिवाजों को लेकर कुछ संकोच हो सकता है, परंतु शांत संवाद और बड़ों के प्रति सम्मान भाव से परिवार अंततः सहर्ष विवाह हेतु सहमत होगा।";
+    successFormulaEn = "Keep mutual respect and communication paramount. Avoid external interference in relationship decisions.";
+    successFormulaHi = "आपसी सम्मान और पारदर्शी संवाद बनाए रखें। तीसरे व्यक्ति के हस्तक्षेप से बचें और माता-पिता को विश्वास में लेकर निर्णय लें।";
+  } else if (lovePct <= 40) {
+    dominantType = "arrange";
+    typeEn = "Arranged Marriage (Paramparik Vivah Yog)";
+    typeHi = "पारंपरिक अरेंज्ड विवाह योग (Arranged Marriage)";
+    verdictEn = `Strong planetary dominance (${arrangePct}%) for an arranged marriage solemnized with full family consensus, tradition, and parental guidance.`;
+    verdictHi = `आपकी कुंडली में ${arrangePct}% प्रबल पारंपरिक अरेंज्ड विवाह का योग है। माता-पिता के आशीर्वाद, पारिवारिक प्रतिष्ठा और कुल-परंपरा से विवाह संपन्न होगा।`;
+    meetingCircumstanceEn = "Introduced through respected family elders, close relatives, trusted matrimonial networks, or dignified social/community gatherings.";
+    meetingCircumstanceHi = "जीवनसाथी का प्रस्ताव परिवार के वरिष्ठ जनों, निकट संबंधियों, प्रतिष्ठित वैवाहिक संपर्कों अथवा पारिवारिक आयोजनों के माध्यम से आएगा।";
+    familyAcceptanceEn = "Immediate, enthusiastic family support. Both families will share harmonic values, social standing, and collaborative goodwill.";
+    familyAcceptanceHi = "परिवार का पूर्ण और उत्साहजनक समर्थन रहेगा। दोनों परिवारों में वैचारिक सामंजस्य, सामाजिक प्रतिष्ठा और आदर का भाव रहेगा।";
+    successFormulaEn = "Spend ample time interacting before finalizing wedding dates to build deep personal compatibility on top of family alignment.";
+    successFormulaHi = "विवाह पूर्व एक-दूसरे के विचारों, प्राथमिकताओं और जीवन के लक्ष्यों को समझने के लिए पर्याप्त समय दें।";
+  } else {
+    dominantType = "both";
+    typeEn = "Love-Cum-Arranged Marriage (Harmonic Blend)";
+    typeHi = "प्रेम विवाह पारिवारिक सहमति सहित (Love-Cum-Arranged)";
+    verdictEn = `Golden harmonic blend (${lovePct}% Love / ${arrangePct}% Arranged). You will choose your partner through mutual affection, but marriage will be solemnized with complete, joyful family approval.`;
+    verdictHi = `स्वर्णिम उभय योग (${lovePct}% प्रेम / ${arrangePct}% अरेंज्ड)। आप जीवनसाथी का चयन स्वयं करेंगे, परंतु विवाह पूर्ण पारिवारिक सहमति, वैदिक रीति-रिवाज और माता-पिता के आशीर्वाद से होगा।`;
+    meetingCircumstanceEn = "Meeting occurs naturally through social circles, professional/academic environments, or online networking, followed by formal family introduction and traditional matchmaking.";
+    meetingCircumstanceHi = "प्रथम परिचय सामाजिक मेलजोल, कार्यस्थल अथवा आधुनिक माध्यमों से होगा, जिसके उपरांत दोनों पक्ष औपचारिक रूप से मिलकर पारिवारिक रिश्ते में बदलेंगे।";
+    familyAcceptanceEn = "Very smooth family transition. While you discover each other independently, parents will gladly welcome and formally endorse the relationship.";
+    familyAcceptanceHi = "परिवार का दृष्टिकोण अत्यंत सकारात्मक रहेगा। थोड़ी जांच-पड़ताल और कुंडली मिलान के उपरांत परिवार खुशी-खुशी रिश्ते को स्वीकार करेगा।";
+    successFormulaEn = "Present your partner to family with humility and confidence. Let elders feel valued in the ceremony preparations.";
+    successFormulaHi = "माता-पिता को उचित समय पर विश्वास में लें और पारंपरिक मर्यादाओं का सम्मान करते हुए रिश्ते को आगे बढ़ाएं।";
+  }
+
+  const sacredRemedyEn = dominantType === "love"
+    ? "• Radha-Krishna or Shiva-Parvati Worship: Light a pure ghee lamp before Radha-Krishna or Shiva-Parvati every Friday for harmony and removal of family objections.\n• Shukra Mantra: Chant 'Om Shum Shukraya Namah' 108 times on Fridays to strengthen mutual affection and relationship longevity.\n• Harmony Gem / Rudraksha: Wearing a natural 2-Mukhi Rudraksha (Do-Mukhi) enhances empathetic emotional connection and dissolves ego clashes."
+    : (dominantType === "arrange"
+      ? "• Guru-Shukra Blessing: Offer yellow sweets or yellow flowers at a Vishnu-Lakshmi temple on Thursdays to attract a noble, highly compatible life partner.\n• Gauri Mata Puja: Recite the Parvati Mangal Stotram or offer red vermillion (Sindoor) to Goddess Gauri for an auspicious alliance without delays.\n• Peepal / Tulsi Seva: Water a holy Tulsi plant daily in the morning to invite positive marital vibrations and family prosperity."
+      : "• Gauri-Shankar Stotra: Recite 'Om Hreem Namah Shivaya' together or perform peaceful Shiva Jalabhishekam on Mondays for lifelong marital bliss.\n• Thursday Charity: Donate yellow pulses or bananas to seekers on Thursdays to gain divine Jupiterian blessings for family harmony.\n• Mutual Respect Protocol: Avoid keeping relationship secrets from elders once emotional commitment is established.");
+
+  const sacredRemedyHi = dominantType === "love"
+    ? "• राधा-कृष्ण अथवा शिव-पार्वती पूजन: प्रत्येक शुक्रवार को राधा-कृष्ण या शिव-पार्वती के समक्ष गाय के घी का दीपक प्रज्वलित करें, पारिवारिक विरोध व मतभेद शांत होंगे।\n• शुक्र बीज मंत्र: शुक्रवार को 'ॐ शुं शुक्राय नमः' का १०८ बार जप करें, दांपत्य जीवन में अटूट प्रेम और आकर्षण बना रहेगा।\n• दो मुखी रुद्राक्ष: दो मुखी रुद्राक्ष धारण करने से दोनों के मध्य भावनात्मक तालमेल प्रगाढ़ होता है और विवाह का मार्ग निष्कंटक होता है।"
+    : (dominantType === "arrange"
+      ? "• विष्णु-लक्ष्मी आराधना: गुरुवार को भगवान विष्णु व माता लक्ष्मी को पीले पुष्प एवं बेसन के लड्डू अर्पित करें, अत्यंत सुयोग्य व कुलीन जीवनसाथी की प्राप्ति होगी।\n• माता गौरी पूजन: मां पार्वती को लाल चुनरी व सिंदूर अर्पित करें तथा 'हे गौरि शंकरार्धांगि' मंत्र का जप करें, शुभ विवाह शीघ्र तय होगा।\n• तुलसी सेवा: नित्य प्रातः तुलसी के पौधे में जल अर्पित करें और सायंकाल घी का दीपक जलाएं, घर में मांगलिक कार्य के योग बनेंगे।"
+      : "• गौरी-शंकर अनुष्ठान: सोमवार के दिन शिवलिंग पर कच्चा दूध व बेलपत्र अर्पित करें और 'ॐ गौरीशंकराय नमः' मंत्र का शांत भाव से जप करें।\n• गुरुवार का दान: गुरुवार को चने की दाल, पीले वस्त्र अथवा फलों का दान करें, जिससे गुरु ग्रह के आशीर्वाद से परिवार में सर्वसम्मति बनेगी।\n• पारदर्शी संवाद: जब आपस में विवाह का निश्चय हो जाए, तो माता-पिता से आदरपूर्वक बात करें, उनका पूर्ण स्नेह व सहयोग प्राप्त होगा।");
+
+  const loveVsArrange = {
+    type: isHi ? typeHi : typeEn,
+    dominantType,
+    verdict: isHi ? verdictHi : verdictEn,
+    lovePercentage: lovePct,
+    arrangePercentage: arrangePct,
+    meetingCircumstance: isHi ? meetingCircumstanceHi : meetingCircumstanceEn,
+    familyAcceptance: isHi ? familyAcceptanceHi : familyAcceptanceEn,
+    successFormula: isHi ? successFormulaHi : successFormulaEn,
+    yogasDetected: isHi ? detectedYogasHi : detectedYogasEn,
+    sacredRemedy: isHi ? sacredRemedyHi : sacredRemedyEn
+  };
+
   return {
     ageRange,
     timingPhase: isHi ? timingPhaseHi : timingPhaseEn,
@@ -910,7 +1113,8 @@ export function calculateMarriagePrediction({ name, dob, lagnaSign = "Aries", ra
     spousePersonality,
     spouseNameLetters,
     obstacleAnalysis: isHi ? obstacleHi : obstacleEn,
-    remedies: isHi ? remedyHi : remedyEn
+    remedies: isHi ? remedyHi : remedyEn,
+    loveVsArrange
   };
 }
 

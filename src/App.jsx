@@ -3148,8 +3148,11 @@ export default function App() {
                 dob: form.dob || "1998-01-01",
                 lagnaSign: result.lagnaSign,
                 rashiSign: result.rashiSign,
-                lang
+                lang,
+                planetData: result.planetData,
+                houses: result.houses
               });
+              const lva = mp.loveVsArrange || {};
               const unlockPrice = PRODUCT_PRICES.marriageTimingReport[currency];
 
               return (
@@ -3176,7 +3179,7 @@ export default function App() {
                     </div>
 
                     {/* Free Highlights Grid */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 22 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, marginBottom: 20 }}>
                       {/* Probable Marriage Age */}
                       <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "18px 20px", textAlign: "center" }}>
                         <div style={{ fontSize: 22 }}>🎂</div>
@@ -3219,6 +3222,117 @@ export default function App() {
                         </div>
                       </div>
                     </div>
+
+                    {/* ── DEDICATED FEATURE: LOVE VS. ARRANGED MARRIAGE PREDICTION ── */}
+                    {lva && lva.type && (
+                      <div style={{ background: "linear-gradient(135deg, rgba(38,16,52,0.88) 0%, rgba(18,12,35,0.95) 100%)", border: "1px solid rgba(244,114,182,0.35)", borderRadius: 14, padding: "22px 24px", marginBottom: 20, boxShadow: "0 10px 30px rgba(0,0,0,0.4)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(244,114,182,0.25)", paddingBottom: 14, marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+                          <div>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(244,114,182,0.18)", border: "1px solid rgba(244,114,182,0.4)", borderRadius: 12, padding: "3px 12px", color: "#FBCFE8", fontSize: 11.5, fontWeight: 800, marginBottom: 4 }}>
+                              <span>💘 vs 🤝</span> {hi ? "प्रेम विवाह बनाम अरेंज्ड विवाह योग" : "LOVE VS. ARRANGED MARRIAGE DOSSIER"}
+                            </div>
+                            <h4 style={{ color: "#FDE68A", fontSize: 17.5, fontWeight: 800, margin: "2px 0 0" }}>
+                              {hi ? "प्रेम विवाह या अरेंज्ड विवाह? कुंडली आधारित भविष्यवाणी" : "Love Marriage or Arranged Marriage Prediction"}
+                            </h4>
+                          </div>
+
+                          <div style={{
+                            background: lva.dominantType === "love" 
+                              ? "linear-gradient(135deg, rgba(236,72,153,0.25), rgba(244,63,94,0.35))"
+                              : (lva.dominantType === "arrange"
+                                ? "linear-gradient(135deg, rgba(59,130,246,0.25), rgba(16,185,129,0.35))"
+                                : "linear-gradient(135deg, rgba(245,158,11,0.25), rgba(236,72,153,0.25))"),
+                            border: `1px solid ${lva.dominantType === "love" ? "#F472B6" : (lva.dominantType === "arrange" ? "#60A5FA" : "#FDE68A")}`,
+                            borderRadius: 20,
+                            padding: "6px 14px",
+                            color: "#FFF",
+                            fontWeight: 800,
+                            fontSize: 13,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            boxShadow: "0 4px 15px rgba(0,0,0,0.3)"
+                          }}>
+                            <span>{lva.dominantType === "love" ? "💘" : (lva.dominantType === "arrange" ? "🤝" : "💞")}</span>
+                            <span>{lva.type}</span>
+                          </div>
+                        </div>
+
+                        {/* Dual Percentage Progress Bar */}
+                        <div style={{ marginBottom: 16 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6, fontSize: 13 }}>
+                            <span style={{ color: "#F472B6", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+                              <span>💖</span> {hi ? "प्रेम विवाह योग" : "Love Marriage Affinity"}: <strong style={{ fontSize: 16 }}>{lva.lovePercentage}%</strong>
+                            </span>
+                            <span style={{ color: "#60A5FA", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+                              <span>🤝</span> {hi ? "पारंपरिक अरेंज्ड विवाह" : "Arranged Marriage Affinity"}: <strong style={{ fontSize: 16 }}>{lva.arrangePercentage}%</strong>
+                            </span>
+                          </div>
+
+                          <div style={{ height: 14, borderRadius: 10, overflow: "hidden", display: "flex", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.12)", padding: 2 }}>
+                            <div style={{ width: `${lva.lovePercentage}%`, background: "linear-gradient(90deg, #EC4899, #F43F5E)", borderRadius: "8px 0 0 8px", boxShadow: "0 0 10px rgba(236,72,153,0.5)", transition: "width 0.8s ease" }} />
+                            <div style={{ width: `${lva.arrangePercentage}%`, background: "linear-gradient(90deg, #3B82F6, #10B981)", borderRadius: "0 8px 8px 0", boxShadow: "0 0 10px rgba(16,185,129,0.5)", transition: "width 0.8s ease" }} />
+                          </div>
+                        </div>
+
+                        {/* Core Verdict Box */}
+                        <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(244,114,182,0.25)", borderRadius: 10, padding: "14px 18px", marginBottom: 16 }}>
+                          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                            <span style={{ fontSize: 18, marginTop: 1 }}>✨</span>
+                            <div style={{ color: "rgba(241,231,208,0.95)", fontSize: 13.5, lineHeight: 1.7, fontWeight: 500 }}>
+                              {lva.verdict}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detailed Aspects: Meeting & Family Dynamics */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, marginBottom: 16 }}>
+                          <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                            <div style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                              <span>📍</span> {hi ? "संभावित मिलन स्थल व माध्यम" : "Destined Meeting Place & Channel"}
+                            </div>
+                            <p style={{ color: "rgba(241,231,208,0.88)", fontSize: 12.5, lineHeight: 1.65, margin: 0 }}>
+                              {lva.meetingCircumstance}
+                            </p>
+                          </div>
+
+                          <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 14 }}>
+                            <div style={{ color: "#34D399", fontSize: 12.5, fontWeight: 800, marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                              <span>👨‍👩‍👧‍👦</span> {hi ? "पारिवारिक सहमति व माता-पिता का दृष्टिकोण" : "Family & Parental Approval Dynamics"}
+                            </div>
+                            <p style={{ color: "rgba(241,231,208,0.88)", fontSize: 12.5, lineHeight: 1.65, margin: 0 }}>
+                              {lva.familyAcceptance}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Planetary Yogas Detected */}
+                        {lva.yogasDetected && lva.yogasDetected.length > 0 && (
+                          <div style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 10, padding: "12px 16px", marginBottom: 14 }}>
+                            <div style={{ color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 8, letterSpacing: 0.5 }}>
+                              🔯 {hi ? "आपकी कुंडली में उपस्थित वैदिक ग्रह योग (Panchamesh, Saptamesh & Graha Drishti)" : "Classical Planetary Yogas Identified in Your Chart"}
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                              {lva.yogasDetected.map((yog, yIdx) => (
+                                <div key={yIdx} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "rgba(241,231,208,0.9)", lineHeight: 1.6 }}>
+                                  <span style={{ color: "#34D399", fontWeight: 800, marginTop: 1 }}>✓</span>
+                                  <span>{yog}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Success Formula */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "rgba(241,231,208,0.9)" }}>
+                          <span style={{ color: "#60A5FA", fontSize: 14 }}>🔑</span>
+                          <div>
+                            <strong style={{ color: "#93C5FD" }}>{hi ? "सफल दांपत्य का वैदिक सूत्र: " : "Astrological Key to Marital Bliss: "}</strong>
+                            {lva.successFormula}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Free General Spouse Demeanor Teaser */}
                     <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 12, padding: "16px 20px" }}>
@@ -3288,7 +3402,7 @@ export default function App() {
                         </p>
                       </div>
 
-                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 16 }}>
+                      <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 16, marginBottom: 16 }}>
                         <div style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800, marginBottom: 8 }}>
                           🛡️ {hi ? "शीघ्र व कल्याणकारी विवाह हेतु अचूक वैदिक उपाय (Prescribed Upay)" : "Sacred Vedic Vivah Remedies & Mantras"}
                         </div>
@@ -3296,6 +3410,18 @@ export default function App() {
                           {mp.remedies}
                         </div>
                       </div>
+
+                      {/* Love & Family Harmony Sacred Remedies */}
+                      {lva && lva.sacredRemedy && (
+                        <div style={{ background: "rgba(244,114,182,0.08)", border: "1px solid rgba(244,114,182,0.3)", borderRadius: 10, padding: 16, marginBottom: 16 }}>
+                          <div style={{ fontSize: 13, color: "#FBCFE8", fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                            <span>🕊️</span> {hi ? "प्रेम संबंध व पारिवारिक सामंजस्य हेतु विशेष वैदिक अनुष्ठान (Sacred Upay)" : "Sacred Vedic Rituals for Love & Family Harmony"}
+                          </div>
+                          <div style={{ color: "rgba(241,231,208,0.92)", fontSize: 13.5, lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                            {lva.sacredRemedy}
+                          </div>
+                        </div>
+                      )}
 
                       {effectiveMarriageUnlocked && (
                         <div style={{ textAlign: "center", paddingTop: 14 }}>
@@ -4007,8 +4133,11 @@ export default function App() {
             dob: form.dob || "1998-01-01",
             lagnaSign: result.lagnaSign,
             rashiSign: result.rashiSign,
-            lang
+            lang,
+            planetData: result.planetData,
+            houses: result.houses
           });
+          const lva = mp.loveVsArrange || {};
 
           return (
             <div className="print-only-report">
@@ -4349,9 +4478,46 @@ export default function App() {
                       <div><b>Nature & Demeanor:</b> {mp.spousePersonality}</div>
                       <div><b>Profession / Field:</b> {mp.spouseProfession}</div>
                       <div><b>Birth Direction:</b> {mp.spouseDirection}</div>
-                      <div><b>Name Initial Letter:</b> {mp.spouseNameInitial}</div>
+                      <div><b>Name Initial Letter:</b> {mp.spouseNameLetters || mp.spouseNameInitial}</div>
                     </div>
                   </div>
+
+                  {/* Chapter: Love vs. Arranged Marriage Horoscopic Analysis */}
+                  {lva && lva.type && (
+                    <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(244,114,182,0.35)", borderRadius: 10, padding: 18, background: "rgba(25,12,38,0.8)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, borderBottom: "1px solid rgba(244,114,182,0.2)", paddingBottom: 6 }}>
+                        <h4 style={{ color: "#FBCFE8", fontSize: 14.5, fontWeight: 800, margin: 0 }}>
+                          💘 CHAPTER: LOVE VS. ARRANGED MARRIAGE HOROSCOPIC PREDICTION
+                        </h4>
+                        <span style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800 }}>
+                          {lva.type} ({lva.lovePercentage}% Love / {lva.arrangePercentage}% Arranged)
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 13, lineHeight: 1.75, color: "rgba(241,231,208,0.95)", margin: "0 0 10px" }}>
+                        {lva.verdict}
+                      </p>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 12.5, marginBottom: 10 }}>
+                        <div style={{ background: "rgba(11,8,25,0.6)", padding: 10, borderRadius: 6, border: "1px solid rgba(212,175,55,0.2)" }}>
+                          <b style={{ color: "#FDE68A" }}>Destined Meeting Circumstance:</b>
+                          <div style={{ color: "rgba(241,231,208,0.85)", marginTop: 3 }}>{lva.meetingCircumstance}</div>
+                        </div>
+                        <div style={{ background: "rgba(11,8,25,0.6)", padding: 10, borderRadius: 6, border: "1px solid rgba(212,175,55,0.2)" }}>
+                          <b style={{ color: "#34D399" }}>Family & Parental Dynamics:</b>
+                          <div style={{ color: "rgba(241,231,208,0.85)", marginTop: 3 }}>{lva.familyAcceptance}</div>
+                        </div>
+                      </div>
+                      {lva.yogasDetected && lva.yogasDetected.length > 0 && (
+                        <div style={{ fontSize: 12, color: "rgba(241,231,208,0.85)", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+                          <b style={{ color: "#FDE68A" }}>Identified Planetary Yogas:</b>
+                          <ul style={{ margin: "4px 0 0", paddingLeft: 18 }}>
+                            {lva.yogasDetected.map((y, yi) => (
+                              <li key={yi} style={{ marginBottom: 3 }}>{y}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: 18, background: "rgba(245,158,11,0.08)" }}>
                     <h4 style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>🛡️ Prescribed Vivah Delay & Kalyana Remedies</h4>
