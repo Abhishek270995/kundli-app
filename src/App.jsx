@@ -556,15 +556,17 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
   const hi = lang === "hi";
 
   // Dynamic price formatted for current currency
+  const isINR = currency === "INR";
   const displayPrice = item.priceKey && PRODUCT_PRICES[item.priceKey]
     ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
     : item.price;
 
-  // Numerical value for PayPal
+  // Numerical value for PayPal / UPI
   const cleanNumericVal = (displayPrice || "4.99").replace(/[^0-9.]/g, "") || "4.99";
   const currCode = currency || "USD";
   const paypalUrl = `https://www.paypal.com/paypalme/abhishek270995/${cleanNumericVal}${currCode}`;
   const dynamicQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(paypalUrl)}&margin=10`;
+  const upiUrl = `upi://pay?pa=8094199663@upi&pn=Jyotish%20Paramarsh&am=${cleanNumericVal}&cu=INR&tn=${encodeURIComponent("Jyotish Paramarsh - " + (item.title || "Vedic Astrological Report"))}`;
 
   const handleProceedToVerify = () => {
     setCheckoutStep("verify");
@@ -726,23 +728,27 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 </div>
               </div>
 
-              {/* PayPal Transaction ID / Order Ref */}
+              {/* Transaction ID / Order Ref */}
               <div style={{ marginBottom: 14 }}>
                 <label htmlFor="checkout-txid-input" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 6 }}>
-                  <span>🅿️</span> {hi ? "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)" : "PayPal Transaction ID / Order Ref (Optional)"}
+                  <span>{isINR ? "📱" : "🅿️"}</span> {isINR
+                    ? (hi ? "UPI Transaction ID / 12-अंकों का UTR (वैकल्पिक)" : "UPI Transaction ID / 12-digit UTR (Optional)")
+                    : (hi ? "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)" : "PayPal Transaction ID / Order Ref (Optional)")}
                 </label>
                 <input
                   id="checkout-txid-input"
                   name="paypalTxId"
                   type="text"
-                  aria-label={hi ? "पेपैल ट्रांजैक्शन आईडी" : "PayPal Transaction ID"}
+                  aria-label={isINR ? (hi ? "यूपीआई ट्रांजैक्शन आईडी" : "UPI Transaction ID") : (hi ? "पेपैल ट्रांजैक्शन आईडी" : "PayPal Transaction ID")}
                   value={paypalTxId}
                   onChange={e => setPaypalTxId(e.target.value)}
-                  placeholder="e.g. 9XY12345678901234"
+                  placeholder={isINR ? "e.g. 423456789012 (12 digits)" : "e.g. 9XY12345678901234"}
                   style={{ width: "100%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "11px 14px", color: "#FFF", fontSize: 14, letterSpacing: 0.5 }}
                 />
                 <div style={{ fontSize: 11.5, color: "rgba(243,211,122,0.75)", marginTop: 4 }}>
-                  💡 {hi ? "पेपैल रसीद / ईमेल में दी गई Transaction ID दर्ज करें।" : "Found in your PayPal confirmation email or activity receipt."}
+                  💡 {isINR
+                    ? (hi ? "PhonePe, GPay या Paytm रसीद में दिया गया UTR / UPI Ref नंबर दर्ज करें।" : "Found in your PhonePe, Google Pay or Paytm payment receipt.")
+                    : (hi ? "पेपैल रसीद / ईमेल में दी गई Transaction ID दर्ज करें।" : "Found in your PayPal confirmation email or activity receipt.")}
                 </div>
               </div>
 
@@ -801,17 +807,20 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
 
             {/* Payment Mode Selector */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
-              {[
+              {(isINR ? [
+                { id: "paypal", name: "UPI / QR Code", icon: "📱", badge: "PhonePe / GPay" },
+                { id: "card", name: hi ? "डेबिट / क्रेडिट कार्ड" : "Debit / Credit Card", icon: "💳", badge: "RuPay/Visa/MC" },
+              ] : [
                 { id: "paypal", name: "PayPal", icon: "🅿️", badge: "Instant" },
                 { id: "card", name: hi ? "डेबिट / क्रेडिट कार्ड" : "Debit / Credit Card", icon: "💳", badge: "Visa/MC" },
-              ].map(m => (
+              ]).map(m => (
                 <button
                   key={m.id}
                   onClick={() => setMethod(m.id)}
                   style={{
-                    background: method === m.id ? "rgba(0,112,186,0.25)" : "rgba(11,8,25,0.6)",
-                    border: `1.5px solid ${method === m.id ? "#0070BA" : "rgba(212,175,55,0.2)"}`,
-                    color: method === m.id ? "#93C5FD" : "#FFF",
+                    background: method === m.id ? (isINR ? "rgba(16,185,129,0.25)" : "rgba(0,112,186,0.25)") : "rgba(11,8,25,0.6)",
+                    border: `1.5px solid ${method === m.id ? (isINR ? "#10B981" : "#0070BA") : "rgba(212,175,55,0.2)"}`,
+                    color: method === m.id ? (isINR ? "#6EE7B7" : "#93C5FD") : "#FFF",
                     borderRadius: 10,
                     padding: "11px 10px",
                     fontSize: 13.5,
@@ -828,63 +837,123 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
             </div>
 
             {method === "paypal" ? (
-              <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(0,112,186,0.45)", borderRadius: 14, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 12 }}>
-                  <span style={{ background: "rgba(0,112,186,0.2)", border: "1px solid rgba(0,112,186,0.5)", borderRadius: 12, padding: "4px 14px", color: "#60A5FA", fontSize: 12.5, fontWeight: 700 }}>
-                    🔒 {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (${currCode})`}
-                  </span>
-                  <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 12, padding: "4px 10px", color: "#34D399", fontSize: 12, fontWeight: 700 }}>
-                    ✓ {hi ? "सत्यापित मर्चेंट" : "Verified Merchant"}
-                  </span>
-                </div>
-
-                {/* Amount-Enforced High-Contrast QR Code */}
-                <div style={{ width: 195, height: 195, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #0070BA", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
-                  <img
-                    src={dynamicQrCodeUrl}
-                    alt="PayPal Payment QR Code"
-                    style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 4 }}
-                  />
-                </div>
-
-                <div style={{ marginTop: 12 }}>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
-                    <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™ वैदिक रिसर्च" : "Merchant: Jyotish Paramarsh™ Vedic Services"}
+              isINR ? (
+                /* ── INR UPI QR CODE (India Users) ── */
+                <div style={{ background: "rgba(11,8,25,0.85)", border: "1.5px solid rgba(16,185,129,0.45)", borderRadius: 14, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                    <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.5)", borderRadius: 12, padding: "4px 14px", color: "#34D399", fontSize: 12.5, fontWeight: 700 }}>
+                      🔒 {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (INR)`}
+                    </span>
+                    <span style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "4px 10px", color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>
+                      ✓ 8094199663@upi
+                    </span>
                   </div>
-                  <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
-                    {hi ? "आधिकारिक पेपैल गेटवे · 100% सुरक्षित एवं गोपनीय" : "Official PayPal Gateway · 100% Buyer Protected"}
+
+                  {/* Amount-Enforced High-Contrast INR UPI QR Code */}
+                  <div style={{ width: 205, height: 205, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2.5px solid #10B981", boxShadow: "0 6px 20px rgba(16,185,129,0.3)" }}>
+                    <img
+                      src="/inr-upi-qr.png"
+                      alt="UPI Payment QR Code (INR)"
+                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 6 }}
+                    />
+                  </div>
+
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#6EE7B7", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                      <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™ (8094199663@upi)" : "Merchant: Jyotish Paramarsh™ (8094199663@upi)"}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+                      Google Pay • PhonePe • Paytm • BHIM • Cred UPI • Any Banking App
+                    </div>
+                  </div>
+
+                  {/* Direct 1-Tap Mobile UPI Intent Link */}
+                  <a
+                    href={upiUrl}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      width: "100%",
+                      marginTop: 14,
+                      background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                      border: "1px solid #34D399",
+                      color: "#FFFFFF",
+                      padding: "13px 14px",
+                      borderRadius: 8,
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      textDecoration: "none",
+                      boxShadow: "0 4px 14px rgba(5,150,105,0.45)"
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>📱</span> {hi ? `किसी भी UPI ऐप से ${displayPrice} का भुगतान करें` : `Pay with Any UPI App (${displayPrice})`}
+                  </a>
+                  <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 8 }}>
+                    {hi ? "PhonePe, Google Pay या Paytm से QR कोड स्कैन करें या ऊपर दिए बटन पर टैप करें।" : "Scan QR code or tap button above to pay directly using any UPI app."}
                   </div>
                 </div>
+              ) : (
+                /* ── EXISTING PAYPAL QR CODE (Non-INR / International Users) ── */
+                <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(0,112,186,0.45)", borderRadius: 14, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                    <span style={{ background: "rgba(0,112,186,0.2)", border: "1px solid rgba(0,112,186,0.5)", borderRadius: 12, padding: "4px 14px", color: "#60A5FA", fontSize: 12.5, fontWeight: 700 }}>
+                      🔒 {hi ? `निर्धारित राशि: ${displayPrice}` : `Amount: ${displayPrice} (${currCode})`}
+                    </span>
+                    <span style={{ background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 12, padding: "4px 10px", color: "#34D399", fontSize: 12, fontWeight: 700 }}>
+                      ✓ {hi ? "सत्यापित मर्चेंट" : "Verified Merchant"}
+                    </span>
+                  </div>
 
-                {/* Direct 1-Tap Mobile / Web PayPal Link */}
-                <a
-                  href={paypalUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    width: "100%",
-                    marginTop: 14,
-                    background: "linear-gradient(135deg, #0070BA 0%, #003087 100%)",
-                    border: "1px solid #60A5FA",
-                    color: "#FFFFFF",
-                    padding: "13px 14px",
-                    borderRadius: 8,
-                    fontSize: 14.5,
-                    fontWeight: 700,
-                    textDecoration: "none",
-                    boxShadow: "0 4px 14px rgba(0,112,186,0.45)"
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>🅿️</span> {hi ? `पेपैल से ${displayPrice} का भुगतान करें` : `Pay with PayPal (${displayPrice})`}
-                </a>
-                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 8 }}>
-                  {hi ? "पेपैल बैलेंस, बैंक खाते या कार्ड्स से सुरक्षित भुगतान करें।" : "Supports PayPal Balance, Bank Transfer & Guest Cards."}
+                  {/* Amount-Enforced High-Contrast QR Code */}
+                  <div style={{ width: 195, height: 195, background: "#FFF", borderRadius: 12, margin: "0 auto", padding: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid #0070BA", boxShadow: "0 6px 20px rgba(0,0,0,0.6)" }}>
+                    <img
+                      src={dynamicQrCodeUrl}
+                      alt="PayPal Payment QR Code"
+                      style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 4 }}
+                    />
+                  </div>
+
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#93C5FD", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                      <span>🛡️</span> {hi ? "प्राप्तकर्ता: ज्योतिष परामर्श™ वैदिक रिसर्च" : "Merchant: Jyotish Paramarsh™ Vedic Services"}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", marginTop: 2 }}>
+                      {hi ? "आधिकारिक पेपैल गेटवे · 100% सुरक्षित एवं गोपनीय" : "Official PayPal Gateway · 100% Buyer Protected"}
+                    </div>
+                  </div>
+
+                  {/* Direct 1-Tap Mobile / Web PayPal Link */}
+                  <a
+                    href={paypalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      width: "100%",
+                      marginTop: 14,
+                      background: "linear-gradient(135deg, #0070BA 0%, #003087 100%)",
+                      border: "1px solid #60A5FA",
+                      color: "#FFFFFF",
+                      padding: "13px 14px",
+                      borderRadius: 8,
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      textDecoration: "none",
+                      boxShadow: "0 4px 14px rgba(0,112,186,0.45)"
+                    }}
+                  >
+                    <span style={{ fontSize: 16 }}>🅿️</span> {hi ? `पेपैल से ${displayPrice} का भुगतान करें` : `Pay with PayPal (${displayPrice})`}
+                  </a>
+                  <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.65)", marginTop: 8 }}>
+                    {hi ? "पेपैल बैलेंस, बैंक खाते या कार्ड्स से सुरक्षित भुगतान करें।" : "Supports PayPal Balance, Bank Transfer & Guest Cards."}
+                  </div>
                 </div>
-              </div>
+              )
             ) : (
               <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 10, padding: 16, marginBottom: 16 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
