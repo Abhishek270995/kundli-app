@@ -44,25 +44,30 @@ const PLANETS = [
   { name: "Ketu", symbol: "Ke", color: "#FB923C", sanskrit: "Ketu", glyph: "☋" },
 ];
 
-const TABS = [
-  { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "चार्ट" },
+const PERSONAL_TABS = [
+  { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "लग्न कुंडली" },
   { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "planets", icon: "🪐", labelEn: "Planets", labelHi: "ग्रह स्थिति" },
+  { id: "houses", icon: "🏠", labelEn: "Houses", labelHi: "भाव विश्लेषण" },
+  { id: "life", icon: "🌿", labelEn: "Life Areas", labelHi: "जीवन क्षेत्र" },
   { id: "careerTiming", icon: "💼", labelEn: "Career & Job", labelHi: "करियर व नौकरी" },
-  { id: "lifeProblems", icon: "🛡️", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण व उपाय" },
   { id: "marriageTiming", icon: "💍", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
+  { id: "predictions", icon: "🔮", labelEn: "Predictions", labelHi: "दशा व भविष्य" },
+  { id: "lifeProblems", icon: "🛡️", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण" },
+  { id: "store", icon: "💎", labelEn: "Gemstones & Remedies", labelHi: "रत्न व उपाय" },
+  { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
+];
+
+const GENERIC_TABS = [
   { id: "panchang", icon: "🕉️", labelEn: "Hindu Panchang", labelHi: "दैनिक पंचांग" },
   { id: "muhurat", icon: "⏳", labelEn: "Shubh Muhurat", labelHi: "शुभ मुहूर्त" },
   { id: "festivals", icon: "🪔", labelEn: "Festivals & Vrat", labelHi: "व्रत व त्यौहार" },
   { id: "daily", icon: "☀️", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
   { id: "forecast", icon: "📅", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
-  { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
-  { id: "consult", icon: "🔮", labelEn: "Talk to Astrologer", labelHi: "ज्योतिषी परामर्श" },
-  { id: "store", icon: "💎", labelEn: "Gemstones & Remedies", labelHi: "रत्न व उपाय" },
-  { id: "planets", icon: "🪐", labelEn: "Planets", labelHi: "ग्रह स्थिति" },
-  { id: "houses", icon: "🏠", labelEn: "Houses", labelHi: "भाव विश्लेषण" },
-  { id: "life", icon: "🌿", labelEn: "Life Areas", labelHi: "जीवन क्षेत्र" },
-  { id: "predictions", icon: "🔮", labelEn: "Predictions", labelHi: "भविष्यवाणी" },
+  { id: "consult", icon: "🧙‍♂️", labelEn: "Talk to Astrologer", labelHi: "ज्योतिषी परामर्श" },
 ];
+
+const TABS = [...PERSONAL_TABS, ...GENERIC_TABS];
 
 const UI = {
   en: {
@@ -954,6 +959,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
   const [tab, setTab] = useState("chart");
+  const [tabCategoryFilter, setTabCategoryFilter] = useState("all"); // 'all' | 'personal' | 'generic'
   const [chartStyle, setChartStyle] = useState("north");
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
@@ -2788,19 +2794,197 @@ export default function App() {
               )}
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="tab-bar-nav" style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 28 }}>
-              {TABS.map(tabItem => (
+            {/* ── REORGANIZED TAB NAVIGATION (Grouped by Context: Individual vs Universal) ── */}
+            <div className="tab-bar-nav no-print" style={{ marginBottom: 30 }}>
+              
+              {/* Category Filter Pills */}
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
                 <button
-                  key={tabItem.id}
-                  onClick={() => setTab(tabItem.id)}
-                  className={`tab-btn ${tab === tabItem.id ? "active" : ""}`}
-                  style={{ fontSize: 14, padding: "10px 18px" }}
+                  type="button"
+                  onClick={() => setTabCategoryFilter("all")}
+                  style={{
+                    padding: "7px 18px",
+                    borderRadius: 22,
+                    fontSize: 13,
+                    fontWeight: tabCategoryFilter === "all" ? 800 : 600,
+                    cursor: "pointer",
+                    background: tabCategoryFilter === "all" ? "rgba(245, 158, 11, 0.25)" : "rgba(26, 18, 48, 0.6)",
+                    border: tabCategoryFilter === "all" ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
+                    color: tabCategoryFilter === "all" ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
+                    boxShadow: tabCategoryFilter === "all" ? "0 0 12px rgba(245, 158, 11, 0.3)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
                 >
-                  <span style={{ fontSize: 16 }}>{tabItem.icon}</span>
-                  <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
+                  ✦ {hi ? "सभी अनुभाग (17)" : "All Sections (17)"}
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setTabCategoryFilter("personal")}
+                  style={{
+                    padding: "7px 18px",
+                    borderRadius: 22,
+                    fontSize: 13,
+                    fontWeight: tabCategoryFilter === "personal" ? 800 : 600,
+                    cursor: "pointer",
+                    background: tabCategoryFilter === "personal" ? "rgba(245, 158, 11, 0.25)" : "rgba(26, 18, 48, 0.6)",
+                    border: tabCategoryFilter === "personal" ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
+                    color: tabCategoryFilter === "personal" ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
+                    boxShadow: tabCategoryFilter === "personal" ? "0 0 12px rgba(245, 158, 11, 0.3)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  👤 {hi ? "व्यक्तिगत कुंडली (11)" : "Individual Astrology (11)"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTabCategoryFilter("generic")}
+                  style={{
+                    padding: "7px 18px",
+                    borderRadius: 22,
+                    fontSize: 13,
+                    fontWeight: tabCategoryFilter === "generic" ? 800 : 600,
+                    cursor: "pointer",
+                    background: tabCategoryFilter === "generic" ? "rgba(139, 92, 246, 0.25)" : "rgba(26, 18, 48, 0.6)",
+                    border: tabCategoryFilter === "generic" ? "1.5px solid #A78BFA" : "1px solid rgba(212, 175, 55, 0.25)",
+                    color: tabCategoryFilter === "generic" ? "#DDD6FE" : "rgba(241, 231, 208, 0.75)",
+                    boxShadow: tabCategoryFilter === "generic" ? "0 0 12px rgba(139, 92, 246, 0.3)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  🌐 {hi ? "दैनिक पंचांग व सामान्य सेवाएं (6)" : "Universal & Daily Tools (6)"}
+                </button>
+              </div>
+
+              {/* ── GROUP 1: INDIVIDUAL ASTROLOGY (Interconnected to Native's Chart) ── */}
+              {(tabCategoryFilter === "all" || tabCategoryFilter === "personal") && (
+                <div
+                  style={{
+                    background: "rgba(18, 12, 36, 0.75)",
+                    border: "1.5px solid rgba(245, 158, 11, 0.3)",
+                    borderRadius: 18,
+                    padding: "16px 20px",
+                    marginBottom: 16,
+                    boxShadow: "0 6px 24px rgba(0,0,0,0.3)"
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(245, 158, 11, 0.18)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 18, color: "#F59E0B" }}>👤</span>
+                      <div>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.6 }}>
+                          {hi ? "व्यक्तिगत कुंडली विश्लेषण" : "INDIVIDUAL ASTROLOGY"}
+                        </span>
+                        <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.65)", marginLeft: 8 }}>
+                          {hi ? "• आपके जन्म समय व ग्रहों पर आधारित" : "• Connected to your birth chart & exact planetary positions"}
+                        </span>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 12, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", fontWeight: 700 }}>
+                      {hi ? "11 व्यक्तिगत भाग" : "11 Linked Sections"}
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-start" }}>
+                    {PERSONAL_TABS.map(tabItem => {
+                      const isActive = tab === tabItem.id;
+                      return (
+                        <button
+                          key={tabItem.id}
+                          type="button"
+                          onClick={() => setTab(tabItem.id)}
+                          className={`tab-btn ${isActive ? "active" : ""}`}
+                          style={{
+                            fontSize: 13.5,
+                            padding: "9px 16px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 7,
+                            borderRadius: 12,
+                            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                            background: isActive
+                              ? "linear-gradient(135deg, #F59E0B, #D97706)"
+                              : "rgba(26, 18, 48, 0.7)",
+                            color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
+                            border: isActive ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
+                            fontWeight: isActive ? 800 : 600,
+                            boxShadow: isActive ? "0 4px 14px rgba(245, 158, 11, 0.4)" : "none",
+                            cursor: "pointer"
+                          }}
+                        >
+                          <span style={{ fontSize: 16 }}>{tabItem.icon}</span>
+                          <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ── GROUP 2: GENERIC FOR EVERYONE (Universal Vedic Tools & Calendars) ── */}
+              {(tabCategoryFilter === "all" || tabCategoryFilter === "generic") && (
+                <div
+                  style={{
+                    background: "rgba(18, 12, 36, 0.75)",
+                    border: "1.5px solid rgba(139, 92, 246, 0.3)",
+                    borderRadius: 18,
+                    padding: "16px 20px",
+                    marginBottom: 24,
+                    boxShadow: "0 6px 24px rgba(0,0,0,0.3)"
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(139, 92, 246, 0.18)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 18, color: "#A78BFA" }}>🌐</span>
+                      <div>
+                        <span style={{ fontSize: 14, fontWeight: 800, color: "#DDD6FE", letterSpacing: 0.6 }}>
+                          {hi ? "सार्वभौमिक वैदिक पंचांग व सामान्य सेवाएं" : "GENERIC FOR EVERYONE · DAILY & UNIVERSAL"}
+                        </span>
+                        <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.65)", marginLeft: 8 }}>
+                          {hi ? "• दैनिक पंचांग, शुभ मुहूर्त, पर्व व राशिफल" : "• Daily Panchang, Auspicious Muhurats, Festivals & Consultations"}
+                        </span>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 12, background: "rgba(139, 92, 246, 0.15)", border: "1px solid rgba(139, 92, 246, 0.3)", color: "#DDD6FE", fontWeight: 700 }}>
+                      {hi ? "6 सामान्य उपकरण" : "6 Universal Tools"}
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-start" }}>
+                    {GENERIC_TABS.map(tabItem => {
+                      const isActive = tab === tabItem.id;
+                      return (
+                        <button
+                          key={tabItem.id}
+                          type="button"
+                          onClick={() => setTab(tabItem.id)}
+                          className={`tab-btn ${isActive ? "active" : ""}`}
+                          style={{
+                            fontSize: 13.5,
+                            padding: "9px 16px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 7,
+                            borderRadius: 12,
+                            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                            background: isActive
+                              ? "linear-gradient(135deg, #8B5CF6, #6D28D9)"
+                              : "rgba(26, 18, 48, 0.7)",
+                            color: isActive ? "#FFFFFF" : "rgba(241, 231, 208, 0.9)",
+                            border: isActive ? "1px solid #A78BFA" : "1px solid rgba(139, 92, 246, 0.25)",
+                            fontWeight: isActive ? 800 : 600,
+                            boxShadow: isActive ? "0 4px 14px rgba(139, 92, 246, 0.4)" : "none",
+                            cursor: "pointer"
+                          }}
+                        >
+                          <span style={{ fontSize: 16 }}>{tabItem.icon}</span>
+                          <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
             </div>
 
             {/* ── TAB 1: CHART ── */}
