@@ -2319,7 +2319,7 @@ export default function App() {
             />
             <div>
               <div style={{ fontFamily: "'Cinzel', serif", fontSize: 17, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>JYOTISH PARAMARSH</div>
-              <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 500 }}>{hi ? "वैदिक ज्योतिष एवं कुंडली मिलान" : "Vedic Astrology & Matchmaking"}</div>
+              <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.4, fontWeight: 500 }}>{hi ? "समस्त ज्योतिषीय आवश्यकताओं का संपूर्ण समाधान" : "Your One-Stop Solution for All Astrology Needs"}</div>
             </div>
           </div>
 
