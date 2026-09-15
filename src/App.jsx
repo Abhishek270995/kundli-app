@@ -539,7 +539,7 @@ const detectDefaultCurrency = () => {
 };
 
 // ── MONETIZATION CHECKOUT MODAL ──────────────────────────────────
-const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurrency }) => {
+const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurrency, isAdmin = false }) => {
   const [method, setMethod] = useState("paypal"); // "paypal" | "card"
   const [checkoutStep, setCheckoutStep] = useState("pay"); // "pay" | "verify" | "success"
   const [email, setEmail] = useState("");
@@ -601,6 +601,27 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", padding: 20 }}>
       <div className="glass-card" style={{ maxWidth: 470, width: "100%", padding: "26px 24px", position: "relative", maxHeight: "92vh", overflowY: "auto", border: "1px solid rgba(212,175,55,0.3)" }}>
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 16, background: "none", border: "none", color: "#F3D37A", fontSize: 20, cursor: "pointer" }}>✕</button>
+
+        {/* 👑 VIP Admin Instant Bypass Banner */}
+        {isAdmin && checkoutStep !== "success" && (
+          <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.25), rgba(217,119,6,0.32))", border: "1.5px solid #F59E0B", borderRadius: 10, padding: "12px 14px", marginBottom: 16, textAlign: "center" }}>
+            <div style={{ color: "#FDE68A", fontWeight: 800, fontSize: 13, marginBottom: 4, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <span>👑</span> {hi ? "एडमिन वीआईपी मोड सक्रिय" : "VIP ADMIN MODE ACTIVE"}
+            </div>
+            <div style={{ color: "rgba(241,231,208,0.9)", fontSize: 12, marginBottom: 8 }}>
+              {hi ? "आप एडमिन मोड में हैं। किसी भुगतान की आवश्यकता नहीं है।" : "You are in Admin Mode. No payment required."}
+            </div>
+            <button
+              onClick={() => {
+                onPaid && onPaid(item);
+                onClose && onClose();
+              }}
+              style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "8px 18px", borderRadius: 6, fontSize: 12.5, fontWeight: 800, cursor: "pointer", boxShadow: "0 2px 8px rgba(245,158,11,0.4)" }}
+            >
+              ⚡ {hi ? "एडमिन: तुरंत अनलॉक करें (बिना भुगतान)" : "Admin Instant Bypass (Unlock Free)"}
+            </button>
+          </div>
+        )}
 
         {/* ── STEP 3: SUCCESS ── */}
         {checkoutStep === "success" && (
@@ -981,6 +1002,20 @@ export default function App() {
       return false;
     }
   });
+  const [unlockedAnnualReport, setUnlockedAnnualReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_unlocked_annual");
+    } catch {
+      return false;
+    }
+  });
+  const [unlockedMatchmakingReport, setUnlockedMatchmakingReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("jyotish_unlocked_matchmaking");
+    } catch {
+      return false;
+    }
+  });
   const [activeProblemId, setActiveProblemId] = useState("career_job");
 
   // Admin VIP Bypass State (Dedicated for Owner Abhishek)
@@ -1008,6 +1043,8 @@ export default function App() {
   const effectiveRemediesUnlocked = isAdmin || unlockedRemediesReport;
   const effectiveDailySubscribed = isAdmin || isDailySubscribed;
   const effectiveProUnlocked = isAdmin || unlockedProReport;
+  const effectiveAnnualUnlocked = isAdmin || unlockedAnnualReport;
+  const effectiveMatchmakingUnlocked = isAdmin || unlockedMatchmakingReport;
 
   const [activePrintReport, setActivePrintReport] = useState("all");
 
@@ -2032,10 +2069,12 @@ export default function App() {
       {activeCheckout && (
         <CheckoutModal
           item={activeCheckout}
+          isAdmin={isAdmin}
           onClose={() => setActiveCheckout(null)}
-          onPaid={() => {
+          onPaid={(purchasedItem) => {
             setUnlockedProReport(true);
-            if (activeCheckout?.isMarriageUnlock) {
+            const key = purchasedItem?.priceKey || activeCheckout?.priceKey;
+            if (activeCheckout?.isMarriageUnlock || key === "marriageReport") {
               try {
                 localStorage.setItem("jyotish_unlocked_marriage", "true");
                 setUnlockedMarriageReport(true);
@@ -2043,7 +2082,7 @@ export default function App() {
                 console.error(e);
               }
             }
-            if (activeCheckout?.isCareerUnlock) {
+            if (activeCheckout?.isCareerUnlock || key === "careerReport") {
               try {
                 localStorage.setItem("jyotish_unlocked_career", "true");
                 setUnlockedCareerReport(true);
@@ -2051,7 +2090,7 @@ export default function App() {
                 console.error(e);
               }
             }
-            if (activeCheckout?.isRemediesUnlock) {
+            if (activeCheckout?.isRemediesUnlock || key === "remediesReport") {
               try {
                 localStorage.setItem("jyotish_unlocked_remedies", "true");
                 setUnlockedRemediesReport(true);
@@ -2059,7 +2098,31 @@ export default function App() {
                 console.error(e);
               }
             }
-            if (activeCheckout?.isDailySub) {
+            if (activeCheckout?.isAnnualUnlock || key === "annualReport") {
+              try {
+                localStorage.setItem("jyotish_unlocked_annual", "true");
+                setUnlockedAnnualReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            if (activeCheckout?.isMatchmakingUnlock || key === "matchmakingReport") {
+              try {
+                localStorage.setItem("jyotish_unlocked_matchmaking", "true");
+                setUnlockedMatchmakingReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            if (activeCheckout?.isDeluxeUnlock || key === "deluxeReport") {
+              try {
+                localStorage.setItem("jyotish_unlocked_deluxe", "true");
+                setUnlockedProReport(true);
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            if (activeCheckout?.isDailySub || key === "dailyYearly" || key === "dailyMonthly") {
               try {
                 localStorage.setItem("jyotish_daily_sub", JSON.stringify({
                   sign: dailySign,
@@ -2682,18 +2745,29 @@ export default function App() {
                   {hi ? "वर्ष 2026-2027 वार्षिक गोचर, साढ़ेसाती व विस्तृत समाधान प्राप्त करें" : "Unlock Complete 2026-2027 Annual Transit Forecast & Remedies"}
                 </h4>
               </div>
-              <button
-                onClick={() => setActiveCheckout({
-                  title: hi ? "50-पेज गोल्डन महा-कुंडली रिपोर्ट" : "Golden Deluxe 50-Page Life Report",
-                  priceKey: "deluxeReport",
-                  price: PRODUCT_PRICES.deluxeReport[currency],
-                  desc: hi ? "दशा विश्लेषण, साढ़ेसाती, करियर और व्यक्तिगत उपाय सहित विस्तृत PDF" : "Full life analysis, transit timing, Sade Sati & energized gemstones PDF",
-                  icon: "📜"
-                })}
-                style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 22px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)" }}
-              >
-                {hi ? "अनलॉक करें" : "Unlock Report"} ({PRODUCT_PRICES.deluxeReport[currency]})
-              </button>
+              {effectiveProUnlocked ? (
+                <button
+                  onClick={() => handlePrintReport("all")}
+                  className="gold-cta-btn"
+                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)", display: "inline-flex", alignItems: "center", gap: 6 }}
+                >
+                  <span>👑</span> {isAdmin ? (hi ? "एडमिन: 50-पेज PDF डाउनलोड करें" : "Admin: Download 50-Page PDF") : (hi ? "50-पेज PDF डाउनलोड करें" : "Download 50-Page PDF")}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setActiveCheckout({
+                    title: hi ? "50-पेज गोल्डन महा-कुंडली रिपोर्ट" : "Golden Deluxe 50-Page Life Report",
+                    priceKey: "deluxeReport",
+                    price: PRODUCT_PRICES.deluxeReport[currency],
+                    desc: hi ? "दशा विश्लेषण, साढ़ेसाती, करियर और व्यक्तिगत उपाय सहित विस्तृत PDF" : "Full life analysis, transit timing, Sade Sati & energized gemstones PDF",
+                    icon: "📜",
+                    isDeluxeUnlock: true
+                  })}
+                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 22px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)" }}
+                >
+                  {hi ? "अनलॉक करें" : "Unlock Report"} ({PRODUCT_PRICES.deluxeReport[currency]})
+                </button>
+              )}
             </div>
 
             {/* Navigation Tabs */}
@@ -3605,23 +3679,41 @@ export default function App() {
                     ))}
                   </div>
 
-                  {/* Upsell to PDF */}
-                  <div style={{ textAlign: "center", padding: "18px", background: "rgba(245,158,11,0.08)", border: "1px dashed rgba(245,158,11,0.4)", borderRadius: 12 }}>
+                  {/* Upsell to PDF or Unlocked View */}
+                  <div style={{ textAlign: "center", padding: "18px", background: effectiveAnnualUnlocked ? "rgba(245,158,11,0.12)" : "rgba(245,158,11,0.08)", border: effectiveAnnualUnlocked ? "1.5px solid rgba(245,158,11,0.5)" : "1px dashed rgba(245,158,11,0.4)", borderRadius: 12 }}>
                     <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, marginBottom: 6 }}>
                       {hi ? "महीने-दर-महीने संपूर्ण 2026-2027 PDF रिपोर्ट डाउनलोड करें" : "Download Full 2026-2027 Month-by-Month Forecast PDF"}
                     </div>
-                    <button
-                      onClick={() => setActiveCheckout({
-                        title: "2026-2027 Annual Transit Forecast PDF",
-                        priceKey: "annualReport",
-                        price: PRODUCT_PRICES.annualReport[currency],
-                        desc: "Detailed monthly predictions, wealth windows & auspicious dates",
-                        icon: "📅"
-                      })}
-                      style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
-                    >
-                      {hi ? "पूर्ण रिपोर्ट प्राप्त करें" : "Get Full PDF"} ({PRODUCT_PRICES.annualReport[currency]})
-                    </button>
+                    {effectiveAnnualUnlocked ? (
+                      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                        {isAdmin && (
+                          <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "3px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                            <span>👑</span> {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Access"}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => handlePrintReport("annual")}
+                          className="gold-cta-btn"
+                          style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "11px 24px", borderRadius: 8, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, boxShadow: "0 4px 14px rgba(245,158,11,0.35)" }}
+                        >
+                          <span>📄</span> {hi ? "2026-2027 वार्षिक PDF डाउनलोड / प्रिंट करें" : "Download / Print Full 2026-2027 Forecast PDF"}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setActiveCheckout({
+                          title: "2026-2027 Annual Transit Forecast PDF",
+                          priceKey: "annualReport",
+                          price: PRODUCT_PRICES.annualReport[currency],
+                          desc: "Detailed monthly predictions, wealth windows & auspicious dates",
+                          icon: "📅",
+                          isAnnualUnlock: true
+                        })}
+                        style={{ marginTop: 8, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                      >
+                        {hi ? "पूर्ण रिपोर्ट प्राप्त करें" : "Get Full PDF"} ({PRODUCT_PRICES.annualReport[currency]})
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -3745,18 +3837,36 @@ export default function App() {
                       <div style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800 }}>
                         {hi ? "विस्तृत दांपत्य भविष्य, संतान योग एवं निवारण रिपोर्ट (PDF)" : "Unlock Complete 25-Page Matrimonial Compatibility PDF"}
                       </div>
-                      <button
-                        onClick={() => setActiveCheckout({
-                          title: "Kundli Milan Comprehensive PDF Report",
-                          priceKey: "matchmakingReport",
-                          price: PRODUCT_PRICES.matchmakingReport[currency],
-                          desc: "In-depth Bhakoot/Nadi analysis, future timing, and harmony remedies",
-                          icon: "❤️"
-                        })}
-                        style={{ marginTop: 10, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
-                      >
-                        {hi ? "डाउनलोड करें" : "Unlock Report"} ({PRODUCT_PRICES.matchmakingReport[currency]})
-                      </button>
+                      {effectiveMatchmakingUnlocked ? (
+                        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                          {isAdmin && (
+                            <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11.5, fontWeight: 800 }}>
+                              👑 {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Access"}
+                            </div>
+                          )}
+                          <button
+                            onClick={() => handlePrintReport("matchmaking")}
+                            className="gold-cta-btn"
+                            style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                          >
+                            <span>📄</span> {hi ? "मिलान PDF डाउनलोड / प्रिंट करें" : "Download / Print Compatibility PDF"}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setActiveCheckout({
+                            title: "Kundli Milan Comprehensive PDF Report",
+                            priceKey: "matchmakingReport",
+                            price: PRODUCT_PRICES.matchmakingReport[currency],
+                            desc: "In-depth Bhakoot/Nadi analysis, future timing, and harmony remedies",
+                            icon: "❤️",
+                            isMatchmakingUnlock: true
+                          })}
+                          style={{ marginTop: 10, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
+                        >
+                          {hi ? "डाउनलोड करें" : "Unlock Report"} ({PRODUCT_PRICES.matchmakingReport[currency]})
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -4604,6 +4714,149 @@ export default function App() {
                       {mp.remedies}
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 5: 2026–2027 ANNUAL TRANSIT & PLANETARY FORECAST DOSSIER
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "annual" && (
+                <div>
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 26, marginBottom: 4 }}>📅 🪐 🌟</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
+                      {hi ? "वर्ष 2026–2027 वार्षिक गोचर एवं संपूर्ण भविष्यवाणी रिपोर्ट" : "2026–2027 VEDIC ANNUAL TRANSIT & PLANETARY FORECAST"}
+                    </h1>
+                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
+                      ✦ CONFIDENTIAL TRANSIT, GOCHARA & MILESTONE DOSSIER ✦
+                    </div>
+                    <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
+                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob} · MOON: {result.rashi}
+                    </p>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 22 }}>
+                    <h3 style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800, marginBottom: 10, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                      ✦ CORE ASTROLOGICAL PARAMETERS & SADE SATI DIAGNOSTIC
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, textAlign: "center", marginBottom: 12 }}>
+                      {[
+                        { label: "Moon Sign (Rashi)", val: result.rashi },
+                        { label: "Natal Nakshatra", val: result.nakshatra },
+                        { label: "Ascendant (Lagna)", val: result.lagna },
+                        { label: "Forecast Period", val: result.annualTransit?.year || "2026–2027" },
+                      ].map((p, i) => (
+                        <div key={i} style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 10px" }}>
+                          <div style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", marginBottom: 3, fontWeight: 600 }}>{p.label}</div>
+                          <div style={{ fontSize: 13.5, color: "#FDE68A", fontWeight: 800 }}>{p.val}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 8, padding: "10px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 700, textAlign: "center" }}>
+                      ⚖️ {result.annualTransit?.sadeSatiStatus}
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+                      🪐 Major Planetary Ingresses & Gochara Influences (2026–2027)
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
+                      {(result.annualTransit?.transits || []).map((tr, i) => (
+                        <div key={i} style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>{tr.planet} in {tr.sign}</div>
+                          <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 12.5, lineHeight: 1.6 }}>{tr.effect}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 22 }}>
+                    <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+                      ⚡ 2026–2027 Quarterly Life Milestones & Growth Trajectory
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+                      {(result.annualTransit?.quarters || []).map((q, i) => (
+                        <div key={i} style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                            <span style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800 }}>{q.quarter}</span>
+                            <span style={{ color: "#34D399", fontSize: 12.5, fontWeight: 800 }}>{q.rating}</span>
+                          </div>
+                          <div style={{ color: "#F3D37A", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{q.theme}</div>
+                          <div style={{ color: "rgba(241,231,208,0.85)", fontSize: 12, lineHeight: 1.55 }}>{q.impact}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="page-break-avoid" style={{ marginBottom: 20, border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: 16, background: "rgba(245,158,11,0.08)" }}>
+                    <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>🛡️ Prescribed Annual Remedies & Planetary Harmonization</h4>
+                    <div style={{ fontSize: 13, lineHeight: 1.7, color: "rgba(241,231,208,0.92)", whiteSpace: "pre-wrap" }}>
+                      {result.remedies || result.overview}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ══════════════════════════════════════════════════════════════════════
+                  CASE 6: ASHTAKOOT 36 GUNA MILAN & COMPATIBILITY DOSSIER
+              ══════════════════════════════════════════════════════════════════════ */}
+              {activePrintReport === "matchmaking" && (
+                <div>
+                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
+                    <div style={{ fontSize: 26, marginBottom: 4 }}>❤️ 🕊️</div>
+                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
+                      {hi ? "वैदिक अष्टकूट ३६ गुण मिलान एवं दांपत्य अनुकूलता रिपोर्ट" : "VEDIC ASHTAKOOT 36 GUNA MILAN & MATRIMONIAL COMPATIBILITY"}
+                    </h1>
+                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
+                      ✦ CONFIDENTIAL KUNDLI MATCHMAKING & VIVAH HARMONY DOSSIER ✦
+                    </div>
+                  </div>
+                  {milanResult ? (
+                    <div>
+                      <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 22, textAlign: "center" }}>
+                        <div style={{ fontSize: 14, color: "rgba(241,231,208,0.85)", marginBottom: 6 }}>
+                          {milanResult.p1.name} ({milanResult.p1.sign}) × {milanResult.p2.name} ({milanResult.p2.sign})
+                        </div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: Number(milanResult.totalGunas) >= 18 ? "#34D399" : "#F87171" }}>
+                          {milanResult.totalGunas} / {milanResult.maxGunas} ({milanResult.percentage}%)
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginTop: 4 }}>
+                          {hi ? milanResult.verdictHi : milanResult.verdict}
+                        </h3>
+                      </div>
+
+                      <div className="page-break-avoid" style={{ marginBottom: 20 }}>
+                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+                          ✦ Ashtakoot 8-Fold Vedic Compatibility Breakdown
+                        </h4>
+                        <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
+                          <thead>
+                            <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
+                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Koota</th>
+                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "center" }}>Obtained / Max</th>
+                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Significance & Analysis</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {(milanResult.breakdown || []).map((b, bi) => (
+                              <tr key={bi} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: bi % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                                <td style={{ padding: "8px 12px", fontWeight: 700, color: "#FDE68A", fontSize: 13 }}>{b.name}</td>
+                                <td style={{ padding: "8px 12px", fontWeight: 700, color: Number(b.obtained) > 0 ? "#34D399" : "#F87171", textAlign: "center", fontSize: 13 }}>
+                                  {b.obtained} / {b.max}
+                                </td>
+                                <td style={{ padding: "8px 12px", fontSize: 12.5, color: "rgba(241,231,208,0.85)" }}>{b.desc}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: 20, color: "rgba(241,231,208,0.8)" }}>
+                      Please calculate Gun Milan from the Kundli Milan tab to print this report.
+                    </div>
+                  )}
                 </div>
               )}
 
