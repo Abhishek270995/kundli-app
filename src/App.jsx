@@ -299,14 +299,35 @@ const NorthIndianChart = ({ houses, planetData, lang, hoveredHouse, setHoveredHo
 
         return (
           <g key={n} style={{ pointerEvents: "none" }}>
-            {isLagna && (
-              <g>
-                <rect x={cx - 36} y={cy - 40} width="72" height="18" rx="4" fill="rgba(245,158,11,0.28)" stroke="#F59E0B" strokeWidth="1" />
-                <text x={cx} y={cy - 27} textAnchor="middle" fill="#FDE68A" fontSize="11" fontWeight="800" letterSpacing="0.6">
-                  {lang === "hi" ? "लग्न १" : "LAGNA 1"}{houses?.[1]?.ascDegree ? ` ${houses[1].ascDegree}` : ""}
-                </text>
-              </g>
-            )}
+            {isLagna && (() => {
+              const hasAscDeg = !!houses?.[1]?.ascDegree;
+              const badgeW = hasAscDeg ? (lang === "hi" ? 104 : 110) : (lang === "hi" ? 64 : 70);
+              return (
+                <g>
+                  <rect
+                    x={cx - badgeW / 2}
+                    y={cy - 41}
+                    width={badgeW}
+                    height="20"
+                    rx="5"
+                    fill="rgba(245,158,11,0.28)"
+                    stroke="#F59E0B"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={cx}
+                    y={cy - 27}
+                    textAnchor="middle"
+                    fill="#FDE68A"
+                    fontSize="10.5"
+                    fontWeight="800"
+                    letterSpacing="0.4"
+                  >
+                    {lang === "hi" ? "लग्न १" : "LAGNA 1"}{hasAscDeg ? ` ${houses[1].ascDegree}` : ""}
+                  </text>
+                </g>
+              );
+            })()}
 
             <text x={cx} y={isLagna ? cy - 6 : cy - 12} textAnchor="middle" fill="#F3D37A" fontSize="15" fontWeight="800" fontFamily="'Outfit', sans-serif">
               {signNum}
@@ -412,15 +433,20 @@ const SouthIndianChart = ({ houses, planetData, lang, hoveredHouse, setHoveredHo
               {lang === "hi" ? box.signHi : box.signName}
             </text>
 
-            {isLagna && (
-              <g>
-                <line x1={bx} y1={by} x2={bx + W} y2={by + W} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                <rect x={bx + W - 44} y={by + 5} width="38" height="14" rx="3" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" strokeWidth="0.8" />
-                <text x={bx + W - 25} y={by + 15} textAnchor="middle" fill="#FDE68A" fontSize="7.5" fontWeight="700">
-                  ASC{houses?.[1]?.ascDegree ? ` ${houses[1].ascDegree}` : ""}
-                </text>
-              </g>
-            )}
+            {isLagna && (() => {
+              const hasAscDeg = !!houses?.[1]?.ascDegree;
+              const badgeW = hasAscDeg ? 56 : 38;
+              const badgeX = bx + W - badgeW - 5;
+              return (
+                <g>
+                  <line x1={bx} y1={by} x2={bx + W} y2={by + W} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
+                  <rect x={badgeX} y={by + 5} width={badgeW} height="15" rx="3" fill="rgba(245,158,11,0.25)" stroke="#F59E0B" strokeWidth="0.8" />
+                  <text x={badgeX + badgeW / 2} y={by + 15.5} textAnchor="middle" fill="#FDE68A" fontSize="7.5" fontWeight="700" letterSpacing="0.2">
+                    ASC{hasAscDeg ? ` ${houses[1].ascDegree}` : ""}
+                  </text>
+                </g>
+              );
+            })()}
 
             {houseNum && (
               <text x={bx + 8} y={by + W - 8} fill="rgba(243,211,122,0.4)" fontSize="9">
