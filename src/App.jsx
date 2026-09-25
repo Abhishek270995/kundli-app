@@ -518,7 +518,7 @@ const CURRENCIES = {
 };
 
 const PRODUCT_PRICES = {
-  dakshina: { USD: "$1.99", EUR: "€1.99", GBP: "£1.49", CAD: "CA$2.49", AUD: "AU$2.99", AED: "AED 9", INR: "₹149" },
+  dakshina: { USD: "$1.99", EUR: "€1.99", GBP: "£1.49", CAD: "CA$2.49", AUD: "AU$2.99", AED: "AED 9", INR: "₹101" },
   deluxeReport: { USD: "$4.99", EUR: "€4.49", GBP: "£3.99", CAD: "CA$6.49", AUD: "AU$7.49", AED: "AED 19", INR: "₹399" },
   annualReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
   matchmakingReport: { USD: "$2.99", EUR: "€2.79", GBP: "£2.49", CAD: "CA$3.99", AUD: "AU$4.49", AED: "AED 12", INR: "₹249" },
@@ -555,11 +555,13 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
   const [orderId, setOrderId] = useState("");
   const hi = lang === "hi";
 
-  // Dynamic price formatted for current currency
+  // Dynamic price formatted for current currency (custom preset dakshina takes precedence)
   const isINR = currency === "INR";
-  const displayPrice = item.priceKey && PRODUCT_PRICES[item.priceKey]
-    ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
-    : item.price;
+  const displayPrice = (item.isDakshina && item.price)
+    ? item.price
+    : (item.priceKey && PRODUCT_PRICES[item.priceKey]
+      ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
+      : item.price);
 
   // Numerical value for PayPal / UPI
   const cleanNumericVal = (displayPrice || "4.99").replace(/[^0-9.]/g, "") || "4.99";
@@ -634,12 +636,16 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
         {/* ── STEP 3: SUCCESS ── */}
         {checkoutStep === "success" && (
           <div style={{ textAlign: "center", padding: "20px 10px" }}>
-            <div style={{ fontSize: 48, marginBottom: 10 }}>🎉</div>
+            <div style={{ fontSize: 48, marginBottom: 10 }}>{item.isDakshina ? "🪷" : "🎉"}</div>
             <h3 style={{ color: "#34D399", fontSize: 19, fontWeight: 700, marginBottom: 6 }}>
-              {hi ? "भुगतान एवं ऑर्डर सफल!" : "Payment & Order Confirmed!"}
+              {item.isDakshina
+                ? (hi ? "आपकी श्रद्धा दक्षिणा सादर स्वीकृत हुई!" : "Sacred Dakshina Received with Reverence!")
+                : (hi ? "भुगतान एवं ऑर्डर सफल!" : "Payment & Order Confirmed!")}
             </h3>
             <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13.5, marginBottom: 16 }}>
-              {hi ? `ऑर्डर आईडी: ${orderId} · सेवा अनलॉक कर दी गई है।` : `Order ID: ${orderId} · Your premium access is now activated.`}
+              {item.isDakshina
+                ? (hi ? `ऑर्डर आईडी: ${orderId} · आपके इस पुनीत सहयोग के लिए हृदय से धन्यवाद। ईश्वर आपका कल्याण करें।` : `Order ID: ${orderId} · Thank you deeply for sustaining this platform. May you be blessed with peace & light.`)
+                : (hi ? `ऑर्डर आईडी: ${orderId} · सेवा अनलॉक कर दी गई है।` : `Order ID: ${orderId} · Your premium access is now activated.`)}
             </p>
 
             <div style={{ background: "rgba(11,8,25,0.85)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14, textAlign: "left", fontSize: 13, marginBottom: 18 }}>
@@ -648,7 +654,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 <span style={{ color: "#F3D37A", fontWeight: 700 }}>{item.title}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ color: "rgba(241,231,208,0.6)" }}>Amount Paid:</span>
+                <span style={{ color: "rgba(241,231,208,0.6)" }}>{item.isDakshina ? (hi ? "समर्पित दक्षिणा:" : "Dakshina Offered:") : "Amount Paid:"}</span>
                 <span style={{ color: "#34D399", fontWeight: 700 }}>{displayPrice}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
@@ -789,7 +795,9 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
                 ← {hi ? "पीछे (Back)" : "Back"}
               </button>
               <button onClick={handleConfirmPayment} className="gold-cta-btn" style={{ padding: "13px 16px", fontSize: 14 }}>
-                {hi ? "सत्यापित करें एवं अनलॉक करें ✦" : `Confirm & Unlock (${displayPrice}) ✦`}
+                {item.isDakshina
+                  ? (hi ? "श्रद्धा दक्षिणा अर्पित करें ✦" : `Confirm Sacred Dakshina (${displayPrice}) ✦`)
+                  : (hi ? "सत्यापित करें एवं अनलॉक करें ✦" : `Confirm & Unlock (${displayPrice}) ✦`)}
               </button>
             </div>
           </div>
@@ -1010,7 +1018,9 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
             )}
 
             <button onClick={handleProceedToVerify} className="gold-cta-btn" style={{ padding: "14px 20px", fontSize: 15, width: "100%" }}>
-              {hi ? `मैंने भुगतान कर दिया है (${displayPrice}) →` : `I Have Made the Payment (${displayPrice}) →`}
+              {item.isDakshina
+                ? (hi ? `मैंने दक्षिणा अर्पित कर दी है (${displayPrice}) →` : `I Have Offered Dakshina (${displayPrice}) →`)
+                : (hi ? `मैंने भुगतान कर दिया है (${displayPrice}) →` : `I Have Made the Payment (${displayPrice}) →`)}
             </button>
             <div style={{ textAlign: "center", fontSize: 12, color: "rgba(243,211,122,0.65)", marginTop: 10 }}>
               🔒 256-Bit Bank Grade SSL Encrypted Global Checkout
@@ -1114,13 +1124,14 @@ export default function App() {
   const [adminPinErr, setAdminPinErr] = useState("");
   const [logoClickCount, setLogoClickCount] = useState(0);
 
-  const effectiveMarriageUnlocked = isAdmin || unlockedMarriageReport;
-  const effectiveCareerUnlocked = isAdmin || unlockedCareerReport;
-  const effectiveRemediesUnlocked = isAdmin || unlockedRemediesReport;
-  const effectiveDailySubscribed = isAdmin || isDailySubscribed;
-  const effectiveProUnlocked = isAdmin || unlockedProReport;
-  const effectiveAnnualUnlocked = isAdmin || unlockedAnnualReport;
-  const effectiveMatchmakingUnlocked = isAdmin || unlockedMatchmakingReport;
+  // ── 100% FREE INITIATIVE: ALL FEATURES & REPORTS ARE FULLY UNLOCKED ──
+  const effectiveMarriageUnlocked = true;
+  const effectiveCareerUnlocked = true;
+  const effectiveRemediesUnlocked = true;
+  const effectiveDailySubscribed = true;
+  const effectiveProUnlocked = true;
+  const effectiveAnnualUnlocked = true;
+  const effectiveMatchmakingUnlocked = true;
 
   const [activePrintReport, setActivePrintReport] = useState("all");
 
@@ -1169,6 +1180,167 @@ export default function App() {
         localStorage.removeItem("jyotish_admin_mode");
       }
     } catch (e) {}
+  };
+
+  // ── DEDICATED SACRED DAKSHINA OFFERING COMPONENT ──
+  const renderDakshinaCard = (isCompact = false) => {
+    const isINR = currency === "INR";
+    const dakshinaPresets = isINR
+      ? [
+          { amount: "₹51", label: hi ? "शुभ भेंट" : "Shubh Bhent" },
+          { amount: "₹101", label: hi ? "श्रद्धा दक्षिणा" : "Shraddha Seva", popular: true },
+          { amount: "₹251", label: hi ? "समर्पण" : "Samarpan" },
+          { amount: "₹501", label: hi ? "कल्याण भेंट" : "Kalyan Bhent" },
+          { amount: "₹1,100", label: hi ? "महा सेवा" : "Maha Seva" },
+        ]
+      : [
+          { amount: `${CURRENCIES[currency]?.symbol || "$" }1.99`, label: hi ? "लघु सहयोग" : "Humble Seva" },
+          { amount: `${CURRENCIES[currency]?.symbol || "$" }4.99`, label: hi ? "श्रद्धा भेंट" : "Devoted Seva", popular: true },
+          { amount: `${CURRENCIES[currency]?.symbol || "$" }11.00`, label: hi ? "पुनीत सहयोग" : "Generous Seva" },
+          { amount: `${CURRENCIES[currency]?.symbol || "$" }21.00`, label: hi ? "महा संरक्षक" : "Patron of Light" },
+        ];
+
+    const openDakshina = (customPrice = null) => {
+      setActiveCheckout({
+        title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+        priceKey: "dakshina",
+        price: customPrice || PRODUCT_PRICES.dakshina[currency],
+        desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+        icon: "🪷",
+        isDakshina: true
+      });
+    };
+
+    return (
+      <div
+        className="glass-card no-print"
+        style={{
+          padding: isCompact ? "20px 22px" : "28px 30px",
+          marginBottom: 26,
+          background: "linear-gradient(135deg, rgba(38, 22, 70, 0.96), rgba(18, 11, 40, 0.98))",
+          border: "1.5px solid rgba(245, 158, 11, 0.6)",
+          borderRadius: 16,
+          boxShadow: "0 8px 32px rgba(245, 158, 11, 0.22), 0 0 16px rgba(245, 158, 11, 0.12)",
+          position: "relative",
+          overflow: "hidden"
+        }}
+      >
+        {/* Soft background ambient halo */}
+        <div style={{ position: "absolute", top: -50, right: -50, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle, rgba(245,158,11,0.28) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -60, left: -40, width: 140, height: 140, borderRadius: "50%", background: "radial-gradient(circle, rgba(217,119,6,0.2) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        {/* Top Header Tag */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 14, position: "relative", zIndex: 2 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(245, 158, 11, 0.2)", border: "1px solid rgba(245, 158, 11, 0.5)", borderRadius: 20, padding: "5px 14px" }}>
+            <span style={{ fontSize: 16 }}>🪷</span>
+            <span style={{ fontSize: 12.5, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.5 }}>
+              {hi ? "श्रद्धा दक्षिणा · एक पावन निवेदन" : "SHRADDHA DAKSHINA · A SACRED OFFERING"}
+            </span>
+          </div>
+          <div style={{ background: "rgba(16, 185, 129, 0.2)", border: "1px solid rgba(16, 185, 129, 0.45)", borderRadius: 12, padding: "4px 12px", color: "#34D399", fontSize: 12, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 5 }}>
+            <span>✓</span> {hi ? "सभी 50+ पेज रिपोर्ट व फीचर्स 100% निःशुल्क" : "ALL 50+ PAGE REPORTS ARE 100% FREE"}
+          </div>
+        </div>
+
+        {/* Emotional Headline */}
+        <h3 style={{ color: "#F3D37A", fontSize: "clamp(18px, 3.2vw, 22px)", fontWeight: 800, lineHeight: 1.4, marginBottom: 12, position: "relative", zIndex: 2 }}>
+          {hi
+            ? "वैदिक ज्ञान का प्रकाश सर्वजन कल्याण हेतु निःशुल्क है — इस पुनीत सेवा को बनाए रखने में अपना सहयोग दें"
+            : "Divine Vedic Wisdom is Free For Every Seeking Soul — Help Us Sustain This Sacred Light"}
+        </h3>
+
+        {/* Heartfelt Emotional Message */}
+        <div style={{ color: "rgba(241, 231, 208, 0.92)", fontSize: 14, lineHeight: 1.75, marginBottom: 20, position: "relative", zIndex: 2 }}>
+          <p style={{ marginBottom: 10 }}>
+            {hi ? (
+              <>
+                सनातन धर्म की पावन परंपरा के अनुसार, वैदिक ज्ञान एवं दिव्य ज्योतिष का प्रकाश हर जिज्ञासु के कल्याण के लिए है, किसी व्यापार के लिए नहीं। इसीलिए हमने इस मंच के <b>समस्त गहन विश्लेषण, 50-पेज महा-कुंडली रिपोर्ट, करियर-विवाह मार्गदर्शन एवं लाल किताब उपाय आप सभी के लिए 100% निःशुल्क (FREE)</b> कर दिए हैं।
+              </>
+            ) : (
+              <>
+                In the timeless spirit of Sanatan Dharma, divine Vedic wisdom is a sacred light meant to illuminate every human journey without financial barriers. That is why <b>every single calculation, planetary transit analysis, personalized remedy, and our comprehensive 50-Page Deluxe Life Dossier is offered 100% FREE for all seekers worldwide</b>.
+              </>
+            )}
+          </p>
+          <p style={{ margin: 0 }}>
+            {hi ? (
+              <>
+                उच्च-सटीक खगोलीय गणनाओं, सुपरकंप्यूटिंग सर्वर और निरंतर वैदिक शोध को निर्बाध संचालित रखने के लिए संसाधन आवश्यक होते हैं। यदि हमारी इस निःशुल्क सेवा से आपके जीवन में थोड़ा भी मार्गदर्शन, शांति अथवा स्पष्टता आई हो, तो इस पुनीत सेवा को सदैव जीवित रखने हेतु अपनी सामर्थ्यानुसार एक छोटी सी <b>'श्रद्धा दक्षिणा' (स्वैच्छिक भेंट)</b> अवश्य अर्पित करें। आपकी यह पावन आहुति इस मंच को हर जरूरतमंद के लिए सदैव निःशुल्क रखने में सहयोग करेगी। 🙏
+              </>
+            ) : (
+              <>
+                Powering high-precision astronomical algorithms, sustaining server infrastructure, and advancing continuous Vedic research requires ongoing resources. If our guidance has illuminated your path, brought peace to your heart, or provided clarity in your decisions, we warmly invite you to offer a small voluntary Dakshina. Whatever offering feels right to your heart—no amount is too small. Your loving support keeps this platform freely accessible for every seeking soul. 🙏
+              </>
+            )}
+          </p>
+        </div>
+
+        {/* Voluntary Dakshina Amount Selector Pills */}
+        <div style={{ marginBottom: 18, position: "relative", zIndex: 2 }}>
+          <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", fontWeight: 700, marginBottom: 8, letterSpacing: 0.5 }}>
+            {hi ? "अपनी स्वेच्छानुसार दक्षिणा राशि चुनें:" : "SELECT A VOLUNTARY DAKSHINA AMOUNT:"}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {dakshinaPresets.map((preset, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => openDakshina(preset.amount)}
+                style={{
+                  background: preset.popular
+                    ? "linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.45))"
+                    : "rgba(26, 18, 48, 0.9)",
+                  border: preset.popular ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.35)",
+                  borderRadius: 12,
+                  padding: "8px 14px",
+                  color: "#FDE68A",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = preset.popular ? "#F59E0B" : "rgba(212, 175, 55, 0.35)"; e.currentTarget.style.transform = "translateY(0)"; }}
+              >
+                <span style={{ fontSize: 14, fontWeight: 800 }}>{preset.amount}</span>
+                <span style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.75)" }}>({preset.label})</span>
+                {preset.popular && <span style={{ fontSize: 10, background: "#F59E0B", color: "#0F0A1E", padding: "1px 6px", borderRadius: 8, fontWeight: 800 }}>⭐ {hi ? "लोकप्रिय" : "Popular"}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Primary Action Buttons */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", position: "relative", zIndex: 2 }}>
+          <button
+            onClick={() => openDakshina()}
+            className="gold-cta-btn"
+            style={{
+              background: "linear-gradient(90deg, #F59E0B, #D97706)",
+              border: "none",
+              color: "#0F0A1E",
+              padding: "13px 28px",
+              borderRadius: 10,
+              fontSize: 14.5,
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 6px 20px rgba(245, 158, 11, 0.4)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8
+            }}
+          >
+            <span style={{ fontSize: 16 }}>🪷</span>
+            <span>{hi ? "श्रद्धा दक्षिणा अर्पित करें (Offer Dakshina)" : "Offer Dakshina Now (श्रद्धा दक्षिणा)"}</span>
+          </button>
+
+          <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.75)", fontStyle: "italic" }}>
+            🔒 {isINR ? "PhonePe, Google Pay, Paytm UPI QR समर्थित" : "Instant & Secure PayPal Contribution"} · {hi ? "शत प्रतिशत सुरक्षित व पूर्णतः स्वैच्छिक" : "100% Secure & Purely Voluntary"}
+          </span>
+        </div>
+      </div>
+    );
   };
 
   const resultRef = useRef(null);
@@ -2371,16 +2543,32 @@ export default function App() {
             </select>
 
             <button
+              type="button"
               onClick={() => setActiveCheckout({
-                title: hi ? "दक्षिणा / आध्यात्मिक सहयोग" : "Offer Dakshina (Support)",
+                title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
                 priceKey: "dakshina",
                 price: PRODUCT_PRICES.dakshina[currency],
-                desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं सर्वर के रख-रखाव हेतु सहयोग" : "Support free spiritual Vedic Astrology research & maintenance",
-                icon: "🪷"
+                desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                icon: "🪷",
+                isDakshina: true
               })}
-              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "7px 14px", borderRadius: 20, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}
+              style={{
+                background: "linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(217, 119, 6, 0.38))",
+                border: "1.5px solid #F59E0B",
+                color: "#FDE68A",
+                padding: "8px 18px",
+                borderRadius: 22,
+                fontSize: 13,
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                boxShadow: "0 0 14px rgba(245,158,11,0.35)",
+                animation: "pulseSlow 3s ease-in-out infinite"
+              }}
             >
-              <span>🙏</span> {hi ? "दक्षिणा दें" : "Offer Dakshina"} ({PRODUCT_PRICES.dakshina[currency]})
+              <span style={{ fontSize: 15 }}>🪷</span> {hi ? "श्रद्धा दक्षिणा" : "Offer Dakshina"} ({PRODUCT_PRICES.dakshina[currency]})
             </button>
 
             {result && (
@@ -2619,6 +2807,74 @@ export default function App() {
               </div>
             )}
 
+            {/* Free Initiative & Dakshina Spotlight Announcement Banner */}
+            {!result && (
+              <div
+                className="glass-card no-print"
+                style={{
+                  padding: "18px 24px",
+                  marginBottom: 24,
+                  background: "linear-gradient(135deg, rgba(38, 22, 68, 0.92), rgba(18, 11, 40, 0.96))",
+                  border: "1.5px solid rgba(245, 158, 11, 0.55)",
+                  borderRadius: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: 16,
+                  boxShadow: "0 6px 24px rgba(245, 158, 11, 0.15)"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 260 }}>
+                  <span style={{ fontSize: 32 }}>🪷</span>
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 11.5, fontWeight: 800, background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.35)", padding: "2px 10px", borderRadius: 12, marginBottom: 4 }}>
+                      <span>✓</span> {hi ? "100% निःशुल्क सेवा पहल · सर्वजन कल्याण" : "100% FREE INITIATIVE · FOR EVERY SEEKER"}
+                    </div>
+                    <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
+                      {hi
+                        ? "समस्त गणनाएं, भविष्यवाणियां व 50-पेज महा-कुंडली रिपोर्ट पूर्णतः निःशुल्क हैं"
+                        : "All Vedic Forecasts & Deluxe 50-Page Kundli Dossiers Are 100% Free"}
+                    </div>
+                    <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, marginTop: 2, lineHeight: 1.5 }}>
+                      {hi
+                        ? "सनातन धर्म की पावन भावना में वैदिक ज्ञान सब के लिए। सर्वर व शोध सहयोग हेतु स्वेच्छानुसार 'श्रद्धा दक्षिणा' अर्पित कर सकते हैं।"
+                        : "Pure Vedic guidance for all. You may offer a voluntary Dakshina to support high-precision servers and continuous research."}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveCheckout({
+                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                    priceKey: "dakshina",
+                    price: PRODUCT_PRICES.dakshina[currency],
+                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                    icon: "🪷",
+                    isDakshina: true
+                  })}
+                  style={{
+                    background: "linear-gradient(90deg, #F59E0B, #D97706)",
+                    border: "none",
+                    color: "#0F0A1E",
+                    padding: "11px 22px",
+                    borderRadius: 22,
+                    fontSize: 13.5,
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 7,
+                    boxShadow: "0 4px 14px rgba(245,158,11,0.35)",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
+                </button>
+              </div>
+            )}
+
             {/* Input Form Card */}
             <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
               <div style={{ marginBottom: 24, textAlign: "center" }}>
@@ -2832,39 +3088,45 @@ export default function App() {
               </div>
             </div>
 
-            {/* Monetization Promotion Banner */}
-            <div className="glass-card" style={{ padding: "20px 26px", marginBottom: 24, background: "linear-gradient(135deg, rgba(35,22,65,0.9), rgba(18,12,38,0.95))", border: "1px solid rgba(245,158,11,0.45)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
+            {/* Dedicated Grand Emotional Dakshina Card (Highest Visibility) */}
+            {renderDakshinaCard(false)}
+
+            {/* 50-Page Deluxe Report Banner — 100% Free */}
+            <div className="glass-card" style={{ padding: "22px 28px", marginBottom: 24, background: "linear-gradient(135deg, rgba(35,22,65,0.95), rgba(18,12,38,0.98))", border: "1.5px solid rgba(245,158,11,0.5)", borderRadius: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
               <div>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.2)", borderRadius: 12, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
-                  <span>⭐</span> {hi ? "प्रीमियम 50+ पेज महा-कुंडली रिपोर्ट" : "DELUXE 50+ PAGE LIFE REPORT"}
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.45)", borderRadius: 12, padding: "4px 12px", color: "#34D399", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
+                  <span>✓</span> {hi ? "100% निःशुल्क महा-रिपोर्ट अनलॉक" : "100% FREE DELUXE REPORT UNLOCKED"}
                 </div>
-                <h4 style={{ color: "#F3D37A", fontSize: 15.5, fontWeight: 700 }}>
-                  {hi ? "वर्ष 2026-2027 वार्षिक गोचर, साढ़ेसाती व विस्तृत समाधान प्राप्त करें" : "Unlock Complete 2026-2027 Annual Transit Forecast & Remedies"}
+                <h4 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800 }}>
+                  {hi ? "सम्पूर्ण 50+ पृष्ठ महा-कुंडली व जीवन दर्शन PDF (निःशुल्क डाउनलोड)" : "Complete 50+ Page Deluxe Kundli Dossier PDF (100% Free)"}
                 </h4>
+                <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, margin: "4px 0 0" }}>
+                  {hi ? "दशा चक्र, साढ़ेसाती काल, करियर प्रोमोशन, विवाह योग एवं सम्पूर्ण लाल किताब उपाय।" : "Full planetary dasha timelines, Sade Sati phases, career windows & remedial shields."}
+                </p>
               </div>
-              {effectiveProUnlocked ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <button
                   onClick={() => handlePrintReport("all")}
                   className="gold-cta-btn"
-                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)", display: "inline-flex", alignItems: "center", gap: 6 }}
+                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)", display: "inline-flex", alignItems: "center", gap: 8 }}
                 >
-                  <span>👑</span> {isAdmin ? (hi ? "एडमिन: 50-पेज PDF डाउनलोड करें" : "Admin: Download 50-Page PDF") : (hi ? "50-पेज PDF डाउनलोड करें" : "Download 50-Page PDF")}
+                  <span>📥</span> {hi ? "50-पेज PDF डाउनलोड करें (निःशुल्क)" : "Download Complete 50-Page PDF (FREE)"}
                 </button>
-              ) : (
                 <button
+                  type="button"
                   onClick={() => setActiveCheckout({
-                    title: hi ? "50-पेज गोल्डन महा-कुंडली रिपोर्ट" : "Golden Deluxe 50-Page Life Report",
-                    priceKey: "deluxeReport",
-                    price: PRODUCT_PRICES.deluxeReport[currency],
-                    desc: hi ? "दशा विश्लेषण, साढ़ेसाती, करियर और व्यक्तिगत उपाय सहित विस्तृत PDF" : "Full life analysis, transit timing, Sade Sati & energized gemstones PDF",
-                    icon: "📜",
-                    isDeluxeUnlock: true
+                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                    priceKey: "dakshina",
+                    price: PRODUCT_PRICES.dakshina[currency],
+                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                    icon: "🪷",
+                    isDakshina: true
                   })}
-                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 22px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)" }}
+                  style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "11px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                 >
-                  {hi ? "अनलॉक करें" : "Unlock Report"} ({PRODUCT_PRICES.deluxeReport[currency]})
+                  <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
                 </button>
-              )}
+              </div>
             </div>
 
             {/* ── REORGANIZED TAB NAVIGATION (Grouped by Context: Individual vs Universal) ── */}
@@ -3314,9 +3576,23 @@ export default function App() {
                       </div>
 
                       {effectiveCareerUnlocked && (
-                        <div style={{ textAlign: "center", paddingTop: 10 }}>
-                          <button onClick={() => handlePrintReport("career")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
-                            📄 {hi ? "करियर PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Career Report PDF"}
+                        <div style={{ textAlign: "center", paddingTop: 14, display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          <button onClick={() => handlePrintReport("career")} className="gold-cta-btn" style={{ padding: "11px 24px", fontSize: 13.5 }}>
+                            📄 {hi ? "करियर PDF रिपोर्ट प्रिंट / डाउनलोड करें (FREE)" : "Save / Print Career Report PDF (FREE)"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveCheckout({
+                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                              priceKey: "dakshina",
+                              price: PRODUCT_PRICES.dakshina[currency],
+                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                              icon: "🪷",
+                              isDakshina: true
+                            })}
+                            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                          >
+                            <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
                           </button>
                         </div>
                       )}
@@ -3522,9 +3798,23 @@ export default function App() {
                       </div>
 
                       {effectiveRemediesUnlocked && (
-                        <div style={{ textAlign: "center", paddingTop: 14 }}>
-                          <button onClick={() => handlePrintReport("remedies")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
-                            📄 {hi ? "उपाय PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Remedies Dossier PDF"}
+                        <div style={{ textAlign: "center", paddingTop: 14, display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          <button onClick={() => handlePrintReport("remedies")} className="gold-cta-btn" style={{ padding: "11px 24px", fontSize: 13.5 }}>
+                            📄 {hi ? "उपाय PDF रिपोर्ट प्रिंट / डाउनलोड करें (FREE)" : "Save / Print Remedies Dossier PDF (FREE)"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveCheckout({
+                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                              priceKey: "dakshina",
+                              price: PRODUCT_PRICES.dakshina[currency],
+                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                              icon: "🪷",
+                              isDakshina: true
+                            })}
+                            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                          >
+                            <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
                           </button>
                         </div>
                       )}
@@ -3852,9 +4142,23 @@ export default function App() {
                       )}
 
                       {effectiveMarriageUnlocked && (
-                        <div style={{ textAlign: "center", paddingTop: 14 }}>
-                          <button onClick={() => handlePrintReport("marriage")} className="gold-cta-btn" style={{ padding: "10px 22px", fontSize: 13.5 }}>
-                            📄 {hi ? "विवाह PDF रिपोर्ट प्रिंट / सेव करें" : "Save / Print Marriage Report PDF"}
+                        <div style={{ textAlign: "center", paddingTop: 14, display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          <button onClick={() => handlePrintReport("marriage")} className="gold-cta-btn" style={{ padding: "11px 24px", fontSize: 13.5 }}>
+                            📄 {hi ? "विवाह PDF रिपोर्ट प्रिंट / डाउनलोड करें (FREE)" : "Save / Print Marriage Report PDF (FREE)"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveCheckout({
+                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                              priceKey: "dakshina",
+                              price: PRODUCT_PRICES.dakshina[currency],
+                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                              icon: "🪷",
+                              isDakshina: true
+                            })}
+                            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                          >
+                            <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
                           </button>
                         </div>
                       )}
@@ -3960,19 +4264,35 @@ export default function App() {
                       {hi ? "महीने-दर-महीने संपूर्ण 2026-2027 PDF रिपोर्ट डाउनलोड करें" : "Download Full 2026-2027 Month-by-Month Forecast PDF"}
                     </div>
                     {effectiveAnnualUnlocked ? (
-                      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                      <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                         {isAdmin && (
                           <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "3px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
                             <span>👑</span> {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Access"}
                           </div>
                         )}
-                        <button
-                          onClick={() => handlePrintReport("annual")}
-                          className="gold-cta-btn"
-                          style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "11px 24px", borderRadius: 8, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, boxShadow: "0 4px 14px rgba(245,158,11,0.35)" }}
-                        >
-                          <span>📄</span> {hi ? "2026-2027 वार्षिक PDF डाउनलोड / प्रिंट करें" : "Download / Print Full 2026-2027 Forecast PDF"}
-                        </button>
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                          <button
+                            onClick={() => handlePrintReport("annual")}
+                            className="gold-cta-btn"
+                            style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "11px 24px", borderRadius: 8, fontSize: 14, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, boxShadow: "0 4px 14px rgba(245,158,11,0.35)" }}
+                          >
+                            <span>📄</span> {hi ? "2026-2027 वार्षिक PDF डाउनलोड / प्रिंट करें (FREE)" : "Download / Print Full 2026-2027 Forecast PDF (FREE)"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setActiveCheckout({
+                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                              priceKey: "dakshina",
+                              price: PRODUCT_PRICES.dakshina[currency],
+                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                              icon: "🪷",
+                              isDakshina: true
+                            })}
+                            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                          >
+                            <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <button
@@ -4113,19 +4433,35 @@ export default function App() {
                         {hi ? "विस्तृत दांपत्य भविष्य, संतान योग एवं निवारण रिपोर्ट (PDF)" : "Unlock Complete 25-Page Matrimonial Compatibility PDF"}
                       </div>
                       {effectiveMatchmakingUnlocked ? (
-                        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                           {isAdmin && (
                             <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11.5, fontWeight: 800 }}>
                               👑 {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Access"}
                             </div>
                           )}
-                          <button
-                            onClick={() => handlePrintReport("matchmaking")}
-                            className="gold-cta-btn"
-                            style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
-                          >
-                            <span>📄</span> {hi ? "मिलान PDF डाउनलोड / प्रिंट करें" : "Download / Print Compatibility PDF"}
-                          </button>
+                          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                            <button
+                              onClick={() => handlePrintReport("matchmaking")}
+                              className="gold-cta-btn"
+                              style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
+                              <span>📄</span> {hi ? "मिलान PDF डाउनलोड / प्रिंट करें (FREE)" : "Download / Print Compatibility PDF (FREE)"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveCheckout({
+                                title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                                priceKey: "dakshina",
+                                price: PRODUCT_PRICES.dakshina[currency],
+                                desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                                icon: "🪷",
+                                isDakshina: true
+                              })}
+                              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
+                              <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <button
@@ -5156,6 +5492,9 @@ export default function App() {
             </div>
           );
         })()}
+
+        {/* Dedicated Emotional Dakshina Card at Bottom of Page */}
+        {renderDakshinaCard(false)}
 
         {/* Screen Footer with Secret Admin Trigger */}
         <footer
