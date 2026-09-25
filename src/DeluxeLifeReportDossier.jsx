@@ -112,6 +112,7 @@ export default function DeluxeLifeReportDossier({
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Date of Birth:</b> <span style={{ color: "#FFF" }}>{dobStr}</span></div>
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Time of Birth:</b> <span style={{ color: "#FFF" }}>{tobStr}</span></div>
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Place of Birth:</b> <span style={{ color: "#FFF" }}>{pobStr}</span></div>
+              <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Gender:</b> <span style={{ color: "#FFF" }}>{form.gender === "female" ? (hi ? "महिला (Female)" : "Female") : form.gender === "other" ? (hi ? "अन्य (Other)" : "Other") : (hi ? "पुरुष (Male)" : "Male")}</span></div>
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Ascendant (Lagna):</b> <span style={{ color: "#34D399", fontWeight: 700 }}>{result.lagna}</span></div>
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Moon Sign (Rashi):</b> <span style={{ color: "#FDE68A", fontWeight: 700 }}>{result.rashi}</span></div>
               <div><b style={{ color: "rgba(243,211,122,0.85)" }}>Birth Nakshatra:</b> <span style={{ color: "#FFF" }}>{result.nakshatra}</span></div>

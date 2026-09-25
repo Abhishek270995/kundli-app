@@ -31,6 +31,21 @@ export const Icons = {
       }
     />
   ),
+  Gender: ({ size = 16, color = "#F59E0B" }) => (
+    <SvgIcon
+      size={size}
+      color={color}
+      path={
+        <>
+          <circle cx="9" cy="9" r="5" />
+          <line x1="13" y1="5" x2="20" y2="1" />
+          <polyline points="15 1 20 1 20 6" />
+          <line x1="9" y1="14" x2="9" y2="21" />
+          <line x1="6" y1="18" x2="12" y2="18" />
+        </>
+      }
+    />
+  ),
   Calendar: ({ size = 16, color = "#FDE68A" }) => (
     <SvgIcon
       size={size}

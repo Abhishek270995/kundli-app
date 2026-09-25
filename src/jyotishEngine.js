@@ -452,7 +452,7 @@ export function generateAnnualTransitReport({ name, ascSignName, moonSignName, l
 /* -------------------------------------------------------------
    COMPLETE VEDIC ANALYSIS GENERATOR
 ------------------------------------------------------------- */
-export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = "en" }) {
+export function generateVedicKundliData({ name, gender = "male", dob, tob, pob, lat, lon, lang = "en" }) {
   let birthDate;
   if (dob.includes("T")) {
     birthDate = new Date(dob);
@@ -835,6 +835,11 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
   const gocharaTransits = calculateCurrentGochara(moonSignIdx, ascSignIdx, lang);
 
   return {
+    name,
+    gender,
+    dob,
+    tob,
+    pob,
     lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
     lagnaSign: ascSign.name,
     rashi: `${moonSign.name} (${moonSign.sanskrit})`,

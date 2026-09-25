@@ -87,6 +87,7 @@ const UI = {
     formTitle: "Enter Your Birth Details",
     formSub: "Accurate planetary calculations according to traditional Parashari Vedic Astrology",
     fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth",
+    fGender: "Gender", genderMale: "Male", genderFemale: "Female", genderOther: "Other",
     fTobHelp: "(12:00 PM if unsure)",
     phName: "Enter your full name", phPob: "Enter birth city, state / country",
     btnGo: "Reveal My Kundli ✦", btnWait: "Consulting the Stars...",
@@ -154,6 +155,7 @@ const UI = {
     formTitle: "अपना जन्म विवरण दर्ज करें",
     formSub: "पराशरी वैदिक ज्योतिष के प्रामाणिक सिद्धांतों पर आधारित सटीक गणना",
     fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान",
+    fGender: "लिंग (Gender)", genderMale: "पुरुष", genderFemale: "महिला", genderOther: "अन्य",
     fTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
     phName: "अपना पूरा नाम दर्ज करें", phPob: "जन्म का शहर, राज्य / देश दर्ज करें",
     btnGo: "मेरी कुंडली प्रकट करें ✦", btnWait: "ग्रहों से परामर्श जारी है...",
@@ -1285,7 +1287,7 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
 
 // ── MAIN APP COMPONENT ───────────────────────────────────────────
 export default function App() {
-  const [form, setForm] = useState({ name: "", dob: "", pob: "", tob: "" });
+  const [form, setForm] = useState({ name: "", gender: "male", dob: "", pob: "", tob: "" });
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
   const [tab, setTab] = useState("chart");
@@ -1352,6 +1354,7 @@ export default function App() {
   const handleFillSample = () => {
     setForm({
       name: hi ? "राहुल शर्मा" : "Rahul Sharma",
+      gender: "male",
       dob: "1995-05-15",
       tob: "10:30",
       pob: "New Delhi, India"
@@ -1795,6 +1798,7 @@ export default function App() {
       await new Promise(r => setTimeout(r, 450));
       const resData = generateVedicKundliData({
         name: form.name,
+        gender: form.gender || "male",
         dob: form.dob,
         tob: form.tob,
         pob: form.pob,
@@ -1835,6 +1839,7 @@ export default function App() {
       try {
         const updated = generateVedicKundliData({
           name: form.name,
+          gender: form.gender || "male",
           dob: form.dob,
           tob: form.tob,
           pob: form.pob,
@@ -4006,6 +4011,61 @@ export default function App() {
                   />
                 </div>
 
+                <div>
+                  <label id="birth-gender-label" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
+                    <Icons.Gender size={15} color="#F59E0B" /> {t.fGender} *
+                  </label>
+                  <div
+                    role="radiogroup"
+                    aria-labelledby="birth-gender-label"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gap: 6,
+                      height: 48
+                    }}
+                  >
+                    {[
+                      { val: "male", label: t.genderMale, icon: "♂" },
+                      { val: "female", label: t.genderFemale, icon: "♀" },
+                      { val: "other", label: t.genderOther, icon: "⚧" }
+                    ].map(g => {
+                      const active = (form.gender || "male") === g.val;
+                      return (
+                        <button
+                          key={g.val}
+                          type="button"
+                          role="radio"
+                          aria-checked={active}
+                          onClick={() => { setForm({ ...form, gender: g.val }); if (err) setErr(""); }}
+                          style={{
+                            background: active
+                              ? "linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.25))"
+                              : "rgba(11, 8, 25, 0.65)",
+                            border: active ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
+                            borderRadius: 10,
+                            color: active ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
+                            fontWeight: active ? 800 : 600,
+                            fontSize: 13,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 5,
+                            padding: "0 4px",
+                            boxShadow: active ? "0 0 14px rgba(245, 158, 11, 0.3)" : "none",
+                            transition: "all 0.15s ease",
+                            fontFamily: "inherit"
+                          }}
+                        >
+                          <span style={{ fontSize: 14, color: active ? "#F59E0B" : "rgba(243, 211, 122, 0.6)" }}>{g.icon}</span>
+                          <span>{g.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div style={{ gridColumn: "1 / -1" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
                     <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", letterSpacing: 0.5 }}>
@@ -4169,7 +4229,7 @@ export default function App() {
                 {form.name.toUpperCase()}
               </h2>
               <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13.5, letterSpacing: 0.5, fontWeight: 500 }}>
-                {form.dob} · {form.pob} {form.tob ? `· ${form.tob}` : ""}
+                {form.dob} · {form.pob} {form.tob ? `· ${form.tob}` : ""} · {form.gender === "female" ? (hi ? "महिला (Female)" : "Female") : form.gender === "other" ? (hi ? "अन्य (Other)" : "Other") : (hi ? "पुरुष (Male)" : "Male")}
               </p>
 
               {/* Core Panchang Pills */}
@@ -7471,7 +7531,7 @@ export default function App() {
                       ✦ CONFIDENTIAL PARASHARI & D10 DASAMSA HOROSCOPIC DOSSIER ✦
                     </div>
                     <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
-                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                      {form.name.toUpperCase()} · {form.gender === "female" ? "FEMALE" : form.gender === "other" ? "OTHER" : "MALE"} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
                     </p>
                   </div>
 
@@ -7680,7 +7740,7 @@ export default function App() {
                       ✦ CONFIDENTIAL TANTRA, MANTRA, YANTRA & VASTU SHIELD ✦
                     </div>
                     <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
-                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                      {form.name.toUpperCase()} · {form.gender === "female" ? "FEMALE" : form.gender === "other" ? "OTHER" : "MALE"} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
                     </p>
                   </div>
 
@@ -7754,7 +7814,7 @@ export default function App() {
                       ✦ 7TH HOUSE, NAVAMSHA (D9) & MATRIMONIAL MUHURAT DOSSIER ✦
                     </div>
                     <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
-                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
+                      {form.name.toUpperCase()} · {form.gender === "female" ? "FEMALE" : form.gender === "other" ? "OTHER" : "MALE"} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob}
                     </p>
                   </div>
 
@@ -7857,7 +7917,7 @@ export default function App() {
                       ✦ CONFIDENTIAL TRANSIT, GOCHARA & MILESTONE DOSSIER ✦
                     </div>
                     <p style={{ color: "rgba(243,211,122,0.9)", fontSize: 13, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 6 }}>
-                      {form.name.toUpperCase()} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob} · MOON: {result.rashi}
+                      {form.name.toUpperCase()} · {form.gender === "female" ? "FEMALE" : form.gender === "other" ? "OTHER" : "MALE"} · DOB: {form.dob} · TOB: {form.tob || "12:00 PM"} · POB: {form.pob} · MOON: {result.rashi}
                     </p>
                   </div>
 
