@@ -7,6 +7,13 @@ import {
   HOUSE_DEEP_DIVES,
   PLANETS
 } from "./deluxeReportData";
+import {
+  getPlanetaryAvastha,
+  detectPlanetaryConjunctions,
+  getPlanetLifeImpactBreakdown,
+  HOUSE_TITLES
+} from "./planetaryAnalysisEngine";
+import { SIGNS } from "./jyotishEngine";
 
 export default function DeluxeLifeReportDossier({
   result,
@@ -34,6 +41,13 @@ export default function DeluxeLifeReportDossier({
   const cp = careerPrediction || {};
   const mp = marriagePrediction || {};
   const lva = mp.loveVsArrange || {};
+
+  // Conjunctions & Planetary Map
+  const pMap = result.planetHouseMap || PLANETS.reduce((acc, p) => {
+    if (result.planetData?.[p.name]?.house) acc[p.name] = result.planetData[p.name].house;
+    return acc;
+  }, {});
+  const conjunctions = detectPlanetaryConjunctions(pMap, result.planetData, lang);
 
   // Standard Page Shell Helper
   const PageShell = ({ pageNum, chapterNum, chapterTitle, children, noHeader = false }) => (
@@ -335,26 +349,39 @@ export default function DeluxeLifeReportDossier({
           <thead>
             <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
               <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Planet</th>
-              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Sign & Sanskrit</th>
-              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>House</th>
-              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Degrees</th>
-              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Nakshatra (Pada)</th>
+              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Sign & House</th>
+              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Degrees & Pada</th>
+              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Avastha & Potency</th>
               <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Dignity</th>
-              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Effect</th>
+              <th style={{ padding: "8px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Functional Effect</th>
             </tr>
           </thead>
           <tbody>
             {PLANETS.map((p, idx) => {
               const pd = result.planetData?.[p.name] || {};
+              const signIdx = Math.max(0, SIGNS.findIndex(s => s.name === pd.sign));
+              const av = getPlanetaryAvastha(pd.degInt !== undefined ? pd.degInt : (parseFloat(pd.degree) || 0), signIdx);
+
               return (
-                <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent", fontSize: 11.5 }}>
-                  <td style={{ padding: "7px 10px", fontWeight: 700, color: p.color }}>{p.symbol} {p.name}</td>
-                  <td style={{ padding: "7px 10px" }}>{pd.sign} ({pd.signSanskrit})</td>
-                  <td style={{ padding: "7px 10px", fontWeight: 700, color: "#FDE68A" }}>H{pd.house}</td>
-                  <td style={{ padding: "7px 10px", color: "#34D399", fontWeight: 600 }}>{pd.degree}</td>
-                  <td style={{ padding: "7px 10px" }}>{pd.nakshatra} (P{pd.pada})</td>
-                  <td style={{ padding: "7px 10px", fontWeight: 700, color: pd.status?.includes("Exalted") || pd.status?.includes("Own") ? "#34D399" : "#FDE68A" }}>{pd.status}</td>
-                  <td style={{ padding: "7px 10px", fontSize: 10.5, color: "rgba(241,231,208,0.85)" }}>{pd.effect}</td>
+                <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent", fontSize: 11 }}>
+                  <td style={{ padding: "7px 10px", fontWeight: 700, color: p.color }}>{p.symbol} {p.name} <span style={{ fontSize: 9.5, opacity: 0.75 }}>({p.sanskrit})</span></td>
+                  <td style={{ padding: "7px 10px" }}>{pd.sign} <span style={{ color: "#FDE68A", fontWeight: 700 }}>· H{pd.house}</span></td>
+                  <td style={{ padding: "7px 10px", color: "#34D399", fontWeight: 600 }}>{pd.degree} <div style={{ fontSize: 9.5, color: "rgba(241,231,208,0.75)" }}>{pd.nakshatra} (P{pd.pada})</div></td>
+                  <td style={{ padding: "7px 10px" }}>
+                    <span style={{
+                      padding: "2px 6px",
+                      borderRadius: 6,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      background: av.key === "Yuva" ? "rgba(16, 185, 129, 0.2)" : (av.key === "Kumara" ? "rgba(59, 130, 246, 0.2)" : "rgba(245, 158, 11, 0.2)"),
+                      color: av.key === "Yuva" ? "#34D399" : (av.key === "Kumara" ? "#93C5FD" : "#FDE68A")
+                    }}>
+                      {hi ? av.nameHi : av.nameEn}
+                    </span>
+                    <div style={{ fontSize: 9.5, color: "rgba(241,231,208,0.7)", marginTop: 2 }}>{hi ? av.potencyHi : av.potencyEn}</div>
+                  </td>
+                  <td style={{ padding: "7px 10px", fontWeight: 700, color: pd.status?.includes("Exalted") || pd.status?.includes("Own") ? "#34D399" : "#FDE68A" }}>{pd.status || "Active"}</td>
+                  <td style={{ padding: "7px 10px", fontSize: 10, color: "rgba(241,231,208,0.85)", lineHeight: 1.4 }}>{pd.effect}</td>
                 </tr>
               );
             })}
@@ -362,38 +389,79 @@ export default function DeluxeLifeReportDossier({
         </table>
 
         <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: 12, fontSize: 12, lineHeight: 1.6, color: "rgba(241,231,208,0.85)" }}>
-          <b style={{ color: "#F3D37A" }}>✦ Ephemeris Analysis:</b> Planets located in Kendra houses (1, 4, 7, 10) and Trikona houses (1, 5, 9) form the core pillar of power in your life, assuring steady recovery from transient afflictions.
+          <b style={{ color: "#F3D37A" }}>✦ Ephemeris & Avastha Analysis:</b> Planets positioned in Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses endowed with Yuva or Kumara Avasthas form the indestructible backbone of your fortune, rapidly delivering auspicious outcomes during their dasha sub-periods.
         </div>
       </PageShell>
 
       {/* ══════════════════════════════════════════════════════════════
-          PAGE 10: AVASTHAS, COMBUSTIONS, RETROGRADE & KARAKAS
+          PAGE 10: AVASTHAS, DEGREE POTENCIES & JAIMINI KARAKAS
       ══════════════════════════════════════════════════════════════ */}
       <PageShell pageNum={10} chapterNum={3} chapterTitle="Planetary Avasthas & Karakas">
-        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 12 }}>
-          ✦ PLANETARY AVASTHAS (STATES) & JAIMINI CHARA KARAKAS
+        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 10 }}>
+          ✦ PLANETARY AVASTHAS (DEGREE POTENCY) & JAIMINI CHARA KARAKAS
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
-            <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, margin: "0 0 8px" }}>⚖️ Baladi Avasthas (Age States)</h4>
-            <div style={{ fontSize: 11.5, lineHeight: 1.7, color: "rgba(241,231,208,0.88)" }}>
-              • <b>Yuva Avastha (Youth — 100% Strength):</b> Full manifestation of auspicious results.<br />
-              • <b>Kumara Avastha (Adolescent — 50% Strength):</b> Active potential with effort.<br />
-              • <b>Bala Avastha (Infant — 25% Strength):</b> Slow germination, results mature with age.<br />
-              • <b>Vriddha / Mrita Avastha:</b> Dormant or internal spiritual energy.
-            </div>
+
+        {/* Native's Computed Avasthas Matrix */}
+        <div style={{ background: "rgba(15,10,32,0.8)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: "10px 12px", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <h4 style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800, margin: 0 }}>
+              ⚖️ Classical Baladi Avastha Analysis (Odd/Even Sign Degree Rule)
+            </h4>
+            <span style={{ fontSize: 10, color: "#34D399", fontWeight: 700 }}>
+              Parashari Metric
+            </span>
           </div>
-          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
-            <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, margin: "0 0 8px" }}>🌀 Retrogression (Vakri) & Combustion (Asta)</h4>
-            <div style={{ fontSize: 11.5, lineHeight: 1.7, color: "rgba(241,231,208,0.88)" }}>
-              • <b>Vakri (Retrograde):</b> Enhances Chesta Bala (effort strength), compelling non-traditional solutions.<br />
-              • <b>Asta (Combust):</b> Purifies external worldly manifestation to elevate inner spiritual clarity.
-            </div>
-          </div>
+
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 10 }}>
+            <thead>
+              <tr style={{ background: "rgba(245, 158, 11, 0.12)", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Planet</th>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Sign & Type</th>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Degree</th>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Avastha</th>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Potency</th>
+                <th style={{ padding: "4px 6px", color: "#FDE68A", textAlign: "left" }}>Physical Manifestation Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PLANETS.map((p, pIdx) => {
+                const pd = result.planetData?.[p.name] || {};
+                const signIdx = Math.max(0, SIGNS.findIndex(s => s.name === pd.sign));
+                const av = getPlanetaryAvastha(pd.degInt !== undefined ? pd.degInt : (parseFloat(pd.degree) || 0), signIdx);
+                const isOdd = signIdx % 2 === 0;
+
+                return (
+                  <tr key={p.name} style={{ borderBottom: "1px solid rgba(212,175,55,0.08)", background: pIdx % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
+                    <td style={{ padding: "4px 6px", fontWeight: 700, color: p.color }}>{p.symbol} {p.name}</td>
+                    <td style={{ padding: "4px 6px", color: "rgba(241,231,208,0.9)" }}>{pd.sign} ({isOdd ? "Odd" : "Even"})</td>
+                    <td style={{ padding: "4px 6px", color: "#34D399", fontWeight: 600 }}>{pd.degree}</td>
+                    <td style={{ padding: "4px 6px" }}>
+                      <span style={{
+                        padding: "1px 5px",
+                        borderRadius: 4,
+                        fontWeight: 700,
+                        fontSize: 9.5,
+                        background: av.key === "Yuva" ? "rgba(16, 185, 129, 0.2)" : (av.key === "Kumara" ? "rgba(59, 130, 246, 0.2)" : "rgba(245, 158, 11, 0.2)"),
+                        color: av.key === "Yuva" ? "#34D399" : (av.key === "Kumara" ? "#93C5FD" : "#FDE68A")
+                      }}>
+                        {av.nameEn}
+                      </span>
+                    </td>
+                    <td style={{ padding: "4px 6px", fontWeight: 700, color: av.key === "Yuva" ? "#34D399" : "#FDE68A" }}>
+                      {av.pct}%
+                    </td>
+                    <td style={{ padding: "4px 6px", color: "rgba(241,231,208,0.85)", fontSize: 9.5 }}>
+                      {av.descEn}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
-        <h4 style={{ color: "#F3D37A", fontSize: 14, fontWeight: 800, marginBottom: 8 }}>✦ JAIMINI CHARA KARAKAS (SOUL MISSION INDICATORS)</h4>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+        <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 800, margin: "0 0 6px" }}>✦ JAIMINI CHARA KARAKAS (SOUL MISSION INDICATORS)</h4>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
           {[
             { role: "Atmakaraka (AK)", desc: "King of the Soul — reveals your highest spiritual lessons & supreme karmic purpose.", icon: "👑" },
             { role: "Amatyakaraka (AmK)", desc: "Minister of Career — indicates professional vocation, intellect & financial vehicle.", icon: "💼" },
@@ -402,9 +470,9 @@ export default function DeluxeLifeReportDossier({
             { role: "Putrakaraka (PK)", desc: "Progeny & Wisdom — governs artistic children, creative intelligence & disciples.", icon: "🎨" },
             { role: "Darakaraka (DK)", desc: "Spouse & Soulmate — defines the nature and arrival of the lifetime romantic partner.", icon: "💑" },
           ].map((k, i) => (
-            <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "10px 12px" }}>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#FDE68A" }}>{k.icon} {k.role}</div>
-              <div style={{ fontSize: 11, color: "rgba(241,231,208,0.85)", marginTop: 4, lineHeight: 1.5 }}>{k.desc}</div>
+            <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: "7px 9px" }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#FDE68A" }}>{k.icon} {k.role}</div>
+              <div style={{ fontSize: 10, color: "rgba(241,231,208,0.85)", marginTop: 2, lineHeight: 1.35 }}>{k.desc}</div>
             </div>
           ))}
         </div>
@@ -417,50 +485,121 @@ export default function DeluxeLifeReportDossier({
         const pObj = PLANETS.find(x => x.name === pName) || { symbol: pName.slice(0, 2), color: "#D4AF37" };
         const pd = result.planetData?.[pName] || {};
         const dd = PLANET_DEEP_DIVES[pName] || {};
+        const pBreakdown = getPlanetLifeImpactBreakdown(pName, pd, result.houses, lang);
 
         return (
           <PageShell key={pName} pageNum={11 + pIdx} chapterNum={4} chapterTitle={`${pName} Cosmic Dossier`}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, borderBottom: "1.5px solid rgba(212,175,55,0.3)", paddingBottom: 10, marginBottom: 14 }}>
-              <div style={{ fontSize: 32, color: pObj.color }}>{pObj.symbol}</div>
-              <div>
-                <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>{dd.title}</h3>
-                <div style={{ color: "rgba(241,231,208,0.75)", fontSize: 12, marginTop: 2 }}>{dd.sanskrit} · In your chart: <b>{pd.sign}</b> ({pd.degree}) in <b>House {pd.house}</b></div>
+            {/* Header Banner */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1.5px solid rgba(212,175,55,0.3)", paddingBottom: 6, marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ fontSize: 26, color: pObj.color }}>{pObj.symbol}</div>
+                <div>
+                  <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                    {pBreakdown.planet} ({pBreakdown.planetHi}) · {dd.title}
+                  </h3>
+                  <div style={{ color: "rgba(241,231,208,0.75)", fontSize: 11, marginTop: 2 }}>
+                    Placement: <b>{pBreakdown.sign}</b> ({pBreakdown.degree}) in <b>House {pBreakdown.house}</b> · Karaka: {pBreakdown.karaka}
+                  </div>
+                </div>
+              </div>
+              <span style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.35)", color: "#34D399", padding: "2px 7px", borderRadius: 6, fontSize: 10.5, fontWeight: 700 }}>
+                {pd.status || "Benefic"}
+              </span>
+            </div>
+
+            {/* Degree Avastha & House Association Banner */}
+            <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 8, marginBottom: 8 }}>
+              <div style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 7, padding: "6px 9px", fontSize: 10.5 }}>
+                <div style={{ color: "#FDE68A", fontWeight: 800, marginBottom: 2, display: "flex", alignItems: "center", gap: 5 }}>
+                  <span>📐</span>
+                  <span>Avastha: {pBreakdown.avastha.nameEn} ({pBreakdown.avastha.potencyEn})</span>
+                </div>
+                <div style={{ color: "rgba(241,231,208,0.9)", lineHeight: 1.4 }}>
+                  {pBreakdown.avastha.descEn}
+                </div>
+              </div>
+
+              <div style={{ background: "rgba(59, 130, 246, 0.08)", border: "1px solid rgba(59, 130, 246, 0.3)", borderRadius: 7, padding: "6px 9px", fontSize: 10.5 }}>
+                <div style={{ color: "#93C5FD", fontWeight: 800, marginBottom: 2, display: "flex", alignItems: "center", gap: 5 }}>
+                  <span>🏠</span>
+                  <span>{pBreakdown.houseTitle}</span>
+                </div>
+                <div style={{ color: "rgba(241,231,208,0.9)", lineHeight: 1.4 }}>
+                  {pBreakdown.houseGovernance}
+                </div>
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 14 }}>
-              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 10 }}>
-                <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>Nakshatra & Pada</div>
-                <div style={{ fontSize: 13, color: "#FFF", fontWeight: 800, marginTop: 2 }}>{pd.nakshatra} (P{pd.pada})</div>
+            {/* 5-Dimensional Life Impact Grid */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 11.5, fontWeight: 800, color: "#F3D37A", marginBottom: 5, letterSpacing: 0.5 }}>
+                ✦ MULTI-DIMENSIONAL LIFE IMPACT ANALYSIS
               </div>
-              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 10 }}>
-                <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>Dignity / Status</div>
-                <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 2 }}>{pd.status || "Benefic"}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}>
+                {/* 1. Career */}
+                <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 7, padding: "7px 9px" }}>
+                  <div style={{ color: "#FDE68A", fontSize: 10.5, fontWeight: 800, marginBottom: 2 }}>
+                    💼 Career & Ambition
+                  </div>
+                  <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 10, lineHeight: 1.45 }}>
+                    {pBreakdown.aspects.career}
+                  </div>
+                </div>
+
+                {/* 2. Education */}
+                <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 7, padding: "7px 9px" }}>
+                  <div style={{ color: "#93C5FD", fontSize: 10.5, fontWeight: 800, marginBottom: 2 }}>
+                    🎓 Education & Intellect
+                  </div>
+                  <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 10, lineHeight: 1.45 }}>
+                    {pBreakdown.aspects.education}
+                  </div>
+                </div>
+
+                {/* 3. Love Life */}
+                <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 7, padding: "7px 9px" }}>
+                  <div style={{ color: "#F472B6", fontSize: 10.5, fontWeight: 800, marginBottom: 2 }}>
+                    ❤️ Love Life & Marriage
+                  </div>
+                  <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 10, lineHeight: 1.45 }}>
+                    {pBreakdown.aspects.love}
+                  </div>
+                </div>
+
+                {/* 4. Wealth */}
+                <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 7, padding: "7px 9px" }}>
+                  <div style={{ color: "#34D399", fontSize: 10.5, fontWeight: 800, marginBottom: 2 }}>
+                    💰 Wealth & Assets
+                  </div>
+                  <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 10, lineHeight: 1.45 }}>
+                    {pBreakdown.aspects.wealth}
+                  </div>
+                </div>
               </div>
-              <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 8, padding: 10 }}>
-                <div style={{ fontSize: 11, color: "#FDE68A", fontWeight: 700 }}>Governed Organs</div>
-                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.9)", marginTop: 2 }}>{dd.bodyParts}</div>
+
+              {/* 5. Health */}
+              <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 7, padding: "7px 9px", marginTop: 7 }}>
+                <div style={{ color: "#C084FC", fontSize: 10.5, fontWeight: 800, marginBottom: 2 }}>
+                  🌿 Health & Vitality
+                </div>
+                <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 10, lineHeight: 1.45 }}>
+                  {pBreakdown.aspects.health}
+                </div>
               </div>
             </div>
 
-            <div style={{ background: "rgba(15,10,32,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16, marginBottom: 14 }}>
-              <h4 style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, margin: "0 0 8px" }}>📜 Astrological Significance & House Placement Effect</h4>
-              <p style={{ fontSize: 12.5, lineHeight: 1.75, color: "rgba(241,231,208,0.92)", margin: "0 0 10px" }}>
-                {pd.effect || dd.significance}
-              </p>
-              <p style={{ fontSize: 12.5, lineHeight: 1.75, color: "rgba(241,231,208,0.92)", margin: 0 }}>
-                {dd.karmicMeaning}
-              </p>
-            </div>
-
-            <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14 }}>
-              <h4 style={{ color: "#F3D37A", fontSize: 13, fontWeight: 800, margin: "0 0 6px" }}>🛡️ Prescribed Harmonization & Sacred Vedic Upay</h4>
-              <div style={{ fontSize: 12, lineHeight: 1.7, color: "rgba(241,231,208,0.9)", marginBottom: 8 }}>
-                {dd.remedyText}
+            {/* Vedic Remedies & Harmonization */}
+            <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 7, padding: "8px 10px" }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#F3D37A", marginBottom: 4, display: "flex", justifyContent: "space-between" }}>
+                <span>🛡️ Vedic Harmonization & Upay</span>
+                <span style={{ color: "#34D399" }}>Deity: {pBreakdown.deity}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, borderTop: "1px solid rgba(245,158,11,0.2)", paddingTop: 8, color: "#FDE68A", flexWrap: "wrap", gap: 6 }}>
-                <span><b>Gemstone:</b> {dd.gemstone}</span>
-                <span><b>Mantra:</b> {dd.mantra}</span>
+              <div style={{ fontSize: 10, lineHeight: 1.45, color: "rgba(241,231,208,0.9)", marginBottom: 4 }}>
+                <b>Remedial Karma:</b> {pBreakdown.remedy}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, borderTop: "1px solid rgba(245,158,11,0.2)", paddingTop: 4, color: "#FDE68A", flexWrap: "wrap", gap: 6 }}>
+                <span><b>Gemstone:</b> {pBreakdown.gemstone}</span>
+                <span><b>Sacred Mantra:</b> {pBreakdown.mantra}</span>
               </div>
             </div>
           </PageShell>
@@ -514,35 +653,65 @@ export default function DeluxeLifeReportDossier({
       })}
 
       {/* ══════════════════════════════════════════════════════════════
-          PAGE 32: MAJOR AUSPICIOUS VEDIC YOGAS
+          PAGE 32: ACTIVE PLANETARY CONJUNCTIONS & GRAND YOGAS
       ══════════════════════════════════════════════════════════════ */}
-      <PageShell pageNum={32} chapterNum={6} chapterTitle="Auspicious Vedic Yogas">
-        <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, marginBottom: 12, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-          ⚡ RAJA YOGAS & DHANA YOGAS ACTIVE IN YOUR BIRTH CHART
+      <PageShell pageNum={32} chapterNum={6} chapterTitle="Vedic Yogas & Combinations">
+        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginBottom: 8, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+          ⚡ ACTIVE PLANETARY CONJUNCTIONS (YUTIS) & GRAND VEDIC YOGAS
         </h3>
-        <p style={{ fontSize: 12.5, lineHeight: 1.7, color: "rgba(241,231,208,0.85)", marginBottom: 14 }}>
-          In Parashari astrology, Yogas represent special geometric alignments that amplify wealth, authority, and public fame. Below are the key planetary combinations identified in your horoscope:
+        <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "rgba(241,231,208,0.85)", marginBottom: 10 }}>
+          When multiple planets occupy the same house, their joint energies synthesize distinct karmic patterns. Below are the active planetary conjunctions identified in your horoscope:
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-          {[
-            { name: "Dharma-Karmadhipati Raja Yoga", type: "Raja Yoga (Supreme Authority)", desc: "Association between 9th Lord (Bhagya) and 10th Lord (Karma). Confers extraordinary executive success, ethical leadership, and high societal influence." },
-            { name: "Gajakesari Yoga", type: "Wisdom & Popularity", desc: "Jupiter in Kendra from Moon. Grants lasting public respect, unwavering optimism, intellectual eminence, and protective immunity against hidden enemies." },
-            { name: "Budhaditya Yoga", type: "Solar-Mercurial Brilliance", desc: "Sun and Mercury conjunction. Bestows analytical acuity, persuasive communication, mastery of strategic planning, and bureaucratic or corporate favor." },
-            { name: "Lakshmi Dhana Yoga", type: "Wealth & Prosperity", desc: "Mutual harmony between 1st, 2nd, and 11th lords. Ensures multi-stream liquid inflows, asset accumulation, and financial security through personal merit." }
-          ].map((y, yi) => (
-            <div key={yi} style={{ background: "rgba(15,10,32,0.8)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800 }}>{y.name}</span>
-                <span style={{ color: "#34D399", fontSize: 11, fontWeight: 700 }}>{y.type}</span>
+        {conjunctions.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 }}>
+            {conjunctions.slice(0, 3).map((conj, cIdx) => (
+              <div key={cIdx} style={{ background: "rgba(15,10,32,0.8)", border: conj.category === "auspicious" ? "1px solid rgba(16, 185, 129, 0.35)" : "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 8, padding: "10px 12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>{conj.icon}</span>
+                    <span>{conj.yogaName}</span>
+                    <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 600 }}>({conj.houseTitle})</span>
+                  </div>
+                  <span style={{
+                    fontSize: 10,
+                    padding: "2px 6px",
+                    borderRadius: 6,
+                    background: conj.category === "auspicious" ? "rgba(16, 185, 129, 0.2)" : "rgba(245, 158, 11, 0.2)",
+                    color: conj.category === "auspicious" ? "#34D399" : "#FDE68A",
+                    fontWeight: 700
+                  }}>
+                    {conj.category === "auspicious" ? "Auspicious Yoga" : "Dynamic Karmic Yoga"}
+                  </span>
+                </div>
+                <p style={{ fontSize: 11, lineHeight: 1.5, color: "rgba(241,231,208,0.9)", margin: "0 0 6px" }}>
+                  {conj.meaning}
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, fontSize: 10 }}>
+                  <div style={{ background: "rgba(245, 158, 11, 0.06)", border: "1px solid rgba(245, 158, 11, 0.2)", borderRadius: 6, padding: "5px 8px" }}>
+                    <b style={{ color: "#FDE68A" }}>💼 Career:</b> <span style={{ color: "rgba(241,231,208,0.85)" }}>{conj.career}</span>
+                  </div>
+                  <div style={{ background: "rgba(59, 130, 246, 0.06)", border: "1px solid rgba(59, 130, 246, 0.2)", borderRadius: 6, padding: "5px 8px" }}>
+                    <b style={{ color: "#93C5FD" }}>🎓 Intellect:</b> <span style={{ color: "rgba(241,231,208,0.85)" }}>{conj.intellect}</span>
+                  </div>
+                  <div style={{ background: "rgba(244, 114, 182, 0.06)", border: "1px solid rgba(244, 114, 182, 0.2)", borderRadius: 6, padding: "5px 8px" }}>
+                    <b style={{ color: "#F472B6" }}>❤️ Love Life:</b> <span style={{ color: "rgba(241,231,208,0.85)" }}>{conj.love}</span>
+                  </div>
+                </div>
               </div>
-              <p style={{ fontSize: 12, lineHeight: 1.65, color: "rgba(241,231,208,0.88)", margin: 0 }}>{y.desc}</p>
+            ))}
+          </div>
+        ) : (
+          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(212,175,55,0.3)", borderRadius: 8, padding: 12, marginBottom: 12, textAlign: "center" }}>
+            <div style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 700 }}>Independent Planetary Distribution</div>
+            <div style={{ color: "rgba(241,231,208,0.85)", fontSize: 11, marginTop: 4 }}>
+              Planets are distributed across separate houses without direct conjunctions, providing focused energy across diverse life spheres without combustion friction.
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
-        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: 14, fontSize: 12.5, lineHeight: 1.75, color: "rgba(241,231,208,0.92)" }}>
-          <b style={{ color: "#F3D37A" }}>✦ Specific Chart Yogas:</b> {result.yogas || "Your birth chart displays fortunate mutual trines between benefic planets, promising steady recognition during Jupiter and Venus dasha periods."}
+        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 10, padding: 12, fontSize: 11.5, lineHeight: 1.65, color: "rgba(241,231,208,0.92)" }}>
+          <b style={{ color: "#F3D37A" }}>✦ Classical Parashari Yogas:</b> {result.yogas || "Your birth chart displays fortunate mutual trines between benefic planets, promising steady recognition during Jupiter and Venus dasha periods."}
         </div>
       </PageShell>
 
