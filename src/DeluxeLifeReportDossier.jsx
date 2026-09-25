@@ -889,16 +889,16 @@ export default function DeluxeLifeReportDossier({
           </div>
           <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
             <div style={{ color: "#34D399", fontSize: 13.5, fontWeight: 800, marginBottom: 4 }}>
-              📅 Active Antardasha: {detailedDashas.activeAntardasha?.subLord || "Benefic"} ({detailedDashas.activeAntardasha?.startYear || 2024} – {detailedDashas.activeAntardasha?.endYear || 2026})
+              📅 Active Antardasha: {detailedDashas.currentActiveAntardasha?.antardashaLord || detailedDashas.activeAntardasha?.subLord || "Benefic"} ({detailedDashas.currentActiveAntardasha?.startYear || detailedDashas.activeAntardasha?.startYear || 2024} – {detailedDashas.currentActiveAntardasha?.endYear || detailedDashas.activeAntardasha?.endYear || 2026})
             </div>
             <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "rgba(241,231,208,0.9)", margin: 0 }}>
-              Sub-period of {detailedDashas.activeAntardasha?.subLord || "current planet"} governs your immediate 12–24 month environment, catalyzing income expansion and strategic decisions.
+              Sub-period of {detailedDashas.currentActiveAntardasha?.antardashaLord || detailedDashas.activeAntardasha?.subLord || "current planet"} governs your immediate 12–24 month environment, catalyzing income expansion and strategic decisions.
             </p>
           </div>
         </div>
 
         {/* Antardasha Timetable */}
-        {detailedDashas.antardashas && detailedDashas.antardashas.length > 0 && (
+        {(detailedDashas.activeAntardashas || detailedDashas.antardashas) && (detailedDashas.activeAntardashas || detailedDashas.antardashas).length > 0 && (
           <div style={{ marginBottom: 14 }}>
             <h4 style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800, margin: "0 0 6px" }}>
               ⏳ 9 Antardasha Timetable of Current {detailedDashas.activeMahadasha?.lord} Mahadasha
@@ -908,33 +908,37 @@ export default function DeluxeLifeReportDossier({
                 <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
                   <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Sub-Period (Bhukti)</th>
                   <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Duration Span</th>
-                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Span Years</th>
+                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Duration</th>
                   <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Current Status</th>
                 </tr>
               </thead>
               <tbody>
-                {detailedDashas.antardashas.map((ad, idx) => (
-                  <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: ad.isCurrent ? "rgba(16, 185, 129, 0.15)" : (idx % 2 ? "rgba(255,255,255,0.02)" : "transparent") }}>
-                    <td style={{ padding: "5px 8px", fontWeight: 700, color: ad.isCurrent ? "#34D399" : "#FDE68A" }}>
-                      {detailedDashas.activeMahadasha?.lord} - {ad.subLord}
-                    </td>
-                    <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.9)" }}>
-                      {ad.startYear} – {ad.endYear}
-                    </td>
-                    <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.75)" }}>
-                      {ad.years} yrs
-                    </td>
-                    <td style={{ padding: "5px 8px" }}>
-                      {ad.isCurrent ? (
-                        <span style={{ background: "rgba(16,185,129,0.3)", color: "#34D399", padding: "1px 6px", borderRadius: 4, fontWeight: 700, fontSize: 10 }}>
-                          ACTIVE NOW
-                        </span>
-                      ) : (
-                        <span style={{ color: "rgba(241,231,208,0.6)", fontSize: 10 }}>Scheduled</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {(detailedDashas.activeAntardashas || detailedDashas.antardashas).map((ad, idx) => {
+                  const subName = ad.antardashaLord || ad.subLord;
+                  const isCurrent = ad.isActive || ad.isCurrent;
+                  return (
+                    <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: isCurrent ? "rgba(16, 185, 129, 0.15)" : (idx % 2 ? "rgba(255,255,255,0.02)" : "transparent") }}>
+                      <td style={{ padding: "5px 8px", fontWeight: 700, color: isCurrent ? "#34D399" : "#FDE68A" }}>
+                        {detailedDashas.activeMahadasha?.lord} - {subName}
+                      </td>
+                      <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.9)" }}>
+                        {ad.startYear} – {ad.endYear}
+                      </td>
+                      <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.75)" }}>
+                        {ad.durationMonths ? `${ad.durationMonths} mo` : `${ad.years} yrs`}
+                      </td>
+                      <td style={{ padding: "5px 8px" }}>
+                        {isCurrent ? (
+                          <span style={{ background: "rgba(16,185,129,0.3)", color: "#34D399", padding: "1px 6px", borderRadius: 4, fontWeight: 700, fontSize: 10 }}>
+                            ACTIVE NOW
+                          </span>
+                        ) : (
+                          <span style={{ color: "rgba(241,231,208,0.6)", fontSize: 10 }}>Scheduled</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
