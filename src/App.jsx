@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   generateVedicKundliData,
   calculateGunMilan,
@@ -3964,9 +3964,10 @@ export default function App() {
                           }}
                         >
                           <span style={{ display: "inline-flex", alignItems: "center" }}>
-                            {Icons[tabItem.iconName]
-                              ? React.createElement(Icons[tabItem.iconName], { size: 16, color: isActive ? "#0F0A1E" : "#FDE68A" })
-                              : tabItem.icon}
+                            {(() => {
+                              const TabIcon = Icons[tabItem.iconName];
+                              return TabIcon ? <TabIcon size={16} color={isActive ? "#0F0A1E" : "#FDE68A"} /> : tabItem.icon;
+                            })()}
                           </span>
                           <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
                         </button>
@@ -4033,9 +4034,10 @@ export default function App() {
                           }}
                         >
                           <span style={{ display: "inline-flex", alignItems: "center" }}>
-                            {Icons[tabItem.iconName]
-                              ? React.createElement(Icons[tabItem.iconName], { size: 16, color: isActive ? "#FFFFFF" : "#DDD6FE" })
-                              : tabItem.icon}
+                            {(() => {
+                              const TabIcon = Icons[tabItem.iconName];
+                              return TabIcon ? <TabIcon size={16} color={isActive ? "#FFFFFF" : "#DDD6FE"} /> : tabItem.icon;
+                            })()}
                           </span>
                           <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
                         </button>
