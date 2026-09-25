@@ -49,6 +49,17 @@ export default function DeluxeLifeReportDossier({
   }, {});
   const conjunctions = detectPlanetaryConjunctions(pMap, result.planetData, lang);
 
+  // 10 Comprehensive Vedic Engine Data
+  const panchang = result.natalPanchang || {};
+  const avakahada = result.avakahadaChakra || {};
+  const astro = result.astronomicalSummary || {};
+  const bhavaChalit = result.bhavaChalit || {};
+  const doshas = result.doshaAnalysis || {};
+  const shadbala = result.shadbala || {};
+  const sav = result.ashtakavarga || {};
+  const detailedDashas = result.detailedDashas || {};
+  const gochara = result.gocharaTransits || [];
+
   // Standard Page Shell Helper
   const PageShell = ({ pageNum, chapterNum, chapterTitle, children, noHeader = false }) => (
     <div className="print-page">
@@ -170,17 +181,21 @@ export default function DeluxeLifeReportDossier({
           {[
             { label: "Ascendant (Lagna)", val: result.lagna, icon: "👑" },
             { label: "Moon Sign (Rashi)", val: result.rashi, icon: "🌙" },
-            { label: "Birth Nakshatra", val: result.nakshatra, icon: "⭐" },
-            { label: "Nakshatra Pada", val: result.planetData?.Moon?.pada ? `Pada ${result.planetData.Moon.pada}` : "Pada 1", icon: "🔢" },
-            { label: "Tithi (Lunar Phase)", val: result.tithi, icon: "🌕" },
-            { label: "Vedic Yoga", val: result.yoga, icon: "⚡" },
-            { label: "Solar Day (Vara)", val: new Date(dobStr).toLocaleDateString("en-US", { weekday: "long" }), icon: "☀️" },
-            { label: "Ayanamsha", val: "Lahiri 24°09'", icon: "📐" },
+            { label: "Birth Nakshatra", val: `${panchang.nakshatra || result.nakshatra} (P${panchang.nakshatraPada || result.planetData?.Moon?.pada || "1"})`, icon: "⭐" },
+            { label: "Nakshatra Lord", val: panchang.nakshatraLord || "Active", icon: "🔱" },
+            { label: "Tithi (Lunar Phase)", val: `${panchang.tithi || result.tithi} (${panchang.paksha || "Shukla"})`, icon: "🌕" },
+            { label: "Vedic Yoga", val: panchang.yoga || result.yoga, icon: "⚡" },
+            { label: "Karana", val: panchang.karana || "Bava", icon: "🐅" },
+            { label: "Solar Day (Vara)", val: `${panchang.day || new Date(dobStr).toLocaleDateString("en-US", { weekday: "long" })} (${panchang.dayLord || "Sun"})`, icon: "☀️" },
+            { label: "Sunrise / Sunset", val: panchang.sunrise ? `${panchang.sunrise} / ${panchang.sunset}` : "06:12 AM / 06:18 PM", icon: "🌅" },
+            { label: "Rahu Kaal Window", val: panchang.rahuKaal || "01:30 PM - 03:00 PM", icon: "⏱️" },
+            { label: "Lahiri Ayanamsha", val: astro.ayanamsaDMS || "24°09'12\"", icon: "📐" },
+            { label: "Sidereal Time (LMST)", val: astro.lmst || "14h 22m", icon: "🌌" },
           ].map((item, i) => (
-            <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 12px", textAlign: "center" }}>
-              <div style={{ fontSize: 16 }}>{item.icon}</div>
-              <div style={{ fontSize: 11, color: "rgba(243,211,122,0.85)", fontWeight: 600, marginTop: 2 }}>{item.label}</div>
-              <div style={{ fontSize: 13.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{item.val}</div>
+            <div key={i} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
+              <div style={{ fontSize: 15 }}>{item.icon}</div>
+              <div style={{ fontSize: 10.5, color: "rgba(243,211,122,0.85)", fontWeight: 600, marginTop: 2 }}>{item.label}</div>
+              <div style={{ fontSize: 12.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{item.val}</div>
             </div>
           ))}
         </div>
@@ -188,34 +203,36 @@ export default function DeluxeLifeReportDossier({
         <h3 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 10 }}>
           ✦ AVAKAHADA 8-FOLD ELEMENTAL TEMPERAMENT MATRIX
         </h3>
-        <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)", marginBottom: 16 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)", marginBottom: 14 }}>
           <thead>
             <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
-              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 11.5, textAlign: "left" }}>Panchang Koota</th>
-              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 11.5, textAlign: "left" }}>Assigned Value</th>
-              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 11.5, textAlign: "left" }}>Cosmic Significance</th>
+              <th style={{ padding: "7px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Panchang Koota</th>
+              <th style={{ padding: "7px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Assigned Value</th>
+              <th style={{ padding: "7px 10px", color: "#FDE68A", fontSize: 11, textAlign: "left" }}>Cosmic Significance</th>
             </tr>
           </thead>
           <tbody>
             {[
-              { koota: "Varna (Intellectual / Action Orientation)", val: ["Cancer", "Scorpio", "Pisces"].includes(result.rashi) ? "Brahmin (Philosophical)" : ["Aries", "Leo", "Sagittarius"].includes(result.rashi) ? "Kshatriya (Protective / Dynamic)" : ["Taurus", "Virgo", "Capricorn"].includes(result.rashi) ? "Vaishya (Commercial / Prudent)" : "Shudra (Diligent / Labor)", desc: "Indicates the innate psychological orientation and core evolutionary aptitude of the soul." },
-              { koota: "Vashya (Magnetism & Control)", val: "Chatushpada / Manava", desc: "Measures mental resilience, authority over circumstance and mutual natural harmony with peers." },
-              { koota: "Yoni (Animal Archetype)", val: "Simha / Ashwa / Gaja", desc: "Reveals instinctive biological temperament, emotional passion, loyalty and raw stamina." },
-              { koota: "Gana (Temperamental Frequency)", val: "Deva (Spiritual) / Manushya (Ambition)", desc: "Governs baseline psychological reactions to stress, societal norms and divine virtues." },
-              { koota: "Nadi (Biological Vitality / Pulse)", val: "Madhya / Antya / Adi Nadi", desc: "Primary indicator of nervous constitution, genetic vitality, bio-energetic health and lineage." },
-              { koota: "Tatva (Elemental Alignment)", val: ["Aries", "Leo", "Sagittarius"].includes(result.lagna) ? "Agni (Fire — Drive & Vision)" : ["Taurus", "Virgo", "Capricorn"].includes(result.lagna) ? "Prithvi (Earth — Practical Stability)" : ["Gemini", "Libra", "Aquarius"].includes(result.lagna) ? "Vayu (Air — Intellect & Speed)" : "Jala (Water — Empathy & Receptivity)", desc: "The elemental anchor through which the native's nervous system and actions interact with reality." },
+              { koota: "Varna (Intellectual / Action Orientation)", val: avakahada.varna || (["Cancer", "Scorpio", "Pisces"].includes(result.rashi) ? "Brahmin" : ["Aries", "Leo", "Sagittarius"].includes(result.rashi) ? "Kshatriya" : ["Taurus", "Virgo", "Capricorn"].includes(result.rashi) ? "Vaishya" : "Shudra"), desc: "Indicates the innate psychological orientation and core evolutionary aptitude of the soul." },
+              { koota: "Vashya (Magnetism & Authority)", val: avakahada.vashya || "Chatushpada / Manava", desc: "Measures mental resilience, authority over circumstance and mutual natural harmony with peers." },
+              { koota: "Yoni (Animal Archetype)", val: avakahada.yoni || "Simha / Ashwa / Gaja", desc: "Reveals instinctive biological temperament, emotional passion, loyalty and raw stamina." },
+              { koota: "Gana (Temperamental Frequency)", val: avakahada.gana || "Deva (Spiritual)", desc: "Governs baseline psychological reactions to stress, societal norms and divine virtues." },
+              { koota: "Nadi (Biological Vitality / Pulse)", val: avakahada.nadi || "Madhya Nadi", desc: "Primary indicator of nervous constitution, genetic vitality, bio-energetic health and lineage." },
+              { koota: "Paya (Pedal Foundation Metal)", val: avakahada.paya || "Rajat (Silver / Extremely Auspicious)", desc: "Classical foundation metal at birth determining ease of worldly fortune and life comforts." },
+              { koota: "Tatva (Elemental Alignment)", val: avakahada.tatva || "Agni (Fire)", desc: "The elemental anchor through which the native's nervous system and actions interact with reality." },
+              { koota: "Namakshar (Lucky Name Syllables)", val: avakahada.namakshar || "Syllable Pada 1-4", desc: "Sacred acoustic frequencies aligned with the moon's vibration for naming and business identity." },
             ].map((row, idx) => (
-              <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent", fontSize: 12 }}>
-                <td style={{ padding: "8px 12px", fontWeight: 700, color: "#FDE68A" }}>{row.koota}</td>
-                <td style={{ padding: "8px 12px", fontWeight: 700, color: "#34D399" }}>{row.val}</td>
-                <td style={{ padding: "8px 12px", color: "rgba(241,231,208,0.85)" }}>{row.desc}</td>
+              <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: idx % 2 ? "rgba(255,255,255,0.02)" : "transparent", fontSize: 11.5 }}>
+                <td style={{ padding: "6px 10px", fontWeight: 700, color: "#FDE68A" }}>{row.koota}</td>
+                <td style={{ padding: "6px 10px", fontWeight: 700, color: "#34D399" }}>{row.val}</td>
+                <td style={{ padding: "6px 10px", color: "rgba(241,231,208,0.85)" }}>{row.desc}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "12px 14px", fontSize: 12, lineHeight: 1.65, color: "rgba(241,231,208,0.9)" }}>
-          <b style={{ color: "#FDE68A" }}>✦ Astrological Synthesis:</b> The conjunction of your Lagna ({result.lagna}) and Moon ({result.rashi}) with Nakshatra ({result.nakshatra}) forms a remarkably coherent mind-body axis. You possess an innate gift for synthesizing intuitive empathy with high logical execution.
+        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "10px 12px", fontSize: 11.5, lineHeight: 1.6, color: "rgba(241,231,208,0.9)" }}>
+          <b style={{ color: "#FDE68A" }}>✦ Astrological Synthesis:</b> The conjunction of your Lagna ({result.lagna}) and Moon ({result.rashi}) with Nakshatra ({panchang.nakshatra || result.nakshatra}) forms a remarkably coherent mind-body axis. You possess an innate gift for synthesizing intuitive empathy with high logical execution.
         </div>
       </PageShell>
 
@@ -334,7 +351,16 @@ export default function DeluxeLifeReportDossier({
           </div>
         </div>
         <div style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 8, padding: "10px 14px", fontSize: 11.5, color: "rgba(241,231,208,0.85)" }}>
-          The D10 chart analyzes executive recognition and promotion cycles, while the Chandra Kundli provides a cross-check of emotional willingness and public popularity.
+          <div style={{ marginBottom: 4 }}>
+            The D10 chart analyzes executive recognition and promotion cycles, while the Chandra Kundli provides a cross-check of emotional willingness and public popularity.
+          </div>
+          <div style={{ paddingTop: 6, borderTop: "1px solid rgba(212,175,55,0.2)", fontSize: 11, color: "#FDE68A" }}>
+            ⚖️ <b>Bhava Chalit (Sripati Cusp) Diagnostics:</b> {bhavaChalit.shiftedPlanets && bhavaChalit.shiftedPlanets.length > 0 ? (
+              <span>Planets shifted in Bhava Chalit: {bhavaChalit.shiftedPlanets.map(sp => `${sp.planet} (Rashi H${sp.rashiHouse} ➔ Chalit H${sp.chalitHouse})`).join(", ")}. These planets deliver physical results corresponding to their Chalit house cusps.</span>
+            ) : (
+              <span>All 9 planets retain identical house positions in Bhava Chalit as in Rashi (D1), creating exceptionally stable and direct karmic manifestations.</span>
+            )}
+          </div>
         </div>
       </PageShell>
 
@@ -475,6 +501,20 @@ export default function DeluxeLifeReportDossier({
               <div style={{ fontSize: 10, color: "rgba(241,231,208,0.85)", marginTop: 2, lineHeight: 1.35 }}>{k.desc}</div>
             </div>
           ))}
+        </div>
+
+        {/* Shadbala Virupa & Sarvashtakavarga Strength Summary */}
+        <div style={{ marginTop: 10, background: "rgba(11,8,25,0.8)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#FDE68A" }}>⚖️ 6-Fold Shadbala Cosmic Potency & Balas</div>
+            <div style={{ fontSize: 10, color: "rgba(241,231,208,0.85)", marginTop: 2 }}>
+              Top Power Grahas: {shadbala.planets ? Object.entries(shadbala.planets).slice(0, 3).map(([p, d]) => `${p} (${d.virupas}V / ${d.percentage}%)`).join(", ") : "Computed across Sthana, Dig, Kala, Chesta, Naisargika, Drik"}
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: "#34D399" }}>Sarvashtakavarga: {sav.total || 337} Bindus</div>
+            <div style={{ fontSize: 9.5, color: "rgba(241,231,208,0.75)" }}>12-House Cosmic Auspicious Matrix</div>
+          </div>
         </div>
       </PageShell>
 
@@ -723,30 +763,86 @@ export default function DeluxeLifeReportDossier({
           ⚠️ DOSHA DIAGNOSTICS & SACRED VEDIC NEUTRALIZATION
         </h3>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14 }}>
-            <h4 style={{ color: "#F87171", fontSize: 13.5, fontWeight: 800, margin: "0 0 6px" }}>🔥 Manglik Dosha (Kuja Dosha) Assessment</h4>
-            <p style={{ fontSize: 12, lineHeight: 1.65, color: "rgba(241,231,208,0.88)", margin: "0 0 8px" }}>
-              Evaluation of Mars in houses 1, 4, 7, 8, 12. In your horoscope, powerful Jupiter aspects and benefic placements neutralize severe friction, ensuring healthy marital harmony.
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          {/* Manglik Dosha */}
+          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <h4 style={{ color: "#F87171", fontSize: 13, fontWeight: 800, margin: 0 }}>🔥 Manglik Dosha (Kuja)</h4>
+              <span style={{ fontSize: 9.5, padding: "2px 6px", borderRadius: 4, fontWeight: 700, background: doshas.manglik?.hasDosha ? (doshas.manglik.isCancelled ? "rgba(245,158,11,0.2)" : "rgba(239,68,68,0.2)") : "rgba(16,185,129,0.2)", color: doshas.manglik?.hasDosha ? (doshas.manglik.isCancelled ? "#FDE68A" : "#F87171") : "#34D399" }}>
+                {doshas.manglik?.hasDosha ? (doshas.manglik.isCancelled ? "Cancelled" : "Present") : "Dosha Free"}
+              </span>
+            </div>
+            <p style={{ fontSize: 11, lineHeight: 1.55, color: "rgba(241,231,208,0.88)", margin: "0 0 6px" }}>
+              {doshas.manglik?.details || `Mars evaluated in houses 1, 4, 7, 8, 12 from Lagna, Moon, and Venus.`}
             </p>
-            <div style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700 }}>Status: Balanced / Mild & Remediable</div>
+            {doshas.manglik?.isCancelled && (
+              <div style={{ fontSize: 10, color: "#34D399", fontWeight: 600 }}>✓ Classical Cancellation: {doshas.manglik.cancellationReason}</div>
+            )}
           </div>
 
-          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14 }}>
-            <h4 style={{ color: "#F87171", fontSize: 13.5, fontWeight: 800, margin: "0 0 6px" }}>🐍 Kaal Sarp & Rahu-Ketu Axis Analysis</h4>
-            <p style={{ fontSize: 12, lineHeight: 1.65, color: "rgba(241,231,208,0.88)", margin: "0 0 8px" }}>
-              Assessment of planet clustering around Rahu and Ketu. Multiple planets break the containment axis, dissolving rigid obstacles and promoting international success.
+          {/* Kaal Sarp Dosha */}
+          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <h4 style={{ color: "#F87171", fontSize: 13, fontWeight: 800, margin: 0 }}>🐍 Kaal Sarp Axis</h4>
+              <span style={{ fontSize: 9.5, padding: "2px 6px", borderRadius: 4, fontWeight: 700, background: doshas.kaalSarp?.hasDosha ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)", color: doshas.kaalSarp?.hasDosha ? "#F87171" : "#34D399" }}>
+                {doshas.kaalSarp?.hasDosha ? (doshas.kaalSarp.intensity || "Active") : "Dosha Free"}
+              </span>
+            </div>
+            <p style={{ fontSize: 11, lineHeight: 1.55, color: "rgba(241,231,208,0.88)", margin: "0 0 6px" }}>
+              {doshas.kaalSarp?.details || `Assessment of planetary containment along Rahu and Ketu axis across 12 classical houses.`}
             </p>
-            <div style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700 }}>Status: Free from Total Kaal Sarp Dosha</div>
+            <div style={{ fontSize: 10, color: doshas.kaalSarp?.hasDosha ? "#FDE68A" : "#34D399", fontWeight: 600 }}>
+              {doshas.kaalSarp?.hasDosha ? `Identified Type: ${doshas.kaalSarp.type}` : "Planets break the Rahu-Ketu nodal axis, ensuring worldly expansion."}
+            </div>
+          </div>
+
+          {/* Shani Sade Sati */}
+          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <h4 style={{ color: "#93C5FD", fontSize: 13, fontWeight: 800, margin: 0 }}>🪐 Shani Sade Sati & Dhaiya</h4>
+              <span style={{ fontSize: 9.5, padding: "2px 6px", borderRadius: 4, fontWeight: 700, background: "rgba(59,130,246,0.2)", color: "#93C5FD" }}>
+                {doshas.sadeSati?.phase || "Transit Active"}
+              </span>
+            </div>
+            <p style={{ fontSize: 11, lineHeight: 1.55, color: "rgba(241,231,208,0.88)", margin: "0 0 6px" }}>
+              {doshas.sadeSati?.details || `Saturn transit through Pisces, Aries, and Taurus evaluated against natal Moon (${result.rashi}).`}
+            </p>
+            <div style={{ fontSize: 10, color: "#FDE68A", fontWeight: 600 }}>
+              Moon: {result.rashi} · Current Saturn in Pisces (2025–2027)
+            </div>
+          </div>
+
+          {/* Pitra & Ancestral Balance */}
+          <div style={{ background: "rgba(11,8,25,0.8)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+              <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, margin: 0 }}>📜 Pitra, Chandal & Gandmool</h4>
+              <span style={{ fontSize: 9.5, padding: "2px 6px", borderRadius: 4, fontWeight: 700, background: "rgba(16,185,129,0.2)", color: "#34D399" }}>
+                Vedic Filter
+              </span>
+            </div>
+            <p style={{ fontSize: 11, lineHeight: 1.55, color: "rgba(241,231,208,0.88)", margin: "0 0 6px" }}>
+              {doshas.pitraDosha?.details || `Pitra Dosha: ${doshas.pitraDosha?.hasDosha ? "Observed" : "Clean"} · Guru Chandal: ${doshas.guruChandal?.hasDosha ? "Active" : "Clean"} · Gandmool: ${doshas.gandmool?.isGandmool ? "Active" : "Clean"}`}
+            </p>
+            <div style={{ fontSize: 10, color: "#34D399", fontWeight: 600 }}>
+              Ancestral lineage blessing is active with regular tarpana on Amavasya.
+            </div>
           </div>
         </div>
 
-        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 16 }}>
-          <h4 style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, margin: "0 0 8px" }}>🛡️ Universal Dosha Remedial Protocol</h4>
-          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, lineHeight: 1.8, color: "rgba(241,231,208,0.9)" }}>
-            <li><b>Mahamrityunjaya Japa:</b> Recite 11 times daily to create an invulnerable auric shield against accidents and stress.</li>
-            <li><b>Hanuman Chalisa:</b> Chanting on Tuesdays and Saturdays dispels fear, inertia, and Mars-Saturn friction.</li>
-            <li><b>Charity & Seva:</b> Feeding stray cows on Wednesdays and dogs on Saturdays balances Rahu-Ketu and Mercury.</li>
+        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14 }}>
+          <h4 style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800, margin: "0 0 6px" }}>🛡️ Vedic Neutralization & Classical Remedial Protocols</h4>
+          <ul style={{ margin: 0, paddingLeft: 18, fontSize: 11.5, lineHeight: 1.7, color: "rgba(241,231,208,0.9)" }}>
+            {doshas.remediesSummary && doshas.remediesSummary.length > 0 ? (
+              doshas.remediesSummary.map((rem, rIdx) => (
+                <li key={rIdx}>{rem}</li>
+              ))
+            ) : (
+              <>
+                <li><b>Mahamrityunjaya Japa:</b> Recite 11 times daily to generate an impenetrable auric shield against acute malefic afflictions.</li>
+                <li><b>Hanuman Chalisa:</b> Chanting on Tuesdays and Saturdays decisively neutralizes Mars and Saturn friction.</li>
+                <li><b>Charity & Seva:</b> Feeding stray cows on Wednesdays and birds daily balances Mercury, Rahu, and Ketu karmas.</li>
+              </>
+            )}
           </ul>
         </div>
       </PageShell>
@@ -782,23 +878,70 @@ export default function DeluxeLifeReportDossier({
           ⚡ CURRENT ACTIVE MAHADASHA & ANTARDASHA STRATEGIC FORECAST
         </h3>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
-          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16 }}>
-            <div style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>🌟 Active Mahadasha Lord Influence</div>
-            <p style={{ fontSize: 12, lineHeight: 1.7, color: "rgba(241,231,208,0.9)", margin: 0 }}>
-              Your current Mahadasha period activates Kendra and Trikona houses, stimulating career ambitions, asset acquisition, and expanding social prestige. You are being pushed to take calculated strategic risks.
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
+            <div style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 4 }}>
+              🌟 Active Mahadasha: {detailedDashas.activeMahadasha?.lord || "Primary"} ({detailedDashas.activeMahadasha?.startYear || 2022} – {detailedDashas.activeMahadasha?.endYear || 2038})
+            </div>
+            <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "rgba(241,231,208,0.9)", margin: 0 }}>
+              The {detailedDashas.activeMahadasha?.lord || "active"} Mahadasha activates key life houses, stimulating long-term wealth consolidation, professional status, and deep karmic milestones.
             </p>
           </div>
-          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 16 }}>
-            <div style={{ color: "#34D399", fontSize: 14, fontWeight: 800, marginBottom: 6 }}>📅 Immediate 24-Month Forecast</div>
-            <p style={{ fontSize: 12, lineHeight: 1.7, color: "rgba(241,231,208,0.9)", margin: 0 }}>
-              Upcoming Antardashas trigger favorable salary leaps, high-value professional collaborations, and resolution of longstanding family or legal matters.
+          <div style={{ background: "rgba(15,10,32,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
+            <div style={{ color: "#34D399", fontSize: 13.5, fontWeight: 800, marginBottom: 4 }}>
+              📅 Active Antardasha: {detailedDashas.activeAntardasha?.subLord || "Benefic"} ({detailedDashas.activeAntardasha?.startYear || 2024} – {detailedDashas.activeAntardasha?.endYear || 2026})
+            </div>
+            <p style={{ fontSize: 11.5, lineHeight: 1.6, color: "rgba(241,231,208,0.9)", margin: 0 }}>
+              Sub-period of {detailedDashas.activeAntardasha?.subLord || "current planet"} governs your immediate 12–24 month environment, catalyzing income expansion and strategic decisions.
             </p>
           </div>
         </div>
 
-        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 14, fontSize: 12.5, lineHeight: 1.75, color: "rgba(241,231,208,0.92)" }}>
-          <b style={{ color: "#FDE68A" }}>Strategic Action Directive:</b> Align your key contracts, property purchases, and marriage milestones during sub-periods of benefic planets (Jupiter, Venus, Mercury) to ensure lasting auspiciousness.
+        {/* Antardasha Timetable */}
+        {detailedDashas.antardashas && detailedDashas.antardashas.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <h4 style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 800, margin: "0 0 6px" }}>
+              ⏳ 9 Antardasha Timetable of Current {detailedDashas.activeMahadasha?.lord} Mahadasha
+            </h4>
+            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)", fontSize: 11 }}>
+              <thead>
+                <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
+                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Sub-Period (Bhukti)</th>
+                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Duration Span</th>
+                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Span Years</th>
+                  <th style={{ padding: "6px 8px", color: "#FDE68A", textAlign: "left" }}>Current Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {detailedDashas.antardashas.map((ad, idx) => (
+                  <tr key={idx} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: ad.isCurrent ? "rgba(16, 185, 129, 0.15)" : (idx % 2 ? "rgba(255,255,255,0.02)" : "transparent") }}>
+                    <td style={{ padding: "5px 8px", fontWeight: 700, color: ad.isCurrent ? "#34D399" : "#FDE68A" }}>
+                      {detailedDashas.activeMahadasha?.lord} - {ad.subLord}
+                    </td>
+                    <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.9)" }}>
+                      {ad.startYear} – {ad.endYear}
+                    </td>
+                    <td style={{ padding: "5px 8px", color: "rgba(241,231,208,0.75)" }}>
+                      {ad.years} yrs
+                    </td>
+                    <td style={{ padding: "5px 8px" }}>
+                      {ad.isCurrent ? (
+                        <span style={{ background: "rgba(16,185,129,0.3)", color: "#34D399", padding: "1px 6px", borderRadius: 4, fontWeight: 700, fontSize: 10 }}>
+                          ACTIVE NOW
+                        </span>
+                      ) : (
+                        <span style={{ color: "rgba(241,231,208,0.6)", fontSize: 10 }}>Scheduled</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: 12, fontSize: 12, lineHeight: 1.65, color: "rgba(241,231,208,0.92)" }}>
+          <b style={{ color: "#FDE68A" }}>Strategic Action Directive:</b> Align your major financial commitments, property transactions, and partnership launches during sub-periods of benefic planets (Jupiter, Venus, Mercury) to ensure enduring success.
         </div>
       </PageShell>
 
@@ -862,9 +1005,12 @@ export default function DeluxeLifeReportDossier({
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12, marginBottom: 16 }}>
-          {(result.annualTransit?.transits || []).map((tr, i) => (
+          {(gochara.length > 0 ? gochara : (result.annualTransit?.transits || [])).map((tr, i) => (
             <div key={i} style={{ background: "rgba(15,10,32,0.8)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 10, padding: 14 }}>
-              <div style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 4 }}>{tr.planet} in {tr.sign}</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <span style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800 }}>{tr.planet} in {tr.sign}</span>
+                {tr.house && <span style={{ color: "#34D399", fontSize: 11, fontWeight: 700 }}>H{tr.house}</span>}
+              </div>
               <div style={{ color: "rgba(241,231,208,0.88)", fontSize: 12, lineHeight: 1.6 }}>{tr.effect}</div>
             </div>
           ))}

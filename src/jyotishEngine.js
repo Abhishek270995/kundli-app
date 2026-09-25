@@ -1,4 +1,22 @@
 import { AstroTime, GeoVector, Ecliptic, Body, SiderealTime } from "astronomy-engine";
+import {
+  calculateJulianDay,
+  calculateGMSTDegrees,
+  calculateLSTDegrees,
+  formatDMS,
+  calculateBirthSunriseSunset,
+  calculateNatalBirthPanchang,
+  calculateAvakahadaChakra,
+  calculateBhavaChalit,
+  getDivisionalSignIndex,
+  SHODASHVARGA_LIST,
+  buildDivisionalChartData,
+  calculateComprehensiveDoshas,
+  calculateShadbala,
+  calculateSarvashtakavarga,
+  calculateDetailedDashas,
+  calculateCurrentGochara
+} from "./vedicComprehensiveEngine.js";
 
 /* -------------------------------------------------------------
    ZODIAC SIGNS & NAKSHATRAS
@@ -764,6 +782,58 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     lang
   });
 
+  // ── 10 CORE ASTROLOGICAL ENGINES SYNTHESIS ──
+  // 1. Birth Data & Sidereal Astronomy
+  const julianDay = calculateJulianDay(birthDate);
+  const gmst = calculateGMSTDegrees(birthDate);
+  const lst = calculateLSTDegrees(birthDate, validLon);
+  const ayanamsaVal = getLahiriAyanamsa(birthDate);
+  const ayanamsaFormatted = formatDMS(ayanamsaVal);
+  const astronomicalSummary = {
+    julianDay: julianDay.toFixed(4),
+    gmst: formatDMS(gmst),
+    lst: formatDMS(lst),
+    ayanamsa: ayanamsaFormatted,
+    ayanamsaVal,
+    latitude: validLat.toFixed(4),
+    longitude: validLon.toFixed(4)
+  };
+
+  // 2. Natal Birth Panchanga Engine
+  const natalPanchang = calculateNatalBirthPanchang({
+    birthDate,
+    lat: validLat,
+    lon: validLon,
+    sunDeg,
+    moonDeg,
+    lang
+  });
+
+  // 3. Nakshatra & Avakahada Chakra Engine
+  const avakahadaChakra = calculateAvakahadaChakra(moonDeg, ascDeg, lang);
+
+  // 4. Lagna & Bhava Chalit Engine
+  const bhavaChalit = calculateBhavaChalit(ascDeg, planets, lang);
+
+  // 5. Divisional Charts Engine (Shodashvarga Suite: D1, D9, D10, D2, D3, D4, D7, D12, D16, D20, D24, D27, D30, D60, Chandra, Surya, Chalit)
+  const divisionalCharts = {};
+  SHODASHVARGA_LIST.forEach(v => {
+    divisionalCharts[v.id] = buildDivisionalChartData(planets, ascDeg, v.id);
+  });
+
+  // 6. Yoga & Dosha Diagnostic Engine
+  const doshaAnalysis = calculateComprehensiveDoshas(planetData, planetHouseMap, ascSignIdx, moonSignIdx, lang);
+
+  // 7. Strength / Shadbala Engine
+  const shadbala = calculateShadbala(planets, ascDeg, birthDate, lang);
+
+  // 8. Sarvashtakavarga (SAV) Engine
+  const ashtakavarga = calculateSarvashtakavarga(planets, ascSignIdx, lang);
+
+  // 9. Dasha & Transit Engine
+  const detailedDashas = calculateDetailedDashas(moonNak, birthDate, lang);
+  const gocharaTransits = calculateCurrentGochara(moonSignIdx, ascSignIdx, lang);
+
   return {
     lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
     lagnaSign: ascSign.name,
@@ -796,7 +866,19 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     planetHouseMap,
     annualTransit,
     marriagePrediction,
-    careerPrediction
+    careerPrediction,
+    // ── Newly Integrated 10 Modules ──
+    astronomicalSummary,
+    natalPanchang,
+    avakahadaChakra,
+    bhavaChalit,
+    divisionalCharts,
+    shodashvargaList: SHODASHVARGA_LIST,
+    doshaAnalysis,
+    shadbala,
+    ashtakavarga,
+    detailedDashas,
+    gocharaTransits
   };
 }
 
@@ -3204,3 +3286,22 @@ export function getFestivalOrVratForDate(dateStr, panchangData = null) {
 
   return null;
 }
+
+export {
+  calculateJulianDay,
+  calculateGMSTDegrees,
+  calculateLSTDegrees,
+  formatDMS,
+  calculateBirthSunriseSunset,
+  calculateNatalBirthPanchang,
+  calculateAvakahadaChakra,
+  calculateBhavaChalit,
+  getDivisionalSignIndex,
+  SHODASHVARGA_LIST,
+  buildDivisionalChartData,
+  calculateComprehensiveDoshas,
+  calculateShadbala,
+  calculateSarvashtakavarga,
+  calculateDetailedDashas,
+  calculateCurrentGochara
+};

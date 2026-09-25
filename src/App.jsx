@@ -52,14 +52,16 @@ const PLANETS = [
 ];
 
 const PERSONAL_TABS = [
-  { id: "chart", icon: "🔯", labelEn: "Chart", labelHi: "लग्न कुंडली" },
-  { id: "overview", icon: "🌟", labelEn: "Overview", labelHi: "सिंहावलोकन" },
+  { id: "chart", icon: "🔯", labelEn: "Chart & Shodashvarga", labelHi: "लग्न व वर्ग कुंडलियां" },
+  { id: "overview", icon: "🌟", labelEn: "Overview & Panchang", labelHi: "सिंहावलोकन व पंचांग" },
   { id: "planets", icon: "🪐", labelEn: "Planets", labelHi: "ग्रह स्थिति" },
   { id: "houses", icon: "🏠", labelEn: "Houses", labelHi: "भाव विश्लेषण" },
+  { id: "doshas", icon: "⚡", labelEn: "Doshas & Yogas", labelHi: "दोष व योग निदान" },
+  { id: "shadbala", icon: "⚖️", labelEn: "Shadbala & SAV", labelHi: "षड्बल व अष्टकवर्ग" },
   { id: "life", icon: "🌿", labelEn: "Life Areas", labelHi: "जीवन क्षेत्र" },
   { id: "careerTiming", icon: "💼", labelEn: "Career & Job", labelHi: "करियर व नौकरी" },
   { id: "marriageTiming", icon: "💍", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
-  { id: "predictions", icon: "🔮", labelEn: "Predictions", labelHi: "दशा व भविष्य" },
+  { id: "predictions", icon: "🔮", labelEn: "Dasha & Transits", labelHi: "दशा व गोचर" },
   { id: "lifeProblems", icon: "🛡️", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण" },
   { id: "store", icon: "💎", labelEn: "Gemstones & Remedies", labelHi: "रत्न व उपाय" },
   { id: "matchmaking", icon: "❤️", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
@@ -1225,6 +1227,8 @@ export default function App() {
   const [tab, setTab] = useState("chart");
   const [tabCategoryFilter, setTabCategoryFilter] = useState("all"); // 'all' | 'personal' | 'generic'
   const [chartStyle, setChartStyle] = useState("north");
+  const [selectedDivisionalChart, setSelectedDivisionalChart] = useState("D1");
+  const [showBhavaCuspTable, setShowBhavaCuspTable] = useState(false);
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
   const [lang, setLang] = useState("en");
@@ -3596,7 +3600,7 @@ export default function App() {
                     transition: "all 0.2s ease"
                   }}
                 >
-                  ✦ {hi ? "सभी अनुभाग (17)" : "All Sections (17)"}
+                  ✦ {hi ? `सभी अनुभाग (${PERSONAL_TABS.length + GENERIC_TABS.length})` : `All Sections (${PERSONAL_TABS.length + GENERIC_TABS.length})`}
                 </button>
                 <button
                   type="button"
@@ -3614,7 +3618,7 @@ export default function App() {
                     transition: "all 0.2s ease"
                   }}
                 >
-                  👤 {hi ? "व्यक्तिगत कुंडली (11)" : "Individual Astrology (11)"}
+                  👤 {hi ? `व्यक्तिगत कुंडली (${PERSONAL_TABS.length})` : `Individual Astrology (${PERSONAL_TABS.length})`}
                 </button>
                 <button
                   type="button"
@@ -3632,7 +3636,7 @@ export default function App() {
                     transition: "all 0.2s ease"
                   }}
                 >
-                  🌐 {hi ? "दैनिक पंचांग व सामान्य सेवाएं (6)" : "Universal & Daily Tools (6)"}
+                  🌐 {hi ? `दैनिक पंचांग व सामान्य सेवाएं (${GENERIC_TABS.length})` : `Universal & Daily Tools (${GENERIC_TABS.length})`}
                 </button>
               </div>
 
@@ -3661,7 +3665,7 @@ export default function App() {
                       </div>
                     </div>
                     <span style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 12, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", fontWeight: 700 }}>
-                      {hi ? "11 व्यक्तिगत भाग" : "11 Linked Sections"}
+                      {hi ? `${PERSONAL_TABS.length} व्यक्तिगत भाग` : `${PERSONAL_TABS.length} Linked Sections`}
                     </span>
                   </div>
 
@@ -3768,13 +3772,43 @@ export default function App() {
 
             </div>
 
-            {/* ── TAB 1: CHART ── */}
-            {tab === "chart" && (
+            {/* ── TAB 1: CHART & SHODASHVARGA DIVISIONAL CHARTS ── */}
+            {tab === "chart" && (() => {
+              const activeDivisionalList = result.shodashvargaList || [
+                { id: "D1", nameEn: "D1 Rashi", nameHi: "डी-१ लग्न कुंडली", descEn: "Physical body, vitality, and primary life destiny", descHi: "शारीरिक ऊर्जा, व्यक्तित्व व संपूर्ण जीवन की दिशा" },
+                { id: "D9", nameEn: "D9 Navamsha", nameHi: "डी-९ नवांश कुंडली", descEn: "Dharma, marriage, spouse, and inner soul potential", descHi: "धर्म, दांपत्य सुख, जीवनसाथी व आत्मा का सूक्ष्म स्वरूप" },
+                { id: "D10", nameEn: "D10 Dasamsha", nameHi: "डी-१० दशमांश कुंडली", descEn: "Career, profession, reputation, and public accomplishments", descHi: "करियर, आजीविका, प्रतिष्ठा व सामाजिक प्रभाव" },
+                { id: "CHALIT", nameEn: "Bhava Chalit", nameHi: "भाव चलित कुंडली", descEn: "Exact active cusp-based house placements of all planets", descHi: "वास्तविक संधि-आधारित ग्रह स्थिति व भाव प्रभाव" },
+                { id: "CHANDRA", nameEn: "Chandra Kundli", nameHi: "चंद्र कुंडली", descEn: "Mental perception, emotional rhythm, and public reception", descHi: "मनोवैज्ञानिक दृष्टिकोण, मानसिक शांति व समाज में छवि" },
+                { id: "SURYA", nameEn: "Surya Kundli", nameHi: "सूर्य कुंडली", descEn: "Soul purpose, physical vitality, willpower, and authority", descHi: "आत्मबल, शारीरिक तेज, प्रशासनिक क्षमता व प्रभुत्व" },
+                { id: "D2", nameEn: "D2 Hora", nameHi: "डी-२ होरा कुंडली", descEn: "Wealth accumulation, financial mindset, and monetary prosperity", descHi: "धन संचय, वित्तीय स्थिरता व आर्थिक संपन्नता" },
+                { id: "D3", nameEn: "D3 Drekkana", nameHi: "डी-३ द्रेष्काण कुंडली", descEn: "Courage, siblings, vitality, and creative endeavors", descHi: "पराक्रम, भाई-बहन, साहस व रचनात्मक क्षमता" },
+                { id: "D4", nameEn: "D4 Chaturthamsha", nameHi: "डी-४ चतुर्थांश कुंडली", descEn: "Fixed assets, real estate, vehicles, and inner contentment", descHi: "भूमि, भवन, वाहन, अचल संपत्ति व मानसिक सुख" },
+                { id: "D7", nameEn: "D7 Saptamsha", nameHi: "डी-७ सप्तमांश कुंडली", descEn: "Progeny, children's prospects, and creative legacy", descHi: "संतान सुख, वंश वृद्धि व रचनात्मक विरासत" },
+                { id: "D12", nameEn: "D12 Dwadasamsha", nameHi: "डी-१२ द्वादशांश कुंडली", descEn: "Ancestral roots, parents' health, and inherited karma", descHi: "माता-पिता, पैतृक संस्कार व पूर्वजों का कर्मिक ऋण" },
+                { id: "D16", nameEn: "D16 Shodashamsha", nameHi: "डी-१६ षोडशांश कुंडली", descEn: "Vehicles, luxury, worldly pleasures, and comforts", descHi: "वाहन सुख, वैभव, भौतिक सुख-सुविधाएं व प्रसन्नता" },
+                { id: "D20", nameEn: "D20 Vimshamsha", nameHi: "डी-२० विंशांश कुंडली", descEn: "Spiritual practice, mantra siddhi, and devotion", descHi: "अध्यात्म, साधना, मंत्र सिद्धि व ईश्वर कृपा" },
+                { id: "D24", nameEn: "D24 Siddhamsa", nameHi: "डी-२४ चतुर्विंशांश कुंडली", descEn: "Higher learning, scholarship, intellect, and memory", descHi: "उच्च शिक्षा, विद्या, बौद्धिक प्रज्ञा व अनुसंधान" },
+                { id: "D27", nameEn: "D27 Bhamsa", nameHi: "डी-२७ भrequestांश कुंडली", descEn: "Innate strengths, endurance, and psychological fortitude", descHi: "आंतरिक बल, सहनशीलता व चारित्रिक सामर्थ्य" },
+                { id: "D30", nameEn: "D30 Trimshamsha", nameHi: "डी-३० त्रिंशांश कुंडली", descEn: "Karmic evils, misfortunes, and remedial tests", descHi: "अरिष्ट, जीवन की बाधाएं, दोष व रोग निवारण" },
+                { id: "D60", nameEn: "D60 Shashtiamsha", nameHi: "डी-६० षष्ट्यंश कुंडली", descEn: "Supreme past-life karmic blueprint and fine destiny", descHi: "सर्वोच्च पूर्वजन्म कर्म चक्र व सूक्ष्म प्रारब्ध" }
+              ];
+              const currentDivInfo = activeDivisionalList.find(d => d.id === selectedDivisionalChart) || activeDivisionalList[0];
+              const activeHouses = (result.divisionalCharts && result.divisionalCharts[selectedDivisionalChart]) || result.houses;
+
+              return (
               <div className="glass-card" style={{ padding: "30px 24px", marginBottom: 24 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
                   <div>
-                    <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800 }}>{t.chartTitle}</h3>
-                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13.5 }}>{t.chartSub}</p>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#F59E0B", fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>
+                      <span>🔯</span> {hi ? "षोडशवर्ग व भाव चलित चक्र" : "SHODASHVARGA & BHAVA CHALIT"}
+                    </div>
+                    <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 800 }}>
+                      {hi ? currentDivInfo.nameHi : currentDivInfo.nameEn}
+                    </h3>
+                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, margin: "2px 0 0" }}>
+                      {hi ? currentDivInfo.descHi : currentDivInfo.descEn}
+                    </p>
                   </div>
 
                   <div style={{ display: "flex", background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 20, padding: 3 }}>
@@ -3793,11 +3827,58 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Divisional Chart Selector Chips */}
+                <div style={{ background: "rgba(11, 8, 25, 0.6)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+                    <span style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, letterSpacing: 0.5 }}>
+                      ✦ {hi ? "वर्ग कुंडली बदलें (Click to switch chart view):" : "Switch Divisional Chart View:"}
+                    </span>
+                    {selectedDivisionalChart !== "D1" && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDivisionalChart("D1")}
+                        style={{ background: "rgba(245, 158, 11, 0.18)", border: "1px solid #F59E0B", color: "#FDE68A", padding: "3px 10px", borderRadius: 6, fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        ↺ {hi ? "लग्न कुंडली (D1) पर लौटें" : "Reset to D1 Rashi"}
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {activeDivisionalList.map(item => {
+                      const isSel = selectedDivisionalChart === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setSelectedDivisionalChart(item.id)}
+                          style={{
+                            padding: "5px 12px",
+                            borderRadius: 8,
+                            fontSize: 12,
+                            fontWeight: isSel ? 800 : 600,
+                            cursor: "pointer",
+                            background: isSel ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(26, 18, 48, 0.75)",
+                            border: isSel ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
+                            color: isSel ? "#0F0A1E" : "rgba(241, 231, 208, 0.85)",
+                            boxShadow: isSel ? "0 2px 10px rgba(245, 158, 11, 0.35)" : "none",
+                            transition: "all 0.15s ease"
+                          }}
+                        >
+                          <span>{isSel ? "✦ " : ""}{item.id}</span>
+                          <span style={{ opacity: isSel ? 0.95 : 0.7, marginLeft: 4 }}>
+                            ({item.id === "D1" ? (hi ? "लग्न" : "Rashi") : item.id === "D9" ? (hi ? "नवांश" : "Navamsha") : item.id === "D10" ? (hi ? "दशमांश" : "Dasamsha") : item.id === "CHALIT" ? (hi ? "चलित" : "Chalit") : item.id === "CHANDRA" ? (hi ? "चंद्र" : "Moon") : item.id})
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
                   {chartStyle === "north" ? (
-                    <NorthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
+                    <NorthIndianChart houses={activeHouses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
                   ) : (
-                    <SouthIndianChart houses={result.houses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
+                    <SouthIndianChart houses={activeHouses} planetData={result.planetData} lang={lang} hoveredHouse={hoveredHouse} setHoveredHouse={setHoveredHouse} />
                   )}
                 </div>
 
@@ -3915,12 +3996,311 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* ── TAB 2: OVERVIEW ── */}
+                {/* ── MODULE 4: BHAVA CHALIT & CUSP DIAGNOSTICS ── */}
+                {result.bhavaChalit && (
+                  <div style={{ marginTop: 20, background: "rgba(18, 12, 36, 0.8)", border: "1.5px solid rgba(245, 158, 11, 0.35)", borderRadius: 14, padding: "18px 22px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 20, color: "#F59E0B" }}>🌀</span>
+                        <div>
+                          <h4 style={{ color: "#FDE68A", fontSize: 15.5, fontWeight: 800, margin: 0 }}>
+                            {hi ? "भाव चलित विश्लेषण व संधि बिंदु (Bhava Chalit Engine)" : "Bhava Chalit Engine & Cusp Analysis"}
+                          </h4>
+                          <span style={{ color: "rgba(241, 231, 208, 0.7)", fontSize: 12 }}>
+                            {hi ? "श्रीपति पद्धति अनुसार वास्तविक भाव सीमाएं एवं ग्रह स्थानांतरण" : "Actual karmic house cusps & planetary shifts according to Sripati system"}
+                          </span>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDivisionalChart(selectedDivisionalChart === "CHALIT" ? "D1" : "CHALIT")}
+                          style={{
+                            background: selectedDivisionalChart === "CHALIT" ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(245, 158, 11, 0.15)",
+                            border: "1px solid #F59E0B",
+                            borderRadius: 8,
+                            color: selectedDivisionalChart === "CHALIT" ? "#0F0A1E" : "#FDE68A",
+                            padding: "6px 14px",
+                            fontSize: 12.5,
+                            fontWeight: 700,
+                            cursor: "pointer"
+                          }}
+                        >
+                          {selectedDivisionalChart === "CHALIT" ? (hi ? "✓ चलित कुंडली दृश्यमान" : "✓ Viewing Chalit Chart") : (hi ? "चलित कुंडली देखें" : "View Chalit Chart")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowBhavaCuspTable(!showBhavaCuspTable)}
+                          style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.35)", borderRadius: 8, color: "#FDE68A", padding: "6px 14px", fontSize: 12.5, fontWeight: 700, cursor: "pointer" }}
+                        >
+                          {showBhavaCuspTable ? (hi ? "▲ संधि विवरण छिपाएं" : "▲ Hide Cusp Table") : (hi ? "▼ 12 भाव संधि व मध्य देखें" : "▼ View 12 Bhavas Cusp Table")}
+                        </button>
+                      </div>
+                    </div>
+
+                    {result.bhavaChalit.hasShift ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ fontSize: 12.5, color: "#F59E0B", fontWeight: 700 }}>
+                          ⚡ {hi ? "ग्रह भाव परिवर्तन (Planets Shifting House in Chalit):" : "Planetary House Transitions in Chalit:"}
+                        </div>
+                        {result.bhavaChalit.shiftedPlanets.map((shift, idx) => (
+                          <div key={idx} style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 8, padding: "9px 14px", fontSize: 13 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800 }}>
+                              <span style={{ color: "#FDE68A" }}>✦ {shift.planet}</span>
+                              <span style={{ color: "#34D399" }}>
+                                {hi ? `लग्न कुंडली भाव ${shift.rashiHouse} ➔ चलित भाव ${shift.chalitHouse}` : `D1 House ${shift.rashiHouse} ➔ Chalit House ${shift.chalitHouse}`}
+                              </span>
+                            </div>
+                            <div style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 12, marginTop: 4, lineHeight: 1.5 }}>
+                              {hi ? shift.reasonHi : shift.reasonEn}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 8, padding: "10px 14px", color: "#34D399", fontSize: 13 }}>
+                        ✓ {hi ? "सर्व ग्रह समरूप: आपकी कुंडली में सभी ग्रह भाव चलित और लग्न कुंडली दोनों में समान भावों में स्थित हैं।" : "Full Alignment: All 9 planets occupy the exact same houses in both D1 Rashi and Bhava Chalit charts."}
+                      </div>
+                    )}
+
+                    {/* Bhava Cusps Table */}
+                    {showBhavaCuspTable && (
+                      <div style={{ marginTop: 16, overflowX: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left", color: "rgba(241,231,208,0.9)" }}>
+                          <thead>
+                            <tr style={{ background: "rgba(245, 158, 11, 0.18)", borderBottom: "1px solid rgba(245, 158, 11, 0.35)" }}>
+                              <th style={{ padding: "8px 10px" }}>{hi ? "भाव" : "House"}</th>
+                              <th style={{ padding: "8px 10px" }}>{hi ? "राशि" : "Sign"}</th>
+                              <th style={{ padding: "8px 10px" }}>{hi ? "भाव आरंभ (Cusp Start)" : "Bhava Arambha (Start)"}</th>
+                              <th style={{ padding: "8px 10px", color: "#FDE68A" }}>{hi ? "भाव मध्य (Cusp Peak)" : "Bhava Madhya (Peak)"}</th>
+                              <th style={{ padding: "8px 10px" }}>{hi ? "भाव अंत (Cusp End)" : "Bhava Anta (End)"}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {result.bhavaChalit.bhavaCuspsTable.map(row => (
+                              <tr key={row.house} style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.15)" }}>
+                                <td style={{ padding: "7px 10px", fontWeight: 700, color: "#FDE68A" }}>{hi ? `भाव ${row.house}` : `House ${row.house}`}</td>
+                                <td style={{ padding: "7px 10px" }}>{hi ? row.signSanskrit : row.sign}</td>
+                                <td style={{ padding: "7px 10px", opacity: 0.85 }}>{row.arambha}</td>
+                                <td style={{ padding: "7px 10px", color: "#34D399", fontWeight: 700 }}>{row.madhya}</td>
+                                <td style={{ padding: "7px 10px", opacity: 0.85 }}>{row.anta}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+            {/* ── TAB 2: OVERVIEW & NATAL PANCHANGA & AVAKAHADA CHAKRA ── */}
             {tab === "overview" && (
               <div>
+                {/* 1. Natal Birth Panchanga Engine Card */}
+                {result.natalPanchang && (
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 24 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 12, marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 24 }}>🕉️</span>
+                        <div>
+                          <div style={{ fontSize: 11.5, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                            MODULE 2 · NATAL PANCHANGA ENGINE
+                          </div>
+                          <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>
+                            {hi ? "जन्म कालीन पंचांग (Natal Birth Panchang)" : "Natal Birth Panchanga (Five Cosmic Limbs at Birth)"}
+                          </h3>
+                        </div>
+                      </div>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 14, padding: "4px 12px", color: "#FDE68A", fontSize: 12, fontWeight: 700 }}>
+                        <span>☀️</span> {result.natalPanchang.birthKaal}
+                      </div>
+                    </div>
+
+                    {/* 5 Angas Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 16 }}>
+                      {/* Tithi */}
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>1. {hi ? "तिथि (Tithi)" : "Tithi (Lunar Day)"}</div>
+                        <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.natalPanchang.tithi}</div>
+                        <div style={{ fontSize: 12, color: "#34D399", marginTop: 2 }}>{result.natalPanchang.paksha}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", marginTop: 4 }}>
+                          {hi ? `देवता: ${result.natalPanchang.tithiDeity}` : `Deity: ${result.natalPanchang.tithiDeity}`}
+                        </div>
+                      </div>
+
+                      {/* Vaar */}
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>2. {hi ? "वार (Solar Day)" : "Vaar (Solar Day)"}</div>
+                        <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.natalPanchang.vaar}</div>
+                        <div style={{ fontSize: 12, color: "#34D399", marginTop: 2 }}>
+                          {hi ? `स्वामी: ${result.natalPanchang.vaarLord}` : `Lord: ${result.natalPanchang.vaarLord}`}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", marginTop: 4 }}>
+                          {hi ? `उपास्य: ${result.natalPanchang.vaarDeity}` : `Deity: ${result.natalPanchang.vaarDeity}`}
+                        </div>
+                      </div>
+
+                      {/* Nakshatra */}
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>3. {hi ? "नक्षत्र (Nakshatra)" : "Nakshatra (Lunar Mansion)"}</div>
+                        <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.natalPanchang.nakshatra}</div>
+                        <div style={{ fontSize: 12, color: "#34D399", marginTop: 2 }}>
+                          {hi ? `नक्षत्र स्वामी: ${result.natalPanchang.nakshatraLord}` : `Ruler: ${result.natalPanchang.nakshatraLord}`}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", marginTop: 4 }}>
+                          {hi ? `गण: ${result.natalPanchang.nakshatraGana} · नाड़ी: ${result.natalPanchang.nakshatraNadi}` : `Gana: ${result.natalPanchang.nakshatraGana} · Nadi: ${result.natalPanchang.nakshatraNadi}`}
+                        </div>
+                      </div>
+
+                      {/* Yoga */}
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>4. {hi ? "योग (Solilunar Yoga)" : "Yoga (Solilunar Aspect)"}</div>
+                        <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.natalPanchang.yoga}</div>
+                        <div style={{ fontSize: 12, color: result.natalPanchang.isYogaAuspicious ? "#34D399" : "#F59E0B", marginTop: 2 }}>
+                          {result.natalPanchang.yogaStatus}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", marginTop: 4 }}>
+                          {hi ? "सूर्य-चंद्र का संयुक्त प्रभाव" : "Solilunar alignment"}
+                        </div>
+                      </div>
+
+                      {/* Karana */}
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>5. {hi ? "करण (Karana - Half Tithi)" : "Karana (Half Tithi)"}</div>
+                        <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.natalPanchang.karana}</div>
+                        <div style={{ fontSize: 12, color: "#34D399", marginTop: 2 }}>
+                          {hi ? `प्रतीक: ${result.natalPanchang.karanaAnimal}` : `Animal: ${result.natalPanchang.karanaAnimal}`}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", marginTop: 4 }}>
+                          {hi ? `करण स्वामी: ${result.natalPanchang.karanaLord}` : `Lord: ${result.natalPanchang.karanaLord}`}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Secondary Solar & Muhurat Details */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between", background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.2)", borderRadius: 10, padding: "10px 16px", fontSize: 12.5 }}>
+                      <div><span style={{ color: "#F59E0B", fontWeight: 700 }}>🌅 {hi ? "सूर्योदय" : "Sunrise"}:</span> <span style={{ color: "#FDE68A" }}>{result.natalPanchang.sunrise}</span></div>
+                      <div><span style={{ color: "#F59E0B", fontWeight: 700 }}>🌇 {hi ? "सूर्यास्त" : "Sunset"}:</span> <span style={{ color: "#FDE68A" }}>{result.natalPanchang.sunset}</span></div>
+                      <div><span style={{ color: "#F59E0B", fontWeight: 700 }}>⏳ {hi ? "दिनमान" : "Day Length"}:</span> <span style={{ color: "#FDE68A" }}>{result.natalPanchang.dayLength}</span></div>
+                      <div><span style={{ color: "#F59E0B", fontWeight: 700 }}>⚠️ {hi ? "राहु काल (जन्म दिवस)" : "Rahu Kaal"}:</span> <span style={{ color: "#F87171" }}>{result.natalPanchang.rahuKaal}</span></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. Avakahada Chakra Engine Card (Module 5) */}
+                {result.avakahadaChakra && (
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 24 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 12, marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 24 }}>⭐</span>
+                        <div>
+                          <div style={{ fontSize: 11.5, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase" }}>
+                            MODULE 5 · NAKSHATRA & AVAKAHADA ENGINE
+                          </div>
+                          <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>
+                            {hi ? "अवकहड़ा चक्र एवं नामाक्षर (Avakahada Chakra)" : "Avakahada Chakra & Lucky Name Syllables"}
+                          </h3>
+                        </div>
+                      </div>
+                      <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", borderRadius: 14, padding: "4px 12px", color: "#34D399", fontSize: 12, fontWeight: 700 }}>
+                        ✦ {result.avakahadaChakra.paya.split(" ")[0]} {hi ? "पाया" : "Foot"}
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 16 }}>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "वर्ण (Varna)" : "Varna (Caste/Class)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.varna}</div>
+                      </div>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "वश्य (Vashya)" : "Vashya (Control Group)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.vashya}</div>
+                      </div>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "योनि (Yoni Archetype)" : "Yoni (Animal Archetype)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.yoni}</div>
+                      </div>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "गण (Gana)" : "Gana (Temperament)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.gana}</div>
+                      </div>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "नाड़ी (Nadi)" : "Nadi (Humor/Dosha)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.nadi}</div>
+                      </div>
+                      <div style={{ background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "तत्व (Cosmic Element)" : "Tatva (Element)"}</div>
+                        <div style={{ fontSize: 14.5, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{result.avakahadaChakra.tatva}</div>
+                      </div>
+                    </div>
+
+                    {/* Paya & Namakshar Details */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+                      <div style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 10, padding: "12px 16px" }}>
+                        <div style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700 }}>
+                          🦶 {hi ? "पाया विचार (Birth Foot):" : "Paya Auspiciousness:"} <span style={{ color: "#34D399" }}>{result.avakahadaChakra.paya}</span>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, margin: "4px 0 0", lineHeight: 1.5 }}>
+                          {result.avakahadaChakra.payaDesc}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(139, 92, 246, 0.08)", border: "1px solid rgba(139, 92, 246, 0.25)", borderRadius: 10, padding: "12px 16px" }}>
+                        <div style={{ fontSize: 12, color: "#DDD6FE", fontWeight: 700 }}>
+                          ✍️ {hi ? "शुभ नामाक्षर (Auspicious Naming Syllable):" : "Auspicious Name Syllables:"} <span style={{ color: "#FDE68A", fontSize: 14 }}>{result.avakahadaChakra.namakshar}</span>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, margin: "4px 0 0", lineHeight: 1.5 }}>
+                          {hi ? `नक्षत्र के सभी ४ चरणों के नामाक्षर: ${result.avakahadaChakra.allSyllables}` : `Syllables across all 4 padas: ${result.avakahadaChakra.allSyllables}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Birth Data & Sidereal Astronomy Engine Card (Module 1) */}
+                {result.astronomicalSummary && (
+                  <div className="glass-card" style={{ padding: "20px 24px", marginBottom: 24, background: "rgba(11, 8, 25, 0.65)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 18, color: "#F59E0B" }}>🌐</span>
+                        <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
+                          {hi ? "जन्म समय खगोलीय गणना विवरण (Birth Data & Astronomical Engine)" : "Birth Astronomical Coordinates & Sidereal Time (Module 1)"}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)" }}>
+                        {hi ? "चित्रा पक्ष (लाहिड़ी) अयनांश" : "Chitra Paksha (Lahiri) Ayanamsa"}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, fontSize: 12.5 }}>
+                      <div style={{ background: "rgba(26, 18, 48, 0.7)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                        <div style={{ color: "rgba(243, 211, 122, 0.75)" }}>{hi ? "लाहिड़ी अयनांश" : "Lahiri Ayanamsa"}</div>
+                        <div style={{ color: "#FDE68A", fontWeight: 700, marginTop: 2 }}>{result.astronomicalSummary.ayanamsa}</div>
+                      </div>
+                      <div style={{ background: "rgba(26, 18, 48, 0.7)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                        <div style={{ color: "rgba(243, 211, 122, 0.75)" }}>{hi ? "जूलियन दिन (JD)" : "Julian Day (JD)"}</div>
+                        <div style={{ color: "#FDE68A", fontWeight: 700, marginTop: 2 }}>{result.astronomicalSummary.julianDay}</div>
+                      </div>
+                      <div style={{ background: "rgba(26, 18, 48, 0.7)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                        <div style={{ color: "rgba(243, 211, 122, 0.75)" }}>{hi ? "स्थानीय नाक्षत्र काल (LST)" : "Local Sidereal (LST)"}</div>
+                        <div style={{ color: "#FDE68A", fontWeight: 700, marginTop: 2 }}>{result.astronomicalSummary.lst}</div>
+                      </div>
+                      <div style={{ background: "rgba(26, 18, 48, 0.7)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                        <div style={{ color: "rgba(243, 211, 122, 0.75)" }}>{hi ? "ग्रीनविच नाक्षत्र काल (GMST)" : "Greenwich Sidereal (GMST)"}</div>
+                        <div style={{ color: "#FDE68A", fontWeight: 700, marginTop: 2 }}>{result.astronomicalSummary.gmst}</div>
+                      </div>
+                      <div style={{ background: "rgba(26, 18, 48, 0.7)", padding: "8px 12px", borderRadius: 8, border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                        <div style={{ color: "rgba(243, 211, 122, 0.75)" }}>{hi ? "अक्षांश व देशांतर" : "Coordinates"}</div>
+                        <div style={{ color: "#FDE68A", fontWeight: 700, marginTop: 2 }}>{result.astronomicalSummary.latitude}°N, {result.astronomicalSummary.longitude}°E</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <SectionCard icon="🌟" title={t.sec.blueprint} content={result.overview} />
                 <SectionCard icon="⚡" title={t.sec.yogas} content={result.yogas} />
                 <SectionCard icon="✨" title={t.sec.verdict} content={result.verdict} highlight />
@@ -5906,6 +6286,356 @@ export default function App() {
               </div>
             )}
 
+            {/* ── MODULE 7: DOSHAS & YOGAS DIAGNOSTIC HUB ── */}
+            {tab === "doshas" && (() => {
+              const da = result.doshaAnalysis || {};
+              const m = da.manglik || {};
+              const ks = da.kaalSarp || {};
+              const ss = da.sadeSati || {};
+              const p = da.pitra || {};
+              const gc = da.guruChandal || {};
+              const km = da.kemadruma || {};
+              const gm = da.gandmool || {};
+
+              return (
+                <div style={{ animation: "fadeInCard 0.4s ease" }}>
+                  {/* Header Banner */}
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>
+                          <span>⚡</span> MODULE 7 · YOGA & DOSHA DIAGNOSTIC ENGINE
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, margin: 0 }}>
+                          {hi ? "वैदिक दोष व योग संपूर्ण निदान एवं शास्त्रीय उपाय" : "Comprehensive Vedic Dosha Diagnostics & Remedial Shields"}
+                        </h3>
+                        <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, marginTop: 4 }}>
+                          {hi ? "मांगलिक, कालसर्प (१२ प्रकार), शनि साढ़ेसाती, पितृ दोष, गुरु चांडाल, केमद्रुम एवं राजयोगों का प्रामाणिक विश्लेषण।" : "Authentic Parashari assessment of Manglik, 12 Kaal Sarp variants, Sade Sati, Pitra & Kemadruma with Vedic remedies."}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 14, padding: "8px 16px", textAlign: "center" }}>
+                        <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 600 }}>{hi ? "दोष निवारण कवच" : "Remedial Status"}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "#34D399" }}>
+                          {m.isCancelled || !m.isManglik ? (hi ? "संरक्षित व शुभ" : "Shielded / Auspicious") : (hi ? "उपाय अपेक्षित" : "Remedies Active")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 1. Manglik Dosha Card */}
+                  <div className="glass-card" style={{ padding: "24px 26px", marginBottom: 18 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 22 }}>🔥</span>
+                        <h4 style={{ color: "#FDE68A", fontSize: 17, fontWeight: 800, margin: 0 }}>
+                          {hi ? "१. मांगलिक दोष (भौम / कुज दोष) विचार" : "1. Manglik Dosha (Kuja Dosha) Assessment"}
+                        </h4>
+                      </div>
+                      <span style={{
+                        padding: "5px 14px",
+                        borderRadius: 14,
+                        fontSize: 12.5,
+                        fontWeight: 800,
+                        background: m.isCancelled ? "rgba(16, 185, 129, 0.2)" : m.isManglik ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.2)",
+                        border: m.isCancelled ? "1px solid #10B981" : m.isManglik ? "1px solid #EF4444" : "1px solid #10B981",
+                        color: m.isCancelled ? "#34D399" : m.isManglik ? "#F87171" : "#34D399"
+                      }}>
+                        {m.status}
+                      </span>
+                    </div>
+
+                    <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.7, marginBottom: 14 }}>
+                      {m.desc}
+                    </p>
+
+                    <div style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 10, padding: "12px 16px" }}>
+                      <div style={{ fontSize: 12.5, color: "#FDE68A", fontWeight: 700, marginBottom: 4 }}>
+                        🛡️ {hi ? "शास्त्रीय मंगल उपाय (Vedic Kuja Remedies):" : "Prescribed Vedic Remedies:"}
+                      </div>
+                      <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6 }}>
+                        {hi ? m.remediesHi : m.remediesEn}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Kaal Sarp Dosha Card */}
+                  <div className="glass-card" style={{ padding: "24px 26px", marginBottom: 18 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 22 }}>🐍</span>
+                        <h4 style={{ color: "#FDE68A", fontSize: 17, fontWeight: 800, margin: 0 }}>
+                          {hi ? "२. कालसर्प योग (१२ शास्त्रीय प्रकार) विचार" : "2. Kaal Sarp Yoga (12 Classical Archetypes)"}
+                        </h4>
+                      </div>
+                      <span style={{
+                        padding: "5px 14px",
+                        borderRadius: 14,
+                        fontSize: 12.5,
+                        fontWeight: 800,
+                        background: ks.isFull ? "rgba(239, 68, 68, 0.2)" : ks.isPartial ? "rgba(245, 158, 11, 0.2)" : "rgba(16, 185, 129, 0.2)",
+                        border: ks.isFull ? "1px solid #EF4444" : ks.isPartial ? "1px solid #F59E0B" : "1px solid #10B981",
+                        color: ks.isFull ? "#F87171" : ks.isPartial ? "#FDE68A" : "#34D399"
+                      }}>
+                        {ks.status}
+                      </span>
+                    </div>
+
+                    <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.7, marginBottom: 14 }}>
+                      {ks.desc}
+                    </p>
+
+                    <div style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 10, padding: "12px 16px" }}>
+                      <div style={{ fontSize: 12.5, color: "#FDE68A", fontWeight: 700, marginBottom: 4 }}>
+                        🕉️ {hi ? "कालसर्प शांति व शिव साधना उपाय:" : "Prescribed Kaal Sarp Remedies:"}
+                      </div>
+                      <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6 }}>
+                        {hi ? ks.remediesHi : ks.remediesEn}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. Shani Sade Sati & Shani Dhaiya Tracker Card */}
+                  <div className="glass-card" style={{ padding: "24px 26px", marginBottom: 18 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 12, marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 22 }}>🪐</span>
+                        <h4 style={{ color: "#FDE68A", fontSize: 17, fontWeight: 800, margin: 0 }}>
+                          {hi ? "३. शनि साढ़ेसाती एवं ढैया गोचर काल (2025–2027)" : "3. Shani Sade Sati & Dhaiya Live Transit (2025–2027)"}
+                        </h4>
+                      </div>
+                      <span style={{
+                        padding: "5px 14px",
+                        borderRadius: 14,
+                        fontSize: 12.5,
+                        fontWeight: 800,
+                        background: ss.phase !== "None" ? "rgba(139, 92, 246, 0.25)" : "rgba(16, 185, 129, 0.2)",
+                        border: ss.phase !== "None" ? "1px solid #A78BFA" : "1px solid #10B981",
+                        color: ss.phase !== "None" ? "#DDD6FE" : "#34D399"
+                      }}>
+                        {ss.status}
+                      </span>
+                    </div>
+
+                    <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.7, marginBottom: 14 }}>
+                      {ss.desc}
+                    </p>
+
+                    <div style={{ background: "rgba(139, 92, 246, 0.08)", border: "1px solid rgba(139, 92, 246, 0.25)", borderRadius: 10, padding: "12px 16px" }}>
+                      <div style={{ fontSize: 12.5, color: "#DDD6FE", fontWeight: 700, marginBottom: 4 }}>
+                        ⚖️ {hi ? "शनि देव अनुग्रह व रक्षा उपाय:" : "Prescribed Saturnian Remedial Shields:"}
+                      </div>
+                      <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6 }}>
+                        {hi ? ss.remediesHi : ss.remediesEn}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. Pitra, Guru Chandal, Kemadruma & Gandmool Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, marginBottom: 20 }}>
+                    {/* Pitra Dosha */}
+                    <div style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>☀️ {hi ? "पितृ दोष विचार" : "Pitra Dosha"}</span>
+                        <span style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 8, background: p.isAfflicted ? "rgba(239,68,68,0.2)" : "rgba(16,185,129,0.2)", color: p.isAfflicted ? "#F87171" : "#34D399", fontWeight: 700 }}>
+                          {p.status}
+                        </span>
+                      </div>
+                      <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>{p.desc}</p>
+                      <div style={{ fontSize: 12, color: "#F59E0B" }}><strong>उपाय:</strong> {hi ? p.remediesHi : p.remediesEn}</div>
+                    </div>
+
+                    {/* Guru Chandal */}
+                    <div style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>✨ {hi ? "गुरु चांडाल योग" : "Guru Chandal"}</span>
+                        <span style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 8, background: gc.isAfflicted ? "rgba(245,158,11,0.2)" : "rgba(16,185,129,0.2)", color: gc.isAfflicted ? "#FDE68A" : "#34D399", fontWeight: 700 }}>
+                          {gc.status}
+                        </span>
+                      </div>
+                      <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>{gc.desc}</p>
+                      <div style={{ fontSize: 12, color: "#F59E0B" }}><strong>उपाय:</strong> {hi ? gc.remediesHi : gc.remediesEn}</div>
+                    </div>
+
+                    {/* Kemadruma */}
+                    <div style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>🌙 {hi ? "केमद्रुम योग" : "Kemadruma Yoga"}</span>
+                        <span style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 8, background: km.isAfflicted ? "rgba(245,158,11,0.2)" : "rgba(16,185,129,0.2)", color: km.isAfflicted ? "#FDE68A" : "#34D399", fontWeight: 700 }}>
+                          {km.status}
+                        </span>
+                      </div>
+                      <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>{km.desc}</p>
+                      <div style={{ fontSize: 12, color: "#F59E0B" }}><strong>उपाय:</strong> {hi ? km.remediesHi : km.remediesEn}</div>
+                    </div>
+
+                    {/* Gandmool */}
+                    <div style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>🌿 {hi ? "गंडमूल विचार" : "Gandmool Check"}</span>
+                        <span style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 8, background: gm.isAfflicted ? "rgba(245,158,11,0.2)" : "rgba(16,185,129,0.2)", color: gm.isAfflicted ? "#FDE68A" : "#34D399", fontWeight: 700 }}>
+                          {gm.status}
+                        </span>
+                      </div>
+                      <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>{gm.desc}</p>
+                      <div style={{ fontSize: 12, color: "#F59E0B" }}><strong>उपाय:</strong> {hi ? gm.remediesHi : gm.remediesEn}</div>
+                    </div>
+                  </div>
+
+                  {/* Auspicious Grand Yogas */}
+                  <SectionCard icon="🌟" title={t.sec.yogas} content={result.yogas} />
+                </div>
+              );
+            })()}
+
+            {/* ── MODULE 8: STRENGTH / SHADBALA & SARVASHTAKAVARGA ── */}
+            {tab === "shadbala" && (() => {
+              const sb = result.shadbala || {};
+              const scores = sb.planetScores || {};
+              const ranked = sb.rankedList || [];
+              const sav = result.ashtakavarga || {};
+              const savHouses = sav.houses || {};
+
+              return (
+                <div style={{ animation: "fadeInCard 0.4s ease" }}>
+                  {/* Top Summary Banner */}
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>
+                          <span>⚖️</span> MODULE 8 · SHADBALA & ASHTAKAVARGA ENGINE
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, margin: 0 }}>
+                          {hi ? "षड्बल ग्रह सामर्थ्य एवं सर्वाष्टकवर्ग चक्र (337 बिंदु)" : "Six-Fold Planetary Strengths (Shadbala) & Sarvashtakavarga Matrix"}
+                        </h3>
+                        <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, marginTop: 4 }}>
+                          {hi ? "स्थान, दिग्, काल, चेष्टा, नैसर्गिक व दृग्बल का संपूर्ण अनुपात एवं १२ भावों का बिंदु सामर्थ्य।" : "Positional, directional, temporal, motional, natural, and aspectual planetary potencies."}
+                        </p>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                        <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid #10B981", borderRadius: 12, padding: "8px 14px", textAlign: "center" }}>
+                          <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.7)" }}>{hi ? "सर्वश्रेष्ठ बली ग्रह" : "Strongest Planet"}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "#34D399" }}>👑 {sb.strongestPlanet}</div>
+                        </div>
+                        <div style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid #F59E0B", borderRadius: 12, padding: "8px 14px", textAlign: "center" }}>
+                          <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.7)" }}>{hi ? "अष्टकवर्ग कुल बिंदु" : "Total SAV Bindus"}</div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: "#FDE68A" }}>337 / 337</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Shadbala Planet Strength Cards Grid */}
+                  <div className="glass-card" style={{ padding: "24px 26px", marginBottom: 20 }}>
+                    <h4 style={{ color: "#FDE68A", fontSize: 16.5, fontWeight: 800, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span>🪐</span> {hi ? "सप्तग्रह षड्बल अनुपात एवं शक्ति क्रम (Planetary Strength Rankings)" : "7 Classical Planets: Shadbala Virupas & Potency Rankings"}
+                    </h4>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginBottom: 20 }}>
+                      {ranked.map((p, idx) => (
+                        <div key={p.planet} style={{ background: "rgba(11, 8, 25, 0.75)", border: `1.5px solid ${p.badgeColor}40`, borderRadius: 12, padding: "14px 16px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: 13, background: "rgba(245, 158, 11, 0.2)", border: "1px solid rgba(245, 158, 11, 0.4)", borderRadius: 6, padding: "2px 7px", fontWeight: 800, color: "#FDE68A" }}>
+                                #{p.rank}
+                              </span>
+                              <span style={{ color: "#FFF", fontSize: 15, fontWeight: 800 }}>{p.planet}</span>
+                            </div>
+                            <span style={{ fontSize: 11.5, padding: "3px 9px", borderRadius: 10, background: `${p.badgeColor}25`, border: `1px solid ${p.badgeColor}`, color: p.badgeColor, fontWeight: 700 }}>
+                              {p.category}
+                            </span>
+                          </div>
+
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "rgba(241, 231, 208, 0.8)", marginBottom: 6 }}>
+                            <span>{hi ? "कुल षड्बल" : "Total Virupas"}: <strong style={{ color: "#FDE68A" }}>{p.totalVirupas}</strong></span>
+                            <span>{hi ? "अपेक्षित" : "Required"}: {p.minRequired} ({p.ratioPct}%)</span>
+                          </div>
+
+                          {/* Progress Bar */}
+                          <div style={{ width: "100%", height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+                            <div style={{ width: `${Math.min(100, (p.ratioPct / 1.5))}%`, height: "100%", background: `linear-gradient(90deg, #F59E0B, ${p.badgeColor})`, borderRadius: 4 }} />
+                          </div>
+
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 4, marginTop: 10, textAlign: "center", fontSize: 10, color: "rgba(241, 231, 208, 0.65)" }}>
+                            <div><div>स्थान</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.sthana}</div></div>
+                            <div><div>दिग्</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.dig}</div></div>
+                            <div><div>काल</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.kala}</div></div>
+                            <div><div>चेष्टा</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.chesta}</div></div>
+                            <div><div>नैसर्गिक</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.naisargika}</div></div>
+                            <div><div>दृग्</div><div style={{ color: "#FDE68A", fontWeight: 700 }}>{p.drik}</div></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Sarvashtakavarga 12-House Matrix */}
+                  <div className="glass-card" style={{ padding: "24px 26px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+                      <h4 style={{ color: "#FDE68A", fontSize: 16.5, fontWeight: 800, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span>🔢</span> {hi ? "सर्वाष्टकवर्ग १२ भाव बिंदु चक्र (Sarvashtakavarga Points Matrix)" : "Sarvashtakavarga (SAV) 12 Houses Bindu Allocation"}
+                      </h4>
+                      <div style={{ fontSize: 12, color: "rgba(241, 231, 208, 0.75)" }}>
+                        {hi ? "मानक: २८ बिंदु = संतुलित | >२८ = अति शुभ | <२८ = संवेदनशील" : "Parashari Benchmark: 28 Bindus = Balanced | >28 = Highly Favorable"}
+                      </div>
+                    </div>
+
+                    {/* Key Pillar Summary */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 10, marginBottom: 16 }}>
+                      <div style={{ background: "rgba(16, 185, 129, 0.12)", border: "1px solid rgba(16, 185, 129, 0.35)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700 }}>💰 {hi ? "धन व लाभ भाव (२ व ११)" : "Wealth Axis (2nd & 11th)"}</div>
+                        <div style={{ fontSize: 18, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{sav.wealthBindus} {hi ? "बिंदु" : "Bindus"}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.7)", marginTop: 2 }}>
+                          {sav.wealthBindus >= 56 ? (hi ? "अति उत्कृष्ट धन संचय व आय योग" : "Exceptional wealth accumulation") : (hi ? "संतुलित वित्तीय प्रयास" : "Steady financial rhythm")}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "#F59E0B", fontWeight: 700 }}>💼 {hi ? "कर्म स्थान (१०वां भाव)" : "Career House (10th Bhava)"}</div>
+                        <div style={{ fontSize: 18, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{sav.careerBindus} {hi ? "बिंदु" : "Bindus"}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.7)", marginTop: 2 }}>
+                          {sav.careerBindus >= 30 ? (hi ? "उच्च पद, सत्ता व सामाजिक सम्मान" : "High executive authority & honors") : (hi ? "कर्मठता से प्रगति" : "Progress via diligence")}
+                        </div>
+                      </div>
+
+                      <div style={{ background: "rgba(139, 92, 246, 0.12)", border: "1px solid rgba(139, 92, 246, 0.35)", borderRadius: 10, padding: "10px 14px" }}>
+                        <div style={{ fontSize: 11.5, color: "#DDD6FE", fontWeight: 700 }}>✨ {hi ? "भाग्य स्थान (९वां भाव)" : "Fortune House (9th Bhava)"}</div>
+                        <div style={{ fontSize: 18, color: "#FDE68A", fontWeight: 800, marginTop: 2 }}>{sav.luckBindus} {hi ? "बिंदु" : "Bindus"}</div>
+                        <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.7)", marginTop: 2 }}>
+                          {sav.luckBindus >= 28 ? (hi ? "प्रबल ईश्वरीय कृपा व भाग्य वृद्धि" : "Strong protective Bhagya grace") : (hi ? "आत्म-पुरुषार्थ प्रधान" : "Self-driven karma")}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 12-Houses Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+                      {Array.from({ length: 12 }, (_, i) => {
+                        const hNum = i + 1;
+                        const hData = savHouses[hNum] || { bindus: 28, status: "Balanced", badgeColor: "#F59E0B" };
+                        return (
+                          <div key={hNum} style={{ background: "rgba(11, 8, 25, 0.7)", border: `1px solid ${hData.badgeColor}35`, borderRadius: 10, padding: "10px 12px", textAlign: "center" }}>
+                            <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.8)", fontWeight: 700 }}>
+                              {hi ? `भाव ${hNum}` : `House ${hNum}`}
+                            </div>
+                            <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                              {hi ? hData.signSanskrit : hData.sign}
+                            </div>
+                            <div style={{ fontSize: 22, fontWeight: 900, color: hData.badgeColor, margin: "4px 0" }}>
+                              {hData.bindus}
+                            </div>
+                            <div style={{ fontSize: 10.5, color: hData.badgeColor, fontWeight: 700 }}>
+                              {hData.status}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* ── TAB 9: LIFE AREAS ── */}
             {tab === "life" && (
               <div>
@@ -5917,13 +6647,109 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 10: PREDICTIONS ── */}
-            {tab === "predictions" && (
-              <div>
-                <SectionCard icon="🔮" title={t.sec.pred} content={result.pred} />
-                <SectionCard icon="⏱️" title={t.sec.dasha} content={result.dasha} />
-              </div>
-            )}
+            {/* ── MODULE 9: DASHA TIMETABLE & REAL-TIME GOCHARA TRANSITS ── */}
+            {tab === "predictions" && (() => {
+              const dd = result.detailedDashas || {};
+              const activeMaha = dd.activeMahadasha || {};
+              const antars = dd.activeAntardashas || [];
+              const transits = result.gocharaTransits || [];
+
+              return (
+                <div style={{ animation: "fadeInCard 0.4s ease" }}>
+                  {/* Top Dasha Card */}
+                  <div className="glass-card" style={{ padding: "26px 28px", marginBottom: 20 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(212,175,55,0.25)", paddingBottom: 14, marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                      <div>
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>
+                          <span>🔮</span> MODULE 9 · VIMSHOTTARI DASHA & REAL-TIME TRANSIT ENGINE
+                        </div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 800, margin: 0 }}>
+                          {hi ? `वर्तमान सक्रिय महादशा: ${activeMaha.lord} (${activeMaha.startYear} – ${activeMaha.endYear})` : `Active Vimshottari Mahadasha: ${activeMaha.lord} (${activeMaha.startYear} – ${activeMaha.endYear})`}
+                        </h3>
+                        <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, marginTop: 4 }}>
+                          {hi ? "प्रत्येक महादशा के अंतर्गत ९ सूक्ष्म अंतर्दशाएं सक्रिय जीवन चक्र को निर्धारित करती हैं।" : "Each Mahadasha unfolds through 9 granular Antardasha sub-periods guiding current life outcomes."}
+                        </p>
+                      </div>
+
+                      <div style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid #10B981", borderRadius: 12, padding: "8px 16px", textAlign: "center" }}>
+                        <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.7)" }}>{hi ? "सक्रिय अंतर्दशा" : "Active Antardasha"}</div>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: "#34D399" }}>
+                          ⚡ {dd.currentActiveAntardasha?.antardashaLord || activeMaha.lord}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Antardasha Timetable */}
+                    <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 700, marginBottom: 12 }}>
+                      ⏱️ {hi ? `${activeMaha.lord} महादशा के अंतर्गत ९ अंतर्दशा चक्र (Sub-Period Timetable):` : `9 Antardasha Cycles under ${activeMaha.lord} Mahadasha:`}
+                    </h4>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10, marginBottom: 16 }}>
+                      {antars.map((a, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            background: a.isActive ? "linear-gradient(135deg, rgba(245,158,11,0.25), rgba(11,8,25,0.9))" : "rgba(11, 8, 25, 0.65)",
+                            border: a.isActive ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.2)",
+                            borderRadius: 10,
+                            padding: "10px 14px",
+                            boxShadow: a.isActive ? "0 0 14px rgba(245,158,11,0.3)" : "none"
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ color: a.isActive ? "#FDE68A" : "#FFF", fontSize: 13.5, fontWeight: 800 }}>
+                              {activeMaha.lord} – {a.antardashaLord}
+                            </span>
+                            {a.isActive && (
+                              <span style={{ fontSize: 10, background: "#10B981", color: "#0F0A1E", padding: "2px 6px", borderRadius: 6, fontWeight: 900 }}>
+                                ACTIVE NOW
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: "rgba(241, 231, 208, 0.75)", marginTop: 4 }}>
+                            {a.startYear} – {a.endYear} ({a.durationMonths} {hi ? "माह" : "mo"})
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 2026-2027 Real-Time Gochara Transits Hub */}
+                  <div className="glass-card" style={{ padding: "24px 26px", marginBottom: 20 }}>
+                    <h4 style={{ color: "#FDE68A", fontSize: 16.5, fontWeight: 800, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span>🪐</span> {hi ? "वर्ष 2026–2027 प्रमुख ग्रह गोचर प्रभाव (Real-Time Planetary Transits)" : "2026–2027 Major Planetary Transits (Gochara Impact)"}
+                    </h4>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+                      {transits.map(tItem => (
+                        <div key={tItem.planet} style={{ background: "rgba(11, 8, 25, 0.7)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "14px 16px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                            <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>{tItem.planet}</span>
+                            <span style={{ fontSize: 11.5, padding: "2px 8px", borderRadius: 8, background: tItem.isFavorable ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)", color: tItem.isFavorable ? "#34D399" : "#FDE68A", fontWeight: 700 }}>
+                              {tItem.isFavorable ? (hi ? "शुभ गोचर" : "Favorable") : (hi ? "संयम अपेक्षित" : "Inner Growth")}
+                            </span>
+                          </div>
+
+                          <div style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.8)", marginBottom: 4 }}>
+                            {hi ? `वर्तमान राशि: ${tItem.signSanskrit}` : `Current Transit: ${tItem.currentSign}`}
+                          </div>
+                          <div style={{ fontSize: 12, color: "#34D399", marginBottom: 6 }}>
+                            {hi ? `चंद्र राशि से भाव ${tItem.houseFromMoon} | लग्न से भाव ${tItem.houseFromAsc}` : `House ${tItem.houseFromMoon} from Moon | House ${tItem.houseFromAsc} from Lagna`}
+                          </div>
+                          <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
+                            {tItem.impact}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Decade Predictions */}
+                  <SectionCard icon="🔮" title={t.sec.pred} content={result.pred} />
+                  <SectionCard icon="⏱️" title={t.sec.dasha} content={result.dasha} />
+                </div>
+              );
+            })()}
 
           </div>
         )}
