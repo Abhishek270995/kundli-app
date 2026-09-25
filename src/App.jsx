@@ -657,8 +657,8 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
               </div>
               {paypalTxId && (
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ color: "rgba(241,231,208,0.6)" }}>PayPal Tx ID:</span>
-                  <span style={{ color: "#93C5FD", fontWeight: 600 }}>{paypalTxId}</span>
+                  <span style={{ color: "rgba(241,231,208,0.6)" }}>{isINR ? "UPI UTR / Ref:" : "PayPal Tx ID:"}</span>
+                  <span style={{ color: isINR ? "#6EE7B7" : "#93C5FD", fontWeight: 600 }}>{paypalTxId}</span>
                 </div>
               )}
             </div>
