@@ -6050,58 +6050,138 @@ export default function App() {
                       🔥 <b>{hi ? "मांगलिक स्थिति व सामंजस्य:" : "Manglik Alignment:"}</b> {hi ? (milanResult.manglikStatusHi || milanResult.manglikStatus) : milanResult.manglikStatus}
                     </div>
 
-                    {/* Pro compatibility report unlock */}
-                    <div style={{ textAlign: "center", padding: "16px", background: "rgba(35,22,65,0.8)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10 }}>
-                      <div style={{ color: "#F3D37A", fontSize: 14.5, fontWeight: 800 }}>
-                        {hi ? "विस्तृत दांपत्य भविष्य, संतान योग एवं निवारण रिपोर्ट (PDF)" : "Unlock Complete 25-Page Matrimonial Compatibility PDF"}
-                      </div>
-                      {effectiveMatchmakingUnlocked ? (
-                        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                          {isAdmin && (
-                            <div style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 12, padding: "2px 10px", color: "#FDE68A", fontSize: 11.5, fontWeight: 800 }}>
-                              👑 {hi ? "एडमिन वीआईपी अनलॉक" : "Admin VIP Access"}
-                            </div>
-                          )}
-                          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                            <button
-                              onClick={() => handlePrintReport("matchmaking")}
-                              className="gold-cta-btn"
-                              style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
-                            >
-                              <span>📄</span> {hi ? "मिलान PDF डाउनलोड / प्रिंट करें (FREE)" : "Download / Print Compatibility PDF (FREE)"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setActiveCheckout({
-                                title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                                priceKey: "dakshina",
-                                price: PRODUCT_PRICES.dakshina[currency],
-                                desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                                icon: "🪷",
-                                isDakshina: true
-                              })}
-                              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
-                            >
-                              <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
-                            </button>
-                          </div>
+                    {/* 1. Four Dimensional Compatibility Pillars */}
+                    {milanResult.dimensions && (
+                      <div style={{ background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "20px 22px", marginBottom: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 14 }}>
+                          <span style={{ fontSize: 18 }}>⚖️</span> {hi ? "वैदिक दांपत्य के चार प्रमुख आधार (Four Core Dimensions)" : "Four Core Pillars of Matrimonial Harmony"}
                         </div>
-                      ) : (
-                        <button
-                          onClick={() => setActiveCheckout({
-                            title: "Kundli Milan Comprehensive PDF Report",
-                            priceKey: "matchmakingReport",
-                            price: PRODUCT_PRICES.matchmakingReport[currency],
-                            desc: "In-depth Bhakoot/Nadi analysis, future timing, and harmony remedies",
-                            icon: "❤️",
-                            isMatchmakingUnlock: true
-                          })}
-                          style={{ marginTop: 10, background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "10px 22px", borderRadius: 8, fontSize: 13.5, fontWeight: 800, cursor: "pointer" }}
-                        >
-                          {hi ? "डाउनलोड करें" : "Unlock Report"} ({PRODUCT_PRICES.matchmakingReport[currency]})
-                        </button>
-                      )}
-                    </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+                          {[
+                            { key: "mental", icon: "🧠", data: milanResult.dimensions.mental },
+                            { key: "physical", icon: "💖", data: milanResult.dimensions.physical },
+                            { key: "family", icon: "🏡", data: milanResult.dimensions.family },
+                            { key: "genetic", icon: "🧬", data: milanResult.dimensions.genetic },
+                          ].map(item => (
+                            <div key={item.key} style={{ background: "rgba(18,12,38,0.6)", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 10, padding: "14px 16px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                                <span style={{ fontSize: 13, fontWeight: 700, color: "#FDE68A", display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>{item.icon}</span> {hi ? item.data.titleHi : item.data.title}
+                                </span>
+                                <span style={{ fontSize: 14, fontWeight: 800, color: item.data.score >= 70 ? "#34D399" : item.data.score >= 50 ? "#FBBF24" : "#F87171" }}>
+                                  {item.data.score}%
+                                </span>
+                              </div>
+                              <div style={{ width: "100%", height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
+                                <div
+                                  style={{
+                                    width: `${item.data.score}%`,
+                                    height: "100%",
+                                    background: item.data.score >= 70 ? "linear-gradient(90deg, #10B981, #34D399)" : item.data.score >= 50 ? "linear-gradient(90deg, #F59E0B, #FBBF24)" : "linear-gradient(90deg, #EF4444, #F87171)",
+                                    borderRadius: 3,
+                                    transition: "width 0.6s ease"
+                                  }}
+                                />
+                              </div>
+                              <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.75)", display: "flex", justifyContent: "space-between" }}>
+                                <span>{hi ? "श्रेणी:" : "Status:"}</span>
+                                <span style={{ fontWeight: 700, color: item.data.score >= 70 ? "#34D399" : item.data.score >= 50 ? "#FDE68A" : "#FCA5A5" }}>
+                                  {hi ? item.data.ratingHi : item.data.rating}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. Key Positive Points & Astrological Pillars */}
+                    {milanResult.strengths && milanResult.strengths.length > 0 && (
+                      <div style={{ background: "rgba(16, 185, 129, 0.05)", border: "1px solid rgba(16, 185, 129, 0.35)", borderRadius: 12, padding: "20px 22px", marginBottom: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399", fontSize: 15, fontWeight: 800, marginBottom: 14 }}>
+                          <span style={{ fontSize: 18 }}>🌟</span> {hi ? "सकारात्मक शक्तियां एवं शुभ योग (Key Match Strengths)" : "Key Match Strengths & Auspicious Alignments"}
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+                          {milanResult.strengths.map((str, sIdx) => (
+                            <div key={sIdx} style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 10, padding: "14px 16px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
+                                <div style={{ fontSize: 13.5, fontWeight: 800, color: "#FDE68A", display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>{str.icon}</span> {hi ? str.titleHi : str.title}
+                                </div>
+                                <span style={{ fontSize: 11, background: "rgba(52, 211, 153, 0.15)", color: "#34D399", border: "1px solid rgba(52, 211, 153, 0.3)", borderRadius: 6, padding: "2px 8px", fontWeight: 700, whiteSpace: "nowrap" }}>
+                                  {str.koota}
+                                </span>
+                              </div>
+                              <p style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", lineHeight: 1.6, margin: 0 }}>
+                                {hi ? str.descHi : str.desc}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 3. Critical Checkpoints & Sensitive Friction Points */}
+                    {milanResult.criticalPoints && milanResult.criticalPoints.length > 0 && (
+                      <div style={{ background: "rgba(245, 158, 11, 0.05)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 12, padding: "20px 22px", marginBottom: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FBBF24", fontSize: 15, fontWeight: 800, marginBottom: 14 }}>
+                          <span style={{ fontSize: 18 }}>⚠️</span> {hi ? "संवेदनशील बिंदु एवं गहराई से विश्लेषण (Critical Checkpoints)" : "Critical Checkpoints & Sensitive Friction Points"}
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                          {milanResult.criticalPoints.map((crit, cIdx) => (
+                            <div key={cIdx} style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 10, padding: "16px 18px" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                                <div style={{ fontSize: 14, fontWeight: 800, color: "#FDE68A", display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>{crit.icon}</span> {hi ? crit.titleHi : crit.title}
+                                </div>
+                                <span style={{ fontSize: 11, background: crit.severity === "low" ? "rgba(52, 211, 153, 0.15)" : "rgba(245, 158, 11, 0.15)", color: crit.severity === "low" ? "#34D399" : "#FBBF24", border: `1px solid ${crit.severity === "low" ? "rgba(52, 211, 153, 0.3)" : "rgba(245, 158, 11, 0.3)"}`, borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>
+                                  {crit.koota}
+                                </span>
+                              </div>
+
+                              <div style={{ fontSize: 13, color: "rgba(241,231,208,0.88)", lineHeight: 1.6, marginBottom: (crit.parihara || crit.advice) ? 10 : 0 }}>
+                                <b>{hi ? "ज्योतिषीय प्रभाव:" : "Astrological Context:"}</b> {hi ? crit.analysisHi : crit.analysis}
+                              </div>
+
+                              {crit.parihara && (
+                                <div style={{ background: "rgba(52, 211, 153, 0.1)", border: "1px dashed rgba(52, 211, 153, 0.4)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, color: "#A7F3D0", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                                  <span style={{ fontSize: 16 }}>🛡️</span>
+                                  <span>{hi ? crit.pariharaHi : crit.parihara}</span>
+                                </div>
+                              )}
+
+                              {crit.advice && (
+                                <div style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.2)", borderRadius: 8, padding: "8px 12px", fontSize: 12.5, color: "#FDE68A", display: "flex", alignItems: "flex-start", gap: 8 }}>
+                                  <span style={{ fontSize: 14 }}>💡</span>
+                                  <span><b>{hi ? "सुलझाने का सूत्र:" : "Harmonization Key:"}</b> {hi ? crit.adviceHi : crit.advice}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 4. Vedic Harmonization Remedies & Sutras */}
+                    {milanResult.remedies && milanResult.remedies.length > 0 && (
+                      <div style={{ background: "rgba(139, 92, 246, 0.05)", border: "1px solid rgba(139, 92, 246, 0.3)", borderRadius: 12, padding: "20px 22px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#C4B5FD", fontSize: 15, fontWeight: 800, marginBottom: 14 }}>
+                          <span style={{ fontSize: 18 }}>🛡️</span> {hi ? "वैदिक शांति उपाय एवं दांपत्य सुख सूत्र (Harmonization Protocol)" : "Vedic Harmonization Protocol & Practical Sutras"}
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+                          {milanResult.remedies.map((rem, rIdx) => (
+                            <div key={rIdx} style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(139, 92, 246, 0.25)", borderRadius: 10, padding: "14px 16px" }}>
+                              <div style={{ fontSize: 13.5, fontWeight: 800, color: "#FDE68A", display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                <span>{rem.icon}</span> {hi ? rem.titleHi : rem.title}
+                              </div>
+                              <p style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", lineHeight: 1.65, margin: 0 }}>
+                                {hi ? rem.descHi : rem.desc}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -7984,67 +8064,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* ══════════════════════════════════════════════════════════════════════
-                  CASE 6: ASHTAKOOT 36 GUNA MILAN & COMPATIBILITY DOSSIER
-              ══════════════════════════════════════════════════════════════════════ */}
-              {activePrintReport === "matchmaking" && (
-                <div>
-                  <div style={{ textAlign: "center", borderBottom: "2px solid #D4AF37", paddingBottom: 16, marginBottom: 24 }}>
-                    <div style={{ fontSize: 26, marginBottom: 4 }}>❤️ 🕊️</div>
-                    <h1 style={{ fontFamily: "'Cinzel', serif", color: "#F3D37A", fontSize: 25, fontWeight: 800, letterSpacing: 1.5, margin: 0 }}>
-                      {hi ? "वैदिक अष्टकूट ३६ गुण मिलान एवं दांपत्य अनुकूलता रिपोर्ट" : "VEDIC ASHTAKOOT 36 GUNA MILAN & MATRIMONIAL COMPATIBILITY"}
-                    </h1>
-                    <div style={{ fontSize: 13, color: "#34D399", fontWeight: 800, marginTop: 4, letterSpacing: 1 }}>
-                      ✦ CONFIDENTIAL KUNDLI MATCHMAKING & VIVAH HARMONY DOSSIER ✦
-                    </div>
-                  </div>
-                  {milanResult ? (
-                    <div>
-                      <div className="page-break-avoid" style={{ background: "rgba(26, 18, 48, 0.8)", border: "1px solid rgba(212, 175, 55, 0.4)", borderRadius: 12, padding: "16px 20px", marginBottom: 22, textAlign: "center" }}>
-                        <div style={{ fontSize: 14, color: "rgba(241,231,208,0.85)", marginBottom: 6 }}>
-                          {milanResult.p1.name} ({milanResult.p1.sign}) × {milanResult.p2.name} ({milanResult.p2.sign})
-                        </div>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: Number(milanResult.totalGunas) >= 18 ? "#34D399" : "#F87171" }}>
-                          {milanResult.totalGunas} / {milanResult.maxGunas} ({milanResult.percentage}%)
-                        </div>
-                        <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, marginTop: 4 }}>
-                          {hi ? milanResult.verdictHi : milanResult.verdict}
-                        </h3>
-                      </div>
 
-                      <div className="page-break-avoid" style={{ marginBottom: 20 }}>
-                        <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
-                          ✦ Ashtakoot 8-Fold Vedic Compatibility Breakdown
-                        </h4>
-                        <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid rgba(212,175,55,0.3)" }}>
-                          <thead>
-                            <tr style={{ background: "rgba(245, 158, 11, 0.15)", borderBottom: "1px solid rgba(212,175,55,0.4)" }}>
-                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Koota</th>
-                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "center" }}>Obtained / Max</th>
-                              <th style={{ padding: "8px 12px", color: "#FDE68A", fontSize: 12.5, textAlign: "left" }}>Significance & Analysis</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {(milanResult.breakdown || []).map((b, bi) => (
-                              <tr key={bi} style={{ borderBottom: "1px solid rgba(212,175,55,0.1)", background: bi % 2 ? "rgba(255,255,255,0.02)" : "transparent" }}>
-                                <td style={{ padding: "8px 12px", fontWeight: 700, color: "#FDE68A", fontSize: 13 }}>{b.name}</td>
-                                <td style={{ padding: "8px 12px", fontWeight: 700, color: Number(b.obtained) > 0 ? "#34D399" : "#F87171", textAlign: "center", fontSize: 13 }}>
-                                  {b.obtained} / {b.max}
-                                </td>
-                                <td style={{ padding: "8px 12px", fontSize: 12.5, color: "rgba(241,231,208,0.85)" }}>{b.desc}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{ textAlign: "center", padding: 20, color: "rgba(241,231,208,0.8)" }}>
-                      Please calculate Gun Milan from the Kundli Milan tab to print this report.
-                    </div>
-                  )}
-                </div>
-              )}
 
               {/* ══════════════════════════════════════════════════════════════════════
                   CASE 4: COMPLETE DELUXE NATAL KUNDLI & LIFE REPORT (Default All)

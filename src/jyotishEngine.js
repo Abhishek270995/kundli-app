@@ -297,27 +297,370 @@ export function calculateGunMilan({ partner1, partner2 }) {
   const isBhakootDosha = [2, 12, 6, 8, 9, 5].includes(signDist);
   let bhakootScore = isBhakootDosha ? 0 : 7;
 
-  // 8. Nadi (8 Points)
-  const isNadiDosha = nak1.nadi === nak2.nadi;
-  let nadiScore = isNadiDosha ? 0 : 8;
+  // Planetary Friendship Table (Natural Vedic Mitra/Sama/Shatru)
+  const PLANET_FRIENDS = {
+    Sun: ["Moon", "Mars", "Jupiter"],
+    Moon: ["Sun", "Mercury"],
+    Mars: ["Sun", "Moon", "Jupiter"],
+    Mercury: ["Sun", "Venus"],
+    Jupiter: ["Sun", "Moon", "Mars"],
+    Venus: ["Mercury", "Saturn"],
+    Saturn: ["Mercury", "Venus"]
+  };
+  const areLordsFriends = (lord1, lord2) => {
+    if (lord1 === lord2) return true;
+    const f1 = PLANET_FRIENDS[lord1] || [];
+    const f2 = PLANET_FRIENDS[lord2] || [];
+    return f1.includes(lord2) || f2.includes(lord1);
+  };
 
-  const totalGunas = varnaScore + vashyaScore + taraScore + yoniScore + maitriScore + ganaScore + bhakootScore + nadiScore;
-
-  // Manglik Check
-  const mars1H = ((getSignIndex(p1Planets["Mars"]) - s1Idx + 12) % 12) + 1;
-  const mars2H = ((getSignIndex(p2Planets["Mars"]) - s2Idx + 12) % 12) + 1;
-  const p1Manglik = [1, 4, 7, 8, 12].includes(mars1H);
-  const p2Manglik = [1, 4, 7, 8, 12].includes(mars2H);
-
-  let matchVerdict = "Excellent Match (Uttam)";
-  let matchVerdictHi = "उत्कृष्ट एवं अत्यंत शुभ मिलान (उत्तम)";
-  if (totalGunas < 18) {
-    matchVerdict = "Challenging Compatibility (Remedies Advised)";
-    matchVerdictHi = "सावधानी एवं वैदिक उपाय आवश्यक (चुनौतीपूर्ण)";
-  } else if (totalGunas <= 25) {
-    matchVerdict = "Good & Harmonious Match (Madhyam)";
-    matchVerdictHi = "शुभ एवं सामंजस्यपूर्ण मिलान (मध्यम)";
+  // Detailed Bhakoot Dynamics & Parihara (Cancellation)
+  let bhakootType = "";
+  let bhakootTypeHi = "";
+  let bhakootAxisDesc = "";
+  let bhakootAxisDescHi = "";
+  if (signDist === 1 || signDist === 7) {
+    bhakootType = signDist === 1 ? "Prathama (1-1 / Same Rashi)" : "Samasaptaka (7-7 / Direct Aspect)";
+    bhakootTypeHi = signDist === 1 ? "प्रथम (१-१ / समान राशि)" : "समसप्तक (७-७ / परस्पर शुभ दृष्टि)";
+    bhakootAxisDesc = "Direct mirror alignment fostering deep mutual understanding and balanced marital partnership.";
+    bhakootAxisDescHi = "परस्पर समसप्तक दृष्टि दांपत्य में स्वाभाविक संतुलन और परस्पर समर्पण को प्रोत्साहित करती है।";
+  } else if (signDist === 3 || signDist === 11) {
+    bhakootType = "Tritiya-Ekadasha (3-11 / Growth Axis)";
+    bhakootTypeHi = "तृतीय-एकादश (३-११ / लाभ व वृद्धि)";
+    bhakootAxisDesc = "Highly favorable Upachaya dynamic promoting continuous economic elevation and lasting camaraderie.";
+    bhakootAxisDescHi = "उपचय भावों की शुभ स्थिति दांपत्य में आर्थिक उन्नति, आपसी सहयोग और मित्रता को बल देती है।";
+  } else if (signDist === 4 || signDist === 10) {
+    bhakootType = "Kendra Bhakoot (4-10 / Action Axis)";
+    bhakootTypeHi = "केन्द्र भकूट (४-१० / कर्म व सुख)";
+    bhakootAxisDesc = "Strong foundation for domestic security, parental duties, and cooperative career ambitions.";
+    bhakootAxisDescHi = "गृहस्थ सुख, परिवार निर्माण और सामाजिक दायित्वों के प्रति संयुक्त निष्ठा का प्रतीक।";
+  } else if (signDist === 2 || signDist === 12) {
+    bhakootType = "Dwirdwadasha (2-12 / Expenditure Axis)";
+    bhakootTypeHi = "द्विर्द्वादश (२-१२ / व्यय व दृष्टिकोण भेद)";
+    bhakootAxisDesc = "Differences in expenditure preferences, lifestyle pacing, or family background traditions.";
+    bhakootAxisDescHi = "व्यय प्राथमिकताओं, वित्तीय निर्णयों अथवा पारिवारिक आदतों में मतभेद की संभावना।";
+  } else if (signDist === 6 || signDist === 8) {
+    bhakootType = "Shadashtaka (6-8 / Transformation Axis)";
+    bhakootTypeHi = "षडाष्टक (६-८ / स्वास्थ्य व तर्क-वितर्क)";
+    bhakootAxisDesc = "Sensitive emotional axis requiring active ego management, regular dialogue, and mutual health care.";
+    bhakootAxisDescHi = "भावनात्मक संवेदनशीलता व स्वास्थ्य पर ध्यान अपेक्षित; संवाद में धैर्य रखना आवश्यक है।";
+  } else if (signDist === 5 || signDist === 9) {
+    bhakootType = "Navam-Panchama (5-9 / Dharma Trikona Axis)";
+    bhakootTypeHi = "नवम-पंचम (५-९ / धर्म-त्रिकोण व संतान)";
+    bhakootAxisDesc = "Sacred trine connection indicating profound intellectual admiration, shared philosophy, and artistic joy.";
+    bhakootAxisDescHi = "त्रिकोण भावों का पावन सम्बंध — विचारों में गहन सम्मान, कलात्मक रुचि एवं आध्यात्मिक सामंजस्य।";
   }
+
+  let hasBhakootParihara = false;
+  let bhakootPariharaReason = "";
+  let bhakootPariharaReasonHi = "";
+  if (isBhakootDosha) {
+    if (sign1.lord === sign2.lord) {
+      hasBhakootParihara = true;
+      bhakootPariharaReason = "Vedic Parihara applies: Both Moon signs share the exact same Planetary Lord (" + sign1.lord + ").";
+      bhakootPariharaReasonHi = "वैदिक परिहार लागू: दोनों चंद्र राशियों का स्वामी ग्रह एक ही (" + sign1.lord + ") होने से दोष समाप्त होता है।";
+    } else if (areLordsFriends(sign1.lord, sign2.lord)) {
+      hasBhakootParihara = true;
+      bhakootPariharaReason = "Vedic Parihara applies: Planetary lords " + sign1.lord + " and " + sign2.lord + " are natural allies (Mitra Grahas), neutralizing friction.";
+      bhakootPariharaReasonHi = "वैदिक परिहार लागू: राशि स्वामी " + sign1.lord + " एवं " + sign2.lord + " परस्पर मित्र ग्रह हैं, जिससे भकूट दोष का प्रभाव नगण्य हो जाता है।";
+    } else if (sign1.element === sign2.element) {
+      hasBhakootParihara = true;
+      bhakootPariharaReason = "Elemental Parihara applies: Both signs belong to the same " + sign1.element + " element, ensuring organic resonance.";
+      bhakootPariharaReasonHi = "तत्वीय परिहार लागू: दोनों राशियां एक ही (" + sign1.element + ") तत्व की हैं, जिससे प्राकृतिक तालमेल बना रहता है।";
+    }
+  }
+
+  // Nadi Dynamics & Parihara
+  let hasNadiParihara = false;
+  let nadiPariharaReason = "";
+  let nadiPariharaReasonHi = "";
+  if (isNadiDosha) {
+    if (s1Idx === s2Idx && nak1.name !== nak2.name) {
+      hasNadiParihara = true;
+      nadiPariharaReason = "Mitigated: Same Moon sign with different Nakshatras substantially dissolves Nadi affliction.";
+      nadiPariharaReasonHi = "परिहार: समान चंद्र राशि एवं भिन्न नक्षत्र होने से नाड़ी दोष का शास्त्रीय परिहार होता है।";
+    } else if (nak1.pada !== nak2.pada) {
+      hasNadiParihara = true;
+      nadiPariharaReason = "Softened: Differing Nakshatra Padas (quarters) maintain energetic diversity and genetic resilience.";
+      nadiPariharaReasonHi = "आंशिक परिहार: नक्षत्र चरण भिन्न होने से आनुवंशिक ऊर्जा व प्राण शक्ति में संतुलन रहता है।";
+    }
+  }
+
+  // Positive Highlights (Strengths)
+  const strengths = [];
+  if (nadiScore === 8) {
+    strengths.push({
+      icon: "🧬",
+      koota: "Nadi Koota (8/8)",
+      title: "Supreme Genetic & Prana Resonance",
+      titleHi: "उत्कृष्ट प्राण ऊर्जा एवं आनुवंशिक अनुकूलता",
+      desc: "Full 8/8 marks with no Nadi Dosha. Ensures pristine hereditary health, robust nervous system harmony, and auspicious longevity for future progeny.",
+      descHi: "८ में से पूरे ८ अंक! नाड़ी दोष रहित यह योग उत्तम शारीरिक आरोग्यता, स्वस्थ संतति सुख एवं दीर्घायु का प्रबल वरदान है।"
+    });
+  } else if (hasNadiParihara) {
+    strengths.push({
+      icon: "🧬",
+      koota: "Nadi Koota (" + nadiScore + "/8)",
+      title: "Nadi Parihara (Classical Exemption Active)",
+      titleHi: "नाड़ी दोष परिहार (शास्त्रीय दोष शमन)",
+      desc: nadiPariharaReason,
+      descHi: nadiPariharaReasonHi
+    });
+  }
+
+  if (maitriScore >= 4) {
+    strengths.push({
+      icon: "🧠",
+      koota: "Graha Maitri (" + maitriScore + "/5)",
+      title: "Strong Psychological & Intellectual Chemistry",
+      titleHi: "प्रगाढ़ बौद्धिक मित्रता एवं वैचारिक तालमेल",
+      desc: "Rashi lords " + sign1.lord + " and " + sign2.lord + " share mutual affinity. Conversations flow effortlessly, allowing honest communication and mutual respect during differences.",
+      descHi: "राशि स्वामी " + sign1.lord + " एवं " + sign2.lord + " के मध्य मधुर मैत्री है। इससे विचारों में खुलापन, वैचारिक आदर और जीवन निर्णयों में सहज सहमति बनी रहती है।"
+    });
+  }
+
+  if (ganaScore >= 5) {
+    strengths.push({
+      icon: "🕊️",
+      koota: "Gana Koota (" + ganaScore + "/6)",
+      title: "Harmonious Daily Lifestyle & Temperament",
+      titleHi: "सहज सामाजिक व्यवहार एवं जीवनशैली सामंजस्य",
+      desc: nak1.gana + " and " + nak2.gana + " temperaments blend naturally. Shared social values, compatible living pacing, and emotional stability in home life.",
+      descHi: nak1.gana + " और " + nak2.gana + " गण का सुंदर संगम। दैनिक दिनचर्या, पारिवारिक प्राथमिकताओं और सामाजिक व्यवहार में अद्भुत सामंजस्य रहता है।"
+    });
+  }
+
+  if (vashyaScore >= 1.5) {
+    strengths.push({
+      icon: "💖",
+      koota: "Vashya Koota (" + vashyaScore + "/2)",
+      title: "Magnetic Mutual Devotion & Attraction",
+      titleHi: "प्राकृतिक पारस्परिक आकर्षण एवं निष्ठा",
+      desc: "High Vashya score indicates an instinctual pull of affection, emotional warmth, and reciprocal loyalty that binds the relationship over time.",
+      descHi: "दोनों जातकों के मध्य गहरा आंतरिक आकर्षण और परस्पर सम्मान का भाव, जो दांपत्य जीवन को प्रेममय बनाता है।"
+    });
+  }
+
+  if (varnaScore === 1) {
+    strengths.push({
+      icon: "⚖️",
+      koota: "Varna Koota (1/1)",
+      title: "Ego-Free Spiritual & Working Balance",
+      titleHi: "अहंकार-रहित आत्मिक एवं कार्य सामंजस्य",
+      desc: "Balanced ego dynamics. Neither partner diminishes the other's ambition or personal dignity, creating an encouraging environment for growth.",
+      descHi: "कार्यक्षेत्र व आत्मिक स्तर पर अहंकार का अभाव; एक-दूसरे की प्रगति और गरिमा का पूर्ण सम्मान।"
+    });
+  }
+
+  if (taraScore >= 2.5) {
+    strengths.push({
+      icon: "⭐",
+      koota: "Tara Koota (" + taraScore + "/3)",
+      title: "Fortunate Destiny & Health Alignment",
+      titleHi: "शुभ भाग्योदय एवं आरोग्य सुरक्षा",
+      desc: "Auspicious Tara distance guards against sudden misfortune and enhances joint financial luck and physical vitality.",
+      descHi: "शुभ तारा का प्रभाव दोनों के संयुक्त भाग्योदय, दीर्घायु एवं आकस्मिक संकटों से रक्षा करता है।"
+    });
+  }
+
+  if (yoniScore >= 3) {
+    strengths.push({
+      icon: "🔥",
+      koota: "Yoni Koota (" + yoniScore + "/4)",
+      title: "Warm Physical & Biological Chemistry",
+      titleHi: "उत्तम शारीरिक एवं जैविक सामंजस्य",
+      desc: nak1.yoni + " and " + nak2.yoni + " Yonis share natural compatibility, supporting intimate bonding, vitality, and emotional comfort.",
+      descHi: nak1.yoni + " और " + nak2.yoni + " योनि का अनुकूल सम्बंध दांपत्य सुख एवं अंतरंग संतुष्टि को सुदृढ़ करता है।"
+    });
+  }
+
+  if (hasBhakootParihara) {
+    strengths.push({
+      icon: "✨",
+      koota: "Bhakoot Axis",
+      title: "Bhakoot Parihara Shield (" + bhakootType + ")",
+      titleHi: "भकूट दोष परिहार (" + bhakootTypeHi + ")",
+      desc: bhakootPariharaReason + " The 5-9/trine or friendly disposition shields the couple from severe disruption.",
+      descHi: bhakootPariharaReasonHi + " यह शास्त्रीय परिहार दांपत्य में अनावश्यक तनाव से सुरक्षा प्रदान करता है।"
+    });
+  }
+
+  if (p1Manglik === p2Manglik) {
+    strengths.push({
+      icon: "🛡️",
+      koota: "Mangal Dosha",
+      title: "Synchronized Mars Energy (Manglik Neutrality)",
+      titleHi: "संतुलित मंगल ऊर्जा (मांगलिक सामंजस्य)",
+      desc: "Both charts have matching Mars inclinations. No destructive friction or dominance struggle is triggered by Mangal placements.",
+      descHi: "दोनों कुंडलियों में मंगल की स्थिति संतुलित है; कोई अनिष्टकारी प्रभाव अथवा वैवाहिक टकराव नहीं होगा।"
+    });
+  }
+
+  // Critical Points & Sensitive Friction Areas
+  const criticalPoints = [];
+  if (bhakootScore === 0) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Bhakoot Koota (0/7)",
+      severity: hasBhakootParihara ? "low" : "moderate",
+      title: "Bhakoot Sensitivity: " + bhakootType,
+      titleHi: "भकूट संवेदनशीलता: " + bhakootTypeHi,
+      analysis: bhakootAxisDesc,
+      analysisHi: bhakootAxisDescHi,
+      parihara: hasBhakootParihara ? bhakootPariharaReason : null,
+      pariharaHi: hasBhakootParihara ? bhakootPariharaReasonHi : null,
+      advice: "Practice transparent financial budgeting, mutually plan investments, and avoid lingering emotional silence during domestic disagreements.",
+      adviceHi: "आर्थिक मामलों में पूर्ण पारदर्शिता रखें, बड़े निर्णयों पर संयुक्त सहमति बनाएं और किसी भी मतभेद को संवाद द्वारा उसी दिन सुलझाएं।"
+    });
+  }
+
+  if (nadiScore === 0) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Nadi Koota (0/8)",
+      severity: hasNadiParihara ? "moderate" : "high",
+      title: "Nadi Dosha Identified (" + nak1.nadi + " Nadi for both)",
+      titleHi: "नाड़ी दोष विचार (दोनों की " + nak1.nadi + " नाड़ी)",
+      analysis: "Both partners share identical physiological prana types (" + nak1.nadi + "). In classical texts, this warns of energetic overlap and advises care regarding progeny health.",
+      analysisHi: "दोनों की समान नाड़ी (" + nak1.nadi + ") होने से प्राण ऊर्जा में दोहराव होता है। शास्त्रीय ग्रंथों में इसे संतति एवं स्वास्थ्य के प्रति सचेत रहने का संकेत माना गया है।",
+      parihara: hasNadiParihara ? nadiPariharaReason : null,
+      pariharaHi: hasNadiParihara ? nadiPariharaReasonHi : null,
+      advice: "Vedic recitation of Maha Mrityunjaya Mantra, blood group compatibility testing before conception, and regular health checkups ensure smooth vitality.",
+      adviceHi: "महामृत्युंजय मंत्र का नित्य जप, गर्भधारण से पूर्व आवश्यक चिकित्सीय परामर्श एवं स्वर्ण/गौ दान से यह प्रभाव शांत होता है।"
+    });
+  }
+
+  if (maitriScore <= 3) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Graha Maitri (" + maitriScore + "/5)",
+      severity: "low",
+      title: "Moderate Planetary Alignment (" + sign1.lord + " & " + sign2.lord + ")",
+      titleHi: "सामान्य ग्रह मैत्री (" + sign1.lord + " व " + sign2.lord + ")",
+      analysis: "Differing thought processes or decision-making styles. One partner may be highly rational while the other is guided by emotion or pace.",
+      analysisHi: "सोचने एवं निर्णय लेने की शैली में भिन्नता। एक साथी तार्किक हो सकता है तो दूसरा अधिक भावुक।",
+      advice: "Give each other room to process information before expecting immediate consensus. Active listening prevents minor misunderstandings.",
+      adviceHi: "एक-दूसरे को अपनी बात रखने का समय दें। तुरंत प्रतिक्रिया देने के बजाय धैर्यपूर्वक सुनना दांपत्य को मजबूत करेगा।"
+    });
+  }
+
+  if (ganaScore <= 3) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Gana Koota (" + ganaScore + "/6)",
+      severity: "moderate",
+      title: "Differing Temperamental Rhythms (" + nak1.gana + " vs " + nak2.gana + ")",
+      titleHi: "स्वभावगत भिन्नता (" + nak1.gana + " एवं " + nak2.gana + ")",
+      analysis: "Contrasting social expectations and energy levels. One partner may prefer peaceful domestic solitude while the other seeks social activity.",
+      analysisHi: "सामाजिक प्राथमिकताओं एवं ऊर्जा स्तर में अंतर। एक साथी एकांतप्रिय हो सकता है तो दूसरा अधिक सामाजिक।",
+      advice: "Respect each other's need for personal space and avoid enforcing identical social habits.",
+      adviceHi: "एक-दूसरे की व्यक्तिगत स्वतंत्रता का आदर करें और अपनी रुचियों को साथी पर थोपने से बचें।"
+    });
+  }
+
+  if (yoniScore <= 2) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Yoni Koota (" + yoniScore + "/4)",
+      severity: "low",
+      title: "Biological Pace Adaptation (" + nak1.yoni + " & " + nak2.yoni + ")",
+      titleHi: "जैविक तालमेल एवं अंतरंगता (" + nak1.yoni + " व " + nak2.yoni + ")",
+      analysis: "Biological clocks, intimacy expressions, or stress release mechanisms differ slightly.",
+      analysisHi: "जैविक घड़ी, थकान से उबरने के तरीके और अंतरंगता की अभिव्यक्ति में भिन्नता।",
+      advice: "Prioritize gentle communication and quality shared rest without unspoken expectations.",
+      adviceHi: "परस्पर स्नेह एवं कोमल संवाद को प्राथमिकता दें; बिना कहे अपेक्षाएं रखने से बचें।"
+    });
+  }
+
+  if (taraScore <= 1.5) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Tara Koota (" + taraScore + "/3)",
+      severity: "low",
+      title: "Tara Sensitivity (Pratyak / Vipat Axis)",
+      titleHi: "तारा संवेदनशीलता (प्रत्यारी / विपत तारा)",
+      analysis: "Transiting planetary periods may occasionally bring simultaneous periods of fatigue or career pressure.",
+      analysisHi: "गोचर या दशा काल में दोनों पर एक साथ कार्य अथवा मानसिक दबाव आने की संभावना।",
+      advice: "Coordinate during high-stress work transitions and avoid taking joint speculative risks during challenging transits.",
+      adviceHi: "कठिन समय में एक-दूसरे का संबल बनें और भारी वित्तीय जोखिम लेने से पूर्व वरिष्ठों से परामर्श लें।"
+    });
+  }
+
+  if (p1Manglik !== p2Manglik) {
+    criticalPoints.push({
+      icon: "⚠️",
+      koota: "Manglik Diagnostic",
+      severity: "moderate",
+      title: "Single-Chart Mangal Influence",
+      titleHi: "एक जातक मांगलिक प्रभाव",
+      analysis: "One partner carries a stronger assertive Mars orientation, while the other is more calm and accommodating.",
+      analysisHi: "एक जातक में मंगल का तेज अधिक है, जिससे कभी-कभी हठ अथवा क्रोध की स्थिति बन सकती है।",
+      advice: "Regular Hanuman Chalisa recitation on Tuesdays and planting a flowering tree together balances this dynamic beautifully.",
+      adviceHi: "मंगलवार को सुंदरकांड अथवा हनुमान चालीसा का पाठ तथा दोनों द्वारा मिलकर तुलसी/फलदार वृक्ष लगाना शुभ फल देता है।"
+    });
+  }
+
+  // Tailored Vedic Remedies
+  const remedies = [
+    {
+      icon: "🕉️",
+      title: "Gauri-Shankar Sacred Harmonization",
+      titleHi: "श्री गौरी-शंकर संयुक्त पूजन",
+      desc: "Lighting a pure cow ghee lamp in the North-East (Ishan) corner on Mondays while reciting 'Om Gauri Shankaraya Namah' 11 times anchors deep emotional peace and dissolves Bhakoot/emotional ripples.",
+      descHi: "सोमवार के दिन ईशान कोण में शुद्ध घी का दीपक जलाकर 'ॐ गौरीशंकराय नमः' का ११ बार जप करने से दांपत्य में अखंड प्रेम एवं मानसिक शांति बनी रहती है।"
+    },
+    {
+      icon: "🌿",
+      title: "Jupiter & Venus Blessing Ritual (Saptapadi Shield)",
+      titleHi: "गुरु-शुक्र शांति एवं समृद्धि उपाय",
+      desc: "Offering water to a Peepal or Tulsi plant every Thursday and offering white sweets or milk kheer to elders or young girls on Fridays expands family wealth, longevity, and mutual gratitude.",
+      descHi: "गुरुवार को तुलसी जी को जल अर्पित करना और शुक्रवार को कन्याओं या वृद्धजनों को खीर/सफेद मिष्ठान्न खिलाने से सुख-समृद्धि एवं सौभाग्य में निरंतर वृद्धि होती है।"
+    },
+    {
+      icon: "💍",
+      title: "Behavioral Wisdom Key (Sutra)",
+      titleHi: "दांपत्य जीवन का स्वर्णिम सूत्र",
+      desc: "Never go to sleep with unresolved friction. Schedule a calm weekly 15-minute conversation to review mutual plans, appreciate each other's efforts, and maintain crystal-clear financial transparency.",
+      descHi: "किसी भी मनमुटाव को रात में सोने से पहले सौम्य संवाद से सुलझा लें। हर सप्ताह संयुक्त वित्तीय योजनाओं पर खुली चर्चा करें और एक-दूसरे के त्याग की सराहना करें।"
+    }
+  ];
+
+  // 4 Core Dimensional Scores
+  const mentalScore = Math.round(((maitriScore + ganaScore) / 11) * 100);
+  const physicalScore = Math.round(((vashyaScore + yoniScore) / 6) * 100);
+  const familyScore = Math.round(((bhakootScore + taraScore + varnaScore) / 11) * 100);
+  const geneticScore = Math.round((nadiScore / 8) * 100);
+
+  const dimensions = {
+    mental: {
+      score: mentalScore,
+      title: "Mental & Intellectual Alignment",
+      titleHi: "मानसिक व वैचारिक सामंजस्य",
+      rating: mentalScore >= 75 ? "Excellent" : mentalScore >= 55 ? "Harmonious" : "Requires Patience",
+      ratingHi: mentalScore >= 75 ? "उत्कृष्ट" : mentalScore >= 55 ? "शुभ" : "धैर्य अपेक्षित"
+    },
+    physical: {
+      score: physicalScore,
+      title: "Physical & Romantic Chemistry",
+      titleHi: "शारीरिक व भावनात्मक आकर्षण",
+      rating: physicalScore >= 75 ? "Strong" : physicalScore >= 50 ? "Balanced" : "Moderate",
+      ratingHi: physicalScore >= 75 ? "प्रगाढ़" : physicalScore >= 50 ? "संतुलित" : "सामान्य"
+    },
+    family: {
+      score: hasBhakootParihara ? Math.max(familyScore, 72) : familyScore,
+      title: "Family Prosperity & Shared Growth",
+      titleHi: "पारिवारिक समृद्धि व दीर्घकालिक वृद्धि",
+      rating: (hasBhakootParihara || familyScore >= 70) ? "Favorable" : familyScore >= 45 ? "Moderate (Remedies Help)" : "Requires Dialogue",
+      ratingHi: (hasBhakootParihara || familyScore >= 70) ? "शुभप्रद" : familyScore >= 45 ? "मध्यम (उपाय शुभ)" : "संवाद आवश्यक"
+    },
+    genetic: {
+      score: hasNadiParihara ? 80 : geneticScore,
+      title: "Health, Vitality & Progeny Harmony",
+      titleHi: "आरोग्य, प्राण शक्ति व संतान सुख",
+      rating: (geneticScore === 100 || hasNadiParihara) ? "Pristine (No Dosha)" : "Care Advised",
+      ratingHi: (geneticScore === 100 || hasNadiParihara) ? "उत्कृष्ट (दोष रहित)" : "सावधानी अपेक्षित"
+    }
+  };
 
   return {
     totalGunas: totalGunas.toFixed(1),
@@ -381,16 +724,16 @@ export function calculateGunMilan({ partner1, partner2 }) {
         nameHi: "भकूट कूट (पारिवारिक समृद्धि व संतान सुख)",
         score: bhakootScore,
         max: 7,
-        desc: "Financial growth, emotional longevity and offspring",
-        descHi: "आर्थिक उन्नति, भावनात्मक दीर्घायु व संतान सुख"
+        desc: hasBhakootParihara ? "Bhakoot Parihara applies (" + bhakootType + ")" : "Financial growth, emotional longevity and offspring",
+        descHi: hasBhakootParihara ? "भकूट परिहार लागू (" + bhakootTypeHi + ")" : "आर्थिक उन्नति, भावनात्मक दीर्घायु व संतान सुख"
       },
       {
         name: "Nadi Koota (Genetic / Prana Resonance)",
         nameHi: "नाड़ी कूट (प्राण ऊर्जा व आनुवंशिक सामंजस्य)",
         score: nadiScore,
         max: 8,
-        desc: "Hereditary vitality, neurological harmony and progeny",
-        descHi: "आनुवंशिक आरोग्य, प्राण ऊर्जा व स्वस्थ संतति"
+        desc: isNadiDosha ? (hasNadiParihara ? "Nadi Parihara applies" : "Identical Nadi (" + nak1.nadi + ")") : "Hereditary vitality & neurological harmony (" + nak1.nadi + " × " + nak2.nadi + ")",
+        descHi: isNadiDosha ? (hasNadiParihara ? "नाड़ी परिहार लागू" : "समान नाड़ी (" + nak1.nadi + ")") : "उत्तम आनुवंशिक आरोग्य व प्राण ऊर्जा (" + nak1.nadi + " × " + nak2.nadi + ")"
       }
     ],
     manglikStatus: (p1Manglik === p2Manglik)
@@ -398,7 +741,26 @@ export function calculateGunMilan({ partner1, partner2 }) {
       : "One partner is Manglik — simple Kumbh Vivah / Hanuman Chalisa remedies recommended for lasting harmony.",
     manglikStatusHi: (p1Manglik === p2Manglik)
       ? "दोनों कुंडलियों में समान मांगलिक ऊर्जा है — मांगलिक दोष का स्वतः परिहार (शमन) होता है।"
-      : "एक जातक मांगलिक है — वैवाहिक सुख व शांति हेतु सरल कुंभ विवाह / हनुमान चालीसा पाठ श्रेष्ठ है।"
+      : "एक जातक मांगलिक है — वैवाहिक सुख व शांति हेतु सरल कुंभ विवाह / हनुमान चालीसा पाठ श्रेष्ठ है।",
+    strengths,
+    criticalPoints,
+    remedies,
+    dimensions,
+    bhakootInfo: {
+      type: bhakootType,
+      typeHi: bhakootTypeHi,
+      parihara: hasBhakootParihara,
+      pariharaReason: bhakootPariharaReason,
+      pariharaReasonHi: bhakootPariharaReasonHi
+    },
+    nadiInfo: {
+      p1Nadi: nak1.nadi,
+      p2Nadi: nak2.nadi,
+      isDosha: isNadiDosha,
+      parihara: hasNadiParihara,
+      pariharaReason: nadiPariharaReason,
+      pariharaReasonHi: nadiPariharaReasonHi
+    }
   };
 }
 
