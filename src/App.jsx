@@ -531,16 +531,43 @@ const PRODUCT_PRICES = {
 
 const detectDefaultCurrency = () => {
   try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    const navLang = navigator.language || "";
-    if (tz.includes("Europe/London") || navLang.includes("en-GB")) return "GBP";
-    if (tz.includes("Europe/")) return "EUR";
-    if (tz.includes("Canada") || tz.includes("Toronto") || tz.includes("Vancouver")) return "CAD";
-    if (tz.includes("Australia") || tz.includes("Sydney") || tz.includes("Melbourne")) return "AUD";
-    if (tz.includes("Dubai") || tz.includes("Asia/Dubai")) return "AED";
+    // 1. Saved user preference takes top priority
+    const saved = localStorage.getItem("jyotish_user_currency");
+    if (saved && CURRENCIES[saved]) return saved;
+
+    // 2. Exact timezone string
+    const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "").toLowerCase();
+
+    // 3. Timezone offset (IST is UTC+5:30 -> exactly -330 minutes)
+    const offset = new Date().getTimezoneOffset();
+    if (offset === -330) return "INR";
+
+    // 4. Timezone matching India
+    if (tz.includes("kolkata") || tz.includes("calcutta") || tz.includes("india") || tz.includes("delhi") || tz.includes("mumbai")) {
+      return "INR";
+    }
+
+    // 5. Browser languages (Indian languages or en-IN)
+    const navLang = (navigator.language || "").toLowerCase();
+    const navLangs = (navigator.languages || []).map(l => (l || "").toLowerCase());
+    const isIndian = (l) => l.endsWith("-in") || l.startsWith("hi") || l.startsWith("mr") || 
+      l.startsWith("ta") || l.startsWith("te") || l.startsWith("bn") || l.startsWith("gu") || 
+      l.startsWith("kn") || l.startsWith("ml") || l.startsWith("pa") || l.startsWith("or");
+
+    if (isIndian(navLang) || navLangs.some(isIndian)) {
+      return "INR";
+    }
+
+    // 6. International regions
+    if (tz.includes("london") || navLang.includes("en-gb")) return "GBP";
+    if (tz.includes("europe/")) return "EUR";
+    if (tz.includes("canada") || tz.includes("toronto") || tz.includes("vancouver")) return "CAD";
+    if (tz.includes("australia") || tz.includes("sydney") || tz.includes("melbourne")) return "AUD";
+    if (tz.includes("dubai") || tz.includes("asia/dubai") || tz.includes("uae")) return "AED";
+
     return "USD";
   } catch (e) {
-    return "USD";
+    return "INR"; // Safe default for Vedic Jyotish platform
   }
 };
 
@@ -553,15 +580,38 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
   const [phone, setPhone] = useState("");
   const [verifyErr, setVerifyErr] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [modalCustomAmt, setModalCustomAmt] = useState(null);
   const hi = lang === "hi";
 
-  // Dynamic price formatted for current currency (custom preset dakshina takes precedence)
   const isINR = currency === "INR";
-  const displayPrice = (item.isDakshina && item.price)
-    ? item.price
-    : (item.priceKey && PRODUCT_PRICES[item.priceKey]
-      ? PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD
-      : item.price);
+
+  // Handle switching currency inside modal
+  const handleSwitchCurrency = (newCurr) => {
+    if (!newCurr || !CURRENCIES[newCurr]) return;
+    setCurrency && setCurrency(newCurr);
+    try {
+      localStorage.setItem("jyotish_user_currency", newCurr);
+    } catch (e) {}
+    setModalCustomAmt(null);
+  };
+
+  // Dynamic price formatted for current currency (custom preset dakshina takes precedence if it matches currency)
+  let displayPrice = modalCustomAmt;
+  if (!displayPrice) {
+    if (item.isDakshina) {
+      if (isINR) {
+        displayPrice = (item.price && item.price.includes("₹")) ? item.price : (PRODUCT_PRICES.dakshina.INR || "₹101");
+      } else {
+        displayPrice = (item.price && !item.price.includes("₹"))
+          ? item.price
+          : (PRODUCT_PRICES.dakshina[currency] || PRODUCT_PRICES.dakshina.USD || "$1.99");
+      }
+    } else if (item.priceKey && PRODUCT_PRICES[item.priceKey]) {
+      displayPrice = PRODUCT_PRICES[item.priceKey][currency] || PRODUCT_PRICES[item.priceKey].USD;
+    } else {
+      displayPrice = item.price || (isINR ? "₹101" : "$1.99");
+    }
+  }
 
   // Numerical value for PayPal / UPI
   const cleanNumericVal = (displayPrice || "4.99").replace(/[^0-9.]/g, "") || "4.99";
@@ -806,12 +856,140 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
         {/* ── STEP 1: PAYMENT (PAYPAL & CARDS) ── */}
         {checkoutStep === "pay" && (
           <div>
-            <div style={{ textAlign: "center", marginBottom: 18 }}>
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
               <span style={{ fontSize: 36 }}>{item.icon || "💎"}</span>
               <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 700, marginTop: 4 }}>{item.title}</h3>
               <div style={{ color: "#FDE68A", fontSize: 30, fontWeight: 800, marginTop: 4 }}>{displayPrice}</div>
               <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13, marginTop: 4 }}>{item.desc}</p>
             </div>
+
+            {/* ── HIGH PRIORITY: PROMPT REGION & CURRENCY SELECTION BEFORE PAYMENT ── */}
+            <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212,175,55,0.28)", borderRadius: 14, padding: "12px 14px", marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(243,211,122,0.95)", letterSpacing: 0.3, display: "flex", alignItems: "center", gap: 5 }}>
+                  <span>📍</span> {hi ? "भुगतान क्षेत्र / मुद्रा चुनें:" : "Choose Payment Region & Currency:"}
+                </span>
+                <span style={{ fontSize: 11, color: isINR ? "#34D399" : "#60A5FA", fontWeight: 700, background: isINR ? "rgba(16,185,129,0.15)" : "rgba(0,112,186,0.18)", padding: "2px 8px", borderRadius: 10 }}>
+                  {isINR ? "✓ भारत (UPI सक्रिय)" : `✓ International (${currency})`}
+                </span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => handleSwitchCurrency("INR")}
+                  style={{
+                    background: isINR ? "linear-gradient(135deg, rgba(16,185,129,0.3), rgba(5,150,105,0.4))" : "rgba(11,8,25,0.6)",
+                    border: `2px solid ${isINR ? "#10B981" : "rgba(212,175,55,0.22)"}`,
+                    color: isINR ? "#A7F3D0" : "rgba(241,231,208,0.75)",
+                    borderRadius: 10,
+                    padding: "9px 8px",
+                    cursor: "pointer",
+                    textAlign: "center",
+                    boxShadow: isINR ? "0 4px 12px rgba(16,185,129,0.25)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                    <span>🇮🇳</span> भारत / India
+                  </div>
+                  <div style={{ fontSize: 10.5, color: isINR ? "#D1FAE5" : "rgba(241,231,208,0.55)", marginTop: 2 }}>
+                    UPI • PhonePe • GPay • ₹
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSwitchCurrency(currency === "INR" ? "USD" : currency)}
+                  style={{
+                    background: !isINR ? "linear-gradient(135deg, rgba(0,112,186,0.32), rgba(2,132,199,0.42))" : "rgba(11,8,25,0.6)",
+                    border: `2px solid ${!isINR ? "#38BDF8" : "rgba(212,175,55,0.22)"}`,
+                    color: !isINR ? "#BAE6FD" : "rgba(241,231,208,0.75)",
+                    borderRadius: 10,
+                    padding: "9px 8px",
+                    cursor: "pointer",
+                    textAlign: "center",
+                    boxShadow: !isINR ? "0 4px 12px rgba(0,112,186,0.25)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                    <span>🌍</span> Overseas
+                  </div>
+                  <div style={{ fontSize: 10.5, color: !isINR ? "#E0F2FE" : "rgba(241,231,208,0.55)", marginTop: 2 }}>
+                    PayPal • Cards ($/€/£)
+                  </div>
+                </button>
+              </div>
+
+              {!isINR && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8, overflowX: "auto", paddingBottom: 2 }}>
+                  <span style={{ fontSize: 10.5, color: "rgba(241,231,208,0.6)", whiteSpace: "nowrap" }}>{hi ? "विदेशी मुद्रा:" : "Currency:"}</span>
+                  {Object.values(CURRENCIES).filter(c => c.code !== "INR").map(c => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => handleSwitchCurrency(c.code)}
+                      style={{
+                        background: currency === c.code ? "rgba(0,112,186,0.5)" : "rgba(255,255,255,0.06)",
+                        border: `1px solid ${currency === c.code ? "#38BDF8" : "rgba(212,175,55,0.2)"}`,
+                        color: currency === c.code ? "#FFF" : "rgba(241,231,208,0.7)",
+                        borderRadius: 12,
+                        padding: "2px 8px",
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {c.flag} {c.code}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* In-Modal Quick Dakshina Amount Preset Selector */}
+            {item.isDakshina && (
+              <div style={{ marginBottom: 16, textAlign: "center" }}>
+                <div style={{ fontSize: 11, color: "rgba(243,211,122,0.8)", fontWeight: 700, marginBottom: 6 }}>
+                  {hi ? "दक्षिणा राशि बदलें:" : "CHANGE DAKSHINA AMOUNT:"}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 6 }}>
+                  {(isINR
+                    ? ["₹51", "₹101", "₹251", "₹501", "₹1,100"]
+                    : [
+                        `${CURRENCIES[currency]?.symbol || "$" }1.99`,
+                        `${CURRENCIES[currency]?.symbol || "$" }4.99`,
+                        `${CURRENCIES[currency]?.symbol || "$" }11.00`,
+                        `${CURRENCIES[currency]?.symbol || "$" }21.00`
+                      ]
+                  ).map(amt => {
+                    const isSelected = displayPrice === amt;
+                    return (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setModalCustomAmt(amt)}
+                        style={{
+                          background: isSelected ? "linear-gradient(135deg, rgba(245,158,11,0.35), rgba(217,119,6,0.45))" : "rgba(255,255,255,0.06)",
+                          border: `1.5px solid ${isSelected ? "#F59E0B" : "rgba(212,175,55,0.25)"}`,
+                          borderRadius: 8,
+                          padding: "5px 11px",
+                          color: isSelected ? "#FDE68A" : "rgba(241,231,208,0.8)",
+                          fontSize: 12,
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease"
+                        }}
+                      >
+                        {amt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Payment Mode Selector */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
@@ -1045,6 +1223,13 @@ export default function App() {
   const [lang, setLang] = useState("en");
   const [currency, setCurrency] = useState(detectDefaultCurrency);
   const [lastCoords, setLastCoords] = useState({ lat: 26.8467, lon: 80.9462 });
+  const handleSetCurrency = (newCurr) => {
+    if (!newCurr || !CURRENCIES[newCurr]) return;
+    setCurrency(newCurr);
+    try {
+      localStorage.setItem("jyotish_user_currency", newCurr);
+    } catch (e) {}
+  };
 
   // Matchmaking State
   const [partnerForm, setPartnerForm] = useState({ name: "", dob: "", pob: "", tob: "" });
@@ -1275,10 +1460,57 @@ export default function App() {
           </p>
         </div>
 
-        {/* Voluntary Dakshina Amount Selector Pills */}
+        {/* Voluntary Dakshina Amount Selector Pills & Fast Region Toggle */}
         <div style={{ marginBottom: 18, position: "relative", zIndex: 2 }}>
-          <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", fontWeight: 700, marginBottom: 8, letterSpacing: 0.5 }}>
-            {hi ? "अपनी स्वेच्छानुसार दक्षिणा राशि चुनें:" : "SELECT A VOLUNTARY DAKSHINA AMOUNT:"}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+            <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", fontWeight: 700, letterSpacing: 0.5 }}>
+              {hi ? "अपनी स्वेच्छानुसार दक्षिणा राशि चुनें:" : "SELECT A VOLUNTARY DAKSHINA AMOUNT:"}
+            </div>
+            {/* Quick Country / Payment Region Switcher */}
+            <div style={{ display: "inline-flex", background: "rgba(0,0,0,0.5)", borderRadius: 16, padding: 3, border: "1px solid rgba(212,175,55,0.35)" }}>
+              <button
+                type="button"
+                onClick={() => handleSetCurrency("INR")}
+                style={{
+                  background: isINR ? "linear-gradient(90deg, #10B981, #059669)" : "transparent",
+                  color: isINR ? "#FFF" : "rgba(241,231,208,0.7)",
+                  border: "none",
+                  borderRadius: 13,
+                  padding: "4px 11px",
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  boxShadow: isINR ? "0 2px 8px rgba(16,185,129,0.35)" : "none",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <span>🇮🇳</span> भारत (₹ UPI)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetCurrency(currency === "INR" ? "USD" : currency)}
+                style={{
+                  background: !isINR ? "linear-gradient(90deg, #0284C7, #0369A1)" : "transparent",
+                  color: !isINR ? "#FFF" : "rgba(241,231,208,0.7)",
+                  border: "none",
+                  borderRadius: 13,
+                  padding: "4px 11px",
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  boxShadow: !isINR ? "0 2px 8px rgba(2,132,199,0.35)" : "none",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <span>🌍</span> Overseas ($/€/£)
+              </button>
+            </div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
             {dakshinaPresets.map((preset, idx) => (
@@ -2404,7 +2636,7 @@ export default function App() {
           }}
           lang={lang}
           currency={currency}
-          setCurrency={setCurrency}
+          setCurrency={handleSetCurrency}
         />
       )}
 
@@ -2522,7 +2754,7 @@ export default function App() {
               id="header-currency-select"
               aria-label={t.currencyLabel}
               value={currency}
-              onChange={e => setCurrency(e.target.value)}
+              onChange={e => handleSetCurrency(e.target.value)}
               style={{
                 background: "rgba(26,18,48,0.95)",
                 border: "1px solid rgba(212,175,55,0.4)",
