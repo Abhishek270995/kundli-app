@@ -793,6 +793,7 @@ export function generateVedicKundliData({ name, dob, tob, pob, lat, lon, lang = 
     verdict: verdictText,
     houses,
     planetData,
+    planetHouseMap,
     annualTransit,
     marriagePrediction,
     careerPrediction

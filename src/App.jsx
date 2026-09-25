@@ -17,6 +17,12 @@ import {
 } from "./jyotishEngine";
 import { getCoordinates } from "./geocode";
 import DeluxeLifeReportDossier from "./DeluxeLifeReportDossier";
+import {
+  getPlanetaryAvastha,
+  detectPlanetaryConjunctions,
+  getPlanetLifeImpactBreakdown,
+  HOUSE_TITLES
+} from "./planetaryAnalysisEngine";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -1222,6 +1228,7 @@ export default function App() {
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
   const [lang, setLang] = useState("en");
+  const [selectedPlanetDetail, setSelectedPlanetDetail] = useState("Sun");
   const [currency, setCurrency] = useState(detectDefaultCurrency);
   const [lastCoords, setLastCoords] = useState({ lat: 26.8467, lon: 80.9462 });
   const handleSetCurrency = (newCurr) => {
@@ -3842,6 +3849,71 @@ export default function App() {
                       {result.dasha}
                     </div>
                   </div>
+
+                  {/* Planetary Positions, Conjunctions & Life Impact Spotlight Card */}
+                  <div style={{
+                    marginTop: 18,
+                    background: "linear-gradient(135deg, rgba(245,158,11,0.18) 0%, rgba(139,92,246,0.2) 100%)",
+                    border: "1.5px solid rgba(245,158,11,0.45)",
+                    borderRadius: 14,
+                    padding: "20px 22px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: 16,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.35)"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 260, flex: 1 }}>
+                      <div style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        background: "rgba(245,158,11,0.15)",
+                        border: "1px solid rgba(245,158,11,0.35)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 26
+                      }}>
+                        🪐
+                      </div>
+                      <div>
+                        <div style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800 }}>
+                          {hi ? "ग्रह स्थिति, युति एवं संपूर्ण जीवन प्रभाव विश्लेषण" : "Planetary Positions, Yutis & Multi-Life Impact"}
+                        </div>
+                        <div style={{ color: "rgba(241,231,208,0.82)", fontSize: 13, marginTop: 3 }}>
+                          {hi
+                            ? "प्रत्येक ग्रह के अंश (Degree), बाल्यावस्था/युवावस्था बल, सक्रिय ग्रह युतियां व करियर, शिक्षा, दांपत्य, धन व स्वास्थ्य प्रभाव देखें।"
+                            : "Explore exact degree avasthas, planetary combinations (yutis), and multi-dimensional impact on career, education, love life, wealth & health."}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setTab("planets");
+                        window.scrollTo({ top: 400, behavior: "smooth" });
+                      }}
+                      style={{
+                        background: "linear-gradient(90deg, #F59E0B, #D97706)",
+                        color: "#0F0A1E",
+                        border: "none",
+                        borderRadius: 10,
+                        padding: "11px 20px",
+                        fontWeight: 800,
+                        fontSize: 14,
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        boxShadow: "0 4px 16px rgba(245,158,11,0.4)",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      <span>{hi ? "ग्रह स्थिति व प्रभाव देखें" : "Explore Planetary Impact"}</span>
+                      <span style={{ fontSize: 16 }}>→</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -5058,7 +5130,7 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 7: PLANETS ── */}
+            {/* ── TAB 7: PLANETS & COMPREHENSIVE LIFE IMPACT ANALYSIS ── */}
             {tab === "planets" && (() => {
               const getPlanetStrength = (status = "") => {
                 if (status.includes("Exalted") || status.includes("उच्च")) return { pct: 96, label: hi ? "उच्च (सर्वश्रेष्ठ)" : "Exalted (Supreme)", color: "#10B981", glow: "rgba(16,185,129,0.5)" };
@@ -5075,6 +5147,16 @@ export default function App() {
               let exaltedCount = 0;
               let strongCount = 0;
               let debilitatedCount = 0;
+              let yuvaCount = 0;
+
+              // Build resilient planetHouseMap
+              const pMap = result.planetHouseMap || PLANETS.reduce((acc, p) => {
+                if (result.planetData?.[p.name]?.house) acc[p.name] = result.planetData[p.name].house;
+                return acc;
+              }, {});
+
+              // Detect all active planetary conjunctions
+              const conjunctions = detectPlanetaryConjunctions(pMap, result.planetData, lang);
 
               PLANETS.forEach(p => {
                 const pd = result.planetData?.[p.name] || {};
@@ -5082,85 +5164,300 @@ export default function App() {
                 if (st.includes("Exalted") || st.includes("उच्च")) exaltedCount++;
                 else if (st.includes("Own") || st.includes("Moolatrikona") || st.includes("स्वगृही") || st.includes("मूलत्रिकोण") || st.includes("Friend") || st.includes("मित्र")) strongCount++;
                 else if (st.includes("Debilitated") || st.includes("नीच")) debilitatedCount++;
+
+                const signIdx = Math.max(0, ZODIAC_SIGNS.findIndex(s => s.name === pd.sign));
+                const av = getPlanetaryAvastha(pd.degInt !== undefined ? pd.degInt : (parseFloat(pd.degree) || 0), signIdx);
+                if (av.key === "Yuva") yuvaCount++;
               });
+
+              // Detailed planet breakdown for the interactive deep-dive section
+              const currentPlanetData = result.planetData?.[selectedPlanetDetail] || result.planetData?.["Sun"] || {};
+              const planetDetail = getPlanetLifeImpactBreakdown(
+                selectedPlanetDetail,
+                currentPlanetData,
+                result.houses,
+                lang
+              );
 
               return (
                 <div>
-                  {/* Planetary Power Summary Cards */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 20 }}>
+                  {/* Planetary Power & Conjunction Summary Cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 22 }}>
                     <div style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.3)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ fontSize: 28 }}>🌟</span>
                       <div>
                         <div style={{ color: "#34D399", fontSize: 18, fontWeight: 800 }}>{exaltedCount + strongCount} {hi ? "शुभ व बली ग्रह" : "Benefic & Strong"}</div>
-                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "उच्च व स्वराशि बल" : "Exalted & Own Sign Placements"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "उच्च व स्वराशि बल स्थिति" : "Exalted & Own Dignity"}</div>
                       </div>
                     </div>
+
+                    <div style={{ background: "rgba(139, 92, 246, 0.12)", border: "1px solid rgba(139, 92, 246, 0.35)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                      <span style={{ fontSize: 28 }}>✨</span>
+                      <div>
+                        <div style={{ color: "#C4B5FD", fontSize: 18, fontWeight: 800 }}>{conjunctions.length} {hi ? "सक्रिय ग्रह युतियां" : "Active Conjunctions"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "महायोग व युति फल" : "Planetary Combinations & Yogas"}</div>
+                      </div>
+                    </div>
+
                     <div style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ fontSize: 28 }}>⚡</span>
                       <div>
-                        <div style={{ color: "#FDE68A", fontSize: 18, fontWeight: 800 }}>9 {hi ? "ग्रह सक्रिय" : "Planets Analyzed"}</div>
-                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "षड्बल व दिग्बल गणना" : "Dignity & Shadbala Mapping"}</div>
+                        <div style={{ color: "#FDE68A", fontSize: 18, fontWeight: 800 }}>{yuvaCount} {hi ? "युवावस्था ग्रह (100%)" : "Yuva Avastha (100%)"}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{hi ? "पूर्ण भौतिक कार्यक्षमता" : "Full Physical Potency"}</div>
                       </div>
                     </div>
+
                     <div style={{ background: debilitatedCount > 0 ? "rgba(239, 68, 68, 0.1)" : "rgba(59, 130, 246, 0.1)", border: `1px solid ${debilitatedCount > 0 ? "rgba(239, 68, 68, 0.3)" : "rgba(59, 130, 246, 0.3)"}`, borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
                       <span style={{ fontSize: 28 }}>{debilitatedCount > 0 ? "⚠️" : "🛡️"}</span>
                       <div>
                         <div style={{ color: debilitatedCount > 0 ? "#FCA5A5" : "#93C5FD", fontSize: 18, fontWeight: 800 }}>{debilitatedCount} {hi ? "नीच ग्रह" : "Debilitated Placements"}</div>
-                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{debilitatedCount > 0 ? (hi ? "विशिष्ट वैदिक उपाय सुझाए गए" : "Remedies recommended") : (hi ? "कोई गंभीर दोष नहीं" : "Well fortified chart")}</div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, marginTop: 2 }}>{debilitatedCount > 0 ? (hi ? "विशिष्ट वैदिक उपाय सुझाए गए" : "Remedies recommended") : (hi ? "कोई गंभीर दोष नहीं" : "Fortified chart")}</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="glass-card" style={{ padding: "26px 24px", marginBottom: 20 }}>
+                  {/* ─────────────────────────────────────────────────────────────
+                      SECTION 1: PLANETARY CONJUNCTIONS & GRAND YOGAS (युतियां)
+                  ───────────────────────────────────────────────────────────── */}
+                  <div className="glass-card" style={{ padding: "26px 24px", marginBottom: 24, border: "1.5px solid rgba(139, 92, 246, 0.35)", background: "linear-gradient(180deg, rgba(26, 16, 51, 0.85) 0%, rgba(15, 10, 32, 0.95) 100%)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
-                      <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, margin: 0 }}>{t.ptTitle}</h3>
-                      <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.75)", background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 12, padding: "4px 10px" }}>
-                        ✨ {hi ? "चमकदार शक्ति मीटर (Planetary Strength)" : "Glowing Strength Meters Active"}
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 24 }}>✨</span>
+                          <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>
+                            {hi ? "कुंडली में सक्रिय ग्रह युतियां व महायोग (Planetary Conjunctions & Yutis)" : "Active Planetary Conjunctions & Grand Yutis"}
+                          </h3>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13, margin: "6px 0 0 0" }}>
+                          {hi
+                            ? "जब दो या दो से अधिक ग्रह एक ही भाव में स्थित होते हैं, तो उनकी ऊर्जाएं मिलकर जातक के स्वभाव, करियर, शिक्षा और दांपत्य जीवन पर विशिष्ट संयुक्त प्रभाव डालती हैं।"
+                            : "When two or more planets occupy the exact same house, their joint energies synthesize to create distinct life patterns across career, intellect, and marriage."}
+                        </p>
+                      </div>
+                      <div style={{ fontSize: 12, color: "#C4B5FD", background: "rgba(139, 92, 246, 0.15)", border: "1px solid rgba(139, 92, 246, 0.3)", borderRadius: 12, padding: "5px 12px", fontWeight: 700 }}>
+                        {conjunctions.length} {hi ? "युतियां विद्यमान" : "Active Combinations"}
                       </div>
                     </div>
+
+                    {conjunctions.length === 0 ? (
+                      <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px dashed rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "20px 24px", textAlign: "center" }}>
+                        <div style={{ fontSize: 32, marginBottom: 8 }}>🌌</div>
+                        <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 700 }}>
+                          {hi ? "ग्रहों का स्वतंत्र वितरण (Decentralized Planetary Placements)" : "Distinct & Independent Planetary Placements"}
+                        </div>
+                        <div style={{ color: "rgba(241, 231, 208, 0.82)", fontSize: 13, marginTop: 4, maxWidth: 640, margin: "6px auto 0" }}>
+                          {hi
+                            ? "आपकी कुंडली में ग्रह अलग-अलग भावों में स्वतंत्र रूप से स्थित हैं। कोई भी ग्रह किसी अन्य ग्रह के साथ एक ही भाव में युति नहीं बना रहा है, जिससे प्रत्येक भाव को एकाग्र ऊर्जा प्राप्त होती है और परस्पर टकराव नहीं होता।"
+                            : "Your planets are situated across separate houses without direct conjunctions, providing balanced, focused focus across diverse areas of life without combustive interference."}
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                        {conjunctions.map((conj, cIdx) => (
+                          <div
+                            key={cIdx}
+                            style={{
+                              background: "rgba(15, 10, 32, 0.8)",
+                              border: conj.category === "auspicious" ? "1px solid rgba(16, 185, 129, 0.35)" : "1px solid rgba(245, 158, 11, 0.35)",
+                              borderRadius: 14,
+                              padding: "20px 22px",
+                              boxShadow: "0 4px 16px rgba(0,0,0,0.3)"
+                            }}
+                          >
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <span style={{ fontSize: 26 }}>{conj.icon}</span>
+                                <div>
+                                  <div style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800 }}>
+                                    {conj.yogaName}
+                                  </div>
+                                  <div style={{ color: "rgba(243, 211, 122, 0.85)", fontSize: 12.5, marginTop: 2 }}>
+                                    📍 {conj.houseTitle}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                <span style={{
+                                  fontSize: 11.5,
+                                  fontWeight: 700,
+                                  padding: "3px 10px",
+                                  borderRadius: 12,
+                                  background: conj.category === "auspicious" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)",
+                                  color: conj.category === "auspicious" ? "#34D399" : "#FDE68A",
+                                  border: `1px solid ${conj.category === "auspicious" ? "rgba(16, 185, 129, 0.35)" : "rgba(245, 158, 11, 0.35)"}`
+                                }}>
+                                  {conj.category === "auspicious" ? (hi ? "शुभ राजयोग / महायोग" : "Auspicious Rajayoga") : (hi ? "विशिष्ट ऊर्जा योग" : "Dynamic Karmic Yoga")}
+                                </span>
+
+                                <div style={{ display: "flex", gap: 6 }}>
+                                  {conj.planets.map(pName => {
+                                    const pObj = PLANETS.find(p => p.name === pName) || {};
+                                    const pData = result.planetData?.[pName] || {};
+                                    return (
+                                      <span
+                                        key={pName}
+                                        style={{
+                                          background: "rgba(255, 255, 255, 0.06)",
+                                          border: `1px solid ${pObj.color || "#D4AF37"}66`,
+                                          color: pObj.color || "#FDE68A",
+                                          padding: "3px 8px",
+                                          borderRadius: 8,
+                                          fontSize: 12,
+                                          fontWeight: 700,
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          gap: 4
+                                        }}
+                                      >
+                                        <span>{pObj.glyph || pObj.symbol}</span>
+                                        <span>{hi ? (pObj.sanskrit || pName) : pName}</span>
+                                        <span style={{ opacity: 0.75, fontSize: 11 }}>({pData.degree || ""})</span>
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+
+                            <p style={{ color: "rgba(241, 231, 208, 0.92)", fontSize: 13.5, lineHeight: 1.7, margin: "0 0 14px 0", background: "rgba(255, 255, 255, 0.02)", padding: "10px 14px", borderRadius: 8, borderLeft: "3px solid #F59E0B" }}>
+                              {conj.meaning}
+                            </p>
+
+                            {/* 3-Column Life Impact Grid */}
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                              <div style={{ background: "rgba(245, 158, 11, 0.06)", border: "1px solid rgba(245, 158, 11, 0.2)", borderRadius: 10, padding: "12px 14px" }}>
+                                <div style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 700, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>💼</span> {hi ? "करियर व आजीविका प्रभाव" : "Career & Profession Impact"}
+                                </div>
+                                <div style={{ color: "rgba(241, 231, 208, 0.88)", fontSize: 12.5, lineHeight: 1.6 }}>
+                                  {conj.career}
+                                </div>
+                              </div>
+
+                              <div style={{ background: "rgba(59, 130, 246, 0.06)", border: "1px solid rgba(59, 130, 246, 0.2)", borderRadius: 10, padding: "12px 14px" }}>
+                                <div style={{ color: "#93C5FD", fontSize: 12.5, fontWeight: 700, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>🎓</span> {hi ? "शिक्षा व बौद्धिक क्षमता" : "Education & Intellect"}
+                                </div>
+                                <div style={{ color: "rgba(241, 231, 208, 0.88)", fontSize: 12.5, lineHeight: 1.6 }}>
+                                  {conj.intellect}
+                                </div>
+                              </div>
+
+                              <div style={{ background: "rgba(244, 114, 182, 0.06)", border: "1px solid rgba(244, 114, 182, 0.2)", borderRadius: 10, padding: "12px 14px" }}>
+                                <div style={{ color: "#F472B6", fontSize: 12.5, fontWeight: 700, marginBottom: 5, display: "flex", alignItems: "center", gap: 6 }}>
+                                  <span>❤️</span> {hi ? "दांपत्य व प्रेम संबंध" : "Love Life & Marriage"}
+                                </div>
+                                <div style={{ color: "rgba(241, 231, 208, 0.88)", fontSize: 12.5, lineHeight: 1.6 }}>
+                                  {conj.love}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ─────────────────────────────────────────────────────────────
+                      SECTION 2: PLANETARY DEGREE, AVASTHA & DIGNITY MATRIX TABLE
+                  ───────────────────────────────────────────────────────────── */}
+                  <div className="glass-card" style={{ padding: "26px 24px", marginBottom: 24 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
+                      <div>
+                        <h3 style={{ color: "#F3D37A", fontSize: 17, fontWeight: 800, margin: 0 }}>
+                          {hi ? "ग्रह स्थिति, अंश, अवस्था व शक्ति सारणी (Degree & Avastha Matrix)" : "Planetary Degrees, Avasthas & Dignity Matrix"}
+                        </h3>
+                        <p style={{ color: "rgba(241, 231, 208, 0.78)", fontSize: 12.5, margin: "4px 0 0 0" }}>
+                          {hi ? "पराशरीय बाल्यावस्था, कुमारावस्था, युवावस्था, वृद्धावस्था व मृतावस्था फल" : "Classical Parashari Bala, Kumara, Yuva, Vriddha & Mrita avastha potencies"}
+                        </p>
+                      </div>
+                      <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 12, padding: "4px 10px" }}>
+                        ✨ {hi ? "क्लिक करके विस्तृत प्रभाव देखें" : "Click Planet for In-Depth Life Impact"}
+                      </div>
+                    </div>
+
                     <div style={{ overflowX: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 700 }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
                         <thead>
                           <tr style={{ background: "rgba(245, 158, 11, 0.12)", borderBottom: "1px solid rgba(212, 175, 55, 0.3)" }}>
-                            {t.pcols.map(col => (
-                              <th key={col} style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left", letterSpacing: 0.5 }}>{col}</th>
-                            ))}
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left" }}>{hi ? "ग्रह (Planet)" : "Planet"}</th>
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left" }}>{hi ? "राशि व भाव" : "Sign & House"}</th>
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left" }}>{hi ? "अंश व नक्षत्र" : "Degree & Nakshatra"}</th>
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left" }}>{hi ? "ग्रहावस्था व कार्यक्षमता" : "Avastha & Potency"}</th>
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "left" }}>{hi ? "स्थिति व बल" : "Dignity Strength"}</th>
+                            <th style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 13, fontWeight: 800, textAlign: "center" }}>{hi ? "विश्लेषण" : "Deep Dive"}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {PLANETS.map((p, idx) => {
                             const pd = result.planetData?.[p.name] || {};
                             const strength = getPlanetStrength(pd.status);
+                            const signIdx = Math.max(0, ZODIAC_SIGNS.findIndex(s => s.name === pd.sign));
+                            const avastha = getPlanetaryAvastha(pd.degInt !== undefined ? pd.degInt : (parseFloat(pd.degree) || 0), signIdx);
+                            const isSelected = selectedPlanetDetail === p.name;
 
                             return (
-                              <tr key={p.name} style={{ borderBottom: "1px solid rgba(212, 175, 55, 0.1)", background: idx % 2 ? "rgba(255, 255, 255, 0.02)" : "transparent" }}>
+                              <tr
+                                key={p.name}
+                                onClick={() => {
+                                  setSelectedPlanetDetail(p.name);
+                                  const el = document.getElementById("planet-deep-dive-section");
+                                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                                }}
+                                style={{
+                                  borderBottom: "1px solid rgba(212, 175, 55, 0.1)",
+                                  background: isSelected ? "rgba(245, 158, 11, 0.12)" : (idx % 2 ? "rgba(255, 255, 255, 0.02)" : "transparent"),
+                                  cursor: "pointer",
+                                  transition: "background 0.2s"
+                                }}
+                              >
                                 <td style={{ padding: "12px 14px" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255, 255, 255, 0.05)", border: `1px solid ${p.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: p.color, fontWeight: "bold" }}>
-                                      {p.symbol}
+                                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                    <div style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(255, 255, 255, 0.05)", border: `1px solid ${p.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, color: p.color, fontWeight: "bold" }}>
+                                      {p.glyph || p.symbol}
                                     </div>
                                     <div>
-                                      <span style={{ color: p.color, fontWeight: "bold", fontSize: 14 }}>{p.name}</span>
+                                      <div style={{ color: p.color, fontWeight: "bold", fontSize: 14 }}>{p.name}</div>
                                       <div style={{ fontSize: 11.5, color: "rgba(241, 231, 208, 0.75)", marginTop: 1 }}>{p.sanskrit}</div>
                                     </div>
                                   </div>
                                 </td>
-                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.95)", fontSize: 14, fontWeight: 600 }}>
-                                  {pd.sign} <span style={{ fontSize: 12.5, color: "rgba(243, 211, 122, 0.85)" }}>({pd.signSanskrit})</span>
+
+                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, fontWeight: 600 }}>
+                                  <div>{pd.sign} <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)" }}>({pd.signSanskrit})</span></div>
+                                  <div style={{ color: "#FDE68A", fontSize: 12, fontWeight: 700, marginTop: 2 }}>{hi ? `${pd.house}वां भाव` : `House ${pd.house}`}</div>
                                 </td>
-                                <td style={{ padding: "12px 14px", color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
-                                  House {pd.house}
-                                </td>
+
                                 <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5 }}>
-                                  {pd.degree}
-                                  <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", marginTop: 2 }}>{pd.nakshatra} (P{pd.pada})</div>
+                                  <div style={{ fontWeight: 700 }}>{pd.degree}</div>
+                                  <div style={{ fontSize: 11.5, color: "rgba(243, 211, 122, 0.85)", marginTop: 2 }}>{pd.nakshatra} (P{pd.pada})</div>
                                 </td>
-                                <td style={{ padding: "12px 14px", minWidth: 170 }}>
-                                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+
+                                <td style={{ padding: "12px 14px" }}>
+                                  <span style={{
+                                    display: "inline-block",
+                                    padding: "3px 9px",
+                                    borderRadius: 10,
+                                    fontSize: 11.5,
+                                    fontWeight: 700,
+                                    background: avastha.key === "Yuva" ? "rgba(16, 185, 129, 0.18)" : (avastha.key === "Kumara" ? "rgba(59, 130, 246, 0.18)" : "rgba(245, 158, 11, 0.18)"),
+                                    color: avastha.key === "Yuva" ? "#34D399" : (avastha.key === "Kumara" ? "#93C5FD" : "#FDE68A"),
+                                    border: `1px solid ${avastha.key === "Yuva" ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.3)"}`
+                                  }}>
+                                    {hi ? avastha.nameHi : avastha.nameEn}
+                                  </span>
+                                  <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.7)", marginTop: 3 }}>
+                                    {hi ? avastha.potencyHi : avastha.potencyEn}
+                                  </div>
+                                </td>
+
+                                <td style={{ padding: "12px 14px", minWidth: 150 }}>
+                                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
                                     <span style={{
-                                      padding: "3px 9px",
-                                      borderRadius: 12,
-                                      fontSize: 11.5,
+                                      padding: "2px 7px",
+                                      borderRadius: 10,
+                                      fontSize: 11,
                                       fontWeight: 700,
                                       background: `${strength.color}22`,
                                       color: strength.color,
@@ -5168,37 +5465,313 @@ export default function App() {
                                     }}>
                                       {pd.status || "—"}
                                     </span>
-                                    <span style={{ fontSize: 11.5, fontWeight: 800, color: strength.color }}>
+                                    <span style={{ fontSize: 11, fontWeight: 800, color: strength.color }}>
                                       {strength.pct}%
                                     </span>
                                   </div>
-                                  {/* Glowing Progress Bar */}
                                   <div style={{
                                     width: "100%",
-                                    height: 7,
+                                    height: 6,
                                     background: "rgba(255, 255, 255, 0.08)",
                                     borderRadius: 999,
-                                    overflow: "hidden",
-                                    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)"
+                                    overflow: "hidden"
                                   }}>
                                     <div style={{
                                       width: `${strength.pct}%`,
                                       height: "100%",
                                       borderRadius: 999,
                                       background: `linear-gradient(90deg, ${strength.color}88, ${strength.color})`,
-                                      boxShadow: `0 0 10px ${strength.glow}`,
-                                      transition: "width 0.6s cubic-bezier(0.4, 0, 0.2, 1)"
+                                      boxShadow: `0 0 8px ${strength.glow}`
                                     }} />
                                   </div>
                                 </td>
-                                <td style={{ padding: "12px 14px", color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.6 }}>
-                                  {pd.effect || "—"}
+
+                                <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedPlanetDetail(p.name);
+                                      const el = document.getElementById("planet-deep-dive-section");
+                                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                                    }}
+                                    style={{
+                                      background: isSelected ? "linear-gradient(90deg, #F59E0B, #D97706)" : "rgba(245, 158, 11, 0.12)",
+                                      color: isSelected ? "#0F0A1E" : "#FDE68A",
+                                      border: "1px solid rgba(245, 158, 11, 0.4)",
+                                      borderRadius: 8,
+                                      padding: "6px 12px",
+                                      fontSize: 12,
+                                      fontWeight: 700,
+                                      cursor: "pointer",
+                                      whiteSpace: "nowrap",
+                                      transition: "all 0.2s"
+                                    }}
+                                  >
+                                    {hi ? "विस्तार से समझें 🔍" : "Deep Dive 🔍"}
+                                  </button>
                                 </td>
                               </tr>
                             );
                           })}
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+
+                  {/* ─────────────────────────────────────────────────────────────
+                      SECTION 3: INTERACTIVE 9-PLANET LIFE IMPACT DEEP DIVE
+                  ───────────────────────────────────────────────────────────── */}
+                  <div id="planet-deep-dive-section" className="glass-card" style={{ padding: "28px 24px", marginBottom: 24, border: "1.5px solid rgba(245, 158, 11, 0.45)", background: "linear-gradient(180deg, rgba(20, 14, 40, 0.9) 0%, rgba(11, 8, 25, 0.98) 100%)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 26 }}>🪐</span>
+                          <h3 style={{ color: "#F3D37A", fontSize: 19, fontWeight: 800, margin: 0 }}>
+                            {hi ? "प्रत्येक ग्रह का संपूर्ण जीवन प्रभाव (Multi-Dimensional Life Impact)" : "In-Depth Life Aspect Breakdown by Planet"}
+                          </h3>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13, margin: "6px 0 0 0" }}>
+                          {hi
+                            ? "ग्रह के अंश (Degree), बाल्यावस्था/युवावस्था, संबंधित भाव के कारकत्व और करियर, शिक्षा, प्रेम-दांपत्य, धन व स्वास्थ्य पर प्रभाव का संपूर्ण वैदिक विश्लेषण।"
+                            : "Detailed breakdown of planetary degree, avastha potency, house governance, and multi-dimensional effects across career, education, love, wealth & health."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Planet Selector Pills */}
+                    <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 12, marginBottom: 22, scrollbarWidth: "thin" }}>
+                      {PLANETS.map(p => {
+                        const isSel = selectedPlanetDetail === p.name;
+                        const pd = result.planetData?.[p.name] || {};
+                        return (
+                          <button
+                            key={p.name}
+                            onClick={() => setSelectedPlanetDetail(p.name)}
+                            style={{
+                              background: isSel ? "linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(139, 92, 246, 0.3) 100%)" : "rgba(255, 255, 255, 0.04)",
+                              border: isSel ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.2)",
+                              borderRadius: 12,
+                              padding: "10px 14px",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              whiteSpace: "nowrap",
+                              transition: "all 0.2s ease",
+                              boxShadow: isSel ? "0 4px 14px rgba(245, 158, 11, 0.3)" : "none"
+                            }}
+                          >
+                            <span style={{ fontSize: 18, color: p.color }}>{p.glyph || p.symbol}</span>
+                            <div style={{ textAlign: "left" }}>
+                              <div style={{ color: isSel ? "#FDE68A" : "rgba(241, 231, 208, 0.9)", fontSize: 13, fontWeight: 700 }}>
+                                {hi ? p.sanskrit : p.name}
+                              </div>
+                              <div style={{ fontSize: 11, color: isSel ? "#F3D37A" : "rgba(241, 231, 208, 0.6)" }}>
+                                {hi ? `${pd.house}वां भाव` : `H${pd.house}`} · {pd.degree || ""}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Selected Planet Comprehensive Showcase Card */}
+                    <div style={{ background: "rgba(15, 10, 32, 0.85)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 16, padding: "24px 22px" }}>
+                      {/* Planet Header Banner */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, borderBottom: "1px solid rgba(212, 175, 55, 0.2)", paddingBottom: 18, marginBottom: 20 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                          <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(255, 255, 255, 0.05)", border: `2px solid ${planetDetail.color || "#F59E0B"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: planetDetail.color || "#F59E0B" }}>
+                            {planetDetail.symbol}
+                          </div>
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                              <h4 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, margin: 0 }}>
+                                {hi ? planetDetail.planetHi : planetDetail.planet} ({planetDetail.planet})
+                              </h4>
+                              <span style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", padding: "2px 8px", borderRadius: 8, fontSize: 11.5, fontWeight: 700 }}>
+                                {planetDetail.status || "Active"}
+                              </span>
+                            </div>
+                            <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, marginTop: 4 }}>
+                              <strong>{hi ? "प्राकृतिक कारकतत्व:" : "Natural Significator (Karaka):"}</strong> {planetDetail.karaka}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Position Badges */}
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                            <div style={{ color: "rgba(241, 231, 208, 0.65)", fontSize: 11 }}>{hi ? "राशि" : "Sign"}</div>
+                            <div style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 700 }}>{planetDetail.sign}</div>
+                          </div>
+                          <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                            <div style={{ color: "rgba(241, 231, 208, 0.65)", fontSize: 11 }}>{hi ? "भाव" : "House"}</div>
+                            <div style={{ color: "#34D399", fontSize: 13.5, fontWeight: 800 }}>{hi ? `${planetDetail.house}वां भाव` : `House ${planetDetail.house}`}</div>
+                          </div>
+                          <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                            <div style={{ color: "rgba(241, 231, 208, 0.65)", fontSize: 11 }}>{hi ? "अंश (Degree)" : "Degree"}</div>
+                            <div style={{ color: "#60A5FA", fontSize: 13.5, fontWeight: 700 }}>{planetDetail.degree}</div>
+                          </div>
+                          <div style={{ background: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 10, padding: "8px 12px", textAlign: "center" }}>
+                            <div style={{ color: "rgba(241, 231, 208, 0.65)", fontSize: 11 }}>{hi ? "नक्षत्र" : "Nakshatra"}</div>
+                            <div style={{ color: "#F472B6", fontSize: 13.5, fontWeight: 700 }}>{planetDetail.nakshatra} (P{planetDetail.pada})</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Degree Potency & Avastha Deep-Explanation */}
+                      <div style={{
+                        background: "linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)",
+                        border: "1px solid rgba(245, 158, 11, 0.35)",
+                        borderRadius: 12,
+                        padding: "16px 18px",
+                        marginBottom: 16
+                      }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                          <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
+                            <span>📐</span>
+                            <span>{hi ? "ग्रह के अंश (Degree) व अवस्था का गूढ़ प्रभाव:" : "Exact Degree & Planetary Avastha Impact:"}</span>
+                            <span style={{ color: "#34D399", background: "rgba(16, 185, 129, 0.2)", padding: "2px 8px", borderRadius: 8, fontSize: 12 }}>
+                              {hi ? planetDetail.avastha.nameHi : planetDetail.avastha.nameEn} ({hi ? planetDetail.avastha.potencyHi : planetDetail.avastha.potencyEn})
+                            </span>
+                          </div>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.92)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                          {hi ? planetDetail.avastha.descHi : planetDetail.avastha.descEn}
+                        </p>
+                      </div>
+
+                      {/* House Association & Meaning */}
+                      <div style={{
+                        background: "rgba(59, 130, 246, 0.08)",
+                        border: "1px solid rgba(59, 130, 246, 0.25)",
+                        borderRadius: 12,
+                        padding: "16px 18px",
+                        marginBottom: 20
+                      }}>
+                        <div style={{ color: "#93C5FD", fontSize: 14, fontWeight: 800, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                          <span>🏠</span>
+                          <span>{planetDetail.houseTitle}</span>
+                        </div>
+                        <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.65, margin: 0 }}>
+                          <strong>{hi ? "यह भाव क्या दर्शाता है: " : "Spheres Governed: "}</strong>
+                          {planetDetail.houseGovernance}
+                        </p>
+                      </div>
+
+                      {/* 5-Dimensional Life Impact Grid */}
+                      <div style={{ marginBottom: 22 }}>
+                        <h5 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                          <span>🌐</span> {hi ? "जीवन के 5 मुख्य क्षेत्रों पर प्रभाव (5-Dimensional Life Impact)" : "Multi-Dimensional Life Aspects"}
+                        </h5>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+                          {/* 1. Career */}
+                          <div style={{ background: "rgba(245, 158, 11, 0.07)", border: "1px solid rgba(245, 158, 11, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                            <div style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>💼</span> {hi ? "करियर, आजीविका व पद-प्रतिष्ठा" : "Career, Profession & Ambition"}
+                            </div>
+                            <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                              {planetDetail.aspects.career}
+                            </p>
+                          </div>
+
+                          {/* 2. Education */}
+                          <div style={{ background: "rgba(59, 130, 246, 0.07)", border: "1px solid rgba(59, 130, 246, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                            <div style={{ color: "#93C5FD", fontSize: 13.5, fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>🎓</span> {hi ? "शिक्षा, ज्ञान व बौद्धिक क्षमता" : "Education, Intellect & Learning"}
+                            </div>
+                            <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                              {planetDetail.aspects.education}
+                            </p>
+                          </div>
+
+                          {/* 3. Love Life */}
+                          <div style={{ background: "rgba(244, 114, 182, 0.07)", border: "1px solid rgba(244, 114, 182, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                            <div style={{ color: "#F472B6", fontSize: 13.5, fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>❤️</span> {hi ? "दांपत्य, प्रेम व संबंध" : "Love Life, Marriage & Rapport"}
+                            </div>
+                            <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                              {planetDetail.aspects.love}
+                            </p>
+                          </div>
+
+                          {/* 4. Wealth */}
+                          <div style={{ background: "rgba(16, 185, 129, 0.07)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                            <div style={{ color: "#34D399", fontSize: 13.5, fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>💰</span> {hi ? "धन संचय, आय व आर्थिक समृद्धि" : "Wealth Accumulation & Gains"}
+                            </div>
+                            <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                              {planetDetail.aspects.wealth}
+                            </p>
+                          </div>
+
+                          {/* 5. Health */}
+                          <div style={{ background: "rgba(168, 85, 247, 0.07)", border: "1px solid rgba(168, 85, 247, 0.25)", borderRadius: 12, padding: "16px 18px" }}>
+                            <div style={{ color: "#C084FC", fontSize: 13.5, fontWeight: 800, marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                              <span>🌿</span> {hi ? "स्वास्थ्य, शारीरिक स्फूर्ति व मानसिक ऊर्जा" : "Health, Vitality & Mental Stamina"}
+                            </div>
+                            <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                              {planetDetail.aspects.health}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vedic Remedies & Harmonization Box */}
+                      <div style={{
+                        background: "rgba(245, 158, 11, 0.1)",
+                        border: "1.5px solid rgba(245, 158, 11, 0.4)",
+                        borderRadius: 14,
+                        padding: "18px 20px"
+                      }}>
+                        <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                          <span>🛡️</span>
+                          <span>{hi ? `${planetDetail.planetHi} शांति व शुभ फल वृद्धि वैदिक उपाय` : `${planetDetail.planet} Vedic Harmonization & Remedies`}</span>
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                          {/* Mantra */}
+                          <div style={{ background: "rgba(0, 0, 0, 0.3)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                            <div style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 11.5, fontWeight: 700, marginBottom: 4 }}>
+                              📿 {hi ? "सिद्ध वैदिक मंत्र (108 बार नित्य)" : "Vedic Beej Mantra"}
+                            </div>
+                            <div style={{ color: "#FFF", fontSize: 13, fontWeight: 700, letterSpacing: 0.3 }}>
+                              {planetDetail.mantra}
+                            </div>
+                          </div>
+
+                          {/* Deity */}
+                          <div style={{ background: "rgba(0, 0, 0, 0.3)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                            <div style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 11.5, fontWeight: 700, marginBottom: 4 }}>
+                              🕉️ {hi ? "आराध्य देव / देवी" : "Presiding Deity"}
+                            </div>
+                            <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                              {planetDetail.deity}
+                            </div>
+                          </div>
+
+                          {/* Gemstone */}
+                          <div style={{ background: "rgba(0, 0, 0, 0.3)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(212, 175, 55, 0.2)" }}>
+                            <div style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 11.5, fontWeight: 700, marginBottom: 4 }}>
+                              💎 {hi ? "शुभ रत्न व धातु" : "Auspicious Gemstone & Metal"}
+                            </div>
+                            <div style={{ color: "#34D399", fontSize: 13, fontWeight: 700 }}>
+                              {planetDetail.gemstone}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Karmic Remedy */}
+                        <div style={{ marginTop: 12, background: "rgba(0, 0, 0, 0.25)", borderRadius: 10, padding: "12px 14px", border: "1px solid rgba(212, 175, 55, 0.15)" }}>
+                          <div style={{ color: "rgba(243, 211, 122, 0.85)", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>
+                            🕊️ {hi ? "दैनिक कर्मिक व दान उपाय:" : "Karmic Remedy & Charity:"}
+                          </div>
+                          <div style={{ color: "rgba(241, 231, 208, 0.92)", fontSize: 13, lineHeight: 1.6 }}>
+                            {planetDetail.remedy}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
