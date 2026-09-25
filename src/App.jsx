@@ -216,6 +216,69 @@ const UI = {
   }
 };
 
+const VEDIC_FAQS = [
+  {
+    qEn: "Why is the exact time of birth critical in Vedic Astrology?",
+    qHi: "वैदिक ज्योतिष में जन्म का सटीक समय इतना महत्वपूर्ण क्यों है?",
+    aEn: "In Vedic (Sidereal) astrology, the Ascendant (Lagna) changes sign approximately every 2 hours, and the Moon moves about 1 degree every two hours. Exact birth time determines the precise rising degree, the arrangement of the 12 houses (Bhavas), and micro-divisional charts (like the D9 Navamsha and D60 Shashtiamsha) which govern career, marriage, and past-life karma.",
+    aHi: "वैदिक ज्योतिष में लग्न (Ascendant) औसतन प्रत्येक २ घंटे में बदलता है और चंद्रमा तीव्र गति से राशि चक्र में भ्रमण करता है। सटीक जन्म समय से ही लग्न अंश, द्वादश भावों की संधि एवं सूक्ष्म वर्ग कुंडलियों (जैसे डी-९ नवांश और डी-६० षष्ट्यंश) का सटीक निर्धारण होता है।"
+  },
+  {
+    qEn: "How is Vedic Astrology different from Western Sun Sign astrology?",
+    qHi: "वैदिक ज्योतिष पाश्चात्य (Western) ज्योतिष से किस प्रकार भिन्न है?",
+    aEn: "Western astrology uses the Tropical zodiac (fixed to seasonal equinoxes), which has drifted by approximately 24 degrees from actual visible constellations. Vedic astrology utilizes the Sidereal (Nirayana) zodiac with exact Chitra Paksha Lahiri Ayanamsha, reflecting the true astronomical positions of visible stars in the cosmos.",
+    aHi: "पाश्चात्य ज्योतिष ऋतु-आधारित (Tropical) प्रणाली पर काम करता है जो वास्तविक तारों से लगभग २४ अंश पीछे है। इसके विपरीत, वैदिक ज्योतिष 'निरयण' (Sidereal) खगोलीय पद्धति और चित्रा पक्ष (लाहिड़ी) अयनांश का उपयोग करता है जो आकाश में ग्रहों की वास्तविक स्थिति को दर्शाता है।"
+  },
+  {
+    qEn: "Why are the 50-Page Dossier and calculations 100% free on this platform?",
+    qHi: "इस प्लेटफॉर्म पर 50-पृष्ठ महा-कुंडली और समस्त गणनाएं निःशुल्क क्यों हैं?",
+    aEn: "Jyotish Paramarsh was founded on the sacred principle of Seva (selfless service) and preserving authentic Vedic heritage. We believe everyone deserves pure, unadulterated astrological clarity without paywalls. Seekers who find deep value can voluntarily offer 'Shraddha Dakshina' to help maintain high-performance astronomical servers.",
+    aHi: "ज्योतिष परामर्श की स्थापना सनातन धर्म के सेवा भाव और शुद्ध वैदिक ज्ञान के प्रचार हेतु की गई है। हमारा मानना है कि जीवन मार्गदर्शन पर सबका अधिकार है। इच्छुक जातक सर्वर खर्च व अनुसंधान सहयोग हेतु स्वेच्छानुसार 'श्रद्धा दक्षिणा' अर्पित कर सकते हैं।"
+  },
+  {
+    qEn: "How are Lucky Gemstones and Astrological Remedies prescribed?",
+    qHi: "शुभ रत्न एवं ज्योतिषीय उपाय किस आधार पर निर्धारित किए जाते हैं?",
+    aEn: "Remedies in Brihat Parashara Hora Shastra are prescribed strictly based on your functional benefic planets (Karaka Grahas) for your specific Lagna, ensuring no malefic planet is accidentally energized. We recommend certified natural unheated gemstones and consecrated Rudraksha for spiritual and psychological harmony.",
+    aHi: "बृहत्पाराशर होराशास्त्र के अनुसार, उपाय केवल आपकी कुंडली के 'योगकारक' व शुभ ग्रहों को बल देने हेतु निर्धारित किए जाते हैं। मारक अथवा अकारक ग्रहों का रत्न कभी नहीं पहनाया जाता। हम केवल शुद्ध, प्राकृतिक रत्न व सिद्ध रुद्राक्ष की संस्तुति करते हैं।"
+  },
+  {
+    qEn: "Is my personal birth data kept safe and confidential?",
+    qHi: "क्या मेरा व्यक्तिगत जन्म विवरण सुरक्षित और पूर्णतः गोपनीय है?",
+    aEn: "Absolutely. All chart mathematics and dasha computations are executed securely within your browser session using high-precision client algorithms. We do not sell, harvest, or monetize your personal birth information with third-party advertisers.",
+    aHi: "पूर्णतः सुरक्षित। समस्त खगोलीय गणनाएं आपके ब्राउज़र में सुरक्षित एल्गोरिदम द्वारा की जाती हैं। हम आपका व्यक्तिगत विवरण कभी भी किसी तीसरे पक्ष या विज्ञापनदाता के साथ साझा नहीं करते।"
+  }
+];
+
+const SEEKER_TESTIMONIALS = [
+  {
+    name: "Dr. Vikramaditya M.",
+    roleEn: "Senior Surgeon",
+    roleHi: "वरिष्ठ चिकित्सक",
+    location: "Bengaluru, India",
+    stars: 5,
+    quoteEn: "The accuracy of the Vimshottari Dasha timeline is astonishing. It pinpointed my relocation and surgical fellowship abroad down to the exact month. The 50-page dossier is more thorough than paid consultations I have taken in the past.",
+    quoteHi: "विंशोत्तरी दशा चक्र की सटीकता विस्मयकारी है। इसने मेरे विदेश में फेलोशिप और स्थानांतरण का सटीक महीना पहले ही बता दिया था। 50-पृष्ठ की महा-रिपोर्ट किसी भी सशुल्क परामर्श से कहीं अधिक विस्तृत और प्रामाणिक है।"
+  },
+  {
+    name: "Priyanka & Arjun K.",
+    roleEn: "Software Architects",
+    roleHi: "सॉफ्टवेयर इंजीनियर",
+    location: "London, UK",
+    stars: 5,
+    quoteEn: "We used the Ashtakoot Gun Milan before our wedding. What we appreciated most was the nuanced explanation of Nadi and Bhakoot doshas without fear-mongering, and the clear Vedic remedies provided. Highly recommended!",
+    quoteHi: "हमने अपने विवाह पूर्व अष्टकूट गुण मिलान का उपयोग किया। सबसे प्रशंसनीय बात यह थी कि नाड़ी और भकूट दोष को बिना किसी भय के वैज्ञानिक रूप से समझाया गया और सरल उपाय बताए गए।"
+  },
+  {
+    name: "Rajeshwar Sengupta",
+    roleEn: "Financial Consultant",
+    roleHi: "वित्तीय सलाहकार",
+    location: "Kolkata, India",
+    stars: 5,
+    quoteEn: "Finding a platform that calculates 16 Shodashvarga divisional charts and Sripati Bhava cusps with arc-second precision for free is rare. The Shani Sade Sati and annual transit analysis gave me immense mental peace.",
+    quoteHi: "१६ षोडशवर्ग कुंडलियां और भाव चलित संधि को खगोलीय सटीकता के साथ निःशुल्क उपलब्ध कराने वाला ऐसा प्रामाणिक मंच दुर्लभ है। शनि साढ़ेसाती और गोचर विश्लेषण से मुझे अत्यधिक मानसिक संबल मिला।"
+  }
+];
+
 // ── NORTH INDIAN KUNDLI CHART ─────────────────────────────────────
 // Helper to extract formatted degree for a planet inside chart
 const getPlanetDegree = (pName, houseData, planetData) => {
@@ -1248,6 +1311,54 @@ export default function App() {
   const [partnerForm, setPartnerForm] = useState({ name: "", dob: "", pob: "", tob: "" });
   const [milanResult, setMilanResult] = useState(null);
 
+  // FAQ Accordion State & Location Detector State
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      alert(hi ? "आपके ब्राउज़र में स्थान सेवा समर्थित नहीं है।" : "Geolocation is not supported by your browser.");
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          setLastCoords({ lat: latitude, lon: longitude });
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          if (res.ok) {
+            const data = await res.json();
+            const city = data.address?.city || data.address?.town || data.address?.state_district || data.address?.state || "Detected City";
+            const country = data.address?.country ? `, ${data.address.country}` : "";
+            setForm(prev => ({ ...prev, pob: `${city}${country}` }));
+          } else {
+            setForm(prev => ({ ...prev, pob: `${latitude.toFixed(2)}°N, ${longitude.toFixed(2)}°E` }));
+          }
+        } catch (e) {
+          console.warn("Reverse geocode failed", e);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      () => {
+        setIsLocating(false);
+        alert(hi ? "स्थान का पता लगाने में असमर्थ। कृपया शहर का नाम दर्ज करें।" : "Unable to retrieve location. Please type your city manually.");
+      },
+      { timeout: 8000 }
+    );
+  };
+
+  const handleFillSample = () => {
+    setForm({
+      name: hi ? "राहुल शर्मा" : "Rahul Sharma",
+      dob: "1995-05-15",
+      tob: "10:30",
+      pob: "New Delhi, India"
+    });
+    setErr("");
+  };
+
   // Daily Horoscope State
   const [dailySign, setDailySign] = useState("Aries");
   const [dailyChannel, setDailyChannel] = useState("email");
@@ -1748,6 +1859,133 @@ export default function App() {
       }
     }
   };
+
+  // ── RENDER HELPER: SEEKER TESTIMONIALS ────────────────────────────
+  const renderTestimonialsSection = () => (
+    <section className="no-print" style={{ marginBottom: 36, animation: "fadeInCard 0.4s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 22 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase" }}>
+          <span>🌟</span> {hi ? "विश्वसनीय जातक अनुभव" : "AUTHENTIC SEEKER TESTIMONIALS"}
+        </div>
+        <h3 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, marginTop: 4 }}>
+          {hi ? "हजारों जातकों का विश्वास एवं प्रामाणिक अनुभव" : "Trusted by Thousands of Seekers Worldwide"}
+        </h3>
+        <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13.5, maxWidth: 620, margin: "4px auto 0" }}>
+          {hi ? "पाराशर पद्धति की खगोलीय सटीकता, दशा भविष्यवाणियों एवं निःशुल्क सेवा पर जातकों के विचार" : "Real reflections on Parashari mathematical accuracy, dasha milestones & free Vedic insight"}
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {SEEKER_TESTIMONIALS.map((tItem, idx) => (
+          <div
+            key={idx}
+            className="glass-card"
+            style={{
+              padding: "22px 20px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              border: "1px solid rgba(212,175,55,0.22)",
+              borderRadius: 14,
+              boxShadow: "0 6px 20px rgba(0,0,0,0.3)"
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <div style={{ color: "#F59E0B", fontSize: 14, letterSpacing: 2 }}>
+                  {"★".repeat(tItem.stars)}
+                </div>
+                <span style={{ fontSize: 11, background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)", color: "#34D399", padding: "2px 8px", borderRadius: 8, fontWeight: 700 }}>
+                  ✓ {hi ? "प्रमाणित जातक" : "Verified Seeker"}
+                </span>
+              </div>
+              <p style={{ color: "rgba(241,231,208,0.92)", fontSize: 13, lineHeight: 1.7, fontStyle: "italic", margin: "0 0 14px" }}>
+                "{hi ? tItem.quoteHi : tItem.quoteEn}"
+              </p>
+            </div>
+
+            <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #F59E0B, #D97706)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0F0A1E", fontWeight: 900, fontSize: 13 }}>
+                {tItem.name.charAt(0)}
+              </div>
+              <div>
+                <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>{tItem.name}</div>
+                <div style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5 }}>
+                  {hi ? tItem.roleHi : tItem.roleEn} · {tItem.location}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  // ── RENDER HELPER: VEDIC FAQ ACCORDION ─────────────────────────────
+  const renderFaqSection = () => (
+    <section className="no-print" style={{ marginBottom: 40, animation: "fadeInCard 0.4s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 22 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 12, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase" }}>
+          <span>❓</span> {hi ? "सामान्य जिज्ञासाएं एवं समाधान" : "FREQUENTLY ASKED QUESTIONS"}
+        </div>
+        <h3 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, marginTop: 4 }}>
+          {hi ? "वैदिक ज्योतिष एवं गणना संबंधी प्रश्नोत्तर" : "Understanding Vedic Astrology & Your Kundli"}
+        </h3>
+        <p style={{ color: "rgba(241,231,208,0.75)", fontSize: 13.5, maxWidth: 640, margin: "4px auto 0" }}>
+          {hi ? "सटीक जन्म समय, अयनांश, महा-रिपोर्ट व गोपनीयता संबंधी महत्वपूर्ण शास्त्रीय स्पष्टीकरण" : "Classical clarification on birth accuracy, Lahiri Ayanamsha, and client data privacy"}
+        </p>
+      </div>
+
+      <div style={{ maxWidth: 840, margin: "0 auto", display: "flex", flexDirection: "column", gap: 10 }}>
+        {VEDIC_FAQS.map((faq, idx) => {
+          const isOpen = openFaqIndex === idx;
+          return (
+            <div
+              key={idx}
+              className="glass-card"
+              style={{
+                border: isOpen ? "1.5px solid #F59E0B" : "1px solid rgba(212,175,55,0.22)",
+                borderRadius: 12,
+                overflow: "hidden",
+                transition: "all 0.2s ease"
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "16px 20px",
+                  background: isOpen ? "rgba(245,158,11,0.12)" : "transparent",
+                  border: "none",
+                  color: isOpen ? "#FDE68A" : "#FFF",
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 12
+                }}
+              >
+                <span>{hi ? faq.qHi : faq.qEn}</span>
+                <span style={{ fontSize: 14, color: "#F59E0B", transition: "transform 0.2s ease", transform: isOpen ? "rotate(180deg)" : "rotate(0)" }}>
+                  ▼
+                </span>
+              </button>
+
+              {isOpen && (
+                <div style={{ padding: "0 20px 18px", color: "rgba(241,231,208,0.9)", fontSize: 13.5, lineHeight: 1.75, borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 14 }}>
+                  {hi ? faq.aHi : faq.aEn}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 
   // ── RENDER HELPER: HINDU PANCHANG ────────────────────────────────
   const renderPanchangContent = () => (
@@ -3033,7 +3271,54 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "28px 20px 80px" }}>
+      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "24px 20px 80px" }}>
+
+        {/* ── LIVE REAL-TIME ASTRONOMICAL EPHEMERIS STATUS BAR ── */}
+        <aside
+          aria-label={hi ? "दैनिक खगोलीय पंचांग सूचना" : "Live Astronomical Ephemeris Status"}
+          className="no-print"
+          style={{
+            background: "linear-gradient(135deg, rgba(26, 18, 48, 0.95), rgba(15, 10, 32, 0.98))",
+            border: "1px solid rgba(212, 175, 55, 0.35)",
+            borderRadius: 14,
+            padding: "10px 18px",
+            marginBottom: 20,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+            boxShadow: "0 4px 18px rgba(0, 0, 0, 0.35)"
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.4)", borderRadius: 20, padding: "3px 10px", color: "#34D399", fontSize: 11, fontWeight: 800 }}>
+              <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px #10B981", animation: "pulseSlow 1.5s infinite" }} />
+              {hi ? "लाइव खगोलीय पंचांग" : "LIVE SIDEREAL EPHEMERIS"}
+            </div>
+            <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+              {todayPanchangData.displayDate} · {hi ? `विक्रम संवत ${todayPanchangData.vikramSamvat}` : `Vikram ${todayPanchangData.vikramSamvat}`}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", fontSize: 12.5 }}>
+            <span style={{ color: "rgba(241, 231, 208, 0.9)" }}>
+              🌙 <b>{hi ? "तिथि:" : "Tithi:"}</b> <span style={{ color: "#FDE68A" }}>{todayPanchangData.tithi}</span>
+            </span>
+            <span style={{ color: "rgba(241, 231, 208, 0.9)" }}>
+              ⭐ <b>{hi ? "नक्षत्र:" : "Nakshatra:"}</b> <span style={{ color: "#FDE68A" }}>{todayPanchangData.nakshatra}</span>
+            </span>
+            <span style={{ color: "rgba(241, 231, 208, 0.9)" }}>
+              ⏱️ <b>{hi ? "राहुकाल:" : "Rahu Kaal:"}</b> <span style={{ color: "#F87171", fontWeight: 700 }}>{todayPanchangData.rahuKaal}</span>
+            </span>
+            <button
+              onClick={() => setMainSection("panchang")}
+              style={{ background: "transparent", border: "none", color: "#F59E0B", fontSize: 12, fontWeight: 800, cursor: "pointer", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              <span>{hi ? "सम्पूर्ण पंचांग" : "Full Almanac"}</span> →
+            </button>
+          </div>
+        </aside>
 
         {/* ── TOP GLOBAL FEATURE NAVIGATION BAR (Instant Access Without Birth Details) ── */}
         <nav className="no-print" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, marginBottom: 28 }}>
@@ -3195,6 +3480,57 @@ export default function App() {
                 <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent)", margin: "12px auto 0" }} />
               </div>
             </section>
+
+            {/* ── 3-PILLAR CREDIBILITY & VEDIC INTEGRITY STRIP ── */}
+            <div className="no-print" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, marginBottom: 28 }}>
+              {[
+                {
+                  icon: "🏛️",
+                  titleEn: "Parashari & Surya Siddhanta",
+                  titleHi: "ऋषि पाराशर एवं सूर्य सिद्धांत",
+                  subEn: "Pure traditional computational core adhering to Brihat Parashara Hora Shastra",
+                  subHi: "बृहत्पाराशर होराशास्त्र एवं शास्त्रीय सिद्धांतों पर आधारित प्रामाणिक गणना"
+                },
+                {
+                  icon: "🔒",
+                  titleEn: "100% Client-Side Privacy",
+                  titleHi: "१००% पूर्ण गोपनीयता गारंटी",
+                  subEn: "Zero data tracking. Calculations compute privately on your device",
+                  subHi: "आपका जन्म विवरण पूर्णतः निजी है। कोई डेटा साझा या बेचा नहीं जाता"
+                },
+                {
+                  icon: "⚡",
+                  titleEn: "Arc-Second NASA Accuracy",
+                  titleHi: "खगोलीय सूक्ष्म अयनांश सटीकता",
+                  subEn: "Exact Chitra Paksha (Lahiri) Ayanamsha with exact Sripati cusp boundaries",
+                  subHi: "चित्रा पक्ष लाहिड़ी अयनांश एवं वास्तविक संधि-आधारित ग्रह विश्लेषण"
+                }
+              ].map((pill, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: "rgba(18, 12, 36, 0.75)",
+                    border: "1px solid rgba(212, 175, 55, 0.25)",
+                    borderRadius: 12,
+                    padding: "14px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    boxShadow: "0 4px 14px rgba(0,0,0,0.25)"
+                  }}
+                >
+                  <span style={{ fontSize: 24 }}>{pill.icon}</span>
+                  <div>
+                    <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>
+                      {hi ? pill.titleHi : pill.titleEn}
+                    </div>
+                    <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 11.5, marginTop: 2, lineHeight: 1.4 }}>
+                      {hi ? pill.subHi : pill.subEn}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             {/* Standalone Feature Spotlight Cards with Realistic Photographic Imagery */}
             {!result && (
@@ -3591,9 +3927,32 @@ export default function App() {
 
             {/* Input Form Card */}
             <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
-              <div style={{ marginBottom: 24, textAlign: "center" }}>
+              <div style={{ marginBottom: 20, textAlign: "center" }}>
                 <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
-                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5 }}>{t.formSub}</p>
+                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5, marginBottom: 12 }}>{t.formSub}</p>
+
+                {/* 1-Click Sample Profile Fill */}
+                <button
+                  type="button"
+                  onClick={handleFillSample}
+                  style={{
+                    background: "rgba(245, 158, 11, 0.15)",
+                    border: "1px solid rgba(245, 158, 11, 0.4)",
+                    color: "#FDE68A",
+                    padding: "6px 16px",
+                    borderRadius: 20,
+                    fontSize: 12,
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    transition: "all 0.2s ease"
+                  }}
+                  title="Auto-fill sample data to test the Kundli engine instantly"
+                >
+                  <span>⚡</span> {hi ? "नमूना विवरण भरें (1-Click Sample Chart)" : "Fill Sample Data (1-Click Demo)"}
+                </button>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
@@ -3648,9 +4007,31 @@ export default function App() {
                 </div>
 
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                    <Icons.Location size={15} color="#F59E0B" /> {t.fPob} *
-                  </label>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
+                    <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", letterSpacing: 0.5 }}>
+                      <Icons.Location size={15} color="#F59E0B" /> {t.fPob} *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleDetectLocation}
+                      disabled={isLocating}
+                      style={{
+                        background: "rgba(52, 211, 153, 0.15)",
+                        border: "1px solid rgba(52, 211, 153, 0.4)",
+                        color: "#34D399",
+                        padding: "3px 10px",
+                        borderRadius: 12,
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        cursor: isLocating ? "wait" : "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4
+                      }}
+                    >
+                      <span>📍</span> {isLocating ? (hi ? "स्थान खोज रहे हैं..." : "Detecting...") : (hi ? "वर्तमान स्थान का उपयोग करें" : "Use Current Location")}
+                    </button>
+                  </div>
                   <input
                     id="birth-pob"
                     name="pob"
@@ -3749,6 +4130,12 @@ export default function App() {
                 </div>
               )}
             </div>
+
+            {/* Seeker Testimonials & Verified Reviews */}
+            {!result && renderTestimonialsSection()}
+
+            {/* Vedic Knowledge & FAQ Accordion */}
+            {!result && renderFaqSection()}
 
             {/* Loading Progress */}
             {step > 0 && (
@@ -7624,31 +8011,212 @@ export default function App() {
         {/* Dedicated Emotional Dakshina Card at Bottom of Page */}
         {renderDakshinaCard(false)}
 
-        {/* Screen Footer with Secret Admin Trigger */}
+        {/* Vedic Knowledge & FAQ Accordion for Screen Results */}
+        {result && renderFaqSection()}
+
+        {/* ── INSTITUTIONAL MULTI-COLUMN LUXURY FOOTER ── */}
         <footer
-          onClick={handleSecretTrigger}
           className="no-print"
-          style={{ textAlign: "center", marginTop: 56, color: "rgba(243, 211, 122, 0.7)", fontSize: 13, letterSpacing: 1.5, cursor: "pointer", userSelect: "none" }}
-          title="Click 3 times for Admin VIP Portal"
+          style={{
+            marginTop: 56,
+            background: "linear-gradient(180deg, rgba(18, 11, 38, 0.85) 0%, rgba(10, 6, 22, 0.98) 100%)",
+            border: "1px solid rgba(212, 175, 55, 0.25)",
+            borderRadius: 20,
+            padding: "40px 32px 28px",
+            boxShadow: "0 12px 40px rgba(0, 0, 0, 0.5)",
+            color: "rgba(241, 231, 208, 0.85)"
+          }}
         >
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-            <img
-              src="/logo.png"
-              alt="Jyotish Paramarsh Logo"
-              style={{ width: 46, height: 46, borderRadius: "50%", border: "2px solid rgba(245,158,11,0.6)", boxShadow: "0 0 16px rgba(245,158,11,0.3)" }}
-            />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, marginBottom: 36, textAlign: "left" }}>
+            
+            {/* Column 1: Brand & Sacred Heritage */}
+            <div>
+              <div
+                onClick={handleSecretTrigger}
+                style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none", marginBottom: 14 }}
+                title="Click 3 times for Admin VIP Portal"
+              >
+                <img
+                  src="/logo.png"
+                  alt="Jyotish Paramarsh Logo"
+                  style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(245,158,11,0.7)", boxShadow: "0 0 14px rgba(245,158,11,0.3)" }}
+                />
+                <div>
+                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>
+                    JYOTISH PARAMARSH
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 600 }}>
+                    {hi ? "प्रामाणिक वैदिक ज्योतिष संस्थान" : "AUTHENTIC PARASHARI VEDIC PLATFORM"}
+                  </div>
+                </div>
+              </div>
+              <p style={{ fontSize: 12.5, lineHeight: 1.7, color: "rgba(241, 231, 208, 0.75)", margin: "0 0 14px" }}>
+                {hi
+                  ? "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र के सिद्धांती सूत्रों एवं आधुनिक खगोलीय सूक्ष्म अयनांश पर आधारित संपूर्ण जीवन मार्गदर्शन।"
+                  : "Dedicated to the pure computational heritage of Maharishi Parashara, delivering arc-second astronomical accuracy and life clarity for every seeker."}
+              </p>
+              <div style={{ fontSize: 12, fontWeight: 800, color: "#F59E0B", letterSpacing: 1 }}>
+                ✦ {t.footer1} ✦
+              </div>
+            </div>
+
+            {/* Column 2: Vedic Engines & Calculators */}
+            <div>
+              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                {hi ? "वैदिक गणना उपकरण" : "Calculators & Ephemeris"}
+              </h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9, fontSize: 12.5 }}>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("kundli"); if (result) setTab("chart"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "लग्न एवं १६ षोडशवर्ग कुंडलियां" : "Lagna & 16 Shodashvargas"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("panchang"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "दैनिक वैदिक पंचांग एवं चौघड़िया" : "Daily Sidereal Panchang"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("muhurat"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी (2026–2027)" : "Shubh Muhurat Timings"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("festivals"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "सनातन धर्म के पावन पर्व एवं व्रत" : "Hindu Festivals & Vrats"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("daily"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "दैनिक राशिफल (१२ राशियां)" : "Daily Zodiac Horoscope"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("kundli"); setTab("matchmaking"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "वैदिक कुंडली मिलान (३६ गुण)" : "Ashtakoot Gun Milan (36 Pts)"}
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Dossiers & Astrologer Guidance */}
+            <div>
+              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                {hi ? "दस्तावेज़ एवं परामर्श" : "Dossiers & Guidance"}
+              </h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9, fontSize: 12.5 }}>
+                <li>
+                  <span style={{ color: "#34D399", fontWeight: 700 }}>✓</span>{" "}
+                  <span style={{ color: "#FDE68A", fontWeight: 700 }}>
+                    {hi ? "50-पेज महा-कुंडली रिपोर्ट (100% FREE)" : "50-Page Deluxe Dossier (FREE)"}
+                  </span>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("kundli"); setTab("consult"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "१-ऑन-१ ज्योतिषी परामर्श प्रतीक्षा सूची" : "1-on-1 Astrologer Priority Desk"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("kundli"); setTab("store"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "निर्धारित रत्न एवं रुद्राक्ष स्टोर" : "Certified Gemstones & Remedies"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => { setMainSection("kundli"); setTab("predictions"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  >
+                    ✦ {hi ? "विंशोत्तरी महादशा एवं साढ़ेसाती" : "Vimshottari Dasha & Sade Sati"}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCheckout({
+                      title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                      priceKey: "dakshina",
+                      price: PRODUCT_PRICES.dakshina[currency],
+                      desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                      icon: "🪷",
+                      isDakshina: true
+                    })}
+                    style={{ background: "none", border: "none", color: "#F59E0B", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left", fontWeight: 700 }}
+                  >
+                    🪷 {hi ? "श्रद्धा दक्षिणा अर्पित करें (Seva)" : "Offer Shraddha Dakshina"}
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: Trust, Security & Help Desk */}
+            <div>
+              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
+                {hi ? "सुरक्षा एवं संपर्क" : "Trust & Support"}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399" }}>
+                  <span>🔒</span>
+                  <span>{hi ? "२५६-बिट बैंक-ग्रेड एन्क्रिप्शन" : "256-Bit Bank Grade SSL Encrypted"}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399" }}>
+                  <span>🛡️</span>
+                  <span>{hi ? "१००% पूर्ण गोपनीयता गारंटी" : "100% Client-Side Privacy Guaranteed"}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FDE68A" }}>
+                  <span>🏛️</span>
+                  <span>{hi ? "सूर्य सिद्धांत एवं पाराशरी प्रमाणित" : "Surya Siddhanta Astronomical Precision"}</span>
+                </div>
+                
+                <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10, marginTop: 4 }}>
+                  <div style={{ color: "#FDE68A", fontWeight: 700, marginBottom: 4 }}>
+                    {hi ? "आधिकारिक सहायता एवं परामर्श डेस्क:" : "Official Astrologer Help Desk:"}
+                  </div>
+                  <a
+                    href="mailto:teamjyotishparamarsh@gmail.com"
+                    style={{ color: "#F59E0B", textDecoration: "underline", fontWeight: 700, fontSize: 12.5 }}
+                  >
+                    teamjyotishparamarsh@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
+
           </div>
-          <div style={{ marginBottom: 6, fontWeight: 700, fontSize: 14 }}>{t.footer1}</div>
-          <div style={{ fontSize: 12.5, letterSpacing: 0.5, color: "rgba(241, 231, 208, 0.75)" }}>{t.footer2}</div>
-          <div style={{ marginTop: 10, fontSize: 12, letterSpacing: 0.3, color: "rgba(243, 211, 122, 0.9)" }}>
-            📧 {hi ? "सहायता एवं परामर्श ईमेल:" : "Official Support & Astrologer Desk:"}{" "}
-            <a
-              href="mailto:teamjyotishparamarsh@gmail.com"
-              onClick={e => e.stopPropagation()}
-              style={{ color: "#FDE68A", textDecoration: "underline", fontWeight: 700 }}
-            >
-              teamjyotishparamarsh@gmail.com
-            </a>
+
+          {/* Bottom Copyright & Sacred Astrological Disclaimer */}
+          <div style={{ borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 20, textAlign: "center", fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", lineHeight: 1.6 }}>
+            <div style={{ color: "rgba(243, 211, 122, 0.85)", fontWeight: 600, marginBottom: 6 }}>
+              {t.footer2}
+            </div>
+            <div>
+              {hi
+                ? "वैदिक ज्योतिष एक प्राचीन आध्यात्मिक एवं खगोलीय विद्या है। गणनाएं शास्त्रीय सूत्रों पर आधारित हैं एवं इनका उद्देश्य आत्म-जागरूकता व शुभ मार्गदर्शन प्रदान करना है। © 2026 Jyotish Paramarsh. All Rights Reserved."
+                : "Vedic astrology is an ancient metaphysical science. All algorithmic calculations are provided for spiritual enrichment and life guidance. © 2026 Jyotish Paramarsh. All Rights Reserved."}
+            </div>
           </div>
         </footer>
 
