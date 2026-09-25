@@ -297,6 +297,28 @@ export function calculateGunMilan({ partner1, partner2 }) {
   const isBhakootDosha = [2, 12, 6, 8, 9, 5].includes(signDist);
   let bhakootScore = isBhakootDosha ? 0 : 7;
 
+  // 8. Nadi (8 Points)
+  const isNadiDosha = nak1.nadi === nak2.nadi;
+  let nadiScore = isNadiDosha ? 0 : 8;
+
+  const totalGunas = varnaScore + vashyaScore + taraScore + yoniScore + maitriScore + ganaScore + bhakootScore + nadiScore;
+
+  // Manglik Check
+  const mars1H = ((getSignIndex(p1Planets["Mars"]) - s1Idx + 12) % 12) + 1;
+  const mars2H = ((getSignIndex(p2Planets["Mars"]) - s2Idx + 12) % 12) + 1;
+  const p1Manglik = [1, 4, 7, 8, 12].includes(mars1H);
+  const p2Manglik = [1, 4, 7, 8, 12].includes(mars2H);
+
+  let matchVerdict = "Excellent Match (Uttam)";
+  let matchVerdictHi = "उत्कृष्ट एवं अत्यंत शुभ मिलान (उत्तम)";
+  if (totalGunas < 18) {
+    matchVerdict = "Challenging Compatibility (Remedies Advised)";
+    matchVerdictHi = "सावधानी एवं वैदिक उपाय आवश्यक (चुनौतीपूर्ण)";
+  } else if (totalGunas <= 25) {
+    matchVerdict = "Good & Harmonious Match (Madhyam)";
+    matchVerdictHi = "शुभ एवं सामंजस्यपूर्ण मिलान (मध्यम)";
+  }
+
   // Planetary Friendship Table (Natural Vedic Mitra/Sama/Shatru)
   const PLANET_FRIENDS = {
     Sun: ["Moon", "Mars", "Jupiter"],

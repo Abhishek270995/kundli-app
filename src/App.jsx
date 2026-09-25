@@ -1818,15 +1818,21 @@ export default function App() {
   };
 
   const handleRunGunMilan = () => {
-    if (!partnerForm.name || !partnerForm.dob) {
+    const p1Dob = form.dob || (result ? form.dob : "1995-05-15");
+    if (!partnerForm.name.trim() || !partnerForm.dob) {
       alert(t.errPartnerFields || (hi ? "कृपया जीवनसाथी का नाम और जन्म तिथि दर्ज करें।" : "Please enter partner name and date of birth."));
       return;
     }
-    const res = calculateGunMilan({
-      partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
-      partner2: partnerForm
-    });
-    setMilanResult(res);
+    try {
+      const res = calculateGunMilan({
+        partner1: { name: form.name || "Primary Native", dob: p1Dob, tob: form.tob },
+        partner2: partnerForm
+      });
+      setMilanResult(res);
+    } catch (e) {
+      console.error("Gun Milan calculation error:", e);
+      alert(hi ? "गुण मिलान गणना में त्रुटि हुई। कृपया जन्म तिथि व समय की पुनः जांच करें।" : "Error calculating Gun Milan compatibility. Please check the birth dates and time.");
+    }
   };
 
   const handleLangToggle = () => {
@@ -1855,7 +1861,7 @@ export default function App() {
     if (milanResult && partnerForm.name && partnerForm.dob) {
       try {
         const updatedMilan = calculateGunMilan({
-          partner1: { name: form.name || "Primary Native", dob: form.dob, tob: form.tob },
+          partner1: { name: form.name || "Primary Native", dob: form.dob || "1995-05-15", tob: form.tob },
           partner2: partnerForm
         });
         setMilanResult(updatedMilan);
