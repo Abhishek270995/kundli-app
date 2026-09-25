@@ -2364,6 +2364,24 @@ export const HINDU_FESTIVALS_CALENDAR = [
     "fastingRulesHi": "पुरुष दाहिने और महिलाएं बाएं हाथ में १४ गांठों वाला अनंत सूत्र बांधें।"
   },
   {
+    "id": "bhadrapada_purnima",
+    "category": "purnima_amavasya",
+    "nameEn": "Bhadrapada Purnima Vrat (Satyanarayan Puja)",
+    "nameHi": "भाद्रपद पूर्णिमा व्रत (श्री सत्यनारायण पूजन)",
+    "date": "2026-09-25",
+    "dayEn": "Friday",
+    "dayHi": "शुक्रवार",
+    "month": "September 2026",
+    "tithiEn": "Bhadrapada Shukla Purnima",
+    "tithiHi": "भाद्रपद शुक्ल पूर्णिमा",
+    "significanceEn": "Sacred full moon fast dedicated to Lord Satyanarayan. Marks the commencement of annual ancestral Shraddha rituals with divine blessings.",
+    "significanceHi": "भगवान श्री सत्यनारायण का पावन व्रत एवं पूर्णिमा श्राद्ध। इस दिन सत्यनारायण कथा श्रवण और चंद्र अर्घ्य से समस्त मनोरथ सिद्ध होते हैं।",
+    "pujaMuhuratEn": "05:45 PM to 08:30 PM (Satyanarayan Katha & Chandra Arghya)",
+    "pujaMuhuratHi": "सायंकाल 05:45 से 08:30 तक (सत्यनारायण कथा व चंद्र दर्शन / अर्घ्य)",
+    "fastingRulesEn": "Satvik grain-free fast. Perform Lord Vishnu puja with Panjiri prasad and offer milk-water Arghya to the Full Moon.",
+    "fastingRulesHi": "दिनभर फलाहार व्रत रखें। भगवान को पंजीरी व चरणामृत का भोग लगाएं तथा चंद्रोदय के उपरांत अर्घ्य देकर पारण करें।"
+  },
+  {
     "id": "pitrupaksha_start",
     "category": "vrat",
     "nameEn": "Pitru Paksha Begins (Shraddha Paksha)",
@@ -3070,4 +3088,118 @@ export const HINDU_FESTIVALS_CALENDAR = [
 export function getUpcomingFestivalsAndVrats({ filter = "all", lang = "hi" }) {
   if (filter === "all") return HINDU_FESTIVALS_CALENDAR;
   return HINDU_FESTIVALS_CALENDAR.filter(f => f.category === filter);
+}
+
+export function getFestivalOrVratForDate(dateStr, panchangData = null) {
+  if (!dateStr) return null;
+  // 1. Direct match in HINDU_FESTIVALS_CALENDAR
+  const matched = HINDU_FESTIVALS_CALENDAR.find(f => f.date === dateStr);
+  if (matched) return matched;
+
+  // 2. Dynamic Vrat detection based on Panchang Tithi if available
+  if (panchangData && panchangData.tithi) {
+    const t = panchangData.tithi;
+    if (t.includes("एकादशी") || t.toLowerCase().includes("ekadashi")) {
+      return {
+        id: `dynamic_ekadashi_${dateStr}`,
+        category: "ekadashi",
+        nameHi: "एकादशी व्रत (श्री हरि वासर)",
+        nameEn: "Ekadashi Vrat (Lord Vishnu Fast)",
+        date: dateStr,
+        dayHi: panchangData.vaar?.split(" ")[0] || "",
+        dayEn: panchangData.vaar || "",
+        month: "",
+        tithiHi: panchangData.tithi,
+        tithiEn: panchangData.tithi,
+        significanceHi: "एकादशी का पावन व्रत समस्त पापों का शमन कर भगवान श्री हरि के परम पद की प्राप्ति कराता है।",
+        significanceEn: "Ekadashi fast purifies the soul and bestows divine blessings of Lord Vishnu.",
+        pujaMuhuratHi: `अभिजीत मुहूर्त: ${panchangData.muhurats?.abhijit || "दोपहर 11:45 से 12:35"}`,
+        pujaMuhuratEn: `Abhijit Muhurat: ${panchangData.muhurats?.abhijit || "11:45 AM to 12:35 PM"}`,
+        fastingRulesHi: "अन्न व चावल वर्जित। फलाहार अथवा जल युक्त सात्विक उपवास रखें।",
+        fastingRulesEn: "Grain-free Satvik fast with fruits, milk, and water."
+      };
+    }
+    if (t.includes("त्रयोदशी") || t.toLowerCase().includes("trayodashi")) {
+      return {
+        id: `dynamic_pradosh_${dateStr}`,
+        category: "vrat",
+        nameHi: "प्रदोष व्रत (शिव आराधना)",
+        nameEn: "Pradosh Vrat (Lord Shiva Puja)",
+        date: dateStr,
+        dayHi: panchangData.vaar?.split(" ")[0] || "",
+        dayEn: panchangData.vaar || "",
+        month: "",
+        tithiHi: panchangData.tithi,
+        tithiEn: panchangData.tithi,
+        significanceHi: "प्रदोष काल में भगवान शिव और माता पार्वती का पूजन सर्व मनोकामना सिद्धि व कष्ट निवारण करता है।",
+        significanceEn: "Evening Pradosh fast and Shiva Abhishekam dispels all sorrows and brings peace.",
+        pujaMuhuratHi: `गोधूलि / प्रदोष काल: ${panchangData.muhurats?.godhuli || "सायंकाल"}`,
+        pujaMuhuratEn: `Pradosh Sandhya: ${panchangData.muhurats?.godhuli || "Evening"}`,
+        fastingRulesHi: "सायंकाल शिव पूजन के उपरांत फलाहार अथवा सात्विक आहार ग्रहण करें।",
+        fastingRulesEn: "Observe fast until evening Shiva puja."
+      };
+    }
+    if (t.includes("पूर्णिमा") || t.toLowerCase().includes("purnima")) {
+      return {
+        id: `dynamic_purnima_${dateStr}`,
+        category: "purnima_amavasya",
+        nameHi: "पूर्णिमा व्रत व श्री सत्यनारायण पूजन",
+        nameEn: "Purnima Vrat & Satyanarayan Puja",
+        date: dateStr,
+        dayHi: panchangData.vaar?.split(" ")[0] || "",
+        dayEn: panchangData.vaar || "",
+        month: "",
+        tithiHi: panchangData.tithi,
+        tithiEn: panchangData.tithi,
+        significanceHi: "पूर्णिमा पर सत्यनारायण कथा और चंद्र दर्शन से सुख, समृद्धि एवं मानसिक शांति मिलती है।",
+        significanceEn: "Sacred full moon fast bringing mental serenity, abundance and peace.",
+        pujaMuhuratHi: `संध्याकाल व चंद्रोदय काल`,
+        pujaMuhuratEn: `Moonrise & Evening Worship`,
+        fastingRulesHi: "दिनभर सात्विक फलाहार, चंद्र अर्घ्य के बाद पारण करें।",
+        fastingRulesEn: "Satvik fast with fruits, conclude after moon offering."
+      };
+    }
+    if (t.includes("अमावस्या") || t.toLowerCase().includes("amavasya")) {
+      return {
+        id: `dynamic_amavasya_${dateStr}`,
+        category: "purnima_amavasya",
+        nameHi: "दर्श अमावस्या (पितृ तर्पण व दान)",
+        nameEn: "Amavasya (Ancestor Tarpan & Charity)",
+        date: dateStr,
+        dayHi: panchangData.vaar?.split(" ")[0] || "",
+        dayEn: panchangData.vaar || "",
+        month: "",
+        tithiHi: panchangData.tithi,
+        tithiEn: panchangData.tithi,
+        significanceHi: "अमावस्या पर पितरों का तर्पण, पिंडदान एवं दान-पुण्य अत्यंत फलदायी माना गया है।",
+        significanceEn: "Sacred new moon day for honoring ancestors (Pitras) and charitable deeds.",
+        pujaMuhuratHi: `मध्याह्न कुतुप काल व सूर्यास्त पूर्व`,
+        pujaMuhuratEn: `Midday Kutup Muhurat`,
+        fastingRulesHi: "पितरों हेतु तर्पण व जरूरतमंदों को अन्न-वस्त्र दान करें।",
+        fastingRulesEn: "Fasting and offering charity to the needy."
+      };
+    }
+    if (t.includes("चतुर्थी") || t.toLowerCase().includes("chaturthi")) {
+      return {
+        id: `dynamic_chaturthi_${dateStr}`,
+        category: "vrat",
+        nameHi: "श्री गणेश चतुर्थी व्रत",
+        nameEn: "Ganesh Chaturthi Vrat",
+        date: dateStr,
+        dayHi: panchangData.vaar?.split(" ")[0] || "",
+        dayEn: panchangData.vaar || "",
+        month: "",
+        tithiHi: panchangData.tithi,
+        tithiEn: panchangData.tithi,
+        significanceHi: "विघ्नहर्ता भगवान गणेश का पूजन समस्त बाधाओं और संकटों को दूर करता है।",
+        significanceEn: "Worship of Lord Ganesha for removal of obstacles and wisdom.",
+        pujaMuhuratHi: `मध्याह्न अथवा चंद्रोदय काल`,
+        pujaMuhuratEn: `Madhyahna or Moonrise Window`,
+        fastingRulesHi: "मोदक व दुर्वा अर्पित कर फलाहार व्रत करें।",
+        fastingRulesEn: "Offer Durva grass and modak; Satvik fast."
+      };
+    }
+  }
+
+  return null;
 }

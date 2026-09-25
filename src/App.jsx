@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   generateVedicKundliData,
   calculateGunMilan,
@@ -9,6 +9,7 @@ import {
   calculateDailyPanchang,
   getUpcomingShubhMuhurats,
   getUpcomingFestivalsAndVrats,
+  getFestivalOrVratForDate,
   SHUBH_MUHURAT_CATEGORIES,
   MAJOR_INDIAN_CITIES,
   LIFE_PROBLEMS_LIST,
@@ -1610,6 +1611,30 @@ export default function App() {
     return f.nameEn.toLowerCase().includes(q) || f.nameHi.includes(q) || f.month.toLowerCase().includes(q);
   });
 
+  // Current real-time date (YYYY-MM-DD)
+  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  // Today's Panchang Data (computed for today's date for real-time status)
+  const todayPanchangData = useMemo(() => {
+    return calculateDailyPanchang({
+      dateStr: todayStr,
+      lat: panchangCity.lat,
+      lon: panchangCity.lon,
+      cityName: hi ? panchangCity.nameHi : panchangCity.name,
+      lang
+    });
+  }, [todayStr, panchangCity, hi, lang]);
+
+  // Today's active festival or fast (null if regular day)
+  const todayFestival = useMemo(() => {
+    return getFestivalOrVratForDate(todayStr, todayPanchangData);
+  }, [todayStr, todayPanchangData]);
+
+  // Active festival or fast for the user-selected panchang date
+  const selectedPanchangFestival = useMemo(() => {
+    return getFestivalOrVratForDate(panchangDate, panchangData);
+  }, [panchangDate, panchangData]);
+
   // Sync daily horoscope sign when Kundli result loads
   useEffect(() => {
     if (result?.rashiSign) {
@@ -1790,6 +1815,60 @@ export default function App() {
           </select>
         </div>
       </div>
+
+      {/* ── ACTIVE FESTIVAL / VRAT BANNER FOR THIS DATE ── */}
+      {selectedPanchangFestival && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(180, 83, 9, 0.32))",
+            border: "1.5px solid #F59E0B",
+            borderRadius: 14,
+            padding: "16px 20px",
+            marginBottom: 22,
+            boxShadow: "0 6px 20px rgba(245, 158, 11, 0.22)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
+            animation: "fadeInCard 0.3s ease"
+          }}
+        >
+          <div style={{ flex: "1 1 320px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 18 }}>🚩</span>
+              <span style={{ fontSize: 12, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.5, textTransform: "uppercase" }}>
+                {panchangDate === todayStr ? (hi ? "आज का पावन पर्व व व्रत" : "Today's Sacred Festival & Fast") : (hi ? "इस तिथि का पावन पर्व / व्रत" : "Festival on this Date")}
+              </span>
+              <span style={{ background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 800, padding: "2px 8px", borderRadius: 10 }}>
+                {hi ? "विशेष व्रत" : "Active Vrat"}
+              </span>
+            </div>
+            <h4 style={{ color: "#FFF", fontSize: 19, fontWeight: 800, margin: "2px 0 6px" }}>
+              {hi ? selectedPanchangFestival.nameHi : selectedPanchangFestival.nameEn}
+            </h4>
+            <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13, lineHeight: 1.5, margin: "0 0 8px" }}>
+              {hi ? selectedPanchangFestival.significanceHi : selectedPanchangFestival.significanceEn}
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, fontSize: 12.5, color: "#FDE68A" }}>
+              <span>🪔 <b>{hi ? "पूजा मुहूर्त:" : "Puja Muhurat:"}</b> {hi ? selectedPanchangFestival.pujaMuhuratHi : selectedPanchangFestival.pujaMuhuratEn}</span>
+              <span>🙏 <b>{hi ? "व्रत नियम:" : "Fasting:"}</b> {hi ? selectedPanchangFestival.fastingRulesHi : selectedPanchangFestival.fastingRulesEn}</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setMainSection("festivals")}
+            className="gold-cta-btn"
+            style={{
+              padding: "10px 18px",
+              fontSize: 13,
+              fontWeight: 800,
+              whiteSpace: "nowrap"
+            }}
+          >
+            {hi ? "संपूर्ण व्रत कैलेंडर देखें →" : "View Festival Calendar →"}
+          </button>
+        </div>
+      )}
 
       {/* Core 4-Box Metric Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, marginBottom: 24 }}>
@@ -2057,6 +2136,53 @@ export default function App() {
         </p>
       </div>
 
+      {/* ── TODAY'S ACTIVE FESTIVAL HIGHLIGHT SPOTLIGHT ── */}
+      {todayFestival && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35))",
+            border: "2px solid #F59E0B",
+            borderRadius: 14,
+            padding: "20px 22px",
+            marginBottom: 24,
+            boxShadow: "0 8px 24px rgba(245, 158, 11, 0.28)",
+            position: "relative",
+            overflow: "hidden"
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 8 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#F59E0B", color: "#0F0A1E", padding: "3px 10px", borderRadius: 12, fontSize: 11.5, fontWeight: 800 }}>
+              <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#DC2626" }} />
+              {hi ? "आज का पावन पर्व व व्रत" : "TODAY'S SACRED FESTIVAL"}
+            </div>
+            <span style={{ fontSize: 12.5, color: "#34D399", fontWeight: 700 }}>
+              📅 {new Date(todayFestival.date).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "long", year: "numeric" })} ({hi ? todayFestival.dayHi : todayFestival.dayEn})
+            </span>
+          </div>
+
+          <h3 style={{ color: "#FFF", fontSize: 22, fontWeight: 800, margin: "6px 0 8px" }}>
+            {hi ? todayFestival.nameHi : todayFestival.nameEn}
+          </h3>
+
+          <div style={{ fontSize: 13, color: "rgba(243,211,122,0.9)", fontWeight: 600, marginBottom: 8 }}>
+            🌙 {hi ? todayFestival.tithiHi : todayFestival.tithiEn}
+          </div>
+
+          <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 14px", maxWidth: 780 }}>
+            {hi ? todayFestival.significanceHi : todayFestival.significanceEn}
+          </p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10, borderTop: "1px solid rgba(245, 158, 11, 0.3)", paddingTop: 12 }}>
+            <div style={{ fontSize: 12.5, color: "#FDE68A" }}>
+              🪔 <b>{hi ? "पूजा मुहूर्त:" : "Puja Muhurat:"}</b> {hi ? todayFestival.pujaMuhuratHi : todayFestival.pujaMuhuratEn}
+            </div>
+            <div style={{ fontSize: 12.5, color: "#FDE68A" }}>
+              🙏 <b>{hi ? "व्रत व उपवास नियम:" : "Fasting Rules:"}</b> {hi ? todayFestival.fastingRulesHi : todayFestival.fastingRulesEn}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Search & Filter Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
         {/* Category Pills */}
@@ -2102,41 +2228,64 @@ export default function App() {
 
       {/* Festivals Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 16 }}>
-        {filteredFestivals.map((fest) => (
-          <div key={fest.id} style={{ background: "rgba(11,8,25,0.75)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "20px 22px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 12, color: "#34D399", fontWeight: 800 }}>
-                  📅 {new Date(fest.date).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric" })} ({hi ? fest.dayHi : fest.dayEn})
-                </span>
-                <span style={{ fontSize: 11, background: "rgba(245,158,11,0.2)", color: "#FDE68A", padding: "2px 8px", borderRadius: 10, fontWeight: 700 }}>
-                  {fest.month}
-                </span>
+        {filteredFestivals.map((fest) => {
+          const isToday = fest.date === todayStr;
+          return (
+            <div
+              key={fest.id}
+              style={{
+                background: isToday
+                  ? "linear-gradient(135deg, rgba(58, 30, 20, 0.95), rgba(30, 16, 42, 0.98))"
+                  : "rgba(11,8,25,0.75)",
+                border: isToday ? "2px solid #F59E0B" : "1px solid rgba(212,175,55,0.25)",
+                borderRadius: 12,
+                padding: "20px 22px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxShadow: isToday ? "0 0 20px rgba(245, 158, 11, 0.35)" : "none",
+                position: "relative"
+              }}
+            >
+              {isToday && (
+                <div style={{ position: "absolute", top: -10, right: 14, background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 900, padding: "2px 8px", borderRadius: 8, boxShadow: "0 2px 6px rgba(0,0,0,0.4)" }}>
+                  🌟 {hi ? "आज का पर्व (TODAY)" : "TODAY"}
+                </div>
+              )}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <span style={{ fontSize: 12, color: isToday ? "#FDE68A" : "#34D399", fontWeight: 800 }}>
+                    📅 {new Date(fest.date).toLocaleDateString(hi ? "hi-IN" : "en-US", { day: "numeric", month: "short", year: "numeric" })} ({hi ? fest.dayHi : fest.dayEn})
+                  </span>
+                  <span style={{ fontSize: 11, background: isToday ? "#F59E0B" : "rgba(245,158,11,0.2)", color: isToday ? "#0F0A1E" : "#FDE68A", padding: "2px 8px", borderRadius: 10, fontWeight: 700 }}>
+                    {fest.month}
+                  </span>
+                </div>
+
+                <h4 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: "0 0 4px" }}>
+                  {hi ? fest.nameHi : fest.nameEn}
+                </h4>
+
+                <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 10 }}>
+                  🌙 {hi ? fest.tithiHi : fest.tithiEn}
+                </div>
+
+                <p style={{ fontSize: 13, color: "rgba(241,231,208,0.9)", lineHeight: 1.6, marginBottom: 12 }}>
+                  {hi ? fest.significanceHi : fest.significanceEn}
+                </p>
               </div>
 
-              <h4 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: "0 0 4px" }}>
-                {hi ? fest.nameHi : fest.nameEn}
-              </h4>
-
-              <div style={{ fontSize: 12, color: "rgba(243,211,122,0.85)", marginBottom: 10 }}>
-                🌙 {hi ? fest.tithiHi : fest.tithiEn}
+              <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10 }}>
+                <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "6px 10px", color: "#FDE68A", fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
+                  🪔 <b>{hi ? "शुभ पूजा मुहूर्त:" : "Puja Muhurat:"}</b> {hi ? fest.pujaMuhuratHi : fest.pujaMuhuratEn}
+                </div>
+                <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", lineHeight: 1.5 }}>
+                  <b>{hi ? "व्रत व पूजा नियम:" : "Fasting Rules:"}</b> {hi ? fest.fastingRulesHi : fest.fastingRulesEn}
+                </div>
               </div>
-
-              <p style={{ fontSize: 13, color: "rgba(241,231,208,0.9)", lineHeight: 1.6, marginBottom: 12 }}>
-                {hi ? fest.significanceHi : fest.significanceEn}
-              </p>
             </div>
-
-            <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10 }}>
-              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 6, padding: "6px 10px", color: "#FDE68A", fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
-                🪔 <b>{hi ? "शुभ पूजा मुहूर्त:" : "Puja Muhurat:"}</b> {hi ? fest.pujaMuhuratHi : fest.pujaMuhuratEn}
-              </div>
-              <div style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", lineHeight: 1.5 }}>
-                <b>{hi ? "व्रत व पूजा नियम:" : "Fasting Rules:"}</b> {hi ? fest.fastingRulesHi : fest.fastingRulesEn}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -2958,21 +3107,44 @@ export default function App() {
                 {/* 1. Panchang Card */}
                 <div
                   onClick={() => setMainSection("panchang")}
-                  style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "transform 0.2s ease, border-color 0.2s ease" }}
+                  style={{
+                    background: todayFestival
+                      ? "linear-gradient(135deg, rgba(35, 20, 56, 0.95), rgba(18, 11, 36, 0.98))"
+                      : "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))",
+                    border: todayFestival ? "1.5px solid rgba(245, 158, 11, 0.65)" : "1px solid rgba(212,175,55,0.3)",
+                    borderRadius: 14,
+                    padding: "18px 20px",
+                    cursor: "pointer",
+                    boxShadow: todayFestival ? "0 4px 18px rgba(245, 158, 11, 0.22)" : "none",
+                    transition: "transform 0.2s ease, border-color 0.2s ease"
+                  }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "rgba(245, 158, 11, 0.65)" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <span style={{ fontSize: 22 }}>🕉️</span>
-                    <span style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700, background: "rgba(16,185,129,0.15)", padding: "2px 8px", borderRadius: 10 }}>
-                      {hi ? "लाइव पंचांग" : "Live Daily"}
-                    </span>
+                    <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                      {todayFestival && (
+                        <span style={{ fontSize: 10.5, color: "#0F0A1E", fontWeight: 800, background: "#F59E0B", padding: "2px 7px", borderRadius: 8 }}>
+                          🚩 {hi ? "आज विशेष व्रत" : "Today's Vrat"}
+                        </span>
+                      )}
+                      <span style={{ fontSize: 11.5, color: "#34D399", fontWeight: 700, background: "rgba(16,185,129,0.15)", padding: "2px 8px", borderRadius: 10 }}>
+                        {hi ? "लाइव पंचांग" : "Live Daily"}
+                      </span>
+                    </div>
                   </div>
                   <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: "4px 0" }}>
                     {hi ? "दैनिक हिंदू पंचांग" : "Today's Hindu Panchang"}
                   </h3>
                   <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginBottom: 8 }}>
-                    {panchangData.tithi} · {panchangData.nakshatra}
+                    {todayFestival ? (
+                      <span style={{ color: "#FDE68A", fontWeight: 700 }}>
+                        🚩 {hi ? todayFestival.nameHi : todayFestival.nameEn}
+                      </span>
+                    ) : (
+                      `${panchangData.tithi} · ${panchangData.nakshatra}`
+                    )}
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
                     <span>🌟 {hi ? "अभिजीत:" : "Abhijit:"} {panchangData.muhurats.abhijit.split("-")[0]}</span>
@@ -3013,27 +3185,62 @@ export default function App() {
                 {/* 3. Festivals & Vrat Card */}
                 <div
                   onClick={() => setMainSection("festivals")}
-                  style={{ background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 14, padding: "18px 20px", cursor: "pointer", transition: "transform 0.2s ease, border-color 0.2s ease" }}
+                  style={{
+                    background: todayFestival
+                      ? "linear-gradient(135deg, rgba(62, 28, 20, 0.96), rgba(28, 14, 40, 0.98))"
+                      : "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))",
+                    border: todayFestival ? "2px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
+                    borderRadius: 14,
+                    padding: "18px 20px",
+                    cursor: "pointer",
+                    boxShadow: todayFestival ? "0 0 24px rgba(245, 158, 11, 0.35), 0 4px 14px rgba(0,0,0,0.6)" : "none",
+                    position: "relative",
+                    transition: "transform 0.2s ease, border-color 0.2s ease"
+                  }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-3px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
                 >
+                  {todayFestival && (
+                    <div style={{ position: "absolute", top: -10, right: 14, background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 900, padding: "2px 9px", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+                      🌟 {hi ? "आज विशेष पर्व" : "TODAY'S FESTIVAL"}
+                    </div>
+                  )}
+
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                     <span style={{ fontSize: 22 }}>🪔</span>
-                    <span style={{ fontSize: 11.5, color: "#F472B6", fontWeight: 700, background: "rgba(244,114,182,0.15)", padding: "2px 8px", borderRadius: 10 }}>
-                      {hi ? "पर्व व उपवास" : "Festivals"}
+                    <span style={{
+                      fontSize: 11.5,
+                      color: todayFestival ? "#FDE68A" : "#F472B6",
+                      fontWeight: 800,
+                      background: todayFestival ? "rgba(245,158,11,0.25)" : "rgba(244,114,182,0.15)",
+                      border: todayFestival ? "1px solid rgba(245,158,11,0.5)" : "none",
+                      padding: "2px 8px",
+                      borderRadius: 10
+                    }}>
+                      {todayFestival ? (hi ? "🚩 आज का पर्व" : "Active Today") : (hi ? "पर्व व उपवास" : "Festivals")}
                     </span>
                   </div>
+
                   <h3 style={{ color: "#F3D37A", fontSize: 16, fontWeight: 800, margin: "4px 0" }}>
-                    {hi ? "हिंदू व्रत एवं त्यौहार कैलेंडर" : "Festivals & Vrat Calendar"}
+                    {todayFestival ? (hi ? todayFestival.nameHi : todayFestival.nameEn) : (hi ? "हिंदू व्रत एवं त्यौहार कैलेंडर" : "Festivals & Vrat Calendar")}
                   </h3>
-                  <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", marginBottom: 8 }}>
-                    {hi ? "एकादशी, प्रदोष, दीपावली, छठ, शिवरात्रि" : "Ekadashis, Pradosh, Diwali, Chhath & Fasts"}
+
+                  <div style={{ fontSize: 12.5, color: todayFestival ? "#34D399" : "rgba(241,231,208,0.85)", fontWeight: todayFestival ? 700 : 400, marginBottom: 8 }}>
+                    {todayFestival
+                      ? (hi ? `🪔 पूजा मुहूर्त: ${todayFestival.pujaMuhuratHi.split("(")[0]}` : `🪔 Muhurat: ${todayFestival.pujaMuhuratEn.split("(")[0]}`)
+                      : (hi ? "एकादशी, प्रदोष, दीपावली, छठ, शिवरात्रि" : "Ekadashis, Pradosh, Diwali, Chhath & Fasts")}
                   </div>
+
                   <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                    📿 {hi ? "पूजा मुहूर्त व पारण समय सहित" : "With Puja Muhurat & Fasting Rules"}
+                    {todayFestival ? (
+                      <span>🙏 {hi ? "व्रत नियम व पूजा विधि देखें" : "View Fasting Rules & Details"}</span>
+                    ) : (
+                      <span>📿 {hi ? "पूजा मुहूर्त व पारण समय सहित" : "With Puja Muhurat & Fasting Rules"}</span>
+                    )}
                   </div>
+
                   <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right" }}>
-                    {hi ? "कैलेंडर देखें →" : "View Calendar →"}
+                    {todayFestival ? (hi ? "आज का पर्व देखें →" : "View Today's Vrat →") : (hi ? "कैलेंडर देखें →" : "View Calendar →")}
                   </div>
                 </div>
               </div>
