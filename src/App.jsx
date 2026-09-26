@@ -3680,6 +3680,101 @@ export default function App() {
             width: 100%;
             justify-content: flex-start;
             padding: 4px 0 2px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .header-nav-pill {
+            flex-shrink: 0;
+          }
+        }
+
+        /* ── SMARTPHONE & MOBILE DEVICE OPTIMIZATIONS (iPhone & Android) ── */
+        @media (max-width: 600px) {
+          main {
+            padding: 14px 12px 100px !important;
+          }
+
+          /* Prevent iOS Safari unwanted auto-zoom when tapping inputs (requires font-size >= 16px) */
+          input[type="text"],
+          input[type="date"],
+          input[type="time"],
+          input[type="email"],
+          select,
+          textarea,
+          .birth-form-input {
+            font-size: 16px !important;
+          }
+
+          /* Compact Form Card with optimal edge breathing room */
+          .form-section-card {
+            padding: 20px 14px !important;
+            border-radius: 16px !important;
+            margin-bottom: 22px !important;
+          }
+
+          /* Header bar mobile spacing */
+          .top-header-bar {
+            padding: 6px 12px !important;
+          }
+
+          /* Horizontal Ephemeris Ticker */
+          .ephemeris-ticker-bar {
+            padding: 8px 12px !important;
+            gap: 8px !important;
+            font-size: 11.5px !important;
+          }
+
+          /* Floating Mobile Quick Jump Bar with iOS safe area inset support */
+          .sticky-jump-bar {
+            bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+            max-width: 96vw !important;
+            padding: 4px 8px !important;
+            gap: 4px !important;
+            -webkit-overflow-scrolling: touch;
+          }
+          .sticky-jump-btn {
+            padding: 5px 9px !important;
+            font-size: 11.5px !important;
+          }
+          .sticky-jump-collapsed-trigger {
+            bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+            right: 14px !important;
+            padding: 6px 12px !important;
+            font-size: 11.5px !important;
+          }
+
+          /* Touch momentum scrolling for all tables & tabs */
+          [style*="overflowX"],
+          [style*="overflow-x"],
+          .header-nav-strip,
+          .glass-card[style*="overflow"] {
+            -webkit-overflow-scrolling: touch !important;
+          }
+
+          /* Quick City Chips touch targets */
+          .city-chip {
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+          }
+
+          /* Gold CTA Button thumb-friendly tap target */
+          .gold-cta-btn {
+            padding: 13px 20px !important;
+            font-size: 15px !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .header-brand-title {
+            font-size: 14px !important;
+            letter-spacing: 0.6px !important;
+          }
+          #header-currency-select {
+            padding: 4px 6px !important;
+            font-size: 11px !important;
+          }
+          .header-nav-pill {
+            padding: 5px 10px !important;
+            font-size: 11.5px !important;
           }
         }
 
@@ -4007,7 +4102,7 @@ export default function App() {
               style={{ width: 34, height: 34, borderRadius: "50%", border: "1.5px solid rgba(245,158,11,0.7)", boxShadow: "0 0 10px rgba(245,158,11,0.4)", objectFit: "cover" }}
             />
             <div>
-              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.2, lineHeight: 1.1 }}>JYOTISH PARAMARSH</div>
+              <div className="header-brand-title" style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.2, lineHeight: 1.1 }}>JYOTISH PARAMARSH</div>
               <div style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.75)", letterSpacing: 0.3, fontWeight: 500 }} className="desktop-only-tagline">
                 {hi ? "वैदिक ज्योतिष एवं संपूर्ण समाधान" : "Vedic Astrology & Planetary Insights"}
               </div>
