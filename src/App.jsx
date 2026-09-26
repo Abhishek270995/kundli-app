@@ -79,6 +79,54 @@ const GENERIC_TABS = [
 
 const TABS = [...PERSONAL_TABS, ...GENERIC_TABS];
 
+const TAB_PILLARS = [
+  {
+    id: "core",
+    icon: "📊",
+    labelEn: "Core Kundli",
+    labelHi: "लग्न व ग्रह चक्र",
+    descEn: "Birth chart, planetary dignities, 12 houses & Shadbala",
+    descHi: "लग्न व वर्ग चक्र, नवग्रह, १२ भाव व षड्बल बल",
+    tabIds: ["chart", "overview", "planets", "houses", "shadbala"]
+  },
+  {
+    id: "predictions",
+    icon: "🔮",
+    labelEn: "Predictions & Timing",
+    labelHi: "भविष्यफल व दशा काल",
+    descEn: "Career timing, marriage windows, Vimshottari dasha & life areas",
+    descHi: "करियर काल, विवाह योग, महादशा चक्र व जीवन क्षेत्र",
+    tabIds: ["careerTiming", "marriageTiming", "predictions", "life"]
+  },
+  {
+    id: "remedies",
+    icon: "🛡️",
+    labelEn: "Remedies & Guidance",
+    labelHi: "उपाय व समस्या समाधान",
+    descEn: "Doshas, astrological problem remedies & certified gemstones",
+    descHi: "दोष व योग निदान, व्यावहारिक लाल किताब उपाय व रत्न",
+    tabIds: ["doshas", "lifeProblems", "store"]
+  },
+  {
+    id: "universal",
+    icon: "🌐",
+    labelEn: "Daily & Matchmaking",
+    labelHi: "दैनिक पंचांग व मिलान",
+    descEn: "Kundli Milan, live Panchang, Shubh Muhurat, Festivals & Horoscopes",
+    descHi: "३६ गुण मिलान, दैनिक पंचांग, मुहूर्त, व्रत पर्व व राशिफल",
+    tabIds: ["matchmaking", "panchang", "muhurat", "festivals", "daily", "forecast", "consult"]
+  },
+  {
+    id: "all",
+    icon: "✦",
+    labelEn: "All 19 Sections",
+    labelHi: "समस्त १९ अनुभाग",
+    descEn: "Complete Vedic astrological encyclopedia",
+    descHi: "संपूर्ण वैदिक ज्योतिष तालिका",
+    tabIds: ["chart", "overview", "planets", "houses", "doshas", "shadbala", "life", "careerTiming", "marriageTiming", "predictions", "lifeProblems", "store", "matchmaking", "panchang", "muhurat", "festivals", "daily", "forecast", "consult"]
+  }
+];
+
 const UI = {
   en: {
     title: "JYOTISH PARAMARSH",
@@ -1291,7 +1339,34 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
   const [tab, setTab] = useState("chart");
-  const [tabCategoryFilter, setTabCategoryFilter] = useState("all"); // 'all' | 'personal' | 'generic'
+  const [tabCategoryFilter, setTabCategoryFilter] = useState("core"); // 'core' | 'predictions' | 'remedies' | 'universal' | 'all'
+  const [houseDomainFilter, setHouseDomainFilter] = useState("all"); // 'all' | 'dharma' | 'artha' | 'kama' | 'moksha'
+  const [textScale, setTextScale] = useState(() => {
+    try {
+      return localStorage.getItem("jyotish_text_scale") || "normal";
+    } catch (e) {
+      return "normal";
+    }
+  });
+
+  const handleSetTextScale = (scale) => {
+    setTextScale(scale);
+    try {
+      localStorage.setItem("jyotish_text_scale", scale);
+    } catch (e) {}
+  };
+
+  const handleSelectTab = (tabId) => {
+    setTab(tabId);
+    const parentPillar = TAB_PILLARS.find(p => p.id !== "all" && p.tabIds.includes(tabId));
+    if (parentPillar && tabCategoryFilter !== "all") {
+      setTabCategoryFilter(parentPillar.id);
+    }
+    setTimeout(() => {
+      const el = document.getElementById("active-tab-viewport");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
   const [chartStyle, setChartStyle] = useState("north");
   const [selectedDivisionalChart, setSelectedDivisionalChart] = useState("D1");
   const [showBhavaCuspTable, setShowBhavaCuspTable] = useState(false);
@@ -1870,6 +1945,344 @@ export default function App() {
       }
     }
   };
+
+  // ── RENDER HELPER: FREE ASTROLOGICAL TOOLS SPOTLIGHT ────────────────
+  const renderSpotlightCards = () => (
+    <section className="no-print" style={{ marginBottom: 36, animation: "fadeInCard 0.4s ease" }}>
+      <div style={{ textAlign: "center", margin: "36px 0 22px" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "#F59E0B", fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 4 }}>
+          <span>✦</span> {hi ? "समस्त निःशुल्क वैदिक सेवाएं" : "VEDIC ASTROLOGY SUITE"}
+        </div>
+        <h2 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, margin: 0 }}>
+          {hi ? "दैनिक पंचांग, शुभ मुहूर्त एवं ज्योतिषीय उपकरण" : "Explore All Free Vedic Astrology Tools & Horoscopes"}
+        </h2>
+        <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13.5, marginTop: 4 }}>
+          {hi ? "बिना जन्म विवरण के भी दैनिक पंचांग, मुहूर्त, पर्व एवं राशिफल का निःशुल्क उपयोग करें" : "Instant access to live daily almanac, auspicious timings, festivals, and planetary guides"}
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {/* 1. Panchang Card */}
+        <div
+          onClick={() => setMainSection("panchang")}
+          style={{
+            background: "rgba(18, 12, 34, 0.92)",
+            border: todayFestival ? "1.5px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: todayFestival ? "0 6px 24px rgba(245, 158, 11, 0.28)" : "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_panchang.jpg" alt="Daily Hindu Panchang" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
+              {todayFestival && (
+                <span style={{ fontSize: 10.5, color: "#0F0A1E", fontWeight: 800, background: "#F59E0B", padding: "2px 8px", borderRadius: 8 }}>
+                  {hi ? "आज विशेष व्रत" : "Today's Vrat"}
+                </span>
+              )}
+              <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "लाइव पंचांग" : "Live Daily"}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Moon size={16} color="#F59E0B" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "दैनिक हिंदू पंचांग" : "Today's Hindu Panchang"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {todayFestival ? (
+                <span style={{ color: "#FDE68A", fontWeight: 700 }}>
+                  {hi ? todayFestival.nameHi : todayFestival.nameEn}
+                </span>
+              ) : (
+                `${panchangData.tithi} · ${panchangData.nakshatra}`
+              )}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              <span>{hi ? "अभिजीत:" : "Abhijit:"} {panchangData.muhurats.abhijit.split("-")[0]}</span>
+              <span style={{ color: "#F87171" }}>{hi ? "राहुकाल:" : "Rahu:"} {panchangData.inauspicious.rahuKaal.split("-")[0]}</span>
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "चौघड़िया व पंचांग देखें" : "View Full Panchang"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Shubh Muhurat Card */}
+        <div
+          onClick={() => setMainSection("muhurat")}
+          style={{
+            background: "rgba(18, 12, 34, 0.92)",
+            border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_muhurat.jpg" alt="Auspicious Shubh Muhurat" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10 }}>
+              <span style={{ fontSize: 10.5, color: "#FDE68A", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(245,158,11,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                2026–2027
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Clock size={16} color="#F59E0B" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी" : "Auspicious Muhurats"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {hi ? "विवाह, गृह प्रवेश, वाहन, संपत्ति व व्यापार" : "Weddings, Housewarming, Vehicles & Business"}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "#34D399", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              {hi ? "सर्वार्थ सिद्धि व अमृत योग सहित" : "Certified Vedic Muhurat Windows"}
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "शुभ मुहूर्त सूची देखें" : "View All Muhurats"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Festivals & Vrat Card */}
+        <div
+          onClick={() => setMainSection("festivals")}
+          style={{
+            background: todayFestival
+              ? "linear-gradient(135deg, rgba(62, 28, 20, 0.96), rgba(28, 14, 40, 0.98))"
+              : "rgba(18, 12, 34, 0.92)",
+            border: todayFestival ? "2px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: todayFestival ? "0 0 24px rgba(245, 158, 11, 0.35)" : "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_festivals.jpg" alt="Vedic Festivals & Vrats" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            {todayFestival && (
+              <div style={{ position: "absolute", top: 10, right: 10, background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 900, padding: "2px 8px", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
+                {hi ? "आज विशेष पर्व" : "TODAY'S FESTIVAL"}
+              </div>
+            )}
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Flame size={16} color="#F59E0B" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {todayFestival ? (hi ? todayFestival.nameHi : todayFestival.nameEn) : (hi ? "हिंदू व्रत एवं त्यौहार कैलेंडर" : "Festivals & Vrat Calendar")}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: todayFestival ? "#34D399" : "rgba(241,231,208,0.85)", fontWeight: todayFestival ? 700 : 400, margin: "6px 0 10px" }}>
+              {todayFestival
+                ? (hi ? `पूजा मुहूर्त: ${todayFestival.pujaMuhuratHi.split("(")[0]}` : `Muhurat: ${todayFestival.pujaMuhuratEn.split("(")[0]}`)
+                : (hi ? "एकादशी, प्रदोष, दीपावली, छठ, शिवरात्रि" : "Ekadashis, Pradosh, Diwali, Chhath & Fasts")}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              {todayFestival ? (
+                <span>{hi ? "व्रत नियम व पूजा विधि देखें" : "View Fasting Rules & Details"}</span>
+              ) : (
+                <span>{hi ? "पूजा मुहूर्त व पारण समय सहित" : "With Puja Muhurat & Fasting Rules"}</span>
+              )}
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{todayFestival ? (hi ? "आज का पर्व देखें" : "View Today's Vrat") : (hi ? "कैलेंडर देखें" : "View Calendar")}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Daily Horoscope Card */}
+        <div
+          onClick={() => setMainSection("daily")}
+          style={{
+            background: "rgba(18, 12, 34, 0.92)",
+            border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_horoscope.jpg" alt="12 Zodiac Daily Horoscope" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10 }}>
+              <span style={{ fontSize: 10.5, color: "#FBBF24", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(251,191,36,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "१२ राशियां" : "12 Signs"}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Sun size={16} color="#FBBF24" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "दैनिक राशिफल (Rashiphal)" : "Daily Horoscope"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {hi ? "करियर, स्वास्थ्य, प्रेम व वित्तीय मार्गदर्शन" : "Career, Health, Love & Financial Guidance"}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "#34D399", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              {hi ? "नक्षत्र व गोचर आधारित विश्लेषण" : "Accurate Planetary Transit Synthesis"}
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "अपनी राशि चुनें" : "Check Your Rashi"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Kundli Milan Card */}
+        <div
+          onClick={() => {
+            setMainSection("matchmaking");
+            if (result) {
+              setTab("matchmaking");
+            }
+          }}
+          style={{
+            background: "rgba(18, 12, 34, 0.92)",
+            border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_matchmaking.jpg" alt="Vedic Wedding Vivaha Matchmaking" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10 }}>
+              <span style={{ fontSize: 10.5, color: "#F472B6", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(244,114,182,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "३६ गुण मिलान" : "36 Gunas"}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Heart size={16} color="#F472B6" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "कुंडली मिलान (Gun Milan)" : "Kundli Matchmaking"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {hi ? "अष्टकूट मिलान, नाड़ी दोष व मांगलिक परीक्षण" : "Ashtakoot Compatibility, Nadi & Manglik"}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              {hi ? "दांपत्य सुख एवं दीर्घायु मिलान" : "Marital Longevity & Soulmate Harmony"}
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "गुण मिलान करें" : "Calculate Compatibility"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+
+        {/* 6. Gemstones & Remedies Card */}
+        <div
+          onClick={() => {
+            setTab("store");
+            if (!result) {
+              const el = document.getElementById("birth-name");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
+          style={{
+            background: "rgba(18, 12, 34, 0.92)",
+            border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
+            <img src="/images/feature_gemstones.jpg" alt="Vedic Gemstones and Rudraksha" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10 }}>
+              <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "प्रमाणित रत्न" : "Certified Gems"}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <Icons.Gem size={16} color="#34D399" />
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "रत्न एवं रुद्राक्ष निर्धारण" : "Gemstones & Rudraksha"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {hi ? "लग्न कारक रत्न, रुद्राक्ष एवं वैदिक उपाय" : "Lagna Lord Gemstones & Sacred Rudraksha"}
+            </div>
+
+            <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              {hi ? "१००% प्राकृतिक एवं दोषरहित चयन" : "100% Natural Astrological Selection"}
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "उपाय व रत्न देखें" : "View Prescriptions"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 
   // ── RENDER HELPER: SEEKER TESTIMONIALS ────────────────────────────
   const renderTestimonialsSection = () => (
@@ -2871,7 +3284,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0B0819", color: "#F1E7D0", fontFamily: hi ? "'Noto Sans Devanagari', 'Outfit', sans-serif" : "'Outfit', sans-serif", position: "relative", overflowX: "hidden" }}>
+    <div className={`app-root text-scale-${textScale}`} style={{ minHeight: "100vh", background: "#0B0819", color: "#F1E7D0", fontFamily: hi ? "'Noto Sans Devanagari', 'Outfit', sans-serif" : "'Outfit', sans-serif", position: "relative", overflowX: "hidden" }}>
       <style>{`
         @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.9); } 100% { opacity: 0.9; transform: scale(1.2); } }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -2884,6 +3297,18 @@ export default function App() {
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.4); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+        :root {
+          --text-scale-factor: 1;
+        }
+
+        .text-scale-large {
+          --text-scale-factor: 1.15;
+        }
+
+        .text-scale-xl {
+          --text-scale-factor: 1.28;
+        }
 
         .glass-card {
           background: linear-gradient(135deg, rgba(26, 18, 48, 0.7) 0%, rgba(15, 10, 32, 0.85) 100%);
@@ -2965,6 +3390,142 @@ export default function App() {
           transform: translateY(-3px);
           border-color: rgba(245, 158, 11, 0.55) !important;
           box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18) !important;
+        }
+
+        /* ── LAPTOP & DESKTOP READABILITY OVERHAUL ── */
+        @media (min-width: 900px) {
+          main {
+            max-width: 1140px !important;
+            width: 94% !important;
+          }
+
+          /* Fluid & Comfortable Font Scaling */
+          [style*="font-size: 10px"], [style*="font-size:10px"], [style*="fontSize: 10"] {
+            font-size: calc(12.5px * var(--text-scale-factor, 1)) !important;
+          }
+          [style*="font-size: 10.5px"], [style*="font-size:10.5px"] {
+            font-size: calc(13px * var(--text-scale-factor, 1)) !important;
+          }
+          [style*="font-size: 11px"], [style*="font-size:11px"], [style*="fontSize: 11"] {
+            font-size: calc(13.5px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.55 !important;
+          }
+          [style*="font-size: 11.5px"], [style*="font-size:11.5px"] {
+            font-size: calc(14px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.6 !important;
+          }
+          [style*="font-size: 12px"], [style*="font-size:12px"], [style*="fontSize: 12"] {
+            font-size: calc(14.5px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.6 !important;
+          }
+          [style*="font-size: 12.5px"], [style*="font-size:12.5px"] {
+            font-size: calc(15px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.65 !important;
+          }
+          [style*="font-size: 13px"], [style*="font-size:13px"], [style*="fontSize: 13"] {
+            font-size: calc(15.5px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.65 !important;
+          }
+          [style*="font-size: 13.5px"], [style*="font-size:13.5px"] {
+            font-size: calc(16px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.65 !important;
+          }
+          [style*="font-size: 14px"], [style*="font-size:14px"], [style*="fontSize: 14"] {
+            font-size: calc(16.5px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.7 !important;
+          }
+          [style*="font-size: 14.5px"], [style*="font-size:14.5px"] {
+            font-size: calc(17px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.7 !important;
+          }
+          [style*="font-size: 15px"], [style*="font-size:15px"], [style*="fontSize: 15"] {
+            font-size: calc(17.5px * var(--text-scale-factor, 1)) !important;
+            line-height: 1.7 !important;
+          }
+          [style*="font-size: 16px"], [style*="font-size:16px"], [style*="fontSize: 16"] {
+            font-size: calc(18px * var(--text-scale-factor, 1)) !important;
+          }
+          [style*="font-size: 16.5px"], [style*="font-size:16.5px"] {
+            font-size: calc(18.5px * var(--text-scale-factor, 1)) !important;
+          }
+          [style*="font-size: 17px"], [style*="font-size:17px"] {
+            font-size: calc(19.5px * var(--text-scale-factor, 1)) !important;
+          }
+          [style*="font-size: 18px"], [style*="font-size:18px"] {
+            font-size: calc(21px * var(--text-scale-factor, 1)) !important;
+          }
+
+          table th, table td {
+            padding: 10px 14px !important;
+            font-size: calc(14.5px * var(--text-scale-factor, 1)) !important;
+          }
+
+          input, select, textarea {
+            font-size: 15px !important;
+            padding: 12px 16px !important;
+          }
+
+          .glass-card p {
+            line-height: 1.7 !important;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          main {
+            max-width: 1180px !important;
+          }
+        }
+
+        /* ── STICKY QUICK JUMP NAVIGATION BAR ── */
+        .sticky-jump-bar {
+          position: fixed;
+          bottom: 22px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 95;
+          background: rgba(18, 12, 38, 0.94);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          border: 1.5px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.25);
+          border-radius: 40px;
+          padding: 6px 14px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          max-width: 95vw;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .sticky-jump-bar::-webkit-scrollbar {
+          display: none;
+        }
+
+        .sticky-jump-btn {
+          background: transparent;
+          border: 1px solid transparent;
+          color: rgba(241, 231, 208, 0.85);
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          transition: all 0.2s ease;
+        }
+        .sticky-jump-btn:hover {
+          background: rgba(245, 158, 11, 0.15);
+          color: #FFF;
+          border-color: rgba(245, 158, 11, 0.4);
+        }
+        .sticky-jump-btn.active {
+          background: linear-gradient(135deg, #F59E0B, #D97706);
+          color: #0B0819;
+          font-weight: 800;
+          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
         }
 
         .print-only-report {
@@ -3168,7 +3729,7 @@ export default function App() {
 
       {/* Top Header Bar */}
       <header className="no-print" style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(11, 8, 25, 0.88)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(212, 175, 55, 0.2)", padding: "14px 24px" }}>
-        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ maxWidth: 1140, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div
             onClick={handleSecretTrigger}
             style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none" }}
@@ -3207,6 +3768,80 @@ export default function App() {
                 <span>👑</span> VIP Admin
               </div>
             )}
+
+            {/* Desktop & Laptop Text Size Accessibility Switcher */}
+            <div
+              className="no-print"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                background: "rgba(26,18,48,0.95)",
+                border: "1px solid rgba(212,175,55,0.4)",
+                borderRadius: 20,
+                padding: "3px 6px",
+                gap: 3
+              }}
+              title={hi ? "टेक्स्ट रीडेबिलिटी आकार चुनें" : "Adjust Reading Text Size for Desktop/Laptop"}
+            >
+              <span style={{ fontSize: 11, color: "#FDE68A", padding: "0 4px", fontWeight: 700 }}>
+                Aa
+              </span>
+              <button
+                type="button"
+                onClick={() => handleSetTextScale("normal")}
+                style={{
+                  background: textScale === "normal" ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                  color: textScale === "normal" ? "#0F0A1E" : "#E2D9C8",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "4px 8px",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
+                title="Standard Text Size"
+              >
+                A
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetTextScale("large")}
+                style={{
+                  background: textScale === "large" ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                  color: textScale === "large" ? "#0F0A1E" : "#E2D9C8",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "4px 8px",
+                  fontSize: 13.5,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
+                title="Large Text Size (+15%)"
+              >
+                A+
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSetTextScale("xl")}
+                style={{
+                  background: textScale === "xl" ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                  color: textScale === "xl" ? "#0F0A1E" : "#E2D9C8",
+                  border: "none",
+                  borderRadius: 14,
+                  padding: "4px 8px",
+                  fontSize: 15,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
+                title="Extra Large Text Size (+28%)"
+              >
+                A++
+              </button>
+            </div>
+
             {/* Currency Selector */}
             <select
               id="header-currency-select"
@@ -3335,6 +3970,7 @@ export default function App() {
         <nav className="no-print" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10, marginBottom: 28 }}>
           {[
             { id: "kundli", icon: "🔯", label: hi ? "जन्म कुंडली" : "Natal Kundli" },
+            { id: "matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
             { id: "panchang", icon: "🕉️", label: hi ? "दैनिक पंचांग" : "Today's Panchang" },
             { id: "muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Shubh Muhurat" },
             { id: "festivals", icon: "🪔", label: hi ? "व्रत व त्यौहार" : "Festivals & Vrat" },
@@ -3346,7 +3982,7 @@ export default function App() {
                 key={feat.id}
                 onClick={() => {
                   setMainSection(feat.id);
-                  if (result && ["chart", "panchang", "muhurat", "festivals", "daily"].includes(feat.id)) {
+                  if (result && ["chart", "panchang", "muhurat", "festivals", "daily", "matchmaking"].includes(feat.id)) {
                     setTab(feat.id === "kundli" ? "chart" : feat.id);
                   }
                 }}
@@ -3374,6 +4010,65 @@ export default function App() {
             );
           })}
         </nav>
+
+        {/* ── STANDALONE MATCHMAKING VIEW ── */}
+        {mainSection === "matchmaking" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <button
+                onClick={() => setMainSection("kundli")}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
+              </button>
+            </div>
+            {result ? (
+              (() => {
+                if (tab !== "matchmaking") setTab("matchmaking");
+                return null;
+              })()
+            ) : (
+              <div className="glass-card" style={{ padding: "34px 26px", textAlign: "center", marginBottom: 24, borderRadius: 18 }}>
+                <div style={{ fontSize: 40, marginBottom: 12 }}>💍 🔯</div>
+                <h2 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 800, margin: "0 0 8px" }}>
+                  {hi ? "वैदिक अष्टकूट ३६ गुण मिलान एवं मांगलिक परीक्षण" : "Ashtakoot 36 Gunas Vedic Kundli Milan"}
+                </h2>
+                <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 14, maxWidth: 640, margin: "0 auto 24px", lineHeight: 1.6 }}>
+                  {hi
+                    ? "सटीक गुण मिलान एवं मांगलिक परीक्षण के लिए दोनों जीवनसाथियों के जन्म विवरण की गणना की जाती है। १-क्लिक में तुरंत नमूना मिलान जांचें या अपना जन्म विवरण दर्ज करें:"
+                    : "For high-precision 36 Gunas compatibility and Manglik cancellation checks, the primary birth chart is analyzed with your partner's chart. Test with a 1-click sample demo or enter your birth details:"}
+                </p>
+                <div style={{ display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => {
+                      setMainSection("kundli");
+                      handleFillSample();
+                    }}
+                    className="gold-cta-btn"
+                    style={{ padding: "12px 24px", fontSize: 14 }}
+                  >
+                    ⚡ {hi ? "नमूना चार्ट से मिलान जांचें (1-Click Demo)" : "Try 1-Click Match Demo"}
+                  </button>
+                  <button
+                    onClick={() => setMainSection("kundli")}
+                    style={{
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(212,175,55,0.35)",
+                      color: "#FDE68A",
+                      padding: "12px 22px",
+                      borderRadius: 24,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    📝 {hi ? "जन्म विवरण दर्ज करें" : "Enter Birth Details"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── STANDALONE PANCHANG VIEW ── */}
         {mainSection === "panchang" && (
@@ -3543,398 +4238,7 @@ export default function App() {
               ))}
             </div>
 
-            {/* Standalone Feature Spotlight Cards with Realistic Photographic Imagery */}
-            {!result && (
-              <div className="no-print" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 30 }}>
-                {/* 1. Panchang Card */}
-                <div
-                  onClick={() => setMainSection("panchang")}
-                  style={{
-                    background: "rgba(18, 12, 34, 0.92)",
-                    border: todayFestival ? "1.5px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: todayFestival ? "0 6px 24px rgba(245, 158, 11, 0.28)" : "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_panchang.jpg" alt="Daily Hindu Panchang" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
-                      {todayFestival && (
-                        <span style={{ fontSize: 10.5, color: "#0F0A1E", fontWeight: 800, background: "#F59E0B", padding: "2px 8px", borderRadius: 8 }}>
-                          {hi ? "आज विशेष व्रत" : "Today's Vrat"}
-                        </span>
-                      )}
-                      <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
-                        {hi ? "लाइव पंचांग" : "Live Daily"}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Moon size={16} color="#F59E0B" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {hi ? "दैनिक हिंदू पंचांग" : "Today's Hindu Panchang"}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
-                      {todayFestival ? (
-                        <span style={{ color: "#FDE68A", fontWeight: 700 }}>
-                          {hi ? todayFestival.nameHi : todayFestival.nameEn}
-                        </span>
-                      ) : (
-                        `${panchangData.tithi} · ${panchangData.nakshatra}`
-                      )}
-                    </div>
-
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      <span>{hi ? "अभिजीत:" : "Abhijit:"} {panchangData.muhurats.abhijit.split("-")[0]}</span>
-                      <span style={{ color: "#F87171" }}>{hi ? "राहुकाल:" : "Rahu:"} {panchangData.inauspicious.rahuKaal.split("-")[0]}</span>
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{hi ? "चौघड़िया व पंचांग देखें" : "View Full Panchang"}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Shubh Muhurat Card */}
-                <div
-                  onClick={() => setMainSection("muhurat")}
-                  style={{
-                    background: "rgba(18, 12, 34, 0.92)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_muhurat.jpg" alt="Auspicious Shubh Muhurat" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10 }}>
-                      <span style={{ fontSize: 10.5, color: "#FDE68A", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(245,158,11,0.4)", padding: "2px 8px", borderRadius: 8 }}>
-                        2026–2027
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Clock size={16} color="#F59E0B" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी" : "Auspicious Muhurats"}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
-                      {hi ? "विवाह, गृह प्रवेश, वाहन, संपत्ति व व्यापार" : "Weddings, Housewarming, Vehicles & Business"}
-                    </div>
-
-                    <div style={{ fontSize: 11.5, color: "#34D399", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      {hi ? "सर्वार्थ सिद्धि व अमृत योग सहित" : "Certified Vedic Muhurat Windows"}
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{hi ? "शुभ मुहूर्त सूची देखें" : "View All Muhurats"}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Festivals & Vrat Card */}
-                <div
-                  onClick={() => setMainSection("festivals")}
-                  style={{
-                    background: todayFestival
-                      ? "linear-gradient(135deg, rgba(62, 28, 20, 0.96), rgba(28, 14, 40, 0.98))"
-                      : "rgba(18, 12, 34, 0.92)",
-                    border: todayFestival ? "2px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: todayFestival ? "0 0 24px rgba(245, 158, 11, 0.35)" : "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_festivals.jpg" alt="Vedic Festivals & Vrats" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    {todayFestival && (
-                      <div style={{ position: "absolute", top: 10, right: 10, background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 900, padding: "2px 8px", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
-                        {hi ? "आज विशेष पर्व" : "TODAY'S FESTIVAL"}
-                      </div>
-                    )}
-                  </div>
-
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Flame size={16} color="#F59E0B" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {todayFestival ? (hi ? todayFestival.nameHi : todayFestival.nameEn) : (hi ? "हिंदू व्रत एवं त्यौहार कैलेंडर" : "Festivals & Vrat Calendar")}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: todayFestival ? "#34D399" : "rgba(241,231,208,0.85)", fontWeight: todayFestival ? 700 : 400, margin: "6px 0 10px" }}>
-                      {todayFestival
-                        ? (hi ? `पूजा मुहूर्त: ${todayFestival.pujaMuhuratHi.split("(")[0]}` : `Muhurat: ${todayFestival.pujaMuhuratEn.split("(")[0]}`)
-                        : (hi ? "एकादशी, प्रदोष, दीपावली, छठ, शिवरात्रि" : "Ekadashis, Pradosh, Diwali, Chhath & Fasts")}
-                    </div>
-
-                    <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      {todayFestival ? (
-                        <span>{hi ? "व्रत नियम व पूजा विधि देखें" : "View Fasting Rules & Details"}</span>
-                      ) : (
-                        <span>{hi ? "पूजा मुहूर्त व पारण समय सहित" : "With Puja Muhurat & Fasting Rules"}</span>
-                      )}
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{todayFestival ? (hi ? "आज का पर्व देखें" : "View Today's Vrat") : (hi ? "कैलेंडर देखें" : "View Calendar")}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. Daily Horoscope Card */}
-                <div
-                  onClick={() => setMainSection("daily")}
-                  style={{
-                    background: "rgba(18, 12, 34, 0.92)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_horoscope.jpg" alt="12 Zodiac Daily Horoscope" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10 }}>
-                      <span style={{ fontSize: 10.5, color: "#FBBF24", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(251,191,36,0.4)", padding: "2px 8px", borderRadius: 8 }}>
-                        {hi ? "१२ राशियां" : "12 Signs"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Sun size={16} color="#FBBF24" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {hi ? "दैनिक राशिफल (Rashiphal)" : "Daily Horoscope"}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
-                      {hi ? "करियर, स्वास्थ्य, प्रेम व वित्तीय मार्गदर्शन" : "Career, Health, Love & Financial Guidance"}
-                    </div>
-
-                    <div style={{ fontSize: 11.5, color: "#34D399", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      {hi ? "नक्षत्र व गोचर आधारित विश्लेषण" : "Accurate Planetary Transit Synthesis"}
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{hi ? "अपनी राशि चुनें" : "Check Your Rashi"}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. Kundli Milan Card */}
-                <div
-                  onClick={() => {
-                    setTab("matchmaking");
-                    if (!result) {
-                      const el = document.getElementById("birth-name");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  style={{
-                    background: "rgba(18, 12, 34, 0.92)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_matchmaking.jpg" alt="Vedic Wedding Vivaha Matchmaking" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10 }}>
-                      <span style={{ fontSize: 10.5, color: "#F472B6", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(244,114,182,0.4)", padding: "2px 8px", borderRadius: 8 }}>
-                        {hi ? "३६ गुण मिलान" : "36 Gunas"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Heart size={16} color="#F472B6" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {hi ? "कुंडली मिलान (Gun Milan)" : "Kundli Matchmaking"}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
-                      {hi ? "अष्टकूट मिलान, नाड़ी दोष व मांगलिक परीक्षण" : "Ashtakoot Compatibility, Nadi & Manglik"}
-                    </div>
-
-                    <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      {hi ? "दांपत्य सुख एवं दीर्घायु मिलान" : "Marital Longevity & Soulmate Harmony"}
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{hi ? "गुण मिलान करें" : "Calculate Compatibility"}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* 6. Gemstones & Remedies Card */}
-                <div
-                  onClick={() => {
-                    setTab("store");
-                    if (!result) {
-                      const el = document.getElementById("birth-name");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }}
-                  style={{
-                    background: "rgba(18, 12, 34, 0.92)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 18px rgba(0,0,0,0.4)",
-                    transition: "transform 0.2s ease, border-color 0.2s ease"
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                >
-                  <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-                    <img src="/images/feature_gemstones.jpg" alt="Vedic Gemstones and Rudraksha" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10 }}>
-                      <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
-                        {hi ? "प्रमाणित रत्न" : "Certified Gems"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ padding: "14px 18px 18px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <Icons.Gem size={16} color="#34D399" />
-                      <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
-                        {hi ? "रत्न एवं रुद्राक्ष निर्धारण" : "Gemstones & Rudraksha"}
-                      </h3>
-                    </div>
-
-                    <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
-                      {hi ? "लग्न कारक रत्न, रुद्राक्ष एवं वैदिक उपाय" : "Lagna Lord Gemstones & Sacred Rudraksha"}
-                    </div>
-
-                    <div style={{ fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
-                      {hi ? "१००% प्राकृतिक एवं दोषरहित चयन" : "100% Natural Astrological Selection"}
-                    </div>
-
-                    <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
-                      <span>{hi ? "उपाय व रत्न देखें" : "View Prescriptions"}</span>
-                      <Icons.ArrowRight size={13} color="#F59E0B" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Free Initiative & Dakshina Spotlight Announcement Banner */}
-            {!result && (
-              <div
-                className="glass-card no-print"
-                style={{
-                  padding: "18px 24px",
-                  marginBottom: 24,
-                  background: "linear-gradient(135deg, rgba(38, 22, 68, 0.92), rgba(18, 11, 40, 0.96))",
-                  border: "1.5px solid rgba(245, 158, 11, 0.55)",
-                  borderRadius: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  flexWrap: "wrap",
-                  gap: 16,
-                  boxShadow: "0 6px 24px rgba(245, 158, 11, 0.15)"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 260 }}>
-                  <span style={{ fontSize: 32 }}>🪷</span>
-                  <div>
-                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 11.5, fontWeight: 800, background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.35)", padding: "2px 10px", borderRadius: 12, marginBottom: 4 }}>
-                      <span>✓</span> {hi ? "100% निःशुल्क सेवा पहल · सर्वजन कल्याण" : "100% FREE INITIATIVE · FOR EVERY SEEKER"}
-                    </div>
-                    <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
-                      {hi
-                        ? "समस्त गणनाएं, भविष्यवाणियां व 50-पेज महा-कुंडली रिपोर्ट पूर्णतः निःशुल्क हैं"
-                        : "All Vedic Forecasts & Deluxe 50-Page Kundli Dossiers Are 100% Free"}
-                    </div>
-                    <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, marginTop: 2, lineHeight: 1.5 }}>
-                      {hi
-                        ? "सनातन धर्म की पावन भावना में वैदिक ज्ञान सब के लिए। सर्वर व शोध सहयोग हेतु स्वेच्छानुसार 'श्रद्धा दक्षिणा' अर्पित कर सकते हैं।"
-                        : "Pure Vedic guidance for all. You may offer a voluntary Dakshina to support high-precision servers and continuous research."}
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveCheckout({
-                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                    priceKey: "dakshina",
-                    price: PRODUCT_PRICES.dakshina[currency],
-                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                    icon: "🪷",
-                    isDakshina: true
-                  })}
-                  style={{
-                    background: "linear-gradient(90deg, #F59E0B, #D97706)",
-                    border: "none",
-                    color: "#0F0A1E",
-                    padding: "11px 22px",
-                    borderRadius: 22,
-                    fontSize: 13.5,
-                    fontWeight: 800,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 7,
-                    boxShadow: "0 4px 14px rgba(245,158,11,0.35)",
-                    whiteSpace: "nowrap"
-                  }}
-                >
-                  <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
-                </button>
-              </div>
-            )}
 
             {/* Input Form Card */}
             <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
@@ -4197,6 +4501,77 @@ export default function App() {
               )}
             </div>
 
+            {/* Free Initiative & Dakshina Spotlight Announcement Banner */}
+            {!result && (
+              <div
+                className="glass-card no-print"
+                style={{
+                  padding: "18px 24px",
+                  marginBottom: 24,
+                  background: "linear-gradient(135deg, rgba(38, 22, 68, 0.92), rgba(18, 11, 40, 0.96))",
+                  border: "1.5px solid rgba(245, 158, 11, 0.55)",
+                  borderRadius: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  flexWrap: "wrap",
+                  gap: 16,
+                  boxShadow: "0 6px 24px rgba(245, 158, 11, 0.15)"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 260 }}>
+                  <span style={{ fontSize: 32 }}>🪷</span>
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#34D399", fontSize: 11.5, fontWeight: 800, background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.35)", padding: "2px 10px", borderRadius: 12, marginBottom: 4 }}>
+                      <span>✓</span> {hi ? "100% निःशुल्क सेवा पहल · सर्वजन कल्याण" : "100% FREE INITIATIVE · FOR EVERY SEEKER"}
+                    </div>
+                    <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
+                      {hi
+                        ? "समस्त गणनाएं, भविष्यवाणियां व 50-पेज महा-कुंडली रिपोर्ट पूर्णतः निःशुल्क हैं"
+                        : "All Vedic Forecasts & Deluxe 50-Page Kundli Dossiers Are 100% Free"}
+                    </div>
+                    <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, marginTop: 2, lineHeight: 1.5 }}>
+                      {hi
+                        ? "सनातन धर्म की पावन भावना में वैदिक ज्ञान सब के लिए। सर्वर व शोध सहयोग हेतु स्वेच्छानुसार 'श्रद्धा दक्षिणा' अर्पित कर सकते हैं।"
+                        : "Pure Vedic guidance for all. You may offer a voluntary Dakshina to support high-precision servers and continuous research."}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveCheckout({
+                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+                    priceKey: "dakshina",
+                    price: PRODUCT_PRICES.dakshina[currency],
+                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+                    icon: "🪷",
+                    isDakshina: true
+                  })}
+                  style={{
+                    background: "linear-gradient(90deg, #F59E0B, #D97706)",
+                    border: "none",
+                    color: "#0F0A1E",
+                    padding: "11px 22px",
+                    borderRadius: 22,
+                    fontSize: 13.5,
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 7,
+                    boxShadow: "0 4px 14px rgba(245,158,11,0.35)",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
+                </button>
+              </div>
+            )}
+
+            {/* Standalone Feature Spotlight Cards with Realistic Photographic Imagery */}
+            {!result && renderSpotlightCards()}
+
             {/* Seeker Testimonials & Verified Reviews */}
             {!result && renderTestimonialsSection()}
 
@@ -4258,6 +4633,153 @@ export default function App() {
               </div>
             </div>
 
+            {/* ── AT-A-GLANCE EXECUTIVE COSMIC SUMMARY (Progressive Disclosure) ── */}
+            <div
+              className="glass-card no-print"
+              style={{
+                padding: "26px 28px",
+                marginBottom: 24,
+                background: "linear-gradient(135deg, rgba(32, 19, 58, 0.95), rgba(15, 10, 32, 0.98))",
+                border: "1.5px solid rgba(245, 158, 11, 0.5)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)"
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 18, borderBottom: "1px solid rgba(245, 158, 11, 0.2)", paddingBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 24 }}>⚡</span>
+                  <div>
+                    <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>
+                      {hi ? "सिंहावलोकन व प्रमुख जीवन सूत्र (At-a-Glance Cosmic Snapshot)" : "At-a-Glance Executive Cosmic Snapshot"}
+                    </h3>
+                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, margin: "2px 0 0" }}>
+                      {hi ? "आपके संपूर्ण जीवन, सक्रिय दशा व मुख्य सामर्थ्य का त्वरित सार" : "Executive takeaways of your soul blueprint, active planetary era & primary life strengths"}
+                    </p>
+                  </div>
+                </div>
+                <span style={{ fontSize: 12, padding: "4px 12px", borderRadius: 20, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", fontWeight: 700 }}>
+                  {hi ? "त्वरित मार्गदर्शन" : "Instant Summary"}
+                </span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+                {/* Card 1: Core Identity & Temperament */}
+                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>👑</span>
+                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+                        {hi ? "आत्मबल व स्वभाव" : "Soul Nature & Temperament"}
+                      </span>
+                    </div>
+                    <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                      {hi
+                        ? `आपका लग्न ${result.lagna} एवं चंद्र राशि ${result.rashi} है। नक्षत्र ${result.nakshatra} आपको गहन अंतर्दृष्टि और स्वभाव में दृढ़ संकल्प प्रदान करता है।`
+                        : `Ascendant in ${result.lagna} with Moon in ${result.rashi}. ${result.nakshatra} Nakshatra confers strategic intuition, dignified perseverance, and enduring resolve.`}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectTab("chart")}
+                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
+                  >
+                    <span>{hi ? "लग्न चक्र देखें" : "Explore Birth Chart"}</span> →
+                  </button>
+                </div>
+
+                {/* Card 2: Current Active Planetary Phase */}
+                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>⏳</span>
+                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+                        {hi ? "सक्रिय महादशा काल" : "Current Active Era"}
+                      </span>
+                    </div>
+                    <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+                      {result.dashaDetails?.activeMahadasha
+                        ? (hi
+                            ? `वर्तमान में ${result.dashaDetails.activeMahadasha.lord} की महादशा (${result.dashaDetails.activeMahadasha.startYear}–${result.dashaDetails.activeMahadasha.endYear}) चल रही है। यह काल आपके कर्म व आत्मोन्नति को दिशा दे रहा है।`
+                            : `Currently navigating ${result.dashaDetails.activeMahadasha.lord} Mahadasha (${result.dashaDetails.activeMahadasha.startYear}–${result.dashaDetails.activeMahadasha.endYear}), catalyzing transformative personal and professional milestones.`)
+                        : (hi
+                            ? `आपकी विंशोत्तरी दशा का वर्तमान चरण महत्वपूर्ण जीवन परिवर्तनों का संकेत दे रहा है।`
+                            : `Your active Vimshottari planetary era is driving key personal breakthroughs.`)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectTab("predictions")}
+                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
+                  >
+                    <span>{hi ? "दशा समय-सारिणी देखें" : "View Dasha Timeline"}</span> →
+                  </button>
+                </div>
+
+                {/* Card 3: Top Planetary Yogas */}
+                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 20 }}>🌟</span>
+                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+                        {hi ? "प्रमुख शुभ योग" : "Key Auspicious Formations"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "6px 0 8px" }}>
+                      {(result.detectedYogas || ["Gajakesari Yoga", "Raj Yoga", "Budhaditya Yoga"]).slice(0, 2).map((y, yIdx) => {
+                        const yName = typeof y === "string" ? y.split(":")[0].replace(/[🌟⚡✨💰🔥]/g, "").trim() : "Raj Yoga";
+                        return (
+                          <span key={yIdx} style={{ fontSize: 11.5, background: "rgba(245, 158, 11, 0.18)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "3px 8px", borderRadius: 8, fontWeight: 700 }}>
+                            ✨ {yName}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
+                      {hi ? "कुंडली में केंद्र व त्रिकोण के शुभ संबंध निरंतर सम्मान व आर्थिक सुरक्षा प्रदान करते हैं।" : "Fortunate Kendra-Trikona harmonies protect reputation and foster steady prosperity."}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectTab("doshas")}
+                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
+                  >
+                    <span>{hi ? "योग व दोष विश्लेषण" : "Explore All Yogas"}</span> →
+                  </button>
+                </div>
+
+                {/* Card 4: Recommended Focus Areas */}
+                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>🧭</span>
+                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+                        {hi ? "अनुशंसित प्राथमिकताएं" : "Recommended Focus"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <button
+                        onClick={() => handleSelectTab("careerTiming")}
+                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                      >
+                        <span>💼 {hi ? "करियर व पदोन्नति खिड़की" : "Career & Job Promotion"}</span>
+                        <span style={{ color: "#F59E0B" }}>→</span>
+                      </button>
+                      <button
+                        onClick={() => handleSelectTab("marriageTiming")}
+                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                      >
+                        <span>💍 {hi ? "विवाह काल व जीवनसाथी" : "Marriage & Soulmate Window"}</span>
+                        <span style={{ color: "#F59E0B" }}>→</span>
+                      </button>
+                      <button
+                        onClick={() => handleSelectTab("lifeProblems")}
+                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                      >
+                        <span>🛡️ {hi ? "वैदिक उपाय व रत्न सुझाव" : "Remedies & Gemstones"}</span>
+                        <span style={{ color: "#F59E0B" }}>→</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Dedicated Grand Emotional Dakshina Card (Highest Visibility) */}
             {renderDakshinaCard(false)}
 
@@ -4299,208 +4821,185 @@ export default function App() {
               </div>
             </div>
 
-            {/* ── REORGANIZED TAB NAVIGATION (Grouped by Context: Individual vs Universal) ── */}
-            <div className="tab-bar-nav no-print" style={{ marginBottom: 30 }}>
+            {/* ── STREAMLINED 4-PILLAR ASTROLOGICAL NAVIGATION (Prevents Overwhelm) ── */}
+            <div className="tab-bar-nav no-print" style={{ marginBottom: 28 }}>
               
-              {/* Category Filter Pills */}
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
-                <button
-                  type="button"
-                  onClick={() => setTabCategoryFilter("all")}
-                  style={{
-                    padding: "7px 18px",
-                    borderRadius: 22,
-                    fontSize: 13,
-                    fontWeight: tabCategoryFilter === "all" ? 800 : 600,
-                    cursor: "pointer",
-                    background: tabCategoryFilter === "all" ? "rgba(245, 158, 11, 0.25)" : "rgba(26, 18, 48, 0.6)",
-                    border: tabCategoryFilter === "all" ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
-                    color: tabCategoryFilter === "all" ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
-                    boxShadow: tabCategoryFilter === "all" ? "0 0 12px rgba(245, 158, 11, 0.3)" : "none",
-                    transition: "all 0.2s ease"
-                  }}
-                >
-                  ✦ {hi ? `सभी अनुभाग (${PERSONAL_TABS.length + GENERIC_TABS.length})` : `All Sections (${PERSONAL_TABS.length + GENERIC_TABS.length})`}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTabCategoryFilter("personal")}
-                  style={{
-                    padding: "7px 18px",
-                    borderRadius: 22,
-                    fontSize: 13,
-                    fontWeight: tabCategoryFilter === "personal" ? 800 : 600,
-                    cursor: "pointer",
-                    background: tabCategoryFilter === "personal" ? "rgba(245, 158, 11, 0.25)" : "rgba(26, 18, 48, 0.6)",
-                    border: tabCategoryFilter === "personal" ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
-                    color: tabCategoryFilter === "personal" ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
-                    boxShadow: tabCategoryFilter === "personal" ? "0 0 12px rgba(245, 158, 11, 0.3)" : "none",
-                    transition: "all 0.2s ease"
-                  }}
-                >
-                  👤 {hi ? `व्यक्तिगत कुंडली (${PERSONAL_TABS.length})` : `Individual Astrology (${PERSONAL_TABS.length})`}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTabCategoryFilter("generic")}
-                  style={{
-                    padding: "7px 18px",
-                    borderRadius: 22,
-                    fontSize: 13,
-                    fontWeight: tabCategoryFilter === "generic" ? 800 : 600,
-                    cursor: "pointer",
-                    background: tabCategoryFilter === "generic" ? "rgba(139, 92, 246, 0.25)" : "rgba(26, 18, 48, 0.6)",
-                    border: tabCategoryFilter === "generic" ? "1.5px solid #A78BFA" : "1px solid rgba(212, 175, 55, 0.25)",
-                    color: tabCategoryFilter === "generic" ? "#DDD6FE" : "rgba(241, 231, 208, 0.75)",
-                    boxShadow: tabCategoryFilter === "generic" ? "0 0 12px rgba(139, 92, 246, 0.3)" : "none",
-                    transition: "all 0.2s ease"
-                  }}
-                >
-                  🌐 {hi ? `दैनिक पंचांग व सामान्य सेवाएं (${GENERIC_TABS.length})` : `Universal & Daily Tools (${GENERIC_TABS.length})`}
-                </button>
+              {/* Category Pillar Selector Cards */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                gap: 12,
+                marginBottom: 20
+              }}>
+                {TAB_PILLARS.map(pillar => {
+                  const isPillarActive = tabCategoryFilter === pillar.id;
+                  const containsCurrentTab = pillar.tabIds.includes(tab);
+                  return (
+                    <button
+                      key={pillar.id}
+                      type="button"
+                      onClick={() => {
+                        setTabCategoryFilter(pillar.id);
+                        if (pillar.id !== "all" && !pillar.tabIds.includes(tab)) {
+                          handleSelectTab(pillar.tabIds[0]);
+                        }
+                      }}
+                      style={{
+                        padding: "14px 16px",
+                        borderRadius: 16,
+                        cursor: "pointer",
+                        textAlign: "left",
+                        background: isPillarActive
+                          ? "linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(180, 83, 9, 0.16))"
+                          : containsCurrentTab
+                          ? "rgba(245, 158, 11, 0.08)"
+                          : "rgba(22, 15, 42, 0.65)",
+                        border: isPillarActive
+                          ? "2px solid #F59E0B"
+                          : containsCurrentTab
+                          ? "1px solid rgba(245, 158, 11, 0.4)"
+                          : "1px solid rgba(212, 175, 55, 0.2)",
+                        boxShadow: isPillarActive
+                          ? "0 6px 20px rgba(245, 158, 11, 0.25)"
+                          : "0 2px 8px rgba(0, 0, 0, 0.2)",
+                        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                        position: "relative",
+                        overflow: "hidden"
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                        <span style={{ fontSize: 22 }}>{pillar.icon}</span>
+                        <span style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: "2px 8px",
+                          borderRadius: 10,
+                          background: isPillarActive ? "rgba(245, 158, 11, 0.3)" : "rgba(255, 255, 255, 0.08)",
+                          color: isPillarActive ? "#FDE68A" : "rgba(241, 231, 208, 0.7)",
+                          border: isPillarActive ? "1px solid rgba(245, 158, 11, 0.5)" : "1px solid rgba(255, 255, 255, 0.05)"
+                        }}>
+                          {pillar.tabIds.length} {hi ? "अनुभाग" : "Sections"}
+                        </span>
+                      </div>
+                      <div style={{
+                        fontSize: 14.5,
+                        fontWeight: 800,
+                        color: isPillarActive ? "#FDE68A" : "#FFFFFF",
+                        letterSpacing: 0.3,
+                        marginBottom: 3
+                      }}>
+                        {hi ? pillar.labelHi : pillar.labelEn}
+                      </div>
+                      <div style={{
+                        fontSize: 12,
+                        color: isPillarActive ? "rgba(253, 230, 138, 0.85)" : "rgba(241, 231, 208, 0.6)",
+                        lineHeight: 1.35,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }}>
+                        {hi ? pillar.descHi : pillar.descEn}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* ── GROUP 1: INDIVIDUAL ASTROLOGY (Interconnected to Native's Chart) ── */}
-              {(tabCategoryFilter === "all" || tabCategoryFilter === "personal") && (
-                <div
-                  style={{
-                    background: "rgba(18, 12, 36, 0.75)",
-                    border: "1.5px solid rgba(245, 158, 11, 0.3)",
-                    borderRadius: 18,
-                    padding: "16px 20px",
-                    marginBottom: 16,
-                    boxShadow: "0 6px 24px rgba(0,0,0,0.3)"
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(245, 158, 11, 0.18)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 18, color: "#F59E0B" }}>👤</span>
-                      <div>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.6 }}>
-                          {hi ? "व्यक्तिगत कुंडली विश्लेषण" : "INDIVIDUAL ASTROLOGY"}
-                        </span>
-                        <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.65)", marginLeft: 8 }}>
-                          {hi ? "• आपके जन्म समय व ग्रहों पर आधारित" : "• Connected to your birth chart & exact planetary positions"}
-                        </span>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 12, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.3)", color: "#FDE68A", fontWeight: 700 }}>
-                      {hi ? `${PERSONAL_TABS.length} व्यक्तिगत भाग` : `${PERSONAL_TABS.length} Linked Sections`}
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-start" }}>
-                    {PERSONAL_TABS.map(tabItem => {
-                      const isActive = tab === tabItem.id;
-                      return (
-                        <button
-                          key={tabItem.id}
-                          type="button"
-                          onClick={() => setTab(tabItem.id)}
-                          className={`tab-btn ${isActive ? "active" : ""}`}
-                          style={{
-                            fontSize: 13.5,
-                            padding: "9px 16px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 8,
-                            borderRadius: 12,
-                            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                            background: isActive
-                              ? "linear-gradient(135deg, #F59E0B, #D97706)"
-                              : "rgba(26, 18, 48, 0.7)",
-                            color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
-                            border: isActive ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.25)",
-                            fontWeight: isActive ? 800 : 600,
-                            boxShadow: isActive ? "0 4px 14px rgba(245, 158, 11, 0.4)" : "none",
-                            cursor: "pointer"
-                          }}
-                        >
-                          <span style={{ display: "inline-flex", alignItems: "center" }}>
-                            {(() => {
-                              const TabIcon = Icons[tabItem.iconName];
-                              return TabIcon ? <TabIcon size={16} color={isActive ? "#0F0A1E" : "#FDE68A"} /> : tabItem.icon;
-                            })()}
+              {/* Active Pillar's Focused Tab Selector Container */}
+              {(() => {
+                const currentPillar = TAB_PILLARS.find(p => p.id === tabCategoryFilter) || TAB_PILLARS[0];
+                const displayedTabIds = currentPillar.tabIds;
+                return (
+                  <div
+                    style={{
+                      background: "rgba(18, 12, 36, 0.85)",
+                      border: "1.5px solid rgba(245, 158, 11, 0.35)",
+                      borderRadius: 18,
+                      padding: "16px 20px",
+                      boxShadow: "0 8px 30px rgba(0,0,0,0.4)"
+                    }}
+                  >
+                    <div style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 10,
+                      marginBottom: 14,
+                      paddingBottom: 10,
+                      borderBottom: "1px solid rgba(245, 158, 11, 0.2)"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 20 }}>{currentPillar.icon}</span>
+                        <div>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.5 }}>
+                            {hi ? currentPillar.labelHi : currentPillar.labelEn}
                           </span>
-                          <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* ── GROUP 2: GENERIC FOR EVERYONE (Universal Vedic Tools & Calendars) ── */}
-              {(tabCategoryFilter === "all" || tabCategoryFilter === "generic") && (
-                <div
-                  style={{
-                    background: "rgba(18, 12, 36, 0.75)",
-                    border: "1.5px solid rgba(139, 92, 246, 0.3)",
-                    borderRadius: 18,
-                    padding: "16px 20px",
-                    marginBottom: 24,
-                    boxShadow: "0 6px 24px rgba(0,0,0,0.3)"
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(139, 92, 246, 0.18)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <Icons.Compass size={18} color="#A78BFA" />
-                      <div>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: "#DDD6FE", letterSpacing: 0.6 }}>
-                          {hi ? "सार्वभौमिक वैदिक पंचांग व सामान्य सेवाएं" : "GENERIC FOR EVERYONE · DAILY & UNIVERSAL"}
-                        </span>
-                        <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.65)", marginLeft: 8 }}>
-                          {hi ? "• दैनिक पंचांग, शुभ मुहूर्त, पर्व व राशिफल" : "• Daily Panchang, Auspicious Muhurats, Festivals & Consultations"}
-                        </span>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 11.5, padding: "4px 10px", borderRadius: 12, background: "rgba(139, 92, 246, 0.15)", border: "1px solid rgba(139, 92, 246, 0.3)", color: "#DDD6FE", fontWeight: 700 }}>
-                      {hi ? "6 सामान्य उपकरण" : "6 Universal Tools"}
-                    </span>
-                  </div>
-
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-start" }}>
-                    {GENERIC_TABS.map(tabItem => {
-                      const isActive = tab === tabItem.id;
-                      return (
-                        <button
-                          key={tabItem.id}
-                          type="button"
-                          onClick={() => setTab(tabItem.id)}
-                          className={`tab-btn ${isActive ? "active" : ""}`}
-                          style={{
-                            fontSize: 13.5,
-                            padding: "9px 16px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: 8,
-                            borderRadius: 12,
-                            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                            background: isActive
-                              ? "linear-gradient(135deg, #8B5CF6, #6D28D9)"
-                              : "rgba(26, 18, 48, 0.7)",
-                            color: isActive ? "#FFFFFF" : "rgba(241, 231, 208, 0.9)",
-                            border: isActive ? "1px solid #A78BFA" : "1px solid rgba(139, 92, 246, 0.25)",
-                            fontWeight: isActive ? 800 : 600,
-                            boxShadow: isActive ? "0 4px 14px rgba(139, 92, 246, 0.4)" : "none",
-                            cursor: "pointer"
-                          }}
-                        >
-                          <span style={{ display: "inline-flex", alignItems: "center" }}>
-                            {(() => {
-                              const TabIcon = Icons[tabItem.iconName];
-                              return TabIcon ? <TabIcon size={16} color={isActive ? "#FFFFFF" : "#DDD6FE"} /> : tabItem.icon;
-                            })()}
+                          <span style={{ fontSize: 13, color: "rgba(241, 231, 208, 0.7)", marginLeft: 8 }}>
+                            • {hi ? currentPillar.descHi : currentPillar.descEn}
                           </span>
-                          <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
-                        </button>
-                      );
-                    })}
+                        </div>
+                      </div>
+                      <span style={{
+                        fontSize: 12,
+                        padding: "4px 12px",
+                        borderRadius: 14,
+                        background: "rgba(245, 158, 11, 0.18)",
+                        border: "1px solid rgba(245, 158, 11, 0.4)",
+                        color: "#FDE68A",
+                        fontWeight: 700
+                      }}>
+                        {hi ? `प्रदर्शित: ${displayedTabIds.length} अनुभाग` : `Showing: ${displayedTabIds.length} Tools`}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-start" }}>
+                      {displayedTabIds.map(tabId => {
+                        const tabItem = TABS.find(t => t.id === tabId);
+                        if (!tabItem) return null;
+                        const isActive = tab === tabItem.id;
+                        return (
+                          <button
+                            key={tabItem.id}
+                            type="button"
+                            onClick={() => handleSelectTab(tabItem.id)}
+                            className={`tab-btn ${isActive ? "active" : ""}`}
+                            style={{
+                              fontSize: 14,
+                              padding: "10px 18px",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 8,
+                              borderRadius: 12,
+                              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                              background: isActive
+                                ? "linear-gradient(135deg, #F59E0B, #D97706)"
+                                : "rgba(26, 18, 48, 0.75)",
+                              color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.95)",
+                              border: isActive ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.28)",
+                              fontWeight: isActive ? 800 : 600,
+                              boxShadow: isActive ? "0 4px 16px rgba(245, 158, 11, 0.45)" : "none",
+                              cursor: "pointer"
+                            }}
+                          >
+                            <span style={{ display: "inline-flex", alignItems: "center" }}>
+                              {(() => {
+                                const TabIcon = Icons[tabItem.iconName];
+                                return TabIcon ? <TabIcon size={16} color={isActive ? "#0F0A1E" : "#FDE68A"} /> : tabItem.icon;
+                              })()}
+                            </span>
+                            <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
             </div>
+            
+            <div id="active-tab-viewport" style={{ scrollMarginTop: 100 }}></div>
 
             {/* ── TAB 1: CHART & SHODASHVARGA DIVISIONAL CHARTS ── */}
             {tab === "chart" && (() => {
@@ -7010,42 +7509,91 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Quick House Jumper Pills */}
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(212,175,55,0.15)" }}>
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const hn = i + 1;
-                      const isSel = hoveredHouse === hn;
+                  {/* Life Domain Filter (Purusharthas) */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#F59E0B" }}>
+                      {hi ? "जीवन क्षेत्र फ़िल्टर:" : "Life Domain Filter:"}
+                    </span>
+                    {[
+                      { id: "all", labelEn: "All 12 Houses", labelHi: "समस्त १२ भाव", icon: "🌟", desc: "1–12" },
+                      { id: "dharma", labelEn: "Dharma (H1, 5, 9)", labelHi: "धर्म (१, ५, ९ भाव)", icon: "🧘", desc: "Soul & Purpose" },
+                      { id: "artha", labelEn: "Artha (H2, 6, 10)", labelHi: "अर्थ (२, ६, १० भाव)", icon: "💰", desc: "Wealth & Career" },
+                      { id: "kama", labelEn: "Kama (H3, 7, 11)", labelHi: "काम (३, ७, ११ भाव)", icon: "🤝", desc: "Relationships & Gains" },
+                      { id: "moksha", labelEn: "Moksha (H4, 8, 12)", labelHi: "मोक्ष (४, ८, १२ भाव)", icon: "🕉️", desc: "Liberation & Inner Peace" },
+                    ].map(dom => {
+                      const isDomActive = houseDomainFilter === dom.id;
                       return (
                         <button
-                          key={hn}
+                          key={dom.id}
                           type="button"
-                          onClick={() => setHoveredHouse(isSel ? null : hn)}
+                          onClick={() => setHouseDomainFilter(dom.id)}
                           style={{
-                            background: isSel ? "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)" : "rgba(255, 255, 255, 0.05)",
-                            color: isSel ? "#0F0A1E" : "rgba(241, 231, 208, 0.85)",
-                            border: isSel ? "1px solid #FCD34D" : "1px solid rgba(212, 175, 55, 0.2)",
-                            borderRadius: 12,
-                            padding: "5px 10px",
-                            fontSize: 12,
-                            fontWeight: isSel ? 800 : 600,
+                            padding: "6px 14px",
+                            borderRadius: 18,
+                            fontSize: 12.5,
+                            fontWeight: isDomActive ? 800 : 600,
                             cursor: "pointer",
-                            transition: "all 0.15s ease",
-                            boxShadow: isSel ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
+                            background: isDomActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(255, 255, 255, 0.05)",
+                            color: isDomActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.85)",
+                            border: isDomActive ? "1.5px solid #FCD34D" : "1px solid rgba(212, 175, 55, 0.2)",
+                            boxShadow: isDomActive ? "0 2px 10px rgba(245, 158, 11, 0.35)" : "none",
+                            transition: "all 0.15s ease"
                           }}
                         >
-                          H{hn} <span style={{ fontSize: 10, opacity: 0.85 }}>({t.hnames[i].split(" ")[0]})</span>
+                          <span>{dom.icon}</span> {hi ? dom.labelHi : dom.labelEn}
                         </button>
                       );
                     })}
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const n = i + 1;
-                      const d = result.houses?.[n] || {};
-                      const sg = ZODIAC_SIGNS.find(z => z.name === d.sign || z.sanskrit === d.sign) || ZODIAC_SIGNS[i];
-                      const pl = d.planets || [];
-                      const isHovered = hoveredHouse === n;
+                  {/* Quick House Jumper Pills */}
+                  {(() => {
+                    const domainMap = {
+                      all: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                      dharma: [1, 5, 9],
+                      artha: [2, 6, 10],
+                      kama: [3, 7, 11],
+                      moksha: [4, 8, 12]
+                    };
+                    const displayedHouseNums = domainMap[houseDomainFilter] || domainMap.all;
+
+                    return (
+                      <>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid rgba(212,175,55,0.15)" }}>
+                          {displayedHouseNums.map(hn => {
+                            const i = hn - 1;
+                            const isSel = hoveredHouse === hn;
+                            return (
+                              <button
+                                key={hn}
+                                type="button"
+                                onClick={() => setHoveredHouse(isSel ? null : hn)}
+                                style={{
+                                  background: isSel ? "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)" : "rgba(255, 255, 255, 0.05)",
+                                  color: isSel ? "#0F0A1E" : "rgba(241, 231, 208, 0.85)",
+                                  border: isSel ? "1px solid #FCD34D" : "1px solid rgba(212, 175, 55, 0.2)",
+                                  borderRadius: 12,
+                                  padding: "5px 12px",
+                                  fontSize: 12.5,
+                                  fontWeight: isSel ? 800 : 600,
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                  boxShadow: isSel ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
+                                }}
+                              >
+                                H{hn} <span style={{ fontSize: 10.5, opacity: 0.85 }}>({t.hnames[i].split(" ")[0]})</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+                          {displayedHouseNums.map(n => {
+                            const i = n - 1;
+                            const d = result.houses?.[n] || {};
+                            const sg = ZODIAC_SIGNS.find(z => z.name === d.sign || z.sanskrit === d.sign) || ZODIAC_SIGNS[i];
+                            const pl = d.planets || [];
+                            const isHovered = hoveredHouse === n;
 
                       return (
                         <div
@@ -7103,7 +7651,10 @@ export default function App() {
                       );
                     })}
                   </div>
-                </div>
+                </>
+              );
+            })()}
+          </div>
 
                 <SectionCard icon="🏠" title={t.sec.ha} content={result.ha} />
               </div>
@@ -7573,6 +8124,57 @@ export default function App() {
                 </div>
               );
             })()}
+
+            {/* ── STICKY QUICK-JUMP FLOATING DOCK (Laptop/Desktop Ergonomic Navigation) ── */}
+            <div className="sticky-jump-bar no-print" role="navigation" aria-label="Quick jump">
+              <span style={{ fontSize: 11, fontWeight: 800, color: "#F59E0B", padding: "0 6px", textTransform: "uppercase", letterSpacing: 0.5, borderRight: "1px solid rgba(245, 158, 11, 0.3)" }}>
+                {hi ? "त्वरित" : "Jump"}
+              </span>
+              {TAB_PILLARS.filter(p => p.id !== "all").map(p => {
+                const isActive = tabCategoryFilter === p.id || p.tabIds.includes(tab);
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      setTabCategoryFilter(p.id);
+                      if (!p.tabIds.includes(tab)) {
+                        handleSelectTab(p.tabIds[0]);
+                      } else {
+                        const el = document.getElementById("active-tab-viewport");
+                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    }}
+                    className="sticky-jump-btn"
+                    style={{
+                      background: isActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                      color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
+                      fontWeight: isActive ? 800 : 600,
+                      boxShadow: isActive ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
+                    }}
+                  >
+                    <span>{p.icon}</span>
+                    <span>{hi ? p.labelHi.split(" ")[0] : p.labelEn.split(" ")[0]}</span>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="sticky-jump-btn"
+                style={{
+                  background: "rgba(255, 255, 255, 0.08)",
+                  color: "#FDE68A",
+                  border: "1px solid rgba(245, 158, 11, 0.3)"
+                }}
+                title={hi ? "ऊपर जाएं" : "Back to Top"}
+              >
+                <span>⬆</span>
+                <span>{hi ? "शीर्ष" : "Top"}</span>
+              </button>
+            </div>
 
           </div>
         )}
