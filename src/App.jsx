@@ -3392,6 +3392,96 @@ export default function App() {
           box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18) !important;
         }
 
+        /* ── ENTRY FORM ALIGNMENT & RESPONSIVENESS ── */
+        .birth-form-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 18px;
+          align-items: start;
+        }
+        @media (max-width: 860px) {
+          .birth-form-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+        .birth-form-full-col {
+          grid-column: 1 / -1;
+        }
+        .birth-form-label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 24px;
+          margin-bottom: 8px;
+          box-sizing: border-box;
+        }
+        .birth-form-label-row label, .birth-form-label-row .birth-form-label-text {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13.5px;
+          font-weight: 700;
+          color: #FDE68A;
+          letter-spacing: 0.3px;
+          margin: 0;
+          white-space: nowrap;
+          line-height: 1.2 !important;
+        }
+        .birth-form-input {
+          width: 100% !important;
+          height: 48px !important;
+          box-sizing: border-box !important;
+          background: rgba(11, 8, 25, 0.65) !important;
+          border: 1px solid rgba(212, 175, 55, 0.3) !important;
+          border-radius: 10px !important;
+          padding: 0 16px !important;
+          color: #FFF !important;
+          font-size: 14.5px !important;
+          font-family: inherit !important;
+          color-scheme: dark !important;
+          outline: none !important;
+          display: block !important;
+          line-height: 48px !important;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+        }
+        .birth-form-input:focus {
+          border-color: #F59E0B !important;
+          box-shadow: 0 0 12px rgba(245, 158, 11, 0.3) !important;
+        }
+        .birth-form-gender-group {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+          height: 48px !important;
+          box-sizing: border-box !important;
+        }
+        .birth-form-gender-btn {
+          height: 48px !important;
+          box-sizing: border-box !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 5px !important;
+          border-radius: 10px !important;
+          cursor: pointer !important;
+          font-family: inherit !important;
+          font-size: 13px !important;
+          padding: 0 4px !important;
+          line-height: normal !important;
+          transition: all 0.15s ease !important;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: invert(0.8) sepia(1) saturate(5) hue-rotate(350deg);
+          cursor: pointer;
+          opacity: 0.85;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
+          opacity: 1;
+        }
+
         /* ── LAPTOP & DESKTOP READABILITY OVERHAUL ── */
         @media (min-width: 900px) {
           main {
@@ -4270,11 +4360,13 @@ export default function App() {
                 </button>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 18 }}>
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <label htmlFor="birth-name" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                    <Icons.User size={15} color="#F59E0B" /> {t.fName} *
-                  </label>
+              <div className="birth-form-grid">
+                <div className="birth-form-full-col">
+                  <div className="birth-form-label-row">
+                    <label htmlFor="birth-name">
+                      <Icons.User size={15} color="#F59E0B" /> {t.fName} <span style={{ color: "#F59E0B" }}>*</span>
+                    </label>
+                  </div>
                   <input
                     id="birth-name"
                     name="name"
@@ -4285,14 +4377,16 @@ export default function App() {
                     value={form.name}
                     onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
                     placeholder={t.phName}
-                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                    className="birth-form-input"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="birth-dob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                    <Icons.Calendar size={15} color="#F59E0B" /> {t.fDob} *
-                  </label>
+                  <div className="birth-form-label-row">
+                    <label htmlFor="birth-dob">
+                      <Icons.Calendar size={15} color="#F59E0B" /> {t.fDob} <span style={{ color: "#F59E0B" }}>*</span>
+                    </label>
+                  </div>
                   <input
                     id="birth-dob"
                     name="dob"
@@ -4302,14 +4396,19 @@ export default function App() {
                     aria-label={t.fDob}
                     value={form.dob}
                     onChange={e => { setForm({ ...form, dob: e.target.value }); if (err) setErr(""); }}
-                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                    className="birth-form-input"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="birth-tob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                    <Icons.Clock size={15} color="#F59E0B" /> {t.fTob} <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.8)", fontWeight: 500 }}>{t.fTobHelp}</span>
-                  </label>
+                  <div className="birth-form-label-row">
+                    <label htmlFor="birth-tob">
+                      <Icons.Clock size={15} color="#F59E0B" /> {t.fTob} <span style={{ color: "#F59E0B" }}>*</span>
+                    </label>
+                    <span style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.75)", fontWeight: 500, whiteSpace: "nowrap" }} title="Vedic astrology defaults to solar noon (12:00 PM) if time is unknown">
+                      {hi ? "अज्ञात? 12:00 PM" : "12:00 PM if unsure"}
+                    </span>
+                  </div>
                   <input
                     id="birth-tob"
                     name="tob"
@@ -4317,23 +4416,20 @@ export default function App() {
                     aria-label={t.fTob}
                     value={form.tob}
                     onChange={e => setForm({ ...form, tob: e.target.value })}
-                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                    className="birth-form-input"
                   />
                 </div>
 
                 <div>
-                  <label id="birth-gender-label" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", marginBottom: 8, letterSpacing: 0.5 }}>
-                    <Icons.Gender size={15} color="#F59E0B" /> {t.fGender} *
-                  </label>
+                  <div className="birth-form-label-row">
+                    <span id="birth-gender-label" className="birth-form-label-text">
+                      <Icons.Gender size={15} color="#F59E0B" /> {t.fGender} <span style={{ color: "#F59E0B" }}>*</span>
+                    </span>
+                  </div>
                   <div
                     role="radiogroup"
                     aria-labelledby="birth-gender-label"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: 6,
-                      height: 48
-                    }}
+                    className="birth-form-gender-group"
                   >
                     {[
                       { val: "male", label: t.genderMale, icon: "♂" },
@@ -4348,38 +4444,29 @@ export default function App() {
                           role="radio"
                           aria-checked={active}
                           onClick={() => { setForm({ ...form, gender: g.val }); if (err) setErr(""); }}
+                          className="birth-form-gender-btn"
                           style={{
                             background: active
                               ? "linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.25))"
                               : "rgba(11, 8, 25, 0.65)",
                             border: active ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
-                            borderRadius: 10,
                             color: active ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
                             fontWeight: active ? 800 : 600,
-                            fontSize: 13,
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 5,
-                            padding: "0 4px",
-                            boxShadow: active ? "0 0 14px rgba(245, 158, 11, 0.3)" : "none",
-                            transition: "all 0.15s ease",
-                            fontFamily: "inherit"
+                            boxShadow: active ? "0 0 14px rgba(245, 158, 11, 0.3)" : "none"
                           }}
                         >
-                          <span style={{ fontSize: 14, color: active ? "#F59E0B" : "rgba(243, 211, 122, 0.6)" }}>{g.icon}</span>
-                          <span>{g.label}</span>
+                          <span style={{ fontSize: 15, color: active ? "#F59E0B" : "rgba(243, 211, 122, 0.7)" }}>{g.icon}</span>
+                          <span style={{ whiteSpace: "nowrap" }}>{g.label}</span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 6 }}>
-                    <label htmlFor="birth-pob" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "#FDE68A", letterSpacing: 0.5 }}>
-                      <Icons.Location size={15} color="#F59E0B" /> {t.fPob} *
+                <div className="birth-form-full-col">
+                  <div className="birth-form-label-row">
+                    <label htmlFor="birth-pob">
+                      <Icons.Location size={15} color="#F59E0B" /> {t.fPob} <span style={{ color: "#F59E0B" }}>*</span>
                     </label>
                     <button
                       type="button"
@@ -4412,7 +4499,7 @@ export default function App() {
                     value={form.pob}
                     onChange={e => { setForm({ ...form, pob: e.target.value }); if (err) setErr(""); }}
                     placeholder={t.phPob}
-                    style={{ width: "100%", background: "rgba(11, 8, 25, 0.65)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 10, padding: "13px 16px", color: "#FFF", fontSize: 15, fontFamily: "inherit", colorScheme: "dark" }}
+                    className="birth-form-input"
                   />
 
                   {/* Quick Global City Chips */}
