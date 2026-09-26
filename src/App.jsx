@@ -1341,6 +1341,8 @@ export default function App() {
   const [tab, setTab] = useState("chart");
   const [tabCategoryFilter, setTabCategoryFilter] = useState("core"); // 'core' | 'predictions' | 'remedies' | 'universal' | 'all'
   const [houseDomainFilter, setHouseDomainFilter] = useState("all"); // 'all' | 'dharma' | 'artha' | 'kama' | 'moksha'
+  const [isJumpBarCollapsed, setIsJumpBarCollapsed] = useState(false);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
   const [textScale, setTextScale] = useState(() => {
     try {
       return localStorage.getItem("jyotish_text_scale") || "normal";
@@ -1842,6 +1844,32 @@ export default function App() {
       setDailySign(result.rashiSign);
     }
   }, [result]);
+
+  // Auto-hide floating quick-jump dock when scrolling down (reading flow), restore on scroll up
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          // Hide when scrolling down past 280px
+          if (currentScrollY > lastScrollY + 8 && currentScrollY > 280) {
+            setIsScrollingDown(true);
+          } else if (currentScrollY < lastScrollY - 8) {
+            setIsScrollingDown(false);
+          }
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const run = async () => {
     if (!form.name.trim() || !form.dob || !form.pob.trim()) {
@@ -3566,7 +3594,10 @@ export default function App() {
           }
         }
 
-        /* ── STICKY QUICK JUMP NAVIGATION BAR ── */
+        /* ── STICKY QUICK JUMP NAVIGATION BAR & CLEARANCE ── */
+        .screen-only-tabs {
+          padding-bottom: 120px !important;
+        }
         .sticky-jump-bar {
           position: fixed;
           bottom: 22px;
@@ -3579,13 +3610,19 @@ export default function App() {
           border: 1.5px solid rgba(245, 158, 11, 0.5);
           box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65), 0 0 25px rgba(245, 158, 11, 0.25);
           border-radius: 40px;
-          padding: 6px 14px;
+          padding: 6px 12px;
           display: flex;
           align-items: center;
           gap: 6px;
           max-width: 95vw;
           overflow-x: auto;
           scrollbar-width: none;
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        }
+        .sticky-jump-bar.hidden-on-scroll {
+          transform: translate(-50%, 120px) !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
         }
         .sticky-jump-bar::-webkit-scrollbar {
           display: none;
@@ -3616,6 +3653,55 @@ export default function App() {
           color: #0B0819;
           font-weight: 800;
           box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+        }
+
+        .sticky-jump-toggle-btn {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(245, 158, 11, 0.25);
+          color: rgba(241, 231, 208, 0.7);
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          cursor: pointer;
+          margin-left: 2px;
+          transition: all 0.2s ease;
+        }
+        .sticky-jump-toggle-btn:hover {
+          background: rgba(239, 68, 68, 0.25);
+          border-color: #EF4444;
+          color: #FFF;
+        }
+
+        .sticky-jump-collapsed-trigger {
+          position: fixed;
+          bottom: 22px;
+          right: 22px;
+          z-index: 95;
+          background: rgba(18, 12, 38, 0.95);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          border: 1.5px solid rgba(245, 158, 11, 0.5);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.25);
+          border-radius: 30px;
+          padding: 8px 16px;
+          color: #FDE68A;
+          font-size: 13px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-family: inherit;
+        }
+        .sticky-jump-collapsed-trigger:hover {
+          transform: scale(1.05);
+          border-color: #F59E0B;
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
         }
 
         .print-only-report {
@@ -8212,56 +8298,82 @@ export default function App() {
               );
             })()}
 
-            {/* ── STICKY QUICK-JUMP FLOATING DOCK (Laptop/Desktop Ergonomic Navigation) ── */}
-            <div className="sticky-jump-bar no-print" role="navigation" aria-label="Quick jump">
-              <span style={{ fontSize: 11, fontWeight: 800, color: "#F59E0B", padding: "0 6px", textTransform: "uppercase", letterSpacing: 0.5, borderRight: "1px solid rgba(245, 158, 11, 0.3)" }}>
-                {hi ? "त्वरित" : "Jump"}
-              </span>
-              {TAB_PILLARS.filter(p => p.id !== "all").map(p => {
-                const isActive = tabCategoryFilter === p.id || p.tabIds.includes(tab);
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => {
-                      setTabCategoryFilter(p.id);
-                      if (!p.tabIds.includes(tab)) {
-                        handleSelectTab(p.tabIds[0]);
-                      } else {
-                        const el = document.getElementById("active-tab-viewport");
-                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }
-                    }}
-                    className="sticky-jump-btn"
-                    style={{
-                      background: isActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
-                      color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
-                      fontWeight: isActive ? 800 : 600,
-                      boxShadow: isActive ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
-                    }}
-                  >
-                    <span>{p.icon}</span>
-                    <span>{hi ? p.labelHi.split(" ")[0] : p.labelEn.split(" ")[0]}</span>
-                  </button>
-                );
-              })}
+            {/* ── STICKY QUICK-JUMP FLOATING DOCK (With Auto-Hide on Scroll & Minimize Toggle) ── */}
+            {isJumpBarCollapsed ? (
               <button
                 type="button"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                className="sticky-jump-btn"
-                style={{
-                  background: "rgba(255, 255, 255, 0.08)",
-                  color: "#FDE68A",
-                  border: "1px solid rgba(245, 158, 11, 0.3)"
-                }}
-                title={hi ? "ऊपर जाएं" : "Back to Top"}
+                onClick={() => setIsJumpBarCollapsed(false)}
+                className="sticky-jump-collapsed-trigger no-print"
+                title={hi ? "त्वरित नेविगेशन खोलें" : "Open quick jump navigation"}
+                aria-label="Open quick jump navigation"
               >
-                <span>⬆</span>
-                <span>{hi ? "शीर्ष" : "Top"}</span>
+                <span>🧭</span>
+                <span>{hi ? "नेविगेशन" : "Jump"}</span>
               </button>
-            </div>
+            ) : (
+              <div
+                className={`sticky-jump-bar no-print ${isScrollingDown ? "hidden-on-scroll" : ""}`}
+                role="navigation"
+                aria-label="Quick jump"
+              >
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#F59E0B", padding: "0 6px", textTransform: "uppercase", letterSpacing: 0.5, borderRight: "1px solid rgba(245, 158, 11, 0.3)" }}>
+                  {hi ? "त्वरित" : "Jump"}
+                </span>
+                {TAB_PILLARS.filter(p => p.id !== "all").map(p => {
+                  const isActive = tabCategoryFilter === p.id || p.tabIds.includes(tab);
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        setTabCategoryFilter(p.id);
+                        if (!p.tabIds.includes(tab)) {
+                          handleSelectTab(p.tabIds[0]);
+                        } else {
+                          const el = document.getElementById("active-tab-viewport");
+                          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                      }}
+                      className="sticky-jump-btn"
+                      style={{
+                        background: isActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                        color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
+                        fontWeight: isActive ? 800 : 600,
+                        boxShadow: isActive ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
+                      }}
+                    >
+                      <span>{p.icon}</span>
+                      <span>{hi ? p.labelHi.split(" ")[0] : p.labelEn.split(" ")[0]}</span>
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="sticky-jump-btn"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.08)",
+                    color: "#FDE68A",
+                    border: "1px solid rgba(245, 158, 11, 0.3)"
+                  }}
+                  title={hi ? "ऊपर जाएं" : "Back to Top"}
+                >
+                  <span>⬆</span>
+                  <span>{hi ? "शीर्ष" : "Top"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsJumpBarCollapsed(true)}
+                  className="sticky-jump-toggle-btn"
+                  title={hi ? "नेविगेशन डॉक छुपाएं" : "Minimize navigation"}
+                  aria-label="Minimize navigation"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
           </div>
         )}
