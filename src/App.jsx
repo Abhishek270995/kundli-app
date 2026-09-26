@@ -3592,6 +3592,8 @@ export default function App() {
           main {
             max-width: 1180px !important;
           }
+        }
+
         /* ── UNIFIED MASTER HEADER & NAVIGATION ── */
         .top-header-bar {
           position: sticky;
@@ -3620,14 +3622,17 @@ export default function App() {
           overflow-x: auto;
           scrollbar-width: none;
           padding: 2px 0;
+          -webkit-overflow-scrolling: touch;
         }
         .header-nav-strip::-webkit-scrollbar {
           display: none;
         }
         .header-nav-pill {
-          background: rgba(22, 15, 42, 0.6);
-          border: 1px solid rgba(212, 175, 55, 0.25);
-          color: rgba(241, 231, 208, 0.85);
+          -webkit-appearance: none !important;
+          appearance: none !important;
+          background: rgba(22, 15, 42, 0.75) !important;
+          border: 1px solid rgba(212, 175, 55, 0.3) !important;
+          color: rgba(241, 231, 208, 0.9) !important;
           padding: 6px 12px;
           border-radius: 20px;
           font-size: 13px;
@@ -3639,19 +3644,22 @@ export default function App() {
           gap: 6px;
           transition: all 0.2s ease;
           font-family: inherit;
+          box-sizing: border-box;
+          outline: none;
+          -webkit-tap-highlight-color: transparent;
         }
         .header-nav-pill:hover {
-          background: rgba(245, 158, 11, 0.18);
-          color: #FFF;
-          border-color: rgba(245, 158, 11, 0.5);
+          background: rgba(245, 158, 11, 0.22) !important;
+          color: #FFF !important;
+          border-color: rgba(245, 158, 11, 0.6) !important;
           transform: translateY(-1px);
         }
         .header-nav-pill.active {
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.45));
-          border-color: #F59E0B;
-          color: #FDE68A;
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.55)) !important;
+          border-color: #F59E0B !important;
+          color: #FDE68A !important;
           font-weight: 800;
-          box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.4) !important;
         }
 
         .ephemeris-ticker-bar {
@@ -4131,6 +4139,15 @@ export default function App() {
                     }
                   }}
                   className={`header-nav-pill ${isSelected ? "active" : ""}`}
+                  style={{
+                    background: isSelected
+                      ? "linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.55))"
+                      : "rgba(22, 15, 42, 0.85)",
+                    border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
+                    color: isSelected ? "#FDE68A" : "rgba(241, 231, 208, 0.92)",
+                    WebkitAppearance: "none",
+                    appearance: "none",
+                  }}
                 >
                   <span style={{ fontSize: 14 }}>{feat.icon}</span>
                   <span>{feat.label}</span>
