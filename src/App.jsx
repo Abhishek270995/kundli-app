@@ -23,6 +23,7 @@ import {
   getPlanetLifeImpactBreakdown,
   HOUSE_TITLES
 } from "./planetaryAnalysisEngine";
+import { Analytics } from '@vercel/analytics/react';
 import { Icons } from "./components/Icons";
 
 const ZODIAC_SIGNS = [
@@ -8349,6 +8350,7 @@ export default function App() {
         )}
 
       </main>
+      <Analytics />
     </div>
   );
 }
