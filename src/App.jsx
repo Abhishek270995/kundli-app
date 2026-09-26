@@ -24,6 +24,7 @@ import {
   HOUSE_TITLES
 } from "./planetaryAnalysisEngine";
 import { Icons } from "./components/Icons";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -8349,6 +8350,7 @@ export default function App() {
         )}
 
       </main>
+      <SpeedInsights />
     </div>
   );
 }
