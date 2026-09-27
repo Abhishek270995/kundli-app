@@ -24,6 +24,7 @@ import {
   HOUSE_TITLES
 } from "./planetaryAnalysisEngine";
 import { Icons } from "./components/Icons";
+import { Analytics } from "./analytics";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -1381,6 +1382,7 @@ export default function App() {
   const handleSetCurrency = (newCurr) => {
     if (!newCurr || !CURRENCIES[newCurr]) return;
     setCurrency(newCurr);
+    Analytics.preferenceChange("currency", newCurr);
     try {
       localStorage.setItem("jyotish_user_currency", newCurr);
     } catch (e) {}
@@ -1437,6 +1439,7 @@ export default function App() {
       pob: "New Delhi, India"
     });
     setErr("");
+    Analytics.generateKundli(true);
   };
 
   // Daily Horoscope State
@@ -1526,6 +1529,7 @@ export default function App() {
 
   const handlePrintReport = (reportType = "all") => {
     setActivePrintReport(reportType);
+    Analytics.printReport(reportType);
     setTimeout(() => {
       window.print();
     }, 120);
@@ -1871,6 +1875,11 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Track Tool Switching & Views in Google Analytics
+  useEffect(() => {
+    Analytics.toolSwitch(mainSection);
+  }, [mainSection]);
+
   const run = async () => {
     if (!form.name.trim() || !form.dob || !form.pob.trim()) {
       setErr(t.errFields);
@@ -1911,6 +1920,7 @@ export default function App() {
       });
 
       setResult(resData);
+      Analytics.generateKundli(false);
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
     } catch (e) {
       console.error(e);
@@ -1941,6 +1951,7 @@ export default function App() {
   const handleLangToggle = () => {
     const newLang = lang === "en" ? "hi" : "en";
     setLang(newLang);
+    Analytics.preferenceChange("language", newLang);
     if (err) {
       setErr(UI[newLang].errFields);
     }
