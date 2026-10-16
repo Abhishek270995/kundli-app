@@ -1,0 +1,12 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/panchang", "destination": "/panchang/index.html" },
+    { "source": "/muhurat", "destination": "/muhurat/index.html" },
+    { "source": "/festivals", "destination": "/festivals/index.html" },
+    { "source": "/daily", "destination": "/daily/index.html" },
+    { "source": "/matchmaking", "destination": "/matchmaking/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

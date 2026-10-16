@@ -1224,7 +1224,9 @@ export function generateVedicKundliData({ name, gender = "male", dob, tob, pob, 
     dob,
     tob,
     pob,
-    lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDeg.toFixed(1)}°`,
+    lagna: `${ascSign.name} (${ascSign.sanskrit}) ${ascDegInSign.toFixed(1)}°`,
+    lagnaDegree: `${ascDegInSign.toFixed(1)}°`,
+    lagnaDegreeFormatted: `${ascDegInt}°${ascMins < 10 ? "0" : ""}${ascMins}'`,
     lagnaSign: ascSign.name,
     rashi: `${moonSign.name} (${moonSign.sanskrit})`,
     rashiSign: moonSign.name,
@@ -1267,6 +1269,7 @@ export function generateVedicKundliData({ name, gender = "male", dob, tob, pob, 
     shadbala,
     ashtakavarga,
     detailedDashas,
+    dashaDetails: detailedDashas,
     gocharaTransits
   };
 }
@@ -2196,7 +2199,7 @@ export const MAJOR_INDIAN_CITIES = [
   { name: "Singapore", nameHi: "सिंगापुर", lat: 1.3521, lon: 103.8198, tz: 8 }
 ];
 
-export function calculateDailyPanchang({ dateStr, lat = 28.6139, lon = 77.2090, cityName = "New Delhi", lang = "hi" }) {
+export function calculateDailyPanchang({ dateStr, lat = 28.6139, lon = 77.2090, cityName = "New Delhi", lang = "en" }) {
   const isHi = lang === "hi";
   const targetDate = dateStr ? new Date(`${dateStr}T12:00:00Z`) : new Date();
   const time = new AstroTime(targetDate);
@@ -2419,6 +2422,9 @@ export function calculateDailyPanchang({ dateStr, lat = 28.6139, lon = 77.2090, 
     sunset,
     moonrise,
     moonset,
+    rahuKaal: `${rahuKaalStart} - ${rahuKaalEnd}`,
+    yamaganda: `${yamaKaalStart} - ${yamaKaalEnd}`,
+    gulika: `${gulikaKaalStart} - ${gulikaKaalEnd}`,
     muhurats: {
       brahma: `${brahmaMuhuratStart} - ${brahmaMuhuratEnd}`,
       abhijit: `${abhijitStart} - ${abhijitEnd}`,
@@ -2754,7 +2760,7 @@ export const UPCOMING_SHUBH_MUHURATS = [
   }
 ];
 
-export function getUpcomingShubhMuhurats({ category = "all", lang = "hi" }) {
+export function getUpcomingShubhMuhurats({ category = "all", lang = "en" }) {
   if (category === "all") return UPCOMING_SHUBH_MUHURATS;
   return UPCOMING_SHUBH_MUHURATS.filter(m => m.category === category);
 }
@@ -3557,7 +3563,7 @@ export const HINDU_FESTIVALS_CALENDAR = [
   }
 ];
 
-export function getUpcomingFestivalsAndVrats({ filter = "all", lang = "hi" }) {
+export function getUpcomingFestivalsAndVrats({ filter = "all", lang = "en" }) {
   if (filter === "all") return HINDU_FESTIVALS_CALENDAR;
   return HINDU_FESTIVALS_CALENDAR.filter(f => f.category === filter);
 }

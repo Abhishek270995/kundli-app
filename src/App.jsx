@@ -1334,6 +1334,88 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
   );
 };
 
+// ── SEO & MULTI-PAGE ROUTING CONFIGURATION ──────────────────────
+const SECTION_CONFIG = {
+  kundli: {
+    path: "/",
+    titleEn: "Jyotish Paramarsh — Authentic Vedic Kundli, Daily Horoscope & Astrological Consultations",
+    titleHi: "ज्योतिष परामर्श — प्रामाणिक वैदिक कुंडली, जन्मपत्रिका एवं भविष्यफल",
+    descEn: "Free authentic Vedic Janam Kundli, 16 divisional charts (Shodashvarga), Vimshottari Dasha, planetary analysis & life predictions based on Maharishi Parashara.",
+    descHi: "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र पर आधारित सटीक जन्म कुंडली, षोडशवर्ग, विंशोत्तरी दशा व संपूर्ण जीवन मार्गदर्शन।"
+  },
+  panchang: {
+    path: "/panchang",
+    titleEn: "Aaj Ka Panchang — Today Hindu Panchang, Tithi, Nakshatra, Rahu Kaal | Jyotish Paramarsh",
+    titleHi: "आज का पंचांग — दैनिक हिंदू पंचांग, तिथि, नक्षत्र, राहुकाल व शुभ मुहूर्त | ज्योतिष परामर्श",
+    descEn: "Accurate real-time Hindu Panchang: today's Tithi, Nakshatra, Yoga, Karana, Rahu Kaal, Abhijit Muhurat, sunrise, sunset, and Choghadiya timings.",
+    descHi: "सटीक दैनिक पंचांग: आज की तिथि, नक्षत्र, योग, करण, राहुकाल, अभिजीत मुहूर्त एवं चौघड़िया मुहूर्त।"
+  },
+  muhurat: {
+    path: "/muhurat",
+    titleEn: "Shubh Muhurat Today — Auspicious Timings, Choghadiya & Vivah Muhurat | Jyotish Paramarsh",
+    titleHi: "शुभ मुहूर्त — आज का शुभ समय, चौघड़िया एवं विवाह-गृहप्रवेश मुहूर्त | ज्योतिष परामर्श",
+    descEn: "Find daily auspicious Shubh Muhurats, Day & Night Choghadiya, Vivah (wedding) Muhurat, Griha Pravesh, and vehicle purchase timings.",
+    descHi: "दैनिक शुभ मुहूर्त, दिन व रात्रि चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन क्रय के श्रेष्ठ मुहूर्त।"
+  },
+  festivals: {
+    path: "/festivals",
+    titleEn: "Hindu Festivals & Vrats Calendar — Dates, Vrat Rules & Puja Muhurat | Jyotish Paramarsh",
+    titleHi: "हिंदू व्रत एवं त्यौहार कैलेंडर — प्रमुख व्रत, त्यौहार तिथियां व पूजा मुहूर्त | ज्योतिष परामर्श",
+    descEn: "Comprehensive calendar of upcoming Hindu festivals, Ekadashi, Pradosh, Shivratri, Navratri, Purnima, Amavasya with authentic Vedic puja timings.",
+    descHi: "आगामी हिंदू त्यौहार, एकादशी, प्रदोष, नवरात्रि, पूर्णिमा, अमावस्या व प्रमुख व्रतों की सटीक तिथियां एवं पूजा विधि।"
+  },
+  daily: {
+    path: "/daily",
+    titleEn: "Daily Horoscope — Today Rashifal for All 12 Moon Signs | Jyotish Paramarsh",
+    titleHi: "दैनिक राशिफल — आज का भविष्यफल सभी १२ चंद्र राशियों के लिए | ज्योतिष परामर्श",
+    descEn: "Accurate Vedic daily horoscope (Dainik Rashifal) for all 12 Rashi signs covering career, finance, romance, health, lucky numbers and colors.",
+    descHi: "सभी १२ राशियों (मेष से मीन) का दैनिक वैदिक राशिफल: करियर, धन, स्वास्थ्य, प्रेम एवं शुभ अंक व रंग।"
+  },
+  matchmaking: {
+    path: "/matchmaking",
+    titleEn: "Kundli Milan — Free 36 Gunas Vedic Horoscope Matching for Marriage | Jyotish Paramarsh",
+    titleHi: "कुंडली मिलान — ३६ गुण मिलान, मांगलिक दोष विचार एवं विवाह अनुकूलता | ज्योतिष परामर्श",
+    descEn: "Complete Vedic Kundli Milan (Gun Milan) for prospective bride and groom. 36 Guna Ashta-Koota calculation, Nadi & Bhakoot dosha, and Manglik cancellation analysis.",
+    descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मंगली दोष परिहार।"
+  }
+};
+
+const getInitialSection = () => {
+  try {
+    const path = (window.location.pathname || "").replace(/^\/+|\/+$/g, '').toLowerCase();
+    if (path.includes("panchang")) return "panchang";
+    if (path.includes("muhurat")) return "muhurat";
+    if (path.includes("festivals") || path.includes("festival")) return "festivals";
+    if (path.includes("daily") || path.includes("horoscope") || path.includes("rashifal")) return "daily";
+    if (path.includes("matchmaking") || path.includes("milan")) return "matchmaking";
+
+    const params = new URLSearchParams(window.location.search);
+    const sec = params.get("section");
+    if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking"].includes(sec.toLowerCase())) {
+      return sec.toLowerCase();
+    }
+  } catch (e) {}
+  return "kundli";
+};
+
+const updatePageMeta = (sectionId, currentLang) => {
+  try {
+    const cfg = SECTION_CONFIG[sectionId] || SECTION_CONFIG.kundli;
+    const isHi = currentLang === "hi";
+    document.title = isHi ? cfg.titleHi : cfg.titleEn;
+    
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute("content", isHi ? cfg.descHi : cfg.descEn);
+    }
+    let canonical = document.querySelector('link[rel="canonical"]');
+    const canonicalUrl = `https://www.jyotishparamash.com${cfg.path === "/" ? "" : cfg.path}`;
+    if (canonical) {
+      canonical.setAttribute("href", canonicalUrl);
+    }
+  } catch (e) {}
+};
+
 // ── MAIN APP COMPONENT ───────────────────────────────────────────
 export default function App() {
   const [form, setForm] = useState({ name: "", gender: "male", dob: "", pob: "", tob: "" });
@@ -1375,7 +1457,13 @@ export default function App() {
   const [showBhavaCuspTable, setShowBhavaCuspTable] = useState(false);
   const [hoveredHouse, setHoveredHouse] = useState(null);
   const [err, setErr] = useState("");
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState(() => {
+    try {
+      const saved = localStorage.getItem("jyotish_user_lang");
+      if (saved === "en" || saved === "hi") return saved;
+    } catch (e) {}
+    return "en";
+  });
   const [selectedPlanetDetail, setSelectedPlanetDetail] = useState("Sun");
   const [currency, setCurrency] = useState(detectDefaultCurrency);
   const [lastCoords, setLastCoords] = useState({ lat: 26.8467, lon: 80.9462 });
@@ -1772,11 +1860,11 @@ export default function App() {
             }}
           >
             <span style={{ fontSize: 16 }}>🪷</span>
-            <span>{hi ? "श्रद्धा दक्षिणा अर्पित करें (Offer Dakshina)" : "Offer Dakshina Now (श्रद्धा दक्षिणा)"}</span>
+            <span>{hi ? "श्रद्धा दक्षिणा अर्पित करें (Offer Dakshina)" : "Offer Voluntary Dakshina"}</span>
           </button>
 
           <span style={{ fontSize: 12.5, color: "rgba(241, 231, 208, 0.75)", fontStyle: "italic" }}>
-            🔒 {isINR ? "PhonePe, Google Pay, Paytm UPI QR समर्थित" : "Instant & Secure PayPal Contribution"} · {hi ? "शत प्रतिशत सुरक्षित व पूर्णतः स्वैच्छिक" : "100% Secure & Purely Voluntary"}
+            🔒 {isINR ? (hi ? "PhonePe, Google Pay, Paytm UPI QR समर्थित" : "PhonePe, Google Pay, Paytm UPI QR Supported") : "Instant & Secure PayPal Contribution"} · {hi ? "शत प्रतिशत सुरक्षित व पूर्णतः स्वैच्छिक" : "100% Secure & Purely Voluntary"}
           </span>
         </div>
       </div>
@@ -1788,7 +1876,22 @@ export default function App() {
   const hi = lang === "hi";
 
   // Standalone Feature State (Direct Access without Birth Details)
-  const [mainSection, setMainSection] = useState("kundli"); // "kundli", "panchang", "muhurat", "festivals", "daily"
+  const [mainSection, setMainSection] = useState(getInitialSection);
+
+  const navigateToSection = (sectionId, e = null) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    setMainSection(sectionId);
+    const targetPath = sectionId === "kundli" ? "/" : `/${sectionId}`;
+    try {
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ section: sectionId }, "", targetPath);
+      }
+    } catch (err) {}
+    updatePageMeta(sectionId, lang);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const [panchangDate, setPanchangDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [panchangCity, setPanchangCity] = useState(MAJOR_INDIAN_CITIES[0]);
   const [choghadiyaPeriod, setChoghadiyaPeriod] = useState("day");
@@ -1880,6 +1983,22 @@ export default function App() {
     Analytics.toolSwitch(mainSection);
   }, [mainSection]);
 
+  // Listen to browser back/forward buttons (popstate)
+  useEffect(() => {
+    const onPopState = () => {
+      const sec = getInitialSection();
+      setMainSection(sec);
+      updatePageMeta(sec, lang);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [lang]);
+
+  // Synchronize dynamic title, description, and canonical on section/lang change
+  useEffect(() => {
+    updatePageMeta(mainSection, lang);
+  }, [mainSection, lang]);
+
   const run = async () => {
     if (!form.name.trim() || !form.dob || !form.pob.trim()) {
       setErr(t.errFields);
@@ -1951,7 +2070,11 @@ export default function App() {
   const handleLangToggle = () => {
     const newLang = lang === "en" ? "hi" : "en";
     setLang(newLang);
+    try {
+      localStorage.setItem("jyotish_user_lang", newLang);
+    } catch (e) {}
     Analytics.preferenceChange("language", newLang);
+    updatePageMeta(mainSection, newLang);
     if (err) {
       setErr(UI[newLang].errFields);
     }
@@ -2002,9 +2125,13 @@ export default function App() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {/* 1. Panchang Card */}
-        <div
-          onClick={() => setMainSection("panchang")}
+        <a
+          href="/panchang"
+          onClick={(e) => navigateToSection("panchang", e)}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: "rgba(18, 12, 34, 0.92)",
             border: todayFestival ? "1.5px solid #F59E0B" : "1px solid rgba(212,175,55,0.3)",
             borderRadius: 16,
@@ -2017,7 +2144,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_panchang.jpg" alt="Daily Hindu Panchang" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_panchang.webp" alt="Daily Hindu Panchang" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
               {todayFestival && (
@@ -2051,7 +2178,7 @@ export default function App() {
 
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
               <span>{hi ? "अभिजीत:" : "Abhijit:"} {panchangData.muhurats.abhijit.split("-")[0]}</span>
-              <span style={{ color: "#F87171" }}>{hi ? "राहुकाल:" : "Rahu:"} {panchangData.inauspicious.rahuKaal.split("-")[0]}</span>
+              <span style={{ color: "#F87171" }}>{hi ? "राहुकाल:" : "Rahu:"} {(panchangData.rahuKaal || panchangData.inauspicious?.rahuKaal || "01:30 PM").split("-")[0]}</span>
             </div>
 
             <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
@@ -2059,12 +2186,16 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 2. Shubh Muhurat Card */}
-        <div
-          onClick={() => setMainSection("muhurat")}
+        <a
+          href="/muhurat"
+          onClick={(e) => navigateToSection("muhurat", e)}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: "rgba(18, 12, 34, 0.92)",
             border: "1px solid rgba(212,175,55,0.3)",
             borderRadius: 16,
@@ -2077,7 +2208,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_muhurat.jpg" alt="Auspicious Shubh Muhurat" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_muhurat.webp" alt="Auspicious Shubh Muhurat" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             <div style={{ position: "absolute", top: 10, right: 10 }}>
               <span style={{ fontSize: 10.5, color: "#FDE68A", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(245,158,11,0.4)", padding: "2px 8px", borderRadius: 8 }}>
@@ -2107,12 +2238,16 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 3. Festivals & Vrat Card */}
-        <div
-          onClick={() => setMainSection("festivals")}
+        <a
+          href="/festivals"
+          onClick={(e) => navigateToSection("festivals", e)}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: todayFestival
               ? "linear-gradient(135deg, rgba(62, 28, 20, 0.96), rgba(28, 14, 40, 0.98))"
               : "rgba(18, 12, 34, 0.92)",
@@ -2127,7 +2262,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = todayFestival ? "#F59E0B" : "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_festivals.jpg" alt="Vedic Festivals & Vrats" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_festivals.webp" alt="Vedic Festivals & Vrats" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             {todayFestival && (
               <div style={{ position: "absolute", top: 10, right: 10, background: "#F59E0B", color: "#0F0A1E", fontSize: 10.5, fontWeight: 900, padding: "2px 8px", borderRadius: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
@@ -2163,12 +2298,16 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 4. Daily Horoscope Card */}
-        <div
-          onClick={() => setMainSection("daily")}
+        <a
+          href="/daily"
+          onClick={(e) => navigateToSection("daily", e)}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: "rgba(18, 12, 34, 0.92)",
             border: "1px solid rgba(212,175,55,0.3)",
             borderRadius: 16,
@@ -2181,7 +2320,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_horoscope.jpg" alt="12 Zodiac Daily Horoscope" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_horoscope.webp" alt="12 Zodiac Daily Horoscope" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             <div style={{ position: "absolute", top: 10, right: 10 }}>
               <span style={{ fontSize: 10.5, color: "#FBBF24", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(251,191,36,0.4)", padding: "2px 8px", borderRadius: 8 }}>
@@ -2211,17 +2350,21 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 5. Kundli Milan Card */}
-        <div
-          onClick={() => {
-            setMainSection("matchmaking");
+        <a
+          href="/matchmaking"
+          onClick={(e) => {
+            navigateToSection("matchmaking", e);
             if (result) {
               setTab("matchmaking");
             }
           }}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: "rgba(18, 12, 34, 0.92)",
             border: "1px solid rgba(212,175,55,0.3)",
             borderRadius: 16,
@@ -2234,7 +2377,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_matchmaking.jpg" alt="Vedic Wedding Vivaha Matchmaking" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_matchmaking.webp" alt="Vedic Wedding Vivaha Matchmaking" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             <div style={{ position: "absolute", top: 10, right: 10 }}>
               <span style={{ fontSize: 10.5, color: "#F472B6", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(244,114,182,0.4)", padding: "2px 8px", borderRadius: 8 }}>
@@ -2264,11 +2407,13 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
 
         {/* 6. Gemstones & Remedies Card */}
-        <div
-          onClick={() => {
+        <a
+          href="#gemstones"
+          onClick={(e) => {
+            e.preventDefault();
             setTab("store");
             if (!result) {
               const el = document.getElementById("birth-name");
@@ -2276,6 +2421,9 @@ export default function App() {
             }
           }}
           style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
             background: "rgba(18, 12, 34, 0.92)",
             border: "1px solid rgba(212,175,55,0.3)",
             borderRadius: 16,
@@ -2288,7 +2436,7 @@ export default function App() {
           onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(212,175,55,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           <div style={{ height: 125, position: "relative", overflow: "hidden" }}>
-            <img src="/images/feature_gemstones.jpg" alt="Vedic Gemstones and Rudraksha" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src="/images/feature_gemstones.webp" alt="Vedic Gemstones and Rudraksha" loading="lazy" decoding="async" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.3) 60%, transparent 100%)" }} />
             <div style={{ position: "absolute", top: 10, right: 10 }}>
               <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
@@ -2318,7 +2466,7 @@ export default function App() {
               <Icons.ArrowRight size={13} color="#F59E0B" />
             </div>
           </div>
-        </div>
+        </a>
       </div>
     </section>
   );
@@ -4116,8 +4264,10 @@ export default function App() {
             title="Click 3 times to open Admin VIP access portal"
           >
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="Jyotish Paramarsh Logo"
+              width="34"
+              height="34"
               style={{ width: 34, height: 34, borderRadius: "50%", border: "1.5px solid rgba(245,158,11,0.7)", boxShadow: "0 0 10px rgba(245,158,11,0.4)", objectFit: "cover" }}
             />
             <div>
@@ -4131,20 +4281,21 @@ export default function App() {
           {/* Master 6-Tool Navigation Pills */}
           <nav className="header-nav-strip" role="navigation" aria-label="Main features">
             {[
-              { id: "kundli", icon: "🔯", label: hi ? "जन्म कुंडली" : "Kundli" },
-              { id: "matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
-              { id: "panchang", icon: "🕉️", label: hi ? "पंचांग" : "Panchang" },
-              { id: "muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Muhurat" },
-              { id: "daily", icon: "☀️", label: hi ? "राशिफल" : "Horoscope" },
-              { id: "festivals", icon: "🪔", label: hi ? "त्यौहार" : "Festivals" }
+              { id: "kundli", path: "/", icon: "🔯", label: hi ? "जन्म कुंडली" : "Kundli" },
+              { id: "matchmaking", path: "/matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
+              { id: "panchang", path: "/panchang", icon: "🕉️", label: hi ? "पंचांग" : "Panchang" },
+              { id: "muhurat", path: "/muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Muhurat" },
+              { id: "daily", path: "/daily", icon: "☀️", label: hi ? "राशिफल" : "Horoscope" },
+              { id: "festivals", path: "/festivals", icon: "🪔", label: hi ? "त्यौहार" : "Festivals" }
             ].map(feat => {
               const isSelected = mainSection === feat.id;
               return (
-                <button
+                <a
                   key={feat.id}
-                  type="button"
-                  onClick={() => {
-                    setMainSection(feat.id);
+                  href={feat.path}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigateToSection(feat.id);
                     if (result && ["chart", "panchang", "muhurat", "festivals", "daily", "matchmaking"].includes(feat.id)) {
                       setTab(feat.id === "kundli" ? "chart" : feat.id);
                     }
@@ -4156,13 +4307,15 @@ export default function App() {
                       : "rgba(22, 15, 42, 0.85)",
                     border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
                     color: isSelected ? "#FDE68A" : "rgba(241, 231, 208, 0.92)",
-                    WebkitAppearance: "none",
-                    appearance: "none",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6
                   }}
                 >
                   <span style={{ fontSize: 14 }}>{feat.icon}</span>
                   <span>{feat.label}</span>
-                </button>
+                </a>
               );
             })}
           </nav>
@@ -4215,26 +4368,50 @@ export default function App() {
               ))}
             </select>
 
-            {/* Language Toggle */}
-            <button
+            {/* Language Toggle (Dual Segmented EN | HI Pill) */}
+            <div
               onClick={handleLangToggle}
+              role="button"
+              tabIndex={0}
+              aria-label="Switch Language (English / हिन्दी)"
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleLangToggle(); }}
               style={{
-                background: "linear-gradient(135deg, rgba(26,18,48,0.9), rgba(15,10,32,0.95))",
+                background: "rgba(22, 15, 42, 0.95)",
                 border: "1px solid rgba(212, 175, 55, 0.4)",
                 borderRadius: 20,
-                padding: "6px 12px",
+                padding: "3px 6px",
                 cursor: "pointer",
-                display: "flex",
+                display: "inline-flex",
                 alignItems: "center",
-                gap: 5,
-                color: "#F3D37A",
-                fontSize: 12.5,
-                fontWeight: 700
+                gap: 4,
+                userSelect: "none"
               }}
             >
-              <span>{hi ? "🇬🇧" : "🇮🇳"}</span>
-              <span>{t.langBtn}</span>
-            </button>
+              <span
+                style={{
+                  padding: "3px 8px",
+                  borderRadius: 14,
+                  fontSize: 12,
+                  fontWeight: !hi ? 800 : 500,
+                  background: !hi ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                  color: !hi ? "#0F0A1E" : "rgba(241, 231, 208, 0.75)"
+                }}
+              >
+                EN
+              </span>
+              <span
+                style={{
+                  padding: "3px 8px",
+                  borderRadius: 14,
+                  fontSize: 12,
+                  fontWeight: hi ? 800 : 500,
+                  background: hi ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
+                  color: hi ? "#0F0A1E" : "rgba(241, 231, 208, 0.75)"
+                }}
+              >
+                हिन्दी
+              </span>
+            </div>
 
             {result && (
               <button
@@ -4274,14 +4451,18 @@ export default function App() {
               ⭐ <b>{hi ? "नक्षत्र:" : "Nakshatra:"}</b> <span style={{ color: "#FDE68A" }}>{todayPanchangData.nakshatra}</span>
             </span>
             <span style={{ color: "rgba(241, 231, 208, 0.9)" }}>
-              ⏱️ <b>{hi ? "राहुकाल:" : "Rahu Kaal:"}</b> <span style={{ color: "#F87171", fontWeight: 700 }}>{todayPanchangData.rahuKaal}</span>
+              ⏱️ <b>{hi ? "राहुकाल:" : "Rahu Kaal:"}</b> <span style={{ color: "#F87171", fontWeight: 700 }}>{todayPanchangData.rahuKaal || todayPanchangData.inauspicious?.rahuKaal || "01:30 PM - 03:00 PM"}</span>
             </span>
-            <button
-              onClick={() => setMainSection("panchang")}
+            <a
+              href="/panchang"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToSection("panchang");
+              }}
               style={{ background: "transparent", border: "none", color: "#F59E0B", fontSize: 12, fontWeight: 800, cursor: "pointer", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 3 }}
             >
               <span>{hi ? "विस्तृत पंचांग" : "Full Almanac"}</span> →
-            </button>
+            </a>
           </div>
         </aside>
 
@@ -4289,12 +4470,16 @@ export default function App() {
         {mainSection === "matchmaking" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <button
-                onClick={() => setMainSection("kundli")}
-                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
               >
                 ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
-              </button>
+              </a>
             </div>
             {result ? (
               (() => {
@@ -4348,12 +4533,16 @@ export default function App() {
         {mainSection === "panchang" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <button
-                onClick={() => setMainSection("kundli")}
-                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
               >
                 ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
-              </button>
+              </a>
             </div>
             {renderPanchangContent()}
           </div>
@@ -4363,12 +4552,16 @@ export default function App() {
         {mainSection === "muhurat" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <button
-                onClick={() => setMainSection("kundli")}
-                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
               >
                 ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
-              </button>
+              </a>
             </div>
             {renderMuhuratContent()}
           </div>
@@ -4378,12 +4571,16 @@ export default function App() {
         {mainSection === "festivals" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <button
-                onClick={() => setMainSection("kundli")}
-                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
               >
                 ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
-              </button>
+              </a>
             </div>
             {renderFestivalsContent()}
           </div>
@@ -4393,12 +4590,16 @@ export default function App() {
         {mainSection === "daily" && (
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <button
-                onClick={() => setMainSection("kundli")}
-                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer" }}
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
               >
                 ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
-              </button>
+              </a>
             </div>
             {renderDailyHoroscopeContent()}
           </div>
@@ -4601,14 +4802,18 @@ export default function App() {
                       <span>⚡</span> {hi ? "त्वरित चयन:" : "Popular Cities:"}
                     </span>
                     {[
-                      { label: "🇺🇸 New York", val: "New York, USA" },
-                      { label: "🇬🇧 London", val: "London, UK" },
-                      { label: "🇨🇦 Toronto", val: "Toronto, Canada" },
-                      { label: "🇦🇺 Sydney", val: "Sydney, Australia" },
-                      { label: "🇦🇪 Dubai", val: "Dubai, UAE" },
                       { label: "🇮🇳 New Delhi", val: "New Delhi, India" },
                       { label: "🇮🇳 Mumbai", val: "Mumbai, India" },
                       { label: "🇮🇳 Bengaluru", val: "Bengaluru, India" },
+                      { label: "🇮🇳 Varanasi", val: "Varanasi, India" },
+                      { label: "🇮🇳 Ayodhya", val: "Ayodhya, India" },
+                      { label: "🇮🇳 Kolkata", val: "Kolkata, India" },
+                      { label: "🇮🇳 Hyderabad", val: "Hyderabad, India" },
+                      { label: "🇮🇳 Pune", val: "Pune, India" },
+                      { label: "🇦🇪 Dubai", val: "Dubai, UAE" },
+                      { label: "🇬🇧 London", val: "London, UK" },
+                      { label: "🇺🇸 New York", val: "New York, USA" },
+                      { label: "🇨🇦 Toronto", val: "Toronto, Canada" },
                     ].map(city => (
                       <button
                         key={city.val}
@@ -4749,8 +4954,11 @@ export default function App() {
                 }}
               >
                 <img
-                  src="/images/hero_vedic_astrology.jpg"
+                  src="/images/hero_vedic_astrology.webp"
                   alt="Ancient Vedic Astrology Armillary Sphere and Manuscripts"
+                  width="960"
+                  height="240"
+                  fetchPriority="high"
                   style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }}
                 />
                 <div
@@ -4970,13 +5178,18 @@ export default function App() {
                       </span>
                     </div>
                     <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                      {result.dashaDetails?.activeMahadasha
-                        ? (hi
-                            ? `वर्तमान में ${result.dashaDetails.activeMahadasha.lord} की महादशा (${result.dashaDetails.activeMahadasha.startYear}–${result.dashaDetails.activeMahadasha.endYear}) चल रही है। यह काल आपके कर्म व आत्मोन्नति को दिशा दे रहा है।`
-                            : `Currently navigating ${result.dashaDetails.activeMahadasha.lord} Mahadasha (${result.dashaDetails.activeMahadasha.startYear}–${result.dashaDetails.activeMahadasha.endYear}), catalyzing transformative personal and professional milestones.`)
-                        : (hi
-                            ? `आपकी विंशोत्तरी दशा का वर्तमान चरण महत्वपूर्ण जीवन परिवर्तनों का संकेत दे रहा है।`
-                            : `Your active Vimshottari planetary era is driving key personal breakthroughs.`)}
+                      {(() => {
+                        const activeMaha = result.detailedDashas?.activeMahadasha || result.dashaDetails?.activeMahadasha;
+                        const activeAntar = result.detailedDashas?.currentActiveAntardasha || result.dashaDetails?.currentActiveAntardasha;
+                        if (activeMaha && activeMaha.lord) {
+                          return hi
+                            ? `वर्तमान में ${activeMaha.lord} की महादशा (${activeMaha.startYear}–${activeMaha.endYear}) चल रही है${activeAntar ? ` (अंतर्दशा: ${activeAntar.antardashaLord})` : ""}। यह काल आपके कर्म व आत्मोन्नति को दिशा दे रहा है।`
+                            : `Currently navigating ${activeMaha.lord} Mahadasha (${activeMaha.startYear}–${activeMaha.endYear})${activeAntar ? ` with ${activeAntar.antardashaLord} Antardasha` : ""}, catalyzing transformative personal and professional milestones.`;
+                        }
+                        return hi
+                          ? `आपकी विंशोत्तरी दशा का वर्तमान चरण महत्वपूर्ण जीवन परिवर्तनों का संकेत दे रहा है।`
+                          : `Your active Vimshottari planetary era is driving key personal breakthroughs.`;
+                      })()}
                     </p>
                   </div>
                   <button
@@ -9026,8 +9239,10 @@ export default function App() {
                 title="Click 3 times for Admin VIP Portal"
               >
                 <img
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt="Jyotish Paramarsh Logo"
+                  width="44"
+                  height="44"
                   style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(245,158,11,0.7)", boxShadow: "0 0 14px rgba(245,158,11,0.3)" }}
                 />
                 <div>
@@ -9056,52 +9271,83 @@ export default function App() {
               </h4>
               <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9, fontSize: 12.5 }}>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("kundli"); if (result) setTab("chart"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("kundli");
+                      if (result) setTab("chart");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "लग्न एवं १६ षोडशवर्ग कुंडलियां" : "Lagna & 16 Shodashvargas"}
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("panchang"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/panchang"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("panchang");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "दैनिक वैदिक पंचांग एवं चौघड़िया" : "Daily Sidereal Panchang"}
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("muhurat"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/muhurat"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("muhurat");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी (2026–2027)" : "Shubh Muhurat Timings"}
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("festivals"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/festivals"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("festivals");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "सनातन धर्म के पावन पर्व एवं व्रत" : "Hindu Festivals & Vrats"}
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("daily"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/daily"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("daily");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "दैनिक राशिफल (१२ राशियां)" : "Daily Zodiac Horoscope"}
-                  </button>
+                  </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => { setMainSection("kundli"); setTab("matchmaking"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
+                  <a
+                    href="/matchmaking"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("matchmaking");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "वैदिक कुंडली मिलान (३६ गुण)" : "Ashtakoot Gun Milan (36 Pts)"}
-                  </button>
+                  </a>
                 </li>
               </ul>
             </div>

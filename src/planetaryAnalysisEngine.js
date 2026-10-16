@@ -108,7 +108,7 @@ export function getPlanetaryAvastha(degInSign, signIdx) {
 /**
  * Detect all active Planetary Conjunctions (Yutis) in the chart
  */
-export function detectPlanetaryConjunctions(planetHouseMap, planetData, lang = "hi") {
+export function detectPlanetaryConjunctions(planetHouseMap, planetData, lang = "en") {
   const isHi = lang === "hi";
   const housePlanets = {};
 
@@ -312,7 +312,7 @@ export function detectPlanetaryConjunctions(planetHouseMap, planetData, lang = "
 /**
  * Generate in-depth life aspect breakdown for every planet in the birth chart
  */
-export function getPlanetLifeImpactBreakdown(planetName, pData, houses, lang = "hi") {
+export function getPlanetLifeImpactBreakdown(planetName, pData, houses, lang = "en") {
   const isHi = lang === "hi";
   const houseNum = pData.house;
   const sign = pData.sign;
@@ -366,7 +366,7 @@ export function getPlanetLifeImpactBreakdown(planetName, pData, houses, lang = "
 // HELPER SYNTHESIS & METADATA
 // ─────────────────────────────────────────────────────────────
 
-function translatePlanet(p, lang = "hi") {
+function translatePlanet(p, lang = "en") {
   const map = {
     Sun: "सूर्य", Moon: "चंद्र", Mars: "मंगल", Mercury: "बुध",
     Jupiter: "गुरु", Venus: "शुक्र", Saturn: "शनि", Rahu: "राहु", Ketu: "केतु"
