@@ -2678,13 +2678,34 @@ export default function App() {
 
           {/* City Selector */}
           <select
+            id="panchang-city-select"
             aria-label="Panchang City"
             value={panchangCity.name}
             onChange={e => {
               const c = MAJOR_INDIAN_CITIES.find(city => city.name === e.target.value);
               if (c) setPanchangCity(c);
             }}
-            style={{ background: "rgba(26,18,48,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 10, padding: "8px 12px", color: "#FDE68A", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+            className="custom-select-arrow"
+            style={{
+              WebkitAppearance: "none",
+              MozAppearance: "none",
+              appearance: "none",
+              background: "rgba(26,18,48,0.9)",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "calc(100% - 12px) center",
+              backgroundSize: "12px 12px",
+              border: "1px solid rgba(212,175,55,0.3)",
+              borderRadius: 10,
+              padding: "8px 34px 8px 12px",
+              color: "#FDE68A",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              outline: "none",
+              boxSizing: "border-box",
+              lineHeight: 1.2
+            }}
           >
             {MAJOR_INDIAN_CITIES.map(c => (
               <option key={c.name} value={c.name} style={{ background: "#0F0A1E", color: "#FFF" }}>
@@ -3382,7 +3403,25 @@ export default function App() {
                     aria-label="Preferred Morning Time"
                     value={dailyTime}
                     onChange={e => setDailyTime(e.target.value)}
-                    style={{ width: "100%", background: "rgba(11,8,25,0.7)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 13.5 }}
+                    className="custom-select-arrow"
+                    style={{
+                      width: "100%",
+                      WebkitAppearance: "none",
+                      MozAppearance: "none",
+                      appearance: "none",
+                      background: "rgba(11,8,25,0.7)",
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "calc(100% - 12px) center",
+                      backgroundSize: "12px 12px",
+                      border: "1px solid rgba(212,175,55,0.3)",
+                      borderRadius: 8,
+                      padding: "10px 34px 10px 14px",
+                      color: "#FFF",
+                      fontSize: 13.5,
+                      outline: "none",
+                      boxSizing: "border-box"
+                    }}
                   >
                     <option value="06:00 AM">🌅 06:00 AM (Sunrise Alert)</option>
                     <option value="07:00 AM">☀️ 07:00 AM (Standard)</option>
@@ -3753,6 +3792,30 @@ export default function App() {
           }
         }
 
+        /* ── CUSTOM DROPDOWN SELECT ARROW STYLING ── */
+        select.custom-select-arrow,
+        #header-currency-select,
+        #panchang-city-select,
+        #daily-time-select {
+          -webkit-appearance: none !important;
+          -moz-appearance: none !important;
+          appearance: none !important;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+          background-repeat: no-repeat !important;
+          background-position: calc(100% - 10px) center !important;
+          background-size: 11px 11px !important;
+          padding-right: 28px !important;
+          box-sizing: border-box !important;
+        }
+        #panchang-city-select {
+          background-position: calc(100% - 12px) center !important;
+          background-size: 12px 12px !important;
+          padding-right: 34px !important;
+        }
+        select::-ms-expand {
+          display: none;
+        }
+
         /* ── UNIFIED MASTER HEADER & NAVIGATION ── */
         .top-header-bar {
           position: sticky;
@@ -3936,8 +3999,10 @@ export default function App() {
             letter-spacing: 0.6px !important;
           }
           #header-currency-select {
-            padding: 4px 6px !important;
-            font-size: 11px !important;
+            padding: 5px 22px 5px 8px !important;
+            font-size: 11.5px !important;
+            background-position: calc(100% - 7px) center !important;
+            background-size: 10px 10px !important;
           }
           .header-nav-pill {
             padding: 5px 10px !important;
@@ -4349,16 +4414,26 @@ export default function App() {
               aria-label={t.currencyLabel}
               value={currency}
               onChange={e => handleSetCurrency(e.target.value)}
+              className="custom-select-arrow"
               style={{
+                WebkitAppearance: "none",
+                MozAppearance: "none",
+                appearance: "none",
                 background: "rgba(26,18,48,0.95)",
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "calc(100% - 10px) center",
+                backgroundSize: "11px 11px",
                 border: "1px solid rgba(212,175,55,0.35)",
                 borderRadius: 18,
-                padding: "6px 10px",
+                padding: "6px 28px 6px 11px",
                 color: "#FDE68A",
                 fontSize: 12.5,
                 fontWeight: 700,
                 cursor: "pointer",
-                outline: "none"
+                outline: "none",
+                boxSizing: "border-box",
+                lineHeight: 1.2
               }}
             >
               {Object.values(CURRENCIES).map(c => (
