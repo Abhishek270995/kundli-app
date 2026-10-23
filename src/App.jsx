@@ -55,28 +55,28 @@ const PLANETS = [
 ];
 
 const PERSONAL_TABS = [
-  { id: "chart", icon: "🔯", iconName: "Chart", labelEn: "Chart & Shodashvarga", labelHi: "लग्न व वर्ग कुंडलियां" },
-  { id: "overview", icon: "🌟", iconName: "Overview", labelEn: "Overview & Panchang", labelHi: "सिंहावलोकन व पंचांग" },
-  { id: "planets", icon: "🪐", iconName: "Planet", labelEn: "Planets", labelHi: "ग्रह स्थिति" },
-  { id: "houses", icon: "🏠", iconName: "House", labelEn: "Houses", labelHi: "भाव विश्लेषण" },
-  { id: "doshas", icon: "⚡", iconName: "Shield", labelEn: "Doshas & Yogas", labelHi: "दोष व योग निदान" },
-  { id: "shadbala", icon: "⚖️", iconName: "Scale", labelEn: "Shadbala & SAV", labelHi: "षड्बल व अष्टकवर्ग" },
-  { id: "life", icon: "🌿", iconName: "Sparkle", labelEn: "Life Areas", labelHi: "जीवन क्षेत्र" },
-  { id: "careerTiming", icon: "💼", iconName: "Briefcase", labelEn: "Career & Job", labelHi: "करियर व नौकरी" },
-  { id: "marriageTiming", icon: "💍", iconName: "Heart", labelEn: "Marriage & Spouse", labelHi: "विवाह व जीवनसाथी" },
-  { id: "predictions", icon: "🔮", iconName: "Hourglass", labelEn: "Dasha & Transits", labelHi: "दशा व गोचर" },
-  { id: "lifeProblems", icon: "🛡️", iconName: "Shield", labelEn: "Problem Solver & Remedies", labelHi: "समस्या निवारण" },
-  { id: "store", icon: "💎", iconName: "Gem", labelEn: "Gemstones & Remedies", labelHi: "रत्न व उपाय" },
-  { id: "matchmaking", icon: "❤️", iconName: "Heart", labelEn: "Kundli Milan", labelHi: "गुण मिलान" },
+  { id: "chart", icon: "🔯", iconName: "Chart", labelEn: "Lagna & 16 Varga Charts", labelHi: "लग्न व १६ वर्ग कुंडलियां" },
+  { id: "overview", icon: "🌟", iconName: "Overview", labelEn: "Birth Avakahada & Panchang", labelHi: "अवकहड़ा चक्र व जन्म पंचांग" },
+  { id: "planets", icon: "🪐", iconName: "Planet", labelEn: "Planetary Dignities (Grahas)", labelHi: "नवग्रह स्थिति, अंश व दृष्टि" },
+  { id: "houses", icon: "🏠", iconName: "House", labelEn: "12 Bhavas (House Analysis)", labelHi: "द्वादश भाव विश्लेषण (१२ भाव)" },
+  { id: "doshas", icon: "⚡", iconName: "Shield", labelEn: "Yogas & Doshas (Manglik, Shani)", labelHi: "शुभ योग एवं दोष (मांगलिक, साढ़ेसाती)" },
+  { id: "shadbala", icon: "⚖️", iconName: "Scale", labelEn: "Shadbala & Ashtakavarga", labelHi: "षड्बल सामर्थ्य व अष्टकवर्ग" },
+  { id: "life", icon: "🌿", iconName: "Sparkle", labelEn: "Life Domains & Karma", labelHi: "समस्त जीवन क्षेत्र व कर्म फल" },
+  { id: "careerTiming", icon: "💼", iconName: "Briefcase", labelEn: "Career & Raj Yoga Timing", labelHi: "आजीविका, करियर व राजयोग काल" },
+  { id: "marriageTiming", icon: "💍", iconName: "Heart", labelEn: "Marriage & Spouse Harmony", labelHi: "विवाह, दांपत्य सुख व जीवनसाथी" },
+  { id: "predictions", icon: "🔮", iconName: "Hourglass", labelEn: "Vimshottari Dasha & Transits", labelHi: "विंशोत्तरी महादशा व गोचर चक्र" },
+  { id: "lifeProblems", icon: "🛡️", iconName: "Shield", labelEn: "Problem Remedies (Lal Kitab)", labelHi: "समस्या निवारण एवं शास्त्रीय उपाय" },
+  { id: "store", icon: "💎", iconName: "Gem", labelEn: "Prescribed Gemstones & Remedies", labelHi: "कुंडली अनुसार रत्न व रुद्राक्ष" },
+  { id: "matchmaking", icon: "❤️", iconName: "Heart", labelEn: "Ashtakoot Kundli Milan (36 Gunas)", labelHi: "अष्टकूट गुण मिलान (३६ गुण)" },
 ];
 
 const GENERIC_TABS = [
-  { id: "panchang", icon: "🕉️", iconName: "Moon", labelEn: "Hindu Panchang", labelHi: "दैनिक पंचांग" },
-  { id: "muhurat", icon: "⏳", iconName: "Clock", labelEn: "Shubh Muhurat", labelHi: "शुभ मुहूर्त" },
-  { id: "festivals", icon: "🪔", iconName: "Flame", labelEn: "Festivals & Vrat", labelHi: "व्रत व त्यौहार" },
-  { id: "daily", icon: "☀️", iconName: "Sun", labelEn: "Daily Horoscope", labelHi: "दैनिक राशिफल" },
-  { id: "forecast", icon: "📅", iconName: "Calendar", labelEn: "2026–2027 Forecast", labelHi: "वार्षिक राशिफल" },
-  { id: "consult", icon: "🧙‍♂️", iconName: "BookOpen", labelEn: "Talk to Astrologer", labelHi: "ज्योतिषी परामर्श" },
+  { id: "panchang", icon: "🕉️", iconName: "Moon", labelEn: "Dainik Panchang (Almanac)", labelHi: "दैनिक वैदिक पंचांग" },
+  { id: "muhurat", icon: "⏳", iconName: "Clock", labelEn: "Shubh Muhurat (Auspicious Time)", labelHi: "शुभ मुहूर्त एवं चौघड़िया" },
+  { id: "festivals", icon: "🪔", iconName: "Flame", labelEn: "Vrat & Festivals Calendar", labelHi: "सनातन व्रत, पर्व एवं त्यौहार" },
+  { id: "daily", icon: "☀️", iconName: "Sun", labelEn: "Daily Rashifal (Horoscope)", labelHi: "दैनिक राशिफल (१२ राशियां)" },
+  { id: "forecast", icon: "📅", iconName: "Calendar", labelEn: "Varshik Rashifal (Annual Forecast)", labelHi: "वार्षिक राशिफल एवं वर्षफल" },
+  { id: "consult", icon: "🧙‍♂️", iconName: "BookOpen", labelEn: "Talk to Astrologer (Paramarsh)", labelHi: "ज्योतिषाचार्य से व्यक्तिगत परामर्श" },
 ];
 
 const TABS = [...PERSONAL_TABS, ...GENERIC_TABS];
@@ -85,37 +85,37 @@ const TAB_PILLARS = [
   {
     id: "core",
     icon: "📊",
-    labelEn: "Core Kundli",
-    labelHi: "लग्न व ग्रह चक्र",
-    descEn: "Birth chart, planetary dignities, 12 houses & Shadbala",
-    descHi: "लग्न व वर्ग चक्र, नवग्रह, १२ भाव व षड्बल बल",
+    labelEn: "Janma Kundli & Grahas",
+    labelHi: "जन्म कुंडली एवं नवग्रह चक्र",
+    descEn: "Lagna chart, planetary dignities, 12 Bhavas, Shadbala & Shodashvargas",
+    descHi: "लग्न चक्र, नवग्रह अंश व दृष्टि, द्वादश भाव, षड्बल एवं १६ वर्ग कुंडलियां",
     tabIds: ["chart", "overview", "planets", "houses", "shadbala"]
   },
   {
     id: "predictions",
     icon: "🔮",
-    labelEn: "Predictions & Timing",
-    labelHi: "भविष्यफल व दशा काल",
-    descEn: "Career timing, marriage windows, Vimshottari dasha & life areas",
-    descHi: "करियर काल, विवाह योग, महादशा चक्र व जीवन क्षेत्र",
+    labelEn: "Dasha & Life Predictions",
+    labelHi: "दशा चक्र एवं जीवन भविष्यफल",
+    descEn: "120-year Vimshottari Mahadasha, career milestones, marriage timing & Gochar transits",
+    descHi: "१२० वर्षीय विंशोत्तरी महादशा, करियर उत्थान, विवाह योग एवं गोचर कालचक्र",
     tabIds: ["careerTiming", "marriageTiming", "predictions", "life"]
   },
   {
     id: "remedies",
     icon: "🛡️",
-    labelEn: "Remedies & Guidance",
-    labelHi: "उपाय व समस्या समाधान",
-    descEn: "Doshas, astrological problem remedies & certified gemstones",
-    descHi: "दोष व योग निदान, व्यावहारिक लाल किताब उपाय व रत्न",
+    labelEn: "Yogas, Doshas & Vedic Remedies",
+    labelHi: "शुभ योग, दोष एवं वैदिक उपाय",
+    descEn: "Manglik dosha, Shani Sade Sati remedies, Lal Kitab, certified gemstones & Rudraksha",
+    descHi: "मांगलिक दोष, साढ़ेसाती शांति, लाल किताब टोटके, रत्न एवं रुद्राक्ष परामर्श",
     tabIds: ["doshas", "lifeProblems", "store"]
   },
   {
     id: "universal",
     icon: "🌐",
-    labelEn: "Daily & Matchmaking",
-    labelHi: "दैनिक पंचांग व मिलान",
-    descEn: "Kundli Milan, live Panchang, Shubh Muhurat, Festivals & Horoscopes",
-    descHi: "३६ गुण मिलान, दैनिक पंचांग, मुहूर्त, व्रत पर्व व राशिफल",
+    labelEn: "Panchang, Milan & Almanac",
+    labelHi: "पंचांग, गुण मिलान एवं राशिफल",
+    descEn: "36 Gunas Kundli Milan, daily Panchang, Shubh Muhurat, Vrats & daily Rashifal",
+    descHi: "अष्टकूट ३६ गुण मिलान, दैनिक पंचांग, शुभ मुहूर्त, व्रत-त्यौहार एवं दैनिक राशिफल",
     tabIds: ["matchmaking", "panchang", "muhurat", "festivals", "daily", "forecast", "consult"]
   },
   {
@@ -132,139 +132,139 @@ const TAB_PILLARS = [
 const UI = {
   en: {
     title: "JYOTISH PARAMARSH",
-    subtitle: "VEDIC BIRTH CHART & COSMIC LIFE READING",
-    tagline: '"As above, so below — the stars illuminate the path of your soul"',
-    formTitle: "Enter Your Birth Details",
-    formSub: "Accurate planetary calculations according to traditional Parashari Vedic Astrology",
-    fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth",
+    subtitle: "AUTHENTIC VEDIC JANAM KUNDLI & LIFE READING",
+    tagline: '"गुह्याद् गुह्यतरं चेदं ज्योतिष्मती परा विद्या — The divine science of light illuminating the karmic path of the soul"',
+    formTitle: "Enter Birth Details for Janam Kundli",
+    formSub: "Precise planetary coordinates and Lagna computed according to Maharishi Parashara's classical Brihat Parashara Hora Shastra",
+    fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth (City / State)",
     fGender: "Gender", genderMale: "Male", genderFemale: "Female", genderOther: "Other",
     fTobHelp: "(12:00 PM if unsure)",
     phName: "Enter your full name", phPob: "Enter birth city, state / country",
-    btnGo: "Reveal My Kundli ✦", btnWait: "Consulting the Stars...",
-    errFields: "Please fill in your Name, Date of Birth, and Place of Birth.",
-    errPartnerFields: "Please enter partner name and date of birth.",
-    errApi: "Unable to generate Kundli. Please verify your details and try again.",
-    s1: "Calculating exact planetary coordinates & Lagna...",
-    s2: "Synthesizing 12 Bhavas, Yogas, Dashas & Life Predictions...",
-    chartTitle: "Natal Birth Chart (Lagna Kundli)",
-    chartSub: "House 1 at top · Signs and planetary placements in natal houses",
-    chartStyleNorth: "North Indian (Diamond)",
-    chartStyleSouth: "South Indian (Square)",
-    ptTitle: "Planetary Positions & Dignities",
-    htTitle: "12 Bhavas (Houses) Comprehensive Breakdown",
+    btnGo: "Generate Free Janam Kundli ✦", btnWait: "Calculating Planetary Coordinates & Lagna...",
+    errFields: "Please enter your Name, Date of Birth, and Place of Birth to generate your Kundli.",
+    errPartnerFields: "Please enter partner's name and date of birth for Ashtakoot Milan.",
+    errApi: "Unable to calculate Kundli. Please verify your birth details and try again.",
+    s1: "Calculating exact planetary coordinates (Graha Sphuta) & Ascendant (Lagna)...",
+    s2: "Synthesizing 12 Bhavas, Auspicious Yogas, Vimshottari Dashas & Predictions...",
+    chartTitle: "Lagna Kundli (Birth Chart) & Shodashvargas",
+    chartSub: "Ascendant (Lagna) in 1st house · Natal signs and planetary placements",
+    chartStyleNorth: "North Indian (Diamond / Diamond-Koshtha)",
+    chartStyleSouth: "South Indian (Square / Chakram)",
+    ptTitle: "Planetary Positions & Dignities (Graha Sthiti & Drishti)",
+    htTitle: "12 Bhavas (Houses) Comprehensive Astrological Breakdown",
     sec: {
-      blueprint: "Cosmic Blueprint & Soul Archetype",
-      yogas: "Auspicious Yogas & Astrological Formations",
-      verdict: "The Stars' Final Verdict",
-      pa: "Planetary Synthesis",
-      ha: "Bhava (House) Dynamics",
-      dasha: "Vimshottari Mahadasha Timeline",
-      health: "Health, Vitality & Well-being",
-      wealth: "Wealth, Finances & Prosperity",
-      education: "Education, Intellect & Learning",
-      career: "Career, Ambition & Societal Status",
-      marriage: "Marriage, Relationships & Partnerships",
+      blueprint: "Lagna Blueprint & Core Temperament",
+      yogas: "Auspicious Raja Yogas & Dhana Yogas",
+      verdict: "Astrological Life Synthesis & Verdict",
+      pa: "Graha Dignity & Planetary Analysis",
+      ha: "12 Bhavas (House Dynamics)",
+      dasha: "Vimshottari Mahadasha Timeline (120 Years)",
+      health: "Health, Vitality & Arogya Vichar",
+      wealth: "Wealth, Finances & Lakshmi Sthana",
+      education: "Education, Intellect & Vidya Sthana",
+      career: "Career, Profession & Karma Bhava",
+      marriage: "Marriage, Spouse & Kalatra Bhava",
       pred: "Life Predictions — Decade by Decade",
-      colours: "Lucky Colours", numbers: "Lucky Numbers", days: "Auspicious Days",
-      rudraksha: "Prescribed Rudraksha", gems: "Gemstones & Astrological Remedies",
-      longevity: "Longevity & Life Vitality (Deerghayu)"
+      colours: "Auspicious Colours", numbers: "Lucky Numbers", days: "Auspicious Days",
+      rudraksha: "Prescribed Consecrated Rudraksha", gems: "Auspicious Gemstones & Vedic Remedies",
+      longevity: "Longevity & Vitality (Ayur Vichar)"
     },
-    pills: { lagna: "Ascendant (Lagna)", rashi: "Moon Sign (Rashi)", nakshatra: "Nakshatra", tithi: "Tithi", yoga: "Yoga" },
-    pcols: ["Planet", "Sign", "House", "Degree & Nakshatra", "Dignity", "Astrological Effect"],
-    hnames: ["Self & Vitality", "Wealth & Lineage", "Courage & Siblings", "Home & Happiness", "Intellect & Karma", "Health & Service", "Marriage & Partners", "Longevity & Transformation", "Fortune & Dharma", "Career & Status", "Gains & Aspirations", "Moksha & Expenses"],
-    nopl: "No planets residing",
+    pills: { lagna: "Ascendant (Lagna)", rashi: "Moon Sign (Rashi)", nakshatra: "Nakshatra & Pada", tithi: "Lunar Tithi", yoga: "Nitya Yoga" },
+    pcols: ["Planet (Graha)", "Zodiac Sign", "Bhava (House)", "Degree & Nakshatra", "Dignity / Strength", "Astrological Effect"],
+    hnames: ["1st: Self, Vitality & Soul", "2nd: Wealth & Family Lineage", "3rd: Courage & Siblings", "4th: Home, Mother & Happiness", "5th: Intellect & Poorva Punya", "6th: Health, Service & Obstacles", "7th: Marriage & Partnerships", "8th: Longevity & Transformation", "9th: Fortune, Dharma & Guru", "10th: Career, Karma & Status", "11th: Gains & Aspirations (Labha)", "12th: Moksha & Spiritual Liberation"],
+    nopl: "No planets occupying",
     langBtn: "हिंदी में देखें",
-    printBtn: "Save Complete Kundli as PDF",
-    editBtn: "Edit Details",
+    printBtn: "Save Complete Janam Kundli (PDF)",
+    editBtn: "Edit Birth Details",
     footer1: "✦ OM TAT SAT ✦",
-    footer2: "Authentic Parashari Vedic Astrology Engine · Client Computation",
-    partnerName: "Partner Name",
+    footer2: "Authentic Parashari Vedic Astrology System · Confidential & Sacred",
+    partnerName: "Partner's Full Name (वधू / वर का नाम)",
     partnerDob: "Date of Birth",
     partnerTob: "Time of Birth",
     partnerTobHelp: "(12:00 PM if unsure)",
-    partnerFormTitle: "Enter Partner's Details:",
-    calculateMatchBtn: "Calculate Gun Milan Compatibility ✦",
+    partnerFormTitle: "Enter Partner's Birth Details for Compatibility (गुण मिलान):",
+    calculateMatchBtn: "Calculate Ashtakoot 36 Guna Milan ✦",
     currencyLabel: "Select Currency",
     deliveryTimeLabel: "Preferred Delivery Time",
     checkoutEmailLabel: "Your Email Address (For PDF Report & Receipt) *",
-    checkoutEmailHelp: "Your unlocked high-resolution report and invoice will be sent here.",
-    checkoutTxIdLabel: "PayPal Transaction ID / Order Ref (Optional)",
-    checkoutTxIdHelp: "Found in your PayPal confirmation email or activity receipt.",
-    checkoutPhoneLabel: "Phone Number (Optional)",
-    checkoutPhoneHelp: "Optional for order reference and dispatch notification.",
+    checkoutEmailHelp: "Your unlocked high-resolution 50-page dossier will be sent here.",
+    checkoutTxIdLabel: "Transaction ID / Order Ref (Optional)",
+    checkoutTxIdHelp: "Found in your confirmation email or payment receipt.",
+    checkoutPhoneLabel: "Phone / WhatsApp Number (Optional)",
+    checkoutPhoneHelp: "Optional for instant dispatch notification.",
     cardNumberLabel: "Card Number",
-    cardExpiryLabel: "Card Expiry (MM/YY)",
+    cardExpiryLabel: "Expiry (MM/YY)",
     cardCvvLabel: "Security Code (CVV)",
-    quickDailyPrompt: "Or check Today's Daily Vedic Horoscope & Email Alerts:",
-    quickDailyBtn: "Daily Horoscope",
+    quickDailyPrompt: "Check Today's Daily Vedic Rashifal (Horoscope):",
+    quickDailyBtn: "Dainik Rashifal",
   },
   hi: {
     title: "ज्योतिष परामर्श",
-    subtitle: "वैदिक जन्म कुंडली एवं ब्रह्मांडीय जीवन विश्लेषण",
-    tagline: '"जैसा ऊपर, वैसा नीचे — नक्षत्र आपकी आत्मा के दिव्य मार्ग को प्रकाशित करते हैं"',
-    formTitle: "अपना जन्म विवरण दर्ज करें",
-    formSub: "पराशरी वैदिक ज्योतिष के प्रामाणिक सिद्धांतों पर आधारित सटीक गणना",
-    fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान",
+    subtitle: "निःशुल्क जन्म पत्रिका — प्रामाणिक वैदिक जन्म कुंडली एवं जीवन दर्पण",
+    tagline: '"नक्षत्रमाला भुवि दीप्यमाना — नवग्रह आपके जीवन, प्रारब्ध एवं कर्म के पथप्रदर्शक हैं"',
+    formTitle: "जन्म कुंडली हेतु अपना जन्म विवरण दर्ज करें",
+    formSub: "महर्षि पराशर प्रणीत बृहत्पाराशर होराशास्त्र के सिद्धांतानुसार सटीक ग्रह स्पष्ट एवं लग्न गणना",
+    fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान (शहर, राज्य / देश)",
     fGender: "लिंग (Gender)", genderMale: "पुरुष", genderFemale: "महिला", genderOther: "अन्य",
     fTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
     phName: "अपना पूरा नाम दर्ज करें", phPob: "जन्म का शहर, राज्य / देश दर्ज करें",
-    btnGo: "मेरी कुंडली प्रकट करें ✦", btnWait: "ग्रहों से परामर्श जारी है...",
-    errFields: "कृपया अपना पूरा नाम, जन्म तिथि और जन्म स्थान भरें।",
-    errPartnerFields: "कृपया जीवनसाथी का नाम और जन्म तिथि दर्ज करें।",
-    errApi: "कुंडली गणना में त्रुटि हुई। कृपया विवरण पुनः जांचें।",
-    s1: "ग्रह स्थितियों एवं लग्न की सटीक खगोलीय गणना...",
-    s2: "१२ भावों, योगों, विंशोत्तरी दशा और जीवन फल का विश्लेषण...",
-    chartTitle: "लग्न कुंडली चक्र (Lagna Kundli)",
-    chartSub: "भाव १ शीर्ष पर · राशि संख्या एवं ग्रहों की जन्मकालीन स्थिति",
-    chartStyleNorth: "उत्तर भारतीय (डायमंड)",
-    chartStyleSouth: "दक्षिण भारतीय (स्क्वायर)",
-    ptTitle: "ग्रह स्थिति एवं बल तालिका",
-    htTitle: "सभी १२ भावों का विस्तृत विश्लेषण",
+    btnGo: "निःशुल्क जन्म कुंडली बनाएं ✦", btnWait: "नवग्रह स्थिति, अंश व लग्न की सूक्ष्म गणना जारी है...",
+    errFields: "कृपया जन्म कुंडली निर्माण हेतु अपना पूरा नाम, जन्म तिथि और जन्म स्थान भरें।",
+    errPartnerFields: "कृपया अष्टकूट गुण मिलान हेतु जीवनसाथी का नाम और जन्म तिथि दर्ज करें।",
+    errApi: "कुंडली गणना में त्रुटि हुई। कृपया जन्म विवरण पुनः जांचें।",
+    s1: "ग्रह स्पष्ट (Graha Sphuta) एवं लग्न की सूक्ष्म खगोलीय गणना...",
+    s2: "द्वादश भावों, शुभ योगों, विंशोत्तरी महादशा और जीवन फल का विश्लेषण...",
+    chartTitle: "लग्न कुंडली चक्र (Lagna Kundli) एवं षोडशवर्ग",
+    chartSub: "प्रथम भाव शीर्ष पर · राशि संख्या एवं नवग्रहों की जन्मकालीन स्थिति",
+    chartStyleNorth: "उत्तर भारतीय (डायमंड कोष्ठक)",
+    chartStyleSouth: "दक्षिण भारतीय (चौकोर चक्र)",
+    ptTitle: "नवग्रह स्थिति, अंश, दृष्टि एवं बल तालिका",
+    htTitle: "द्वादश भाव (१२ भाव) विस्तृत शास्त्रीय विश्लेषण",
     sec: {
-      blueprint: "ब्रह्मांडीय प्रारूप एवं मूल स्वभाव",
-      yogas: "शुभ ग्रह योग एवं प्रभाव",
-      verdict: "तारों का अंतिम संदेश",
-      pa: "ग्रह विश्लेषण",
-      ha: "भाव विश्लेषण",
-      dasha: "विंशोत्तरी महादशा कालचक्र",
-      health: "स्वास्थ्य, स्फूर्ति एवं ऊर्जा",
-      wealth: "धन संचय, वित्त एवं समृद्धि",
-      education: "विद्या, बुद्धि एवं ज्ञान",
-      career: "करियर, आजीविका एवं सामाजिक प्रतिष्ठा",
-      marriage: "विवाह, दांपत्य एवं साझेदारी",
-      pred: "जीवन भविष्यवाणी — दशक दर दशक",
-      colours: "शुभ रंग", numbers: "भाग्यशाली अंक", days: "शुभ दिन",
-      rudraksha: "कल्याणकारी रुद्राक्ष", gems: "रत्न एवं वैदिक उपाय",
-      longevity: "आयु एवं जीवन शक्ति (दीर्घायु)"
+      blueprint: "लग्न स्वरूप, आत्म कारक एवं मूल प्रकृति",
+      yogas: "कुंडली में निर्मित शुभ राजयोग एवं धनयोग",
+      verdict: "ज्योतिषाचार्य का संपूर्ण जीवन निष्कर्ष",
+      pa: "नवग्रह स्थिति, उच्च-नीच व दृष्टि प्रभाव",
+      ha: "द्वादश भाव एवं भावेशों का फलकथन",
+      dasha: "विंशोत्तरी महादशा एवं अंतर्दशा समय-चक्र",
+      health: "स्वास्थ्य, आयुर्वेद त्रिदोष एवं आरोग्य विचार",
+      wealth: "धन संपदा, कोष एवं लक्ष्मी योग विचार",
+      education: "विद्या, उच्च बुद्धि एवं ज्ञान स्थान",
+      career: "कर्म भाव, आजीविका व राजपद प्रतिष्ठा",
+      marriage: "विवाह, दांपत्य सुख एवं कलत्र भाव",
+      pred: "दशकवार जीवन भविष्यवाणी एवं प्रमुख कालखंड",
+      colours: "शुभ रंग", numbers: "भाग्यशाली अंक", days: "शुभ वार",
+      rudraksha: "कल्याणकारी सिद्ध रुद्राक्ष", gems: "कुंडली अनुसार अनुकूल रत्न, धातु एवं वैदिक उपाय",
+      longevity: "आयु एवं जीवन शक्ति (दीर्घायु विचार)"
     },
-    pills: { lagna: "लग्न", rashi: "चंद्र राशि", nakshatra: "नक्षत्र", tithi: "तिथि", yoga: "योग" },
-    pcols: ["ग्रह", "राशि", "भाव", "अंश व नक्षत्र", "स्थिति / बल", "प्रभाव"],
-    hnames: ["स्वयं एवं व्यक्तित्व", "धन एवं कुटुंब", "पराक्रम व बंधु", "गृह-माता सुख", "बुद्धि व संतान", "स्वास्थ्य व प्रतिस्पर्धा", "दांपत्य व साझेदारी", "आयु व परिवर्तन", "भाग्य व धर्म", "करियर व प्रतिष्ठा", "लाभ व आय", "मोक्ष व व्यय"],
-    nopl: "कोई ग्रह नहीं",
+    pills: { lagna: "लग्न", rashi: "चंद्र राशि", nakshatra: "नक्षत्र व चरण", tithi: "तिथि", yoga: "नित्य योग" },
+    pcols: ["ग्रह (Graha)", "राशि", "भाव", "अंश व नक्षत्र", "स्थिति / बल", "ज्योतिषीय प्रभाव"],
+    hnames: ["प्रथम: तनु भाव (स्वयं, व्यक्तित्व व काया)", "द्वितीय: धन भाव (कोष, वाणी व कुटुंब)", "तृतीय: सहज भाव (पराक्रम व सहोदर)", "चतुर्थ: सुख भाव (गृह, माता व भूमि)", "पंचम: सुत भाव (बुद्धि, विद्या व पूर्व पुण्य)", "षष्ठ: रिपु भाव (स्वास्थ्य, सेवा व रोग निवारण)", "सप्तम: जाया भाव (विवाह, दांपत्य व साझेदारी)", "अष्टम: रंध्र भाव (आयु, गूढ़ विद्या व परिवर्तन)", "नवम: भाग्य भाव (धर्म, गुरु व ईश्वरीय कृपा)", "दशम: कर्म भाव (करियर, आजीविका व प्रतिष्ठा)", "एकादश: लाभ भाव (आय, अभीष्ट सिद्धि व मित्र)", "द्वादश: व्यय भाव (मोक्ष, विदेश व आध्यात्मिक साधना)"],
+    nopl: "कोई ग्रह स्थित नहीं",
     langBtn: "View in English",
-    printBtn: "सम्पूर्ण कुंडली PDF सहेजें",
-    editBtn: "विवरण बदलें",
+    printBtn: "सम्पूर्ण जन्म कुंडली PDF सहेजें",
+    editBtn: "जन्म विवरण बदलें",
     footer1: "✦ ॐ तत् सत् ✦",
-    footer2: "प्रामाणिक वैदिक ज्योतिष गणना प्रणाली · सुरक्षित एवं पूर्णतः गोपनीय",
-    partnerName: "जीवनसाथी (Partner) का पूरा नाम",
+    footer2: "प्रामाणिक पराशरी वैदिक ज्योतिष गणना प्रणाली · पूर्णतः सुरक्षित व गोपनीय",
+    partnerName: "जीवनसाथी का पूरा नाम (वधू / वर)",
     partnerDob: "जन्म तिथि",
     partnerTob: "जन्म समय",
     partnerTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
-    partnerFormTitle: "द्वितीय जातक (Partner) का विवरण दर्ज करें:",
-    calculateMatchBtn: "गुण मिलान गणना करें ✦",
+    partnerFormTitle: "द्वितीय जातक (जीवनसाथी) का विवरण दर्ज करें:",
+    calculateMatchBtn: "अष्टकूट ३६ गुण मिलान गणना करें ✦",
     currencyLabel: "मुद्रा चुनें (Select Currency)",
     deliveryTimeLabel: "प्राप्ति समय (Delivery Time)",
     checkoutEmailLabel: "आपका ईमेल पता (PDF रिपोर्ट व रसीद हेतु) *",
-    checkoutEmailHelp: "अनलॉक की गई विस्तृत PDF रिपोर्ट एवं रसीद इस ईमेल पर भेजी जाएगी।",
-    checkoutTxIdLabel: "PayPal Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)",
-    checkoutTxIdHelp: "पेपैल रसीद / ईमेल में दी गई ट्रांजैक्शन आईडी दर्ज करें।",
-    checkoutPhoneLabel: "फोन / मोबाइल नंबर (वैकल्पिक)",
-    checkoutPhoneHelp: "तुरंत ऑर्डर संदर्भ व सूचना हेतु (वैकल्पिक)।",
+    checkoutEmailHelp: "अनलॉक की गई ५०-पृष्ठ विस्तृत जन्म पत्रिका इस ईमेल पर भेजी जाएगी।",
+    checkoutTxIdLabel: "Transaction ID / ऑर्डर संदर्भ (वैकल्पिक)",
+    checkoutTxIdHelp: "पेपैल / भुगतान रसीद में दी गई ट्रांजैक्शन आईडी दर्ज करें।",
+    checkoutPhoneLabel: "फोन / व्हाट्सएप नंबर (वैकल्पिक)",
+    checkoutPhoneHelp: "तुरंत ऑर्डर संदर्भ व सूचना प्रेषण हेतु।",
     cardNumberLabel: "कार्ड नंबर (Card Number)",
     cardExpiryLabel: "समाप्ति तिथि (MM/YY)",
     cardCvvLabel: "सुरक्षा कोड (CVV)",
-    quickDailyPrompt: "या आज का दैनिक राशिफल व ईमेल अलर्ट्स देखें:",
-    quickDailyBtn: "दैनिक राशिफल (Daily Horoscope)",
+    quickDailyPrompt: "आज का दैनिक वैदिक राशिफल (Dainik Rashifal) देखें:",
+    quickDailyBtn: "दैनिक राशिफल",
   }
 };
 
@@ -1339,52 +1339,52 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
 const SECTION_CONFIG = {
   kundli: {
     path: "/",
-    titleEn: "Jyotish Paramarsh — Authentic Vedic Kundli, Daily Horoscope & Astrological Consultations",
-    titleHi: "ज्योतिष परामर्श — प्रामाणिक वैदिक कुंडली, जन्मपत्रिका एवं भविष्यफल",
-    descEn: "Free authentic Vedic Janam Kundli, 16 divisional charts (Shodashvarga), Vimshottari Dasha, planetary analysis & life predictions based on Maharishi Parashara.",
-    descHi: "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र पर आधारित सटीक जन्म कुंडली, षोडशवर्ग, विंशोत्तरी दशा व संपूर्ण जीवन मार्गदर्शन।"
+    titleEn: "Free Janam Kundli Online — Vedic Birth Chart & Life Reading | Jyotish Paramarsh",
+    titleHi: "निःशुल्क जन्म पत्रिका — प्रामाणिक वैदिक जन्म कुंडली एवं जीवन दर्पण | ज्योतिष परामर्श",
+    descEn: "Generate free authentic Vedic Janam Kundli with 16 Shodashvarga divisional charts, Vimshottari Mahadasha, planetary analysis, and life predictions according to Maharishi Parashara.",
+    descHi: "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र पर आधारित निःशुल्क एवं सटीक जन्म कुंडली, १६ वर्ग चक्र, विंशोत्तरी दशा व सम्पूर्ण जीवन मार्गदर्शन।"
   },
   panchang: {
     path: "/panchang",
-    titleEn: "Aaj Ka Panchang — Today Hindu Panchang, Tithi, Nakshatra, Rahu Kaal | Jyotish Paramarsh",
-    titleHi: "आज का पंचांग — दैनिक हिंदू पंचांग, तिथि, नक्षत्र, राहुकाल व शुभ मुहूर्त | ज्योतिष परामर्श",
+    titleEn: "Aaj Ka Panchang — Today's Vedic Panchang, Tithi, Nakshatra, Rahu Kaal & Choghadiya | Jyotish Paramarsh",
+    titleHi: "आज का पंचांग — दैनिक वैदिक पंचांग, तिथि, नक्षत्र, राहुकाल एवं चौघड़िया मुहूर्त | ज्योतिष परामर्श",
     descEn: "Accurate real-time Hindu Panchang: today's Tithi, Nakshatra, Yoga, Karana, Rahu Kaal, Abhijit Muhurat, sunrise, sunset, and Choghadiya timings.",
-    descHi: "सटीक दैनिक पंचांग: आज की तिथि, नक्षत्र, योग, करण, राहुकाल, अभिजीत मुहूर्त एवं चौघड़िया मुहूर्त।"
+    descHi: "सटीक दैनिक वैदिक पंचांग: आज की तिथि, नक्षत्र, योग, करण, राहुकाल, अभिजीत मुहूर्त एवं दिन-रात का चौघड़िया मुहूर्त।"
   },
   muhurat: {
     path: "/muhurat",
-    titleEn: "Shubh Muhurat Today — Auspicious Timings, Choghadiya & Vivah Muhurat | Jyotish Paramarsh",
-    titleHi: "शुभ मुहूर्त — आज का शुभ समय, चौघड़िया एवं विवाह-गृहप्रवेश मुहूर्त | ज्योतिष परामर्श",
+    titleEn: "Shubh Muhurat Today — Vivah, Griha Pravesh, Vehicle & Choghadiya Muhurat | Jyotish Paramarsh",
+    titleHi: "शुभ मुहूर्त — आज का शुभ समय, चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन मुहूर्त | ज्योतिष परामर्श",
     descEn: "Find daily auspicious Shubh Muhurats, Day & Night Choghadiya, Vivah (wedding) Muhurat, Griha Pravesh, and vehicle purchase timings.",
-    descHi: "दैनिक शुभ मुहूर्त, दिन व रात्रि चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन क्रय के श्रेष्ठ मुहूर्त।"
+    descHi: "दैनिक शुभ मुहूर्त, दिन व रात्रि चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन क्रय के श्रेष्ठ शास्त्रीय मुहूर्त।"
   },
   festivals: {
     path: "/festivals",
-    titleEn: "Hindu Festivals & Vrats Calendar — Dates, Vrat Rules & Puja Muhurat | Jyotish Paramarsh",
-    titleHi: "हिंदू व्रत एवं त्यौहार कैलेंडर — प्रमुख व्रत, त्यौहार तिथियां व पूजा मुहूर्त | ज्योतिष परामर्श",
+    titleEn: "Hindu Festivals & Vrat Calendar 2026–2027 — Ekadashi, Pradosh & Tyohar Dates | Jyotish Paramarsh",
+    titleHi: "सनातन व्रत एवं त्यौहार कैलेंडर — एकादशी, प्रदोष, पूर्णिमा एवं प्रमुख व्रत-पर्व तिथियां | ज्योतिष परामर्श",
     descEn: "Comprehensive calendar of upcoming Hindu festivals, Ekadashi, Pradosh, Shivratri, Navratri, Purnima, Amavasya with authentic Vedic puja timings.",
-    descHi: "आगामी हिंदू त्यौहार, एकादशी, प्रदोष, नवरात्रि, पूर्णिमा, अमावस्या व प्रमुख व्रतों की सटीक तिथियां एवं पूजा विधि।"
+    descHi: "आगामी हिंदू त्यौहार, एकादशी, प्रदोष, नवरात्रि, पूर्णिमा, अमावस्या व प्रमुख व्रतों की सटीक तिथियां, पूजा विधि एवं धार्मिक महत्व।"
   },
   daily: {
     path: "/daily",
-    titleEn: "Daily Horoscope — Today Rashifal for All 12 Moon Signs | Jyotish Paramarsh",
-    titleHi: "दैनिक राशिफल — आज का भविष्यफल सभी १२ चंद्र राशियों के लिए | ज्योतिष परामर्श",
+    titleEn: "Dainik Rashifal — Today's Daily Vedic Horoscope for All 12 Moon Signs | Jyotish Paramarsh",
+    titleHi: "दैनिक राशिफल — आज का वैदिक भविष्यफल सभी १२ चंद्र राशियों के लिए | ज्योतिष परामर्श",
     descEn: "Accurate Vedic daily horoscope (Dainik Rashifal) for all 12 Rashi signs covering career, finance, romance, health, lucky numbers and colors.",
-    descHi: "सभी १२ राशियों (मेष से मीन) का दैनिक वैदिक राशिफल: करियर, धन, स्वास्थ्य, प्रेम एवं शुभ अंक व रंग।"
+    descHi: "सभी १२ चंद्र राशियों (मेष से मीन) का दैनिक वैदिक राशिफल: करियर, धन, स्वास्थ्य, प्रेम एवं शुभ अंक व रंग।"
   },
   matchmaking: {
     path: "/matchmaking",
-    titleEn: "Kundli Milan — Free 36 Gunas Vedic Horoscope Matching for Marriage | Jyotish Paramarsh",
-    titleHi: "कुंडली मिलान — ३६ गुण मिलान, मांगलिक दोष विचार एवं विवाह अनुकूलता | ज्योतिष परामर्श",
+    titleEn: "Kundli Milan — Free Ashtakoot 36 Guna Horoscope Matching for Marriage | Jyotish Paramarsh",
+    titleHi: "कुंडली मिलान — वर-वधू का अष्टकूट ३६ गुण मिलान एवं मांगलिक दोष विचार | ज्योतिष परामर्श",
     descEn: "Complete Vedic Kundli Milan (Gun Milan) for prospective bride and groom. 36 Guna Ashta-Koota calculation, Nadi & Bhakoot dosha, and Manglik cancellation analysis.",
-    descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मंगली दोष परिहार।"
+    descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मांगलिक दोष परिहार विश्लेषण।"
   },
   tools: {
     path: "/astrology-tools",
-    titleEn: "Astrology Tools for Every Question — Vedic, KP, Numerology & Timings | Jyotish Paramarsh",
-    titleHi: "हर प्रश्न के लिए ज्योतिषीय टूल्स — वैदिक, केपी, अंक ज्योतिष एवं शुभ मुहूर्त | ज्योतिष परामर्श",
-    descEn: "Explore your birth chart, discover numerology, and calculate auspicious timings. 21 dedicated calculators across Vedic, KP, Numerology, Daily & Decision tools.",
-    descHi: "अपनी जन्म कुंडली जानें, अंकशास्त्र को समझें एवं शुभ समय की गणना करें। ५ श्रेणियों में २१ प्रामाणिक ज्योतिषीय टूल्स।"
+    titleEn: "Vedic Astrology Calculators & Divine Jyotish Instruments | Jyotish Paramarsh",
+    titleHi: "वैदिक ज्योतिष गणना केंद्र एवं दिव्य साधन (२१ शास्त्रीय उपकरण) | ज्योतिष परामर्श",
+    descEn: "21 authentic Vedic astrological calculators: Vimshottari Dasha, Shodashvargas, KP Horary (1-249), Chaldean Numerology, Choghadiya and Prashna Oracle.",
+    descHi: "अपनी जन्म कुंडली जानें, अंक ज्योतिष समझें एवं शुभ समय की गणना करें। ५ श्रेणियों में २१ प्रामाणिक शास्त्रीय वैदिक ज्योतिष साधन।"
   }
 };
 
@@ -3333,7 +3333,7 @@ export default function App() {
                   }}
                 >
                   <span style={{ fontSize: 18 }}>{s.symbol}</span>
-                  <span>{hi ? s.sanskrit : s.name}</span>
+                  <span>{hi ? ({"Aries":"मेष","Taurus":"वृषभ","Gemini":"मिथुन","Cancer":"कर्क","Leo":"सिंह","Virgo":"कन्या","Libra":"तुला","Scorpio":"वृश्चिक","Sagittarius":"धनु","Capricorn":"मकर","Aquarius":"कुंभ","Pisces":"मीन"}[s.name] || s.sanskrit) : `${s.name} (${s.sanskrit})`}</span>
                 </button>
               );
             })}
@@ -4417,7 +4417,7 @@ export default function App() {
             <div>
               <div className="header-brand-title" style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.2, lineHeight: 1.1 }}>JYOTISH PARAMARSH</div>
               <div style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.75)", letterSpacing: 0.3, fontWeight: 500 }} className="desktop-only-tagline">
-                {hi ? "वैदिक ज्योतिष एवं संपूर्ण समाधान" : "Vedic Astrology & Planetary Insights"}
+                {hi ? "प्रामाणिक वैदिक ज्योतिष एवं सम्पूर्ण जीवन दर्शन" : "Authentic Vedic Astrology & Divine Guidance"}
               </div>
             </div>
           </div>
@@ -4425,13 +4425,13 @@ export default function App() {
           {/* Master 7-Tool Navigation Pills */}
           <nav className="header-nav-strip" role="navigation" aria-label="Main features">
             {[
-              { id: "kundli", path: "/", icon: "🔯", label: hi ? "जन्म कुंडली" : "Kundli" },
-              { id: "tools", path: "/tools", icon: "🛠️", label: hi ? "ज्योतिष टूल्स" : "Astro Tools" },
+              { id: "kundli", path: "/", icon: "🔯", label: hi ? "जन्म कुंडली" : "Janam Kundli" },
+              { id: "tools", path: "/tools", icon: "🪐", label: hi ? "ज्योतिष साधन" : "Astro Calculators" },
               { id: "matchmaking", path: "/matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
-              { id: "panchang", path: "/panchang", icon: "🕉️", label: hi ? "पंचांग" : "Panchang" },
-              { id: "muhurat", path: "/muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Muhurat" },
-              { id: "daily", path: "/daily", icon: "☀️", label: hi ? "राशिफल" : "Horoscope" },
-              { id: "festivals", path: "/festivals", icon: "🪔", label: hi ? "त्यौहार" : "Festivals" }
+              { id: "panchang", path: "/panchang", icon: "🕉️", label: hi ? "दैनिक पंचांग" : "Dainik Panchang" },
+              { id: "muhurat", path: "/muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Shubh Muhurat" },
+              { id: "daily", path: "/daily", icon: "☀️", label: hi ? "दैनिक राशिफल" : "Daily Rashifal" },
+              { id: "festivals", path: "/festivals", icon: "🪔", label: hi ? "व्रत व त्यौहार" : "Vrat & Festivals" }
             ].map(feat => {
               const isSelected = mainSection === feat.id;
               return (
@@ -4828,7 +4828,7 @@ export default function App() {
                   }}
                   title="Auto-fill sample data to test the Kundli engine instantly"
                 >
-                  <span>⚡</span> {hi ? "नमूना विवरण भरें (1-Click Sample Chart)" : "Fill Sample Data (1-Click Demo)"}
+                  <span>⚡</span> {hi ? "⚡ आदर्श जन्म कुंडली का नमूना देखें (१-क्लिक)" : "⚡ View Sample Kundli (1-Click Demo)"}
                 </button>
               </div>
 

@@ -39,18 +39,18 @@ import {
 // ── TOOL DEFINITIONS (5 CATEGORIES, 21 TOOLS) ───────────────────────────
 // ── CATEGORY METADATA (5 CATEGORIES) ────────────────────────────────────
 export const TOOL_CATEGORIES = [
-  { id: "all", labelEn: "All Tools (21)", labelHi: "समस्त टूल्स (२१)", icon: "✦" },
-  { id: "vedic", labelEn: "Vedic Astrology (5)", labelHi: "वैदिक ज्योतिष (५)", icon: "🔯" },
-  { id: "kp", labelEn: "KP Astrology (4)", labelHi: "केपी ज्योतिष (४)", icon: "🧭" },
-  { id: "numerology", labelEn: "Numerology (4)", labelHi: "अंकशास्त्र (४)", icon: "🔢" },
-  { id: "daily", labelEn: "Daily Astrology (4)", labelHi: "दैनिक मुहूर्त व पंचांग (४)", icon: "☀️" },
-  { id: "decision", labelEn: "Personal Decisions (4)", labelHi: "निर्णय मार्गदर्शक (४)", icon: "🎯" }
+  { id: "all", labelEn: "All Instruments (21)", labelHi: "समस्त साधन (२१)", icon: "✦" },
+  { id: "vedic", labelEn: "Vedic Jyotish (5)", labelHi: "वैदिक ज्योतिष (५)", icon: "🔯" },
+  { id: "kp", labelEn: "KP Astrology (4)", labelHi: "कृष्णमूर्ति पद्धति - KP (४)", icon: "🧭" },
+  { id: "numerology", labelEn: "Vedic Numerology (4)", labelHi: "अंक ज्योतिष (४)", icon: "🔢" },
+  { id: "daily", labelEn: "Daily Panchang & Muhurat (4)", labelHi: "दैनिक पंचांग व मुहूर्त (४)", icon: "☀️" },
+  { id: "decision", labelEn: "Prashna & Cosmic Guidance (4)", labelHi: "प्रश्न ज्योतिष व निर्णय सिद्धि (४)", icon: "🎯" }
 ];
 
 export const CATEGORY_CARDS = [
   {
     id: "vedic",
-    titleEn: "Vedic Astrology",
+    titleEn: "Vedic Jyotish",
     titleHi: "वैदिक ज्योतिष",
     subtitleEn: "Kundali, Dasha, Transits",
     subtitleHi: "कुंडली, विंशोत्तरी दशा, गोचर",
@@ -67,9 +67,9 @@ export const CATEGORY_CARDS = [
   {
     id: "kp",
     titleEn: "KP Astrology",
-    titleHi: "केपी ज्योतिष",
+    titleHi: "कृष्णमूर्ति पद्धति (KP)",
     subtitleEn: "Sub-lords, Horary, Significators",
-    subtitleHi: "उप-स्वामी, होरारी, भाव कारक",
+    subtitleHi: "उप-स्वामी, प्रश्न ज्योतिष, भाव कारक",
     count: 4,
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -81,8 +81,8 @@ export const CATEGORY_CARDS = [
   },
   {
     id: "numerology",
-    titleEn: "Numerology",
-    titleHi: "अंकशास्त्र",
+    titleEn: "Vedic Numerology",
+    titleHi: "अंक ज्योतिष",
     subtitleEn: "Life Path, Name Numbers",
     subtitleHi: "मूलांक, भाग्यांक, नामांक",
     count: 4,
@@ -97,8 +97,8 @@ export const CATEGORY_CARDS = [
   },
   {
     id: "daily",
-    titleEn: "Daily Astrology",
-    titleHi: "दैनिक ज्योतिष",
+    titleEn: "Panchang & Muhurat",
+    titleHi: "पंचांग व शुभ मुहूर्त",
     subtitleEn: "Panchang, Muhurat, Choghadiya",
     subtitleHi: "पंचांग, शुभ मुहूर्त, चौघड़िया",
     count: 4,
@@ -114,10 +114,10 @@ export const CATEGORY_CARDS = [
   },
   {
     id: "decision",
-    titleEn: "Personal Decision Tools",
-    titleHi: "निर्णय मार्गदर्शक टूल्स",
+    titleEn: "Prashna & Decision Guidance",
+    titleHi: "प्रश्न ज्योतिष व निर्णय सिद्धि",
     subtitleEn: "Prashna, Tara Bala, Hora Compass",
-    subtitleHi: "प्रश्न ओरेकल, तारा बल, ग्रह होरा",
+    subtitleHi: "प्रश्न विचार, तारा बल, ग्रह होरा",
     count: 4,
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -473,8 +473,8 @@ export default function AstrologyToolsHub({
       } else {
         setActiveToolId(null);
         document.title = isHi
-          ? "हर प्रश्न के लिए ज्योतिषीय टूल्स | ज्योतिष परामर्श"
-          : "Astrology Tools for Every Question | Jyotish Paramarsh";
+          ? "वैदिक ज्योतिष गणना केंद्र एवं दिव्य साधन | ज्योतिष परामर्श"
+          : "Vedic Astrology Calculators & Divine Jyotish Instruments | Jyotish Paramarsh";
       }
     };
 
@@ -573,8 +573,8 @@ export default function AstrologyToolsHub({
       }
     } catch (err) {}
     document.title = isHi
-      ? "हर प्रश्न के लिए ज्योतिषीय टूल्स | ज्योतिष परामर्श"
-      : "Astrology Tools for Every Question | Jyotish Paramarsh";
+      ? "वैदिक ज्योतिष गणना केंद्र एवं दिव्य साधन | ज्योतिष परामर्श"
+      : "Vedic Astrology Calculators & Divine Jyotish Instruments | Jyotish Paramarsh";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -645,7 +645,7 @@ export default function AstrologyToolsHub({
               onClick={handleBackToHub}
               style={{ color: "#FDE68A", textDecoration: "none" }}
             >
-              {isHi ? "ज्योतिषीय टूल्स" : "Astrology Tools"}
+              {isHi ? "ज्योतिष साधन" : "Astro Calculators"}
             </a>
             <span>/</span>
             <span style={{ color: "#F59E0B", fontWeight: 700 }}>
@@ -675,7 +675,7 @@ export default function AstrologyToolsHub({
                 transition: "all 0.2s ease"
               }}
             >
-              ← {isHi ? "सभी टूल्स देखें" : "All Astrology Tools"}
+              ← {isHi ? "समस्त ज्योतिष साधन" : "All Astro Calculators"}
             </button>
           </div>
         </div>
@@ -793,7 +793,7 @@ export default function AstrologyToolsHub({
                 onClick={handleBackToHub}
                 style={{ background: "none", border: "none", color: "#D4AF37", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
               >
-                {isHi ? "सभी २१ टूल्स देखें →" : "View All 21 Astrology Tools →"}
+                {isHi ? "समस्त २१ शास्त्रीय साधन देखें →" : "View All 21 Astrological Calculators →"}
               </button>
             </div>
 
@@ -906,14 +906,14 @@ export default function AstrologyToolsHub({
 
         {/* Main Heading */}
         <h1 style={{ color: "#F8FAFC", fontSize: "clamp(24px, 3.6vw, 36px)", fontWeight: 800, margin: "0 0 10px", lineHeight: 1.25 }}>
-          {isHi ? "हर प्रश्न के लिए ज्योतिषीय टूल्स" : "Astrology Tools for Every Question"}
+          {isHi ? "वैदिक ज्योतिष गणना केंद्र एवं दिव्य साधन" : "Vedic Astrology Calculators & Divine Jyotish Instruments"}
         </h1>
 
         {/* Subtitle */}
         <p style={{ color: "#94A3B8", fontSize: "15px", maxWidth: 780, margin: "0 0 24px", lineHeight: 1.6 }}>
           {isHi
-            ? "अपनी जन्म कुंडली जानें, अंकशास्त्र को समझें एवं शुभ समय की गणना करें।"
-            : "Explore your birth chart, discover numerology, and calculate auspicious timings."}
+            ? "२१ प्रामाणिक शास्त्रीय साधन: वैदिक जन्म कुंडली, कृष्णमूर्ति पद्धति (KP), अंक ज्योतिष, दैनिक चौघड़िया मुहूर्त एवं तात्कालिक प्रश्न ज्योतिष।"
+            : "21 Classical Astrological Instruments: Vedic Kundli, KP Horary, Sacred Numerology, Daily Choghadiya, and Decision Oracles computed with astronomical precision."}
         </p>
 
         {/* Search Bar matching screenshot */}
@@ -926,7 +926,7 @@ export default function AstrologyToolsHub({
               setSearchQuery(e.target.value);
               if (selectedCategory !== "all") setSelectedCategory("all");
             }}
-            placeholder={isHi ? "ज्योतिषीय टूल्स खोजें... (उदा. विंशोत्तरी, केपी, नाम अंकशास्त्र, चौघड़िया)" : "Search astrology tools..."}
+            placeholder={isHi ? "वैदिक साधन या गणना खोजें... (उदा. विंशोत्तरी, केपी, नाम अंकशास्त्र, चौघड़िया)" : "Search Vedic calculators & instruments... (e.g. Vimshottari, KP Sub-Lord, Choghadiya, Numerology)"}
             style={{
               width: "100%",
               background: "rgba(255, 255, 255, 0.05)",
