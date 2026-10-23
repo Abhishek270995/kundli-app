@@ -1204,6 +1204,191 @@ function renderActiveToolComponent(props) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INDIVIDUAL TOOL IMPLEMENTATIONS
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PERSONALIZED VEDIC ADVISORY COMPONENT (व्यक्तिगत फलित मार्गदर्शन एवं उपाय)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PersonalizedVedicAdvisory({
+  userName,
+  toolBadge,
+  coreVerdict,
+  goodPoints = [],
+  cautionPoints = [],
+  improvementPoints = [],
+  isHi
+}) {
+  const displayName = userName || (isHi ? "जातक" : "Native");
+
+  return (
+    <div style={{
+      marginTop: 24,
+      marginBottom: 16,
+      background: "linear-gradient(145deg, rgba(24, 16, 46, 0.96), rgba(12, 8, 26, 0.98))",
+      border: "1.5px solid rgba(212, 175, 55, 0.4)",
+      borderRadius: 18,
+      padding: "22px 24px",
+      boxShadow: "0 12px 36px rgba(0,0,0,0.45)"
+    }}>
+      {/* Header Badge & Title */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 12,
+        borderBottom: "1px solid rgba(212, 175, 55, 0.2)",
+        paddingBottom: 14,
+        marginBottom: 16
+      }}>
+        <div>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            background: "rgba(245, 158, 11, 0.18)",
+            border: "1px solid rgba(245, 158, 11, 0.45)",
+            color: "#FDE68A",
+            padding: "4px 12px",
+            borderRadius: 12,
+            fontSize: 11.5,
+            fontWeight: 800,
+            marginBottom: 6
+          }}>
+            <span>🎯</span>
+            <span>{toolBadge || (isHi ? "व्यक्तिगत ज्योतिषीय परामर्श" : "Personalized Astrological Guidance")}</span>
+          </div>
+          <h3 style={{ color: "#FDE68A", fontSize: 18, fontWeight: 900, margin: 0 }}>
+            {isHi ? `${displayName} हेतु व्यावहारिक फलकथन व दिशा-निर्देश` : `Personalized Life Guidance for ${displayName}`}
+          </h3>
+        </div>
+        <span style={{
+          fontSize: 11.5,
+          color: "#34D399",
+          fontWeight: 700,
+          background: "rgba(16, 185, 129, 0.15)",
+          border: "1px solid rgba(16, 185, 129, 0.35)",
+          padding: "4px 12px",
+          borderRadius: 12
+        }}>
+          ✓ {isHi ? "सटीक जन्म विवरण आधारित" : "Certified Natal Synthesis"}
+        </span>
+      </div>
+
+      {/* Core Verdict Narrative */}
+      {coreVerdict && (
+        <div style={{
+          background: "rgba(0,0,0,0.38)",
+          borderRadius: 12,
+          padding: "14px 18px",
+          marginBottom: 18,
+          borderLeft: "3.5px solid #F59E0B"
+        }}>
+          <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>
+            {coreVerdict}
+          </p>
+        </div>
+      )}
+
+      {/* 3 Structured Pillars */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {/* Pillar 1: The Good */}
+        <div style={{
+          background: "rgba(16, 185, 129, 0.08)",
+          border: "1px solid rgba(16, 185, 129, 0.35)",
+          borderRadius: 14,
+          padding: "16px 18px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 18 }}>🌟</span>
+            <div>
+              <div style={{ color: "#34D399", fontSize: 14, fontWeight: 800 }}>
+                {isHi ? "शुभ प्रभाव व वरदान (What is Good)" : "Auspicious Strengths (What is Good)"}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                {isHi ? "आपके पक्ष में अनुकूल ग्रह व शक्तियां" : "Favorable currents & innate advantages"}
+              </div>
+            </div>
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+            {goodPoints.map((pt, idx) => (
+              <li key={idx} style={{ marginBottom: 8 }}>
+                {typeof pt === "string" ? pt : (
+                  <>
+                    <b style={{ color: "#A7F3D0" }}>{pt.title}:</b> {pt.desc}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pillar 2: The Caution */}
+        <div style={{
+          background: "rgba(245, 158, 11, 0.08)",
+          border: "1px solid rgba(245, 158, 11, 0.35)",
+          borderRadius: 14,
+          padding: "16px 18px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 18 }}>⚠️</span>
+            <div>
+              <div style={{ color: "#FBBF24", fontSize: 14, fontWeight: 800 }}>
+                {isHi ? "सतर्कता व कमजोर पहलू (What is Challenging)" : "Cautionary Vulnerabilities (What to Watch Out For)"}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                {isHi ? "संभावित चुनौतियां जहां सावधानी आवश्यक है" : "Pitfalls, blind spots & friction points"}
+              </div>
+            </div>
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+            {cautionPoints.map((pt, idx) => (
+              <li key={idx} style={{ marginBottom: 8 }}>
+                {typeof pt === "string" ? pt : (
+                  <>
+                    <b style={{ color: "#FDE68A" }}>{pt.title}:</b> {pt.desc}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pillar 3: How to Improve */}
+        <div style={{
+          background: "rgba(168, 85, 247, 0.08)",
+          border: "1px solid rgba(168, 85, 247, 0.35)",
+          borderRadius: 14,
+          padding: "16px 18px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 18 }}>🛡️</span>
+            <div>
+              <div style={{ color: "#C084FC", fontSize: 14, fontWeight: 800 }}>
+                {isHi ? "सुधार के सूत्र व सटीक उपाय (How to Improve)" : "Actionable Remedies (How to Improve)"}
+              </div>
+              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                {isHi ? "दैनिक साधना, दान व व्यावहारिक कदम" : "Concrete daily actions, mantras & habits"}
+              </div>
+            </div>
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+            {improvementPoints.map((pt, idx) => (
+              <li key={idx} style={{ marginBottom: 8 }}>
+                {typeof pt === "string" ? pt : (
+                  <>
+                    <b style={{ color: "#DDD6FE" }}>{pt.title}:</b> {pt.desc}
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** 1. VIMSHOTTARI DASHA TOOL **/
@@ -1315,6 +1500,78 @@ function VimshottariTool({ userData, setUserData, corePlanets, lang, isHi }) {
           </tbody>
         </table>
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR VIMSHOTTARI ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData.name}
+        toolBadge={isHi ? "विंशोत्तरी दशा वैयक्तिक फलकथन" : "Vimshottari Dasha Personal Forecast"}
+        coreVerdict={
+          isHi
+            ? `${userData.name || "जातक"} जी, वर्तमान में आप ${dashaData.activeMahadasha?.lord} की महादशा में ${dashaData.currentActiveAntardasha?.antardashaLord} की अंतर्दशा के प्रभाव में हैं। यह समयावधि आपके जीवन में एक महत्वपूर्ण कर्म चक्र का प्रतिनिधित्व करती है। यदि आप सही दिशा में प्रयास करेंगे, तो यह अवधि आपको स्थिरता व दीर्घकालिक प्रतिष्ठा प्रदान करेगी।`
+            : `${userData.name || "Native"}, you are presently navigating the overarching influence of ${dashaData.activeMahadasha?.lord} Mahadasha modulated by ${dashaData.currentActiveAntardasha?.antardashaLord} Antardasha. This energetic window acts as a pivotal karmic catalyst, channeling focus toward core growth pillars.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? "कार्यक्षेत्र व आजीविका में प्रगति" : "Career Growth & Social Momentum",
+            desc: isHi
+              ? `${dashaData.activeMahadasha?.lord} की सक्रिय ऊर्जा आपके प्रयासों को गति देगी। नए अनुबंध, नेतृत्व क्षमता एवं वरिष्ठों से सहयोग प्राप्त होने के प्रबल योग हैं।`
+              : `The activating energy of ${dashaData.activeMahadasha?.lord} fuels strategic ambitions. Favorable for executive responsibility, authority expansion, and structured achievements.`
+          },
+          {
+            title: isHi ? "मानसिक स्पष्टता व अंतर्ज्ञान" : "Intuitive Clarity & Strategic Decisions",
+            desc: isHi
+              ? `जन्म नक्षत्र स्वामी ${moonNak.lord} के सामंजस्य से जटिल समस्याओं को सुलझाने की क्षमता बढ़ेगी। महत्वपूर्ण निर्णयों में दूरदर्शिता लाभ देगी।`
+              : `Supported by your natal Moon nakshatra lord ${moonNak.lord}, this phase enhances foresight, enabling grounded decisions in property, finance, and long-term plans.`
+          },
+          {
+            title: isHi ? "आर्थिक स्थिरता व साधन संचय" : "Financial Conservation & Material Gains",
+            desc: isHi
+              ? `संसाधनों के सदुपयोग व आय के नए मार्ग खुलने की अनुकूलता बनी रहेगी। धैर्यपूर्वक किए गए निवेश फलदायी सिद्ध होंगे।`
+              : `Prudent investments made during this window yield compounded stability. Favorable for consolidating family wealth and securing income streams.`
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "अति-उत्साह व जल्दबाजी से बचें" : "Impatience & Hasty Commitments",
+            desc: isHi
+              ? `दशा संक्रमण काल में बिना सोचे-समझे किए गए वादे या अनियोजित वित्तीय जोखिम हानि पहुंचा सकते हैं। अनुबंधों की शर्तों को ध्यानपूर्वक पढ़ें।`
+              : `During sub-period transitions, avoid taking speculative risks or signing ambiguous contracts without thorough due diligence.`
+          },
+          {
+            title: isHi ? "संवाद में कठोरता व संबंधों में तनाव" : "Communication Friction & Domestic Peace",
+            desc: isHi
+              ? `कार्यभार अधिक होने पर चिड़चिड़ापन या अहंकार परिवार एवं सहयोगियों के साथ मतभेद उत्पन्न कर सकता है। वाणी में मधुरता बनाए रखें।`
+              : `Workplace stress may inadvertently spill over into personal relationships. Practice active listening and temper assertive communication.`
+          },
+          {
+            title: isHi ? "मानसिक थकान व स्वास्थ्य सजगता" : "Mental Fatigue & Sleep Rhythm",
+            desc: isHi
+              ? `अनियमित दिनचर्या व देर रात तक जागने से पाचन व स्नायु तंत्र प्रभावित हो सकता है। पर्याप्त विश्राम व प्राणायाम आवश्यक है।`
+              : `Over-commitment can lead to vitality dips and restless sleep. Maintain disciplined circadian rhythms and hydrate regularly.`
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "दैनिक मंत्र साधना व ध्यान" : "Planetary Mantra Sadhana",
+            desc: isHi
+              ? `प्रतिदिन प्रातः सूर्योदय के समय ॐ नमो भगवते वासुदेवाय अथवा महामृत्युंजय मंत्र का १०८ बार जप करें। इससे नकारात्मक प्रभाव शांत होंगे।`
+              : `Chant the sacred Gayatri Mantra or Mahamrityunjaya Mantra 108 times daily at dawn to align inner biorhythms with cosmic grace.`
+          },
+          {
+            title: isHi ? "दान, सेवा व परोपकार" : "Conscious Charity on Planetary Days",
+            desc: isHi
+              ? `गुरुवार अथवा शनिवार को असहायों को भोजन या पीले/काले अन्न का दान करें। गौशाला में हरी घास या गुड़ खिलाना अत्यंत शुभ रहेगा।`
+              : `Perform acts of selfless service on Thursdays or Saturdays: donate wholesome food or clothing to those in need to mitigate dasha frictions.`
+          },
+          {
+            title: isHi ? "रंग एवं जीवनशैली संतुलन" : "Color Vibration & Auspicious Timing",
+            desc: isHi
+              ? `सप्ताह में हल्के पीले, सफेद अथवा सुनहरे वस्त्रों को प्राथमिकता दें। महत्वपूर्ण बैठकें ब्रह्म मुहूर्त अथवा शुभ चौघड़िया में ही निर्धारित करें।`
+              : `Incorporate serene tones (off-white, subtle gold, pastel green) into your workspace. Schedule high-stake initiatives during auspicious Choghadiya windows.`
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -1790,6 +2047,88 @@ function DivisionalChartTool({ userData, setUserData, corePlanets, ascendantDegr
           </tbody>
         </table>
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR DIVISIONAL VARGA ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData.name}
+        toolBadge={isHi ? `${chartMeta.nameHi} व्यक्तिगत विश्लेषण` : `${chartMeta.nameEn} Native Guidance`}
+        coreVerdict={
+          isHi
+            ? `${userData.name || "जातक"} जी, आपके ${chartMeta.nameHi} में प्रथम भाव (लग्न) ${vargaData?.[1]?.signSanskrit || "लग्न"} राशि में उदित है, जिसके स्वामी ${vargaData?.[1]?.lord} हैं। यह वर्ग चक्र आपके जीवन में ${chartMeta.descHi} का सूक्ष्म दिग्दर्शन कराता है। इस कुंडली के प्रमुख केंद्र एवं त्रिकोण भाव आपके आंतरिक सामर्थ्य को प्रकट कर रहे हैं।`
+            : `${userData.name || "Native"}, your ${chartMeta.nameEn} chart ascends in ${vargaData?.[1]?.sign || "Lagna"} governed by ${vargaData?.[1]?.lord}. This divisional matrix maps your ${chartMeta.descEn}, revealing how underlying karmic seeds manifest in your practical day-to-day reality.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? `${chartMeta.nameEn} का मूल शुभ वरदान` : "Prime Auspicious Alignment",
+            desc: isHi
+              ? `इस वर्ग चक्र में केंद्र भाव (१, ४, ७, १०) एवं त्रिकोण भाव (१, ५, ९) आपके व्यक्तित्व को आंतरिक शक्ति प्रदान कर रहे हैं। ${vargaData?.[1]?.planets?.length > 0 ? `लग्न में स्थित ग्रह (${vargaData[1].planets.join(", ")}) आपको विशिष्ट पहचान दे रहे हैं।` : "लग्न भाव शुद्ध व संतुलित स्थिति में है।"}`
+              : `The cardinal Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses in this varga reinforce stability. ${vargaData?.[1]?.planets?.length > 0 ? `Planets seated in Lagna (${vargaData[1].planets.join(", ")}) endow you with distinctive resilience and talent.` : "Lagna operates with balanced, unhindered polarity."}`
+          },
+          {
+            title: isHi ? "विशेष जीवन क्षेत्र में सफलता" : "Target Domain Mastery",
+            desc: currentChartId === "D9"
+              ? (isHi ? "नवमांश चक्र विवाह उपरांत भाग्य वृद्धि, आत्म-साक्षात्कार एवं धर्मनिष्ठ आचरण में स्वाभाविक उत्कर्ष का संकेत देता है। २८ से ३२ वर्ष की आयु के बाद जीवन में स्थिरता आएगी।" : "Navamsha D9 indicates post-marriage spiritual maturity, refined soul partnership, and significant material flowering after age 28-32.")
+              : currentChartId === "D10"
+              ? (isHi ? "दशमांश चक्र कार्यक्षेत्र में नेतृत्व, स्वतंत्र निर्णय क्षमता एवं समाज में मान-सम्मान व प्रभाव को गति प्रदान कर रहा है।" : "Dashamsha D10 confirms strong capacity for independent leadership, executive autonomy, and professional respect.")
+              : currentChartId === "D7"
+              ? (isHi ? "सप्तमांश चक्र रचनात्मक ऊर्जा, संतान सुख एवं परिवार के प्रति आत्मीय उत्तरदायित्व को सुदृढ़ करता है।" : "Saptamsha D7 strengthens creative legacy, parental contentment, and family lineage fulfillment.")
+              : currentChartId === "D2"
+              ? (isHi ? "होरा चक्र धन संचय, तरल पूंजी प्रबंधन एवं वित्तीय विवेक में स्थिरता का संकेत करता है।" : "Hora D2 supports disciplined asset retention, structured liquid savings, and monetary foresight.")
+              : (isHi ? "यह वर्ग चक्र आपके इस विशिष्ट जीवन क्षेत्र में जन्मजात प्रतिभा व एकाग्रता को बल दे रहा है।" : "This varga acts as a powerful amplifier for your innate talents in this domain.")
+          },
+          {
+            title: isHi ? "कर्म-भाग्य सामंजस्य" : "Karmic Alignment & Fortitude",
+            desc: isHi
+              ? "जन्म कुंडली (D1) के शुभ योगों को यह वर्ग चक्र सूक्ष्म धरातल पर क्रियान्वित करने का सामर्थ्य रखता है।"
+              : "Validates and actualizes the dormant promises of your primary Rashi chart onto the subtle karmic plane."
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "त्रिक भावों (६, ८, १२) से सतर्कता" : "Subtle Dusthana Vulnerabilities",
+            desc: isHi
+              ? `इस वर्ग चक्र के ६ठे (प्रतिस्पर्धा), ८वें (रूकावट) एवं १२वें (व्यय) भावों में उपस्थित ग्रहों के प्रभाव स्वरूप कभी-कभी निर्णय लेने में विलंब या मानसिक संशय हो सकता है।`
+              : `Placements in the 6th, 8th, or 12th houses of this divisional grid require mindfulness: guard against self-doubt, hidden delays, or unwarranted expenditures.`
+          },
+          {
+            title: isHi ? "अति-अपेक्षाएं व भावनात्मक असंतुलन" : "Unrealistic Expectations in Key Life Areas",
+            desc: currentChartId === "D9"
+              ? (isHi ? "दांपत्य व साझेदारियों में छोटी-छोटी बातों पर मतभेद से बचें। जीवनसाथी के दृष्टिकोण का सम्मान करना पारिवारिक सुख की कुंजी है।" : "In partnerships and marriage, avoid projecting perfectionism onto your partner. Cultivate deep empathy and patience.")
+              : currentChartId === "D10"
+              ? (isHi ? "कार्यस्थल पर तात्कालिक परिणामों की अधीरता से बचें। वरिष्ठों अथवा सहकर्मियों से व्यर्थ तर्क-वितर्क से दूर रहें।" : "In career matters, resist impatience with organizational hierarchies. Avoid contentious arguments with authorities.")
+              : (isHi ? "भावुकता में आकर बड़े निर्णय लेने से बचें। पहले तथ्यों का निष्पक्ष विश्लेषण करें।" : "Avoid making spontaneous life commitments when emotionally overwhelmed. Rely on objective facts.")
+          },
+          {
+            title: isHi ? "ऊर्जा का बिखराव" : "Fragmented Focus & Stress",
+            desc: isHi
+              ? "एक साथ कई कार्यों को हाथ में लेने से इस वर्ग चक्र की शुभ ऊर्जा प्रभावित हो सकती है। प्राथमिकताओं को स्पष्ट रखें।"
+              : "Spreading attention too thin diffuses the concentrated potency of this varga. Prioritize one core objective at a time."
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "इष्ट देव व दैनिक साधना" : "Deity Sadhana & Sacred Alignment",
+            desc: currentChartId === "D9"
+              ? (isHi ? "लक्ष्मी-नारायण अथवा शिव-पार्वती की संयुक्त पूजा करें। शुक्रवार को शुद्ध घी का दीपक प्रज्वलित करें।" : "Worship Lakshmi-Narayana or Shiva-Parvati jointly. Light a pure cow-ghee lamp on Friday evenings to harmonize domestic bliss.")
+              : currentChartId === "D10"
+              ? (isHi ? "प्रातःकाल सूर्य देव को तांबे के लोटे से अर्घ्य दें एवं ॐ घृणि सूर्याय नमः का जप करें। यह आजीविका में तेजस्विता लाएगा।" : "Offer water to the rising Sun in a copper vessel daily with the Surya Gayatri Mantra to illuminate professional authority.")
+              : (isHi ? "प्रतिदिन ५ मिनट ध्यान एवं ॐ नमः शिवाय का जप करें। इससे आत्मबल एवं निर्णय क्षमता में वृद्धि होगी।" : "Practice 10 minutes of silent meditation and Om Namah Shivaya chanting daily to stabilize subtle energy.")
+          },
+          {
+            title: isHi ? "सटीक व्यावहारिक व आचरणगत सुधार" : "Behavioral & Practical Refinements",
+            desc: isHi
+              ? "कार्यक्षेत्र एवं व्यक्तिगत जीवन में पारदर्शिता, समय की पाबंदी और बड़ों का सम्मान इस चक्र के फल को दोगुना करता है।"
+              : "Cultivate disciplined punctuality, transparent integrity, and unconditional respect for mentors and family elders."
+          },
+          {
+            title: isHi ? "दान एवं सकारात्मक ऊर्जा संवर्धन" : "Targeted Charity & Environmental Harmony",
+            desc: isHi
+              ? `लग्न स्वामी ${vargaData?.[1]?.lord} के अनुकूल वार को सेवा कार्य करें। अपने कार्यस्थल व पूजा कक्ष को सदैव स्वच्छ व सुवासित रखें।`
+              : `Perform constructive charity on the weekday ruled by Lagna lord ${vargaData?.[1]?.lord}. Keep your personal sanctuary and work desk decluttered.`
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -1898,6 +2237,78 @@ function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
           );
         })}
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR ASHTAKAVARGA ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "सर्वाष्टकवर्ग वैयक्तिक शक्ति विश्लेषण" : "Sarvashtakavarga Matrix Personal Guidance"}
+        coreVerdict={
+          isHi
+            ? `${userData?.name || "जातक"} जी, आपके सर्वाष्टकवर्ग चक्र में कुल ३३७ बिंदुओं का वितरण आपके जीवन के १२ विभागों में ऊर्जा के प्रवाह को दर्शाता है। आपके धन भावों (द्वितीय व एकादश) में ${savData.wealthBindus} बिंदु एवं दशम कर्म भाव में ${savData.careerBindus} बिंदु हैं। २८ या उससे अधिक बिंदुओं वाले भाव आपके स्वाभाविक विजय क्षेत्र हैं, जबकि २५ से कम बिंदु वाले भावों में सचेत प्रबंधन आवश्यक है।`
+            : `${userData?.name || "Native"}, your 337 Sarvashtakavarga (SAV) bindu matrix maps the energetic capacity of your 12 life departments. Your wealth axis (Houses 2 & 11) carries ${savData.wealthBindus} bindus, and your 10th career house holds ${savData.careerBindus} bindus. Houses exceeding 28 bindus represent your natural triumph zones.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? "सर्वोच्च बिंदु युक्त शक्तियां (Peak Houses)" : "Natural Triumph Zones (Houses ≥ 30)",
+            desc: isHi
+              ? "जिन भावों में ३० से अधिक बिंदु हैं, वे आपके जीवन के सुरक्षित स्तंभ हैं। इन क्षेत्रों में कम परिश्रम में भी श्रेष्ठ परिणाम प्राप्त होते हैं और गोचर के दौरान ग्रह अत्यधिक शुभ फल प्रदान करते हैं।"
+              : "Houses bearing 30+ bindus act as innate powerhouses. When transiting planets enter these signs, major milestones, promotions, and lucrative deals manifest smoothly."
+          },
+          {
+            title: isHi ? "धन संचय एवं लाभ संतुलन" : "Wealth Retention Index",
+            desc: savData.wealthBindus >= 56
+              ? (isHi ? `आपके लाभ व धन भावों में कुल ${savData.wealthBindus} बिंदु हैं (औसत से अधिक)। यह आर्थिक स्थिरता, एकाधिक आय स्रोत और संकट काल में भी वित्तीय सुरक्षा का वरदान है।` : `Carrying ${savData.wealthBindus} bindus across wealth houses 2 & 11 (well above the 56-point threshold) indicates strong financial recovery power and natural wealth retention.`)
+              : (isHi ? `धन भाव में ${savData.wealthBindus} बिंदु एक संतुलित व योजनाबद्ध वित्तीय जीवन का संकेत देते हैं। बजट बनाकर चलना आपके लिए अत्यंत लाभकारी रहेगा।` : `A balanced ${savData.wealthBindus} bindus in wealth houses requires structured financial planning and systematic investing to build compounding assets.`)
+          },
+          {
+            title: isHi ? "कर्म एवं प्रतिष्ठा की दृढ़ता" : "Career Endurance & Authority",
+            desc: savData.careerBindus >= 28
+              ? (isHi ? `दशम भाव में ${savData.careerBindus} बिंदु आपकी व्यावसायिक प्रतिष्ठा, सामाजिक सम्मान एवं कार्यक्षेत्र में नेतृत्व क्षमता को सुदृढ़ बनाते हैं।` : `Holding ${savData.careerBindus} bindus in the 10th house provides professional resilience, leadership recognition, and sustained authority.`)
+              : (isHi ? "दशम भाव में संतुलित बिंदु कार्यक्षेत्र में निरंतर लगन व कौशल उन्नयन से मान-सम्मान प्राप्त करने का संकेत देते हैं।" : "Moderate 10th house points suggest that persistent skill upgradation and patience will yield steady executive recognition.")
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "संवेदनशील व अल्प बिंदु भाव (Houses < 25)" : "Vulnerable Friction Houses (< 25 Bindus)",
+            desc: isHi
+              ? "२५ से कम बिंदुओं वाले भावों में जब मंद गति ग्रह (शनि, राहु) गोचर करते हैं, तो वहां अवरोध, विलंब अथवा मानसिक तनाव उत्पन्न हो सकता है। ऐसे समय में धैर्य रखना आवश्यक है।"
+              : "Houses scoring below 25 bindus experience friction and energy leaks when transited by slow-moving planets (Saturn, Rahu). Avoid launching risky ventures in these domains."
+          },
+          {
+            title: isHi ? "आय बनाम व्यय का संतुलन (11th vs 12th House)" : "Income vs Expense Leakage Ratio",
+            desc: isHi
+              ? "यदि द्वादश भाव (व्यय) में एकादश (लाभ) से अधिक बिंदु हों, तो अचानक अनियोजित खर्चे हो सकते हैं। नियमित बचत व आपातकालीन कोष बनाए रखना अनिवार्य है।"
+              : "Ensure your 12th house (expenditures) does not siphon off gains from the 11th house. Automate your monthly savings to eliminate impulsive expenditures."
+          },
+          {
+            title: isHi ? "कमजोर भावों में गोचर के समय सतर्कता" : "Transit Cautions in Low-Scoring Signs",
+            desc: isHi
+              ? "चंद्रमा जब आपके न्यूनतम बिंदुओं वाली राशि से गुजरे, तो महत्वपूर्ण समझौते करने या विवादों में पड़ने से बचें।"
+              : "When the transit Moon crosses your lowest-bindu zodiac signs (occurring ~2.5 days each month), refrain from entering heated disputes or making impulsive investments."
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "अष्टकवर्ग आधारित 'स्वर्ण गोचर' रणनीति" : "The Golden SAV Transit Rule",
+            desc: isHi
+              ? "जब शुभ ग्रह (गुरु, शुक्र, बुध) आपकी ३०+ बिंदु वाली राशियों में गोचर करें, तब साक्षात्कार, नई नौकरी, संपत्ति क्रय व विवाह जैसे बड़े कदम उठाएं। सफलता सुनिश्चित होगी।"
+              : "Schedule decisive life moves (property purchase, job switch, marriage talks, signing partnerships) when Jupiter or Venus transit through your signs with 30+ bindus."
+          },
+          {
+            title: isHi ? "कमजोर भावों की ऊर्जा बढ़ाने के उपाय" : "Energizing Sensitive Houses",
+            desc: isHi
+              ? "जिस भाव में सबसे कम बिंदु हों, उस भाव के स्वामी ग्रह का मंत्र जपें एवं उस ग्रह से संबंधित वस्तुओं का दान करें। इससे ऊर्जा का असंतुलन समाप्त होता है।"
+              : "Remedy your lowest-scoring house by chanting its ruling lord's mantra and performing relevant charity (e.g. green vegetables for Mercury, mustard oil for Saturn)."
+          },
+          {
+            title: isHi ? "दैनिक आध्यात्मिक संतुलन" : "Daily Gayatri & Sun Salutation",
+            desc: isHi
+              ? "प्रतिदिन गायत्री मंत्र का जप एवं सूर्य नमस्कार समस्त १२ भावों के बिंदुओं को जाग्रत कर सकारात्मक ऊर्जा का संचार करता है।"
+              : "Daily Surya Namaskar and Gayatri Mantra recitation systematically energize and harmonize all 12 houses across your 337-point matrix."
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -1945,6 +2356,78 @@ function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
           );
         })}
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR GOCHAR ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "वास्तविक समय गोचर व साढ़े साती विश्लेषण" : "Real-Time Gochar & Sade Sati Personal Guidance"}
+        coreVerdict={
+          isHi
+            ? `${userData?.name || "जातक"} जी, आपकी जन्म चंद्र राशि ${SIGNS[moonSignIdx]?.nameHi || "चंद्र"} (${SIGNS[moonSignIdx]?.sanskrit}) एवं जन्म लग्न ${SIGNS[ascSignIdx]?.nameHi || "लग्न"} (${SIGNS[ascSignIdx]?.sanskrit}) के सापेक्ष वर्तमान आकाशीय मंडल में शनि, गुरु एवं राहु-केतु का गोचर आपके जीवन को नई दिशा दे रहा है। गोचर का प्रभाव आपकी मानसिक शांति, आजीविका व पारिवारिक निर्णयों पर प्रत्यक्ष पड़ता है।`
+            : `${userData?.name || "Native"}, evaluated relative to your Natal Moon in ${SIGNS[moonSignIdx]?.name} (${SIGNS[moonSignIdx]?.sanskrit}) and Ascendant in ${SIGNS[ascSignIdx]?.name} (${SIGNS[ascSignIdx]?.sanskrit}), the current transits of Saturn, Jupiter, and the nodal axis are calibrating your active life priorities.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? "देवगुरु बृहस्पति की अमृत दृष्टि" : "Jupiter's Auspicious Protective Umbrella",
+            desc: isHi
+              ? "गुरु का गोचर जिन भावों पर अपनी ५वीं, ७वीं व ९वीं अमृत दृष्टि डाल रहा है, वे क्षेत्र सुरक्षित हैं। ज्ञानार्जन, धर्म, उच्च शिक्षा एवं पारिवारिक सामंजस्य में देवकृपा प्राप्त होगी।"
+              : "Jupiter's divine 5th, 7th, and 9th aspectual rays shield your key houses, fostering wisdom, ethical growth, familial harmony, and providential guidance."
+          },
+          {
+            title: isHi ? "अनुकूल भावों में गोचर का लाभ" : "Favorable Transit Acceleration",
+            desc: isHi
+              ? "उपचय भावों (३, ६, ११) में गोचररत ग्रह शत्रुओं पर विजय, रोग मुक्ति एवं प्रतियोगिता में श्रेष्ठ प्रदर्शन करने का सामर्थ्य प्रदान कर रहे हैं।"
+              : "Planets currently traversing your Upachaya houses (3rd, 6th, 11th) empower you to overcome competitors, resolve old debts, and convert efforts into tangible gains."
+          },
+          {
+            title: isHi ? "कर्मठता व अनुशासन का सुफल" : "Rewarding Structured Discipline",
+            desc: isHi
+              ? "वर्तमान गोचर सत्य, ईमानदारी और कड़ी मेहनत करने वालों को स्थायित्व व अप्रत्याशित सम्मान प्रदान करने हेतु तत्पर है।"
+              : "Cosmic weather deeply rewards methodical labor and ethical consistency. Long-term initiatives gain traction."
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "शनि गोचर एवं साढ़े साती / ढैय्या प्रभाव" : "Saturn Sade Sati & Dhaiya Status",
+            desc: isHi
+              ? "शनि यदि चंद्र से १२वें, १ले अथवा २रे भाव में हो तो साढ़े साती; एवं ४थे अथवा ८वें भाव में हो तो कंटक/अष्टम ढैय्या का प्रभाव रहता है। इस काल में आलस्य, अहंकार व अनैतिक कार्यों से पूर्णतः बचें।"
+              : "Saturn's transit relative to your Moon determines active Sade Sati or Dhaiya phases. Avoid shortcuts, legal ambiguities, or neglecting physical well-being."
+          },
+          {
+            title: isHi ? "राहु-केतु का कर्मिक धुरी बदलाव" : "Rahu-Ketu Karmic Axis Shift",
+            desc: isHi
+              ? "राहु-केतु जिस अक्ष पर गोचर कर रहे हैं, वहां अचानक बदलाव या भ्रम की स्थिति बन सकती है। वित्तीय सट्टेबाजी या अजनबी व्यक्तियों पर अत्यधिक विश्वास न करें।"
+              : "The Rahu-Ketu nodal axis challenges comfort zones. Guard against speculative gambles, misplaced trust, or impulsive relocations."
+          },
+          {
+            title: isHi ? "मानसिक उद्वेग व वाणी पर नियंत्रण" : "Emotional Composure & Mindful Speech",
+            desc: isHi
+              ? "गोचर में जब क्रूर ग्रह संवेदनशील भावों से गुजरें, तो क्रोध व जल्दबाजी में लिए गए निर्णय संबंधों को नुकसान पहुंचा सकते हैं। शांतचित्त रहें।"
+              : "Mars or Saturn aspecting lunar houses can trigger temporary irritability. Practice calm pause before reacting to interpersonal friction."
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "शनि देव की कृपा हेतु शनिवार के उपाय" : "Saturday Saturn Balance Ritual",
+            desc: isHi
+              ? "प्रत्येक शनिवार सूर्यास्त के समय पीपल के वृक्ष के नीचे अथवा शनि मंदिर में सरसों के तेल का दीपक प्रज्वलित करें। हनुमान चालीसा का नित्य पाठ करें।"
+              : "Light a mustard oil lamp under a Peepal tree or in a quiet sacred corner on Saturday evenings. Recite the Hanuman Chalisa daily for psychic protection."
+          },
+          {
+            title: isHi ? "गुरु कृपा व भाग्योदय हेतु गुरुवार के उपाय" : "Thursday Guru Blessing Practice",
+            desc: isHi
+              ? "गुरुवार को बुजुर्गों, गुरुओं का आशीर्वाद लें। चने की दाल या पीले फल का दान करें। भगवान विष्णु के समक्ष घी का दीपक जलाएं।"
+              : "Honor teachers, parents, and mentors on Thursdays. Donate yellow pulses or bananas to the elderly to attract Jupiterian prosperity."
+          },
+          {
+            title: isHi ? "दैनिक ध्यान व कर्म शुद्धि" : "Daily Grounding & Ethical Alignment",
+            desc: isHi
+              ? "प्रातः १० मिनट मौन प्राणायाम करें। किसी की निंदा या छल-कपट से दूर रहकर अपने निर्धारित कर्तव्यों का निष्ठापूर्वक पालन करें।"
+              : "Spend 10 minutes in morning breathwork (Anulom-Vilom). Maintaining impeccable integrity neutralizes malefic transit friction completely."
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2041,6 +2524,78 @@ function ShadbalaTool({ corePlanets, ascendantDegree, userData, isHi }) {
           );
         })}
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR SHADBALA ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "सप्तग्रह षड्बल वैयक्तिक परामर्श" : "Shadbala Planetary Strength Personal Guidance"}
+        coreVerdict={
+          isHi
+            ? `${userData?.name || "जातक"} जी, आपके षड्बल विश्लेषण में सर्वोच्च बली ग्रह #${scoresList[0]?.rank || 1} ${PLANET_NAMES_HI[scoresList[0]?.planet] || scoresList[0]?.planet || "गुरु"} (${((scoresList[0]?.totalVirupas || 400) / 60).toFixed(2)} रूपा) हैं, जो आपकी जन्मजात महाशक्ति हैं। वहीं #${scoresList[scoresList.length - 1]?.rank || 7} ${PLANET_NAMES_HI[scoresList[scoresList.length - 1]?.planet] || scoresList[scoresList.length - 1]?.planet || "शनि"} (${((scoresList[scoresList.length - 1]?.totalVirupas || 300) / 60).toFixed(2)} रूपा) सबसे कम बल वाले ग्रह हैं, जिन्हें उपाय द्वारा संतुलित करना आवश्यक है।`
+            : `${userData?.name || "Native"}, your Shadbala matrix reveals your #1 Champion Planet as ${scoresList[0]?.planet || "Jupiter"} (${((scoresList[0]?.totalVirupas || 400) / 60).toFixed(2)} Rupas) — your innate superpower. Conversely, your lowest-scoring planet is #${scoresList[scoresList.length - 1]?.rank || 7} ${scoresList[scoresList.length - 1]?.planet || "Saturn"} (${((scoresList[scoresList.length - 1]?.totalVirupas || 300) / 60).toFixed(2)} Rupas), representing your key karmic area requiring conscious remedial care.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? `सर्वोच्च बली ग्रह (${scoresList[0]?.planet || "Leader"}) का वरदान` : `Unlocking Your #1 Planet (${scoresList[0]?.planet}) Superpower`,
+            desc: isHi
+              ? `आपका सर्वोच्च बली ग्रह ${PLANET_NAMES_HI[scoresList[0]?.planet] || scoresList[0]?.planet} आपको कठिन परिस्थितियों में भी स्वाभाविक विजय, बौद्धिक प्रखरता व दृढ़ आत्मविश्वास प्रदान करता है। महत्वपूर्ण कार्यों में इस ग्रह के गुणों का उपयोग करें।`
+              : `Your highest planet (${scoresList[0]?.planet}) endows you with supreme natural aptitude, commanding presence, and intuitive resilience. Leverage its qualities when spearheading major ventures.`
+          },
+          {
+            title: isHi ? "स्थान व दिग्बल की अनुकूलता" : "Positional & Directional Advantage",
+            desc: isHi
+              ? "उच्च षड्बल वाले ग्रह जीवन में संकट के समय स्वतः ढाल बनकर रक्षा करते हैं और प्रतिष्ठा व सम्मान में गिरावट नहीं आने देते।"
+              : "Planets exceeding 100% of their Virupa requirements act as psychic shields, ensuring rapid bounce-back capacity after setbacks."
+          },
+          {
+            title: isHi ? "प्राकृतिक सामर्थ्य का प्रस्फुटन" : "Effortless Competence in Key Domains",
+            desc: isHi
+              ? "बली ग्रहों से जुड़े व्यवसाय, शिक्षा अथवा जीवन-क्षेत्रों में आपको स्वाभाविक सफलता मिलती है और थकावट का अनुभव नहीं होता।"
+              : "Pursuits aligned with your top 3 Shadbala planets evoke effortless flow, authentic charisma, and rapid mastery."
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? `अल्प बली ग्रह (${scoresList[scoresList.length - 1]?.planet || "Weakest"}) की चुनौतियां` : `Mitigating Your Lowest Planet (${scoresList[scoresList.length - 1]?.planet}) Friction`,
+            desc: isHi
+              ? `आपका सबसे कम बली ग्रह ${PLANET_NAMES_HI[scoresList[scoresList.length - 1]?.planet] || scoresList[scoresList.length - 1]?.planet} कभी-कभी आत्म-संदेह, निर्णय में हिचकिचाहट अथवा ऊर्जा की कमी पैदा कर सकता है। इस ग्रह के कारक तत्वों में जल्दबाजी न करें।`
+              : `Your lowest planet (${scoresList[scoresList.length - 1]?.planet}) can trigger subtle procrastination, self-doubt, or avoidable errors in its governed domains. Handle related matters with patient deliberation.`
+          },
+          {
+            title: isHi ? "ऊर्जा का असंतुलन व भावनात्मक उतार-चढ़ाव" : "Planetary Ratio Imbalance",
+            desc: isHi
+              ? "जब एक ग्रह अति-बली और दूसरा अत्यधिक कमजोर हो, तो व्यक्तित्व में एक पक्ष बहुत मजबूत और दूसरा उपेक्षित हो सकता है। दोनों का संतुलन आवश्यक है।"
+              : "A wide disparity between your strongest and weakest planets can cause personality blind spots. Balance passion with disciplined structure."
+          },
+          {
+            title: isHi ? "दशा व गोचर में संवेदनशीलता" : "Vulnerability During Planetary Sub-periods",
+            desc: isHi
+              ? `जब आपके कमजोर ग्रह की अंतर्दशा या गोचर सक्रिय हो, तो अत्यधिक सतर्क रहें एवं तनावपूर्ण परिस्थितियों से बचें।`
+              : `Exercise extra vigilance when entering the sub-periods (Antardashas) or adverse transits of your weaker planets.`
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? `कमजोर ग्रह (${scoresList[scoresList.length - 1]?.planet}) को बल देने के सटीक उपाय` : `Empowering Your Weakest Planet (${scoresList[scoresList.length - 1]?.planet})`,
+            desc: isHi
+              ? `अपने अल्प बली ग्रह (${PLANET_NAMES_HI[scoresList[scoresList.length - 1]?.planet] || scoresList[scoresList.length - 1]?.planet}) के बीज मंत्र का नित्य ११ बार जप करें एवं इसके अनुकूल वार को संबंधित वस्तुओं का दान करें।`
+              : `Chant the Beej Mantra of your weakest planet (${scoresList[scoresList.length - 1]?.planet}) 11 times daily. Engage in associated planetary charity to replenish its subtle reservoir.`
+          },
+          {
+            title: isHi ? "रंग, आहार एवं जीवनशैली द्वारा उपचार" : "Color & Lifestyle Harmonization",
+            desc: isHi
+              ? "कमजोर ग्रह से संबंधित सकारात्मक रंगों का उपयोग करें (जैसे गुरु हेतु हल्का पीला, बुध हेतु हरा, शनि हेतु नीला/गहरा) एवं संबंधित आदतों में सुधार करें।"
+              : "Incorporate the harmonious color spectrum of your weaker planet into your daily environment and adopt supportive dietary habits."
+          },
+          {
+            title: isHi ? "सर्वोच्च बली ग्रह का सदुपयोग" : "Channeling Your Superpower Planet",
+            desc: isHi
+              ? `अपने #1 ग्रह (${scoresList[0]?.planet}) की ऊर्जा को समाज कल्याण, परोपकार एवं रचनात्मक कार्यों में लगाएं। इससे अन्य सभी ग्रह स्वतः संतुलित होने लगते हैं।`
+              : `Channel the abundant vitality of your #1 planet (${scoresList[0]?.planet}) into mentorship and creative initiatives: a strong anchor planet uplifts the entire natal chart.`
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2088,6 +2643,60 @@ function KpChartTool({ corePlanets, ascendantDegree, userData, isHi }) {
           </tbody>
         </table>
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR KP CHART ── */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "केपी पद्धति व्यक्तिगत मार्गदर्शन" : "KP Sub-Lord Astrological Guidance"}
+        coreVerdict={
+          isHi
+            ? `${userData?.name || "जातक"} जी, कृष्णमूर्ति पद्धति (KP) के अनुसार किसी भी कार्य की अंतिम सफलता उस भाव के 'उप-स्वामी' (Sub-Lord) पर निर्भर करती है। 'ग्रह फल का संकेत देता है, नक्षत्र स्वामी फल की प्रकृति तय करता है और उप-स्वामी परिणाम (हाँ अथवा ना) को निर्धारित करता है'। आपकी कुंडली के प्रमुख उप-स्वामी आपको विशिष्ट निर्णयों में निश्चितता प्रदान करते हैं।`
+            : `${userData?.name || "Native"}, Krishnamurti Paddhati (KP) dictates that while planets indicate events and star lords provide the nature of the fruit, the Sub-Lord delivers the final decisive verdict. Your active sub-lord matrix governs precision timing for career, finances, and relationships.`
+        }
+        goodPoints={[
+          {
+            title: isHi ? "उप-स्वामी आधारित सफलता सूत्र" : "Sub-Lord Positive Significators",
+            desc: isHi
+              ? "जब आपके कर्म या धन से जुड़े ग्रहों के उप-स्वामी २, ६, १० या ११वें भाव से संबंधित होते हैं, तो वे अटूट सफलता, पदोन्नति एवं आर्थिक लाभ सुनिश्चित करते हैं।"
+              : "When sub-lords of career and wealth planets connect to houses 2, 6, 10, or 11, success in interviews, business expansion, and promotions is guaranteed."
+          },
+          {
+            title: isHi ? "निर्णय क्षमता में सूक्ष्म स्पष्टता" : "Surgical Timing Accuracy",
+            desc: isHi
+              ? "केपी उप-स्वामी के विश्लेषण से किसी भी संशय की स्थिति में सही समय पर सही दिशा चुनने में मदद मिलती है।"
+              : "KP sub-lords cut through astrological ambiguity, revealing the exact developmental window where your efforts yield peak results."
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "बाधक व विरोधी भावों से सतर्कता" : "Opposing House Cautions (Houses 8, 12)",
+            desc: isHi
+              ? "यदि किसी कार्य विशेष का उप-स्वामी ८वें (अचानक बाधा) या १२वें (व्यय/हानि) भाव को सक्रिय करता है, तो वहां अनियोजित जोखिम लेने से बचें।"
+              : "Sub-lords linking to houses 8 or 12 cause friction, sudden delays, or unforeseen expenditure. Avoid hasty commitments in those domains."
+          },
+          {
+            title: isHi ? "अति-संदेह व अत्यधिक विश्लेषण" : "Over-Analysis & Procrastination",
+            desc: isHi
+              ? "केपी प्रणाली की अत्यधिक गणनाओं में उलझकर कर्म करने में देरी न करें। शुभ समय की पहचान कर तत्परता से कार्य करें।"
+              : "Do not let micro-calculations paralyze execution. Align with favorable sub-lord hours and act decisively."
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "तात्कालिक सत्तारूढ़ ग्रहों (RP) का उपयोग" : "Timing via Ruling Planets (RP)",
+            desc: isHi
+              ? "महत्वपूर्ण ईमेल, अनुबंध अथवा यात्रा की शुरुआत अपने सत्तारूढ़ नक्षत्र स्वामी व उप-स्वामी के होरा अथवा लग्न समय में करें।"
+              : "Initiate decisive negotiations, signatures, or outreach during the active hora of your natal ruling planets."
+          },
+          {
+            title: isHi ? "इष्ट देव की मानसिक आराधना" : "Sub-Lord Planetary Alignment",
+            desc: isHi
+              ? "अपने लग्न एवं दशम भाव के उप-स्वामी ग्रह से संबंधित मंत्र का नित्य स्मरण करें। इससे कार्य में आ रहे गतिरोध स्वतः दूर होते हैं।"
+              : "Chant the mantra corresponding to your 1st and 10th cusp sub-lords daily to clear lingering professional obstacles."
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2180,6 +2789,42 @@ function KpHoraryTool({ horaryNumberInput, setHoraryNumberInput, horaryQueryTopi
           {isHi ? result.verdict.summaryHi : result.verdict.summaryEn}
         </p>
       </div>
+
+      {/* ── PERSONALIZED VEDIC ADVISORY FOR KP HORARY ── */}
+      <PersonalizedVedicAdvisory
+        userName={null}
+        toolBadge={isHi ? `केपी प्रश्न #${result.horaryNumber} विश्लेषण` : `KP Horary #${result.horaryNumber} Advisory`}
+        coreVerdict={
+          isHi
+            ? `आपके प्रश्न संख्या #${result.horaryNumber} पर तात्कालिक उप-स्वामी '${result.subLord}' का आधिपत्य है। केपी सिद्धांत के अनुसार यह उप-स्वामी आपके अभीष्ट विषय (${horaryQueryTopic}) के परिणाम को प्रत्यक्ष रूप से प्रभावित कर रहा है।`
+            : `Your Horary Seed #${result.horaryNumber} is governed by Sub-Lord '${result.subLord}'. Under KP principles, this decisive sub-lord rules the fulfillment timeline for your query (${horaryQueryTopic}).`
+        }
+        goodPoints={[
+          {
+            title: isHi ? "कार्य सिद्धि के अनुकूल संकेत" : "Fulfillment Indicators",
+            desc: isHi
+              ? "यदि आपका प्रश्न सकारात्मक भावों (जैसे करियर में २, ६, १०, ११; विवाह में २, ७, ११) से जुड़ा है, तो उप-स्वामी सफलता का मार्ग प्रशस्त करता है।"
+              : "When primary cusp sub-lords link favorably with augmenting houses, event fruition occurs smoothly within the ruling planetary cycle."
+          }
+        ]}
+        cautionPoints={[
+          {
+            title: isHi ? "विलंब व बाधा के कारक" : "Patience & Timeline Cautions",
+            desc: isHi
+              ? "यदि परिणाम में विलंब का संकेत है, तो किसी भी प्रकार की जल्दबाजी या भावनात्मक दबाव से बचें। सही समय की प्रतीक्षा करें।"
+              : "If delay significators are active, avoid forcing agreements prematurely. Allow cosmic cycles to mature the circumstances."
+          }
+        ]}
+        improvementPoints={[
+          {
+            title: isHi ? "सटीक समाधान व मार्गदर्शन" : "Harmonizing Action Plan",
+            desc: isHi
+              ? `उप-स्वामी ${result.subLord} के अनुकूल दिन पर महत्वपूर्ण पहल करें। भगवान गणेश का ध्यान कर विघ्नों के निवारण की प्रार्थना करें।`
+              : `Initiate active follow-ups on the weekday governed by Sub-Lord ${result.subLord}. Invoke Lord Ganesha for obstruction-free fruition.`
+          }
+        ]}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2263,6 +2908,60 @@ function LifePathTool({ userData, setUserData, isHi }) {
           <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
             {isHi ? lp.archetype.traitsHi : lp.archetype.traitsEn}
           </p>
+
+          {/* ── PERSONALIZED VEDIC ADVISORY FOR LIFE PATH ── */}
+          <PersonalizedVedicAdvisory
+            userName={userData?.name}
+            toolBadge={isHi ? `मूलांक ${lp.lifePathNumber} व्यक्तिगत परामर्श` : `Life Path ${lp.lifePathNumber} Personal Guidance`}
+            coreVerdict={
+              isHi
+                ? `${userData?.name || "जातक"} जी, आपकी जन्म तिथि का संपूर्ण योग मूलांक ${lp.lifePathNumber} बनाता है, जिसके स्वामी ग्रह ${lp.archetype.ruler} हैं। यह अंक आपकी आत्मा के मुख्य जीवन उद्देश्य (${lp.archetype.titleHi}) को प्रकट करता है। इस ऊर्जा के साथ तालमेल बिठाकर चलने पर आपको स्वाभाविक सफलता, आंतरिक शांति एवं दीर्घकालिक समृद्धि प्राप्त होगी।`
+                : `${userData?.name || "Native"}, your birth date reduces to sacred Life Path ${lp.lifePathNumber}, governed by ${lp.archetype.planet}. This vibration embodies '${lp.archetype.titleEn}', defining your core leadership instinct, creative strengths, and ideal career pathway.`
+            }
+            goodPoints={[
+              {
+                title: isHi ? `मूलांक ${lp.lifePathNumber} की स्वाभाविक प्रतिभा` : `Innate Genius of Life Path ${lp.lifePathNumber}`,
+                desc: isHi
+                  ? `आप में ${lp.archetype.traitsHi} जैसे गुण जन्मजात हैं। यह ऊर्जा आपको विपरीत परिस्थितियों में भी लक्ष्य के प्रति अडिग रहने व स्वतंत्र निर्णय लेने की शक्ति देती है।`
+                  : `You are naturally gifted with ${lp.archetype.traitsEn}. This cosmic frequency grants you resilience, strategic focus, and the capacity to pioneer new solutions.`
+              },
+              {
+                title: isHi ? "आकर्षण एवं प्रभावशीलता" : "Natural Magnetism & Social Authority",
+                desc: isHi
+                  ? `जब आप अपने मूलांक के अनुकूल कार्यों में संलग्न होते हैं, तो लोग आपकी प्रामाणिकता व समर्पण का स्वतः सम्मान करते हैं।`
+                  : `Operating in alignment with your numerical destiny commands authentic respect, attracting loyal collaborators and supportive mentors.`
+              }
+            ]}
+            cautionPoints={[
+              {
+                title: isHi ? `मूलांक ${lp.lifePathNumber} के नकारात्मक पहलू (Shadow Traits)` : `Shadow Traps of Number ${lp.lifePathNumber}`,
+                desc: isHi
+                  ? "अति-आत्मविश्वास, जिद, अधीरता अथवा दूसरों की धीमी गति पर चिड़चिड़ाहट इस अंक के मुख्य दोष हैं। दूसरों के दृष्टिकोण को भी धैर्य से सुनना सीखें।"
+                  : "Watch out for rigidity, impatience with colleagues, or emotional burnout. Avoid taking on burdens that belong to others."
+              },
+              {
+                title: isHi ? "भावनात्मक उतार-चढ़ाव व तनाव" : "Stress Triggers & Frustration",
+                desc: isHi
+                  ? "जब योजनाएं तुरंत फलीभूत नहीं होतीं, तो हताश होने के बजाय धैर्यपूर्वक प्रक्रिया पर भरोसा करें। अचानक बड़े फैसले न लें।"
+                  : "Resist the urge to force immediate outcomes when cycles demand patient incubation. Preserve energy for high-leverage moves."
+              }
+            ]}
+            improvementPoints={[
+              {
+                title: isHi ? `स्वामी ग्रह (${lp.archetype.ruler}) का मंत्र व दैनिक साधना` : `Ruling Planetary Alignment (${lp.archetype.ruler})`,
+                desc: isHi
+                  ? `अपने अंक स्वामी ${lp.archetype.ruler} के सम्मान में प्रतिदिन प्रातः ५ मिनट ध्यान करें। संबंधित इष्ट देव की आराधना जीवन में आ रहे अवरोधों को नष्ट करती है।`
+                  : `Dedicate 5 minutes each morning to grounding reflection aligned with ${lp.archetype.ruler}. Chanting sacred mantras aligns your subtle biorhythm.`
+              },
+              {
+                title: isHi ? "अनुकूल रंग व जीवनशैली संतुलन" : "Harmonious Colors & Environment",
+                desc: isHi
+                  ? "हल्के सुनहरे, पीले अथवा सफेद रंगों का प्रयोग करें। अपने कार्यक्षेत्र को व्यवस्थित व सुवासित रखें।"
+                  : "Incorporate luminous, grounding tones (gold, ivory, soft amber) into your wardrobe and workspace to amplify clarity."
+              }
+            ]}
+            isHi={isHi}
+          />
         </div>
       )}
     </div>
@@ -2289,43 +2988,93 @@ function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, isHi 
       </div>
 
       {result && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
-          {/* Chaldean Card */}
-          <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(245, 158, 11, 0.4)", borderRadius: 16, padding: "20px" }}>
-            <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 10px" }}>
-              {isHi ? "काल्डियन वैदिक अंकशास्त्र" : "Chaldean System (Sound Vibration)"}
-            </h4>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-              {result.chaldean.letters.map((item, idx) => (
-                <div key={idx} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "4px 8px", textAlign: "center", border: "1px solid rgba(212,175,55,0.2)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700 }}>{item.char}</div>
-                  <div style={{ fontSize: 11, color: "#F59E0B", fontWeight: 800 }}>{item.val}</div>
-                </div>
-              ))}
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+            {/* Chaldean Card */}
+            <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(245, 158, 11, 0.4)", borderRadius: 16, padding: "20px" }}>
+              <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 10px" }}>
+                {isHi ? "काल्डियन वैदिक अंकशास्त्र" : "Chaldean System (Sound Vibration)"}
+              </h4>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                {result.chaldean.letters.map((item, idx) => (
+                  <div key={idx} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "4px 8px", textAlign: "center", border: "1px solid rgba(212,175,55,0.2)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700 }}>{item.char}</div>
+                    <div style={{ fontSize: 11, color: "#F59E0B", fontWeight: 800 }}>{item.val}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 14, color: "#34D399", fontWeight: 800 }}>
+                {isHi ? "काल्डियन नामांक:" : "Chaldean Name Number:"} {result.chaldean.nameNumber} (Compound {result.chaldean.compoundNumber})
+              </div>
             </div>
-            <div style={{ fontSize: 14, color: "#34D399", fontWeight: 800 }}>
-              {isHi ? "काल्डियन नामांक:" : "Chaldean Name Number:"} {result.chaldean.nameNumber} (Compound {result.chaldean.compoundNumber})
+
+            {/* Pythagorean Card */}
+            <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(212, 175, 55, 0.3)", borderRadius: 16, padding: "20px" }}>
+              <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 10px" }}>
+                {isHi ? "पाइथागोरियन पाश्चात्य अंकशास्त्र" : "Pythagorean System (Western 1–9)"}
+              </h4>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+                {result.pythagorean.letters.map((item, idx) => (
+                  <div key={idx} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "4px 8px", textAlign: "center", border: "1px solid rgba(212,175,55,0.2)" }}>
+                    <div style={{ fontSize: 12, fontWeight: 700 }}>{item.char}</div>
+                    <div style={{ fontSize: 11, color: "#60A5FA", fontWeight: 800 }}>{item.val}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 14, color: "#60A5FA", fontWeight: 800 }}>
+                {isHi ? "पाइथागोरियन भाग्यांक:" : "Destiny Number:"} {result.pythagorean.destinyNumber} (Compound {result.pythagorean.compoundNumber})
+              </div>
             </div>
           </div>
 
-          {/* Pythagorean Card */}
-          <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(212, 175, 55, 0.3)", borderRadius: 16, padding: "20px" }}>
-            <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 10px" }}>
-              {isHi ? "पाइथागोरियन पाश्चात्य अंकशास्त्र" : "Pythagorean System (Western 1–9)"}
-            </h4>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
-              {result.pythagorean.letters.map((item, idx) => (
-                <div key={idx} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 8, padding: "4px 8px", textAlign: "center", border: "1px solid rgba(212,175,55,0.2)" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700 }}>{item.char}</div>
-                  <div style={{ fontSize: 11, color: "#60A5FA", fontWeight: 800 }}>{item.val}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{ fontSize: 14, color: "#60A5FA", fontWeight: 800 }}>
-              {isHi ? "पाइथागोरियन भाग्यांक:" : "Destiny Number:"} {result.pythagorean.destinyNumber} (Compound {result.pythagorean.compoundNumber})
-            </div>
-          </div>
-        </div>
+          {/* ── PERSONALIZED VEDIC ADVISORY FOR NAME NUMEROLOGY ── */}
+          <PersonalizedVedicAdvisory
+            userName={nameNumerologyInput}
+            toolBadge={isHi ? "नामांक व ध्वनि तरंग विश्लेषण" : "Name Vibration Frequency Advisory"}
+            coreVerdict={
+              isHi
+                ? `'${nameNumerologyInput}' नाम की काल्डियन ध्वनि तरंग संख्या ${result.chaldean.nameNumber} (संयुक्त ${result.chaldean.compoundNumber}) एवं पाइथागोरियन भाग्यांक ${result.pythagorean.destinyNumber} बनाती है। नाम की यह ध्वनि आपके अवचेतन मन व सामाजिक छवि को निरंतर ऊर्जा प्रदान करती है। यदि नामांक आपके जन्म मूलांक से मित्रवत हो, तो सफलता तीव्र गति से मिलती है।`
+                : `The vocal frequency of '${nameNumerologyInput}' yields Chaldean Sound Vibration ${result.chaldean.nameNumber} (Compound ${result.chaldean.compoundNumber}) and Pythagorean Expression ${result.pythagorean.destinyNumber}. When this phonetic signature harmonizes with your birth date, opportunities compound effortlessly.`
+            }
+            goodPoints={[
+              {
+                title: isHi ? "नाम की अनुकूल ध्वनि शक्ति" : "Auspicious Vocal Resonance",
+                desc: isHi
+                  ? `यह नामांक समाज में पहचान, सकारात्मक प्रथम प्रभाव एवं व्यावसायिक विश्वसनीयता को बढ़ाने में सहायक है।`
+                  : "This name configuration projects natural credibility, interpersonal warmth, and magnetic public reception."
+              },
+              {
+                title: isHi ? "व्यावसायिक व व्यक्तिगत ब्रांडिंग" : "Brand & Professional Alignment",
+                desc: isHi
+                  ? "हस्ताक्षर एवं आधिकारिक पहचान में इस नाम का निरंतर उपयोग करने से आत्मबल सुदृढ़ होता है।"
+                  : "Consistently utilizing this phonetic structure in official documents and digital signatures reinforces authority."
+              }
+            ]}
+            cautionPoints={[
+              {
+                title: isHi ? "ध्वनि अवरोध व नामांक शत्रुता" : "Conflicting Name Vibrations",
+                desc: isHi
+                  ? "यदि नामांक और जन्म मूलांक परस्पर शत्रु ग्रहों (जैसे सूर्य बनाम शनि, या गुरु बनाम शुक्र) के हों, तो बिना कारण कार्यों में विलंब हो सकता है।"
+                  : "Friction occurs if your name number clashes with your birth date ruler (e.g. 1 vs 8, or 3 vs 6), creating subconscious self-sabotage."
+              }
+            ]}
+            improvementPoints={[
+              {
+                title: isHi ? "सूक्ष्म वर्तनी (Spelling) सुधार सूत्र" : "Micro-Spelling Harmonization",
+                desc: isHi
+                  ? "यदि आवश्यक हो, तो नाम में एक अतिरिक्त अक्षर (जैसे 'A' या 'E') जोड़कर काल्डियन योग को १, ३, ५ अथवा ६ पर लाया जा सकता है, जो सार्वभौमिक रूप से शुभ माने जाते हैं।"
+                  : "If resonance feels sluggish, tuning your name spelling to aggregate into universally auspicious numbers (1, 3, 5, or 6) eliminates friction."
+              },
+              {
+                title: isHi ? "हस्ताक्षर (Signature) सुधार" : "Auspicious Signature Angle",
+                desc: isHi
+                  ? "हस्ताक्षर करते समय सदैव ऊपर की ओर (४५ डिग्री कोण) उठते हुए हस्ताक्षर करें। नीचे की ओर झुकाव प्रगति में रुकावट का प्रतीक है।"
+                  : "Always sign your signature angling upwards (approx. 45-degree trajectory). A descending signature symbolizes downward energy leaks."
+              }
+            ]}
+            isHi={isHi}
+          />
+        </>
       )}
     </div>
   );
@@ -2334,9 +3083,136 @@ function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, isHi 
 /** 12. PERSONAL YEAR TOOL **/
 function PersonalYearTool({ userData, isHi }) {
   const result = calculatePersonalYearAndMonth(userData.dob);
+  const pYear = result?.personalYear || 1;
+
+  const getYearStrengths = () => {
+    switch (pYear) {
+      case 1:
+        return isHi
+          ? ["नये प्रोजेक्ट, स्टार्टअप व करियर में स्वतंत्र निर्णय लेने का श्रेष्ठ वर्ष", "आत्मविश्वास व नेतृत्व क्षमता में अभूतपूर्व वृद्धि", "स्वयं की पहचान व नए संबंधों की सशक्त नींव"]
+          : ["Peak year for launching new ventures, startups, and self-directed initiatives", "Heightened executive presence, confidence, and vital physical energy", "Laying enduring 9-year foundations without lingering past baggage"];
+      case 2:
+        return isHi
+          ? ["भागीदारी, वैवाहिक सौहार्द व कूटनीतिक समझौतों में सफलता", "भावनात्मक संवेदनशीलता व दूसरों के साथ उत्कृष्ट तालमेल", "धीमी पर अत्यंत सुदृढ़ प्रगति"]
+          : ["Optimal timing for strategic partnerships, joint ventures, and marital harmony", "Enhanced intuitive diplomacy and cooperative negotiation prowess", "Patient consolidation that quietly solidifies long-term security"];
+      case 3:
+        return isHi
+          ? ["रचनात्मक अभिव्यक्ति, मीडिया, कला, संचार व सामाजिक लोकप्रियता", "नेटवर्किंग व नए शुभ अवसरों का सहज आगमन", "सकारात्मक ऊर्जा व उत्साह में तीव्र उछाल"]
+          : ["Creative breakthroughs in communication, branding, media, and public visibility", "Spontaneous social expansion, joy, and inspiring serendipitous allies", "High optimism and magnetic charisma attracting lucrative mentors"];
+      case 4:
+        return isHi
+          ? ["कड़ी मेहनत, व्यवस्था, अचल संपत्ति निर्माण व बचत के लिए स्वर्णिम काल", "कार्यप्रणाली में अनुशासन व दीर्घकालिक स्थिरता", "पारिवारिक व कानूनी मामलों में सुदृढ़ स्थिति"]
+          : ["Solid foundation-building, real estate acquisitions, and systematic capital saving", "Unshakable operational discipline, work ethic, and pragmatic systems", "Stabilizing structural family and contractual frameworks"];
+      case 5:
+        return isHi
+          ? ["रोमांचक यात्राएं, करियर में सकारात्मक बदलाव व नए क्षितिज", "व्यापारिक विविधीकरण व अनुकूलनशीलता", "आधुनिक तकनीकों व विदेशी संपर्कों से लाभ"]
+          : ["Expansive travel, liberating career pivots, and dynamic new horizons", "Nimble commercial diversification, rapid learning, and marketing momentum", "Unexpected positive windfalls through tech, media, and international channels"];
+      case 6:
+        return isHi
+          ? ["पारिवारिक सुख, गृह-प्रवेश, विवाह व संतान प्राप्ति का मांगलिक समय", "घरेलू सामंजस्य व प्रेम संबंधों में प्रगाढ़ता", "सहानुभूति व सामाजिक प्रतिष्ठा में वृद्धि"]
+          : ["Domestic bliss, auspicious matrimonial milestones, home beautification, or parenting", "Deepening emotional devotion and healing fractured interpersonal bonds", "Esteem and leadership within your local community and close circle"];
+      case 7:
+        return isHi
+          ? ["आत्म-मंथन, आध्यात्मिक उत्थान, अनुसंधान, शोध व गुप्त ज्ञान की प्राप्ति", "अनावश्यक भागदौड़ से मुक्ति व आंतरिक शांति", "गहन बौद्धिक चिंतन व रणनीतिक स्पष्टता"]
+          : ["Profound spiritual awakening, contemplative introspection, and research breakthroughs", "Clarity derived from strategic solitude, detaching from superficial noise", "Intuitive foresight that prevents costly long-term misjudgments"];
+      case 8:
+        return isHi
+          ? ["आर्थिक समृद्धि, व्यावसायिक अधिकार, पदोन्नति व बड़े निवेश का शिखर काल", "कर्मों का प्रत्यक्ष प्रतिफल व भौतिक लाभ", "प्रशासनिक व वित्तीय मामलों में दबदबा"]
+          : ["Material culmination, executive authority, substantial investments, and revenue peaks", "Karmic justice rewarding your disciplined sweat and perseverance", "High financial leverage and command over complex commercial assets"];
+      case 9:
+      default:
+        return isHi
+          ? ["पुराने तनावों, रुकावटों व अपूर्ण कार्यों की सफल पूर्णाहुति", "मानवतावादी दृष्टिकोण व सामाजिक यश", "जीवन के नए ९-वर्षीय अध्याय की तैयारी"]
+          : ["Graceful culmination of obsolete cycles, freeing you from outdated obligations", "Humanitarian influence, philanthropic reputation, and global perspective", "Cathartic clearing making clean room for your impending next 9-year era"];
+    }
+  };
+
+  const getYearCautions = () => {
+    switch (pYear) {
+      case 1:
+        return isHi
+          ? ["अहंकार अथवा दूसरों के सुझावों की अनदेखी से बचें", "जल्दबाजी में दूसरों पर अत्यधिक निर्भरता न रखें"]
+          : ["Beware of impulsive aggression or dismissing seasoned counsel out of sheer stubbornness", "Avoid isolating yourself by treating teamwork as a hindrance"];
+      case 2:
+        return isHi
+          ? ["अति-भावुकता या निर्णय लेने में अत्यधिक संकोच से बचें", "दूसरों को खुश करने के फेर में अपने हितों का बलिदान न दें"]
+          : ["Vulnerability to passive over-sensitivity, mood swings, or endless procrastination", "Sacrificing your personal boundaries simply to avoid interpersonal friction"];
+      case 3:
+        return isHi
+          ? ["ऊर्जा का बिखराव, अत्यधिक खर्चे अथवा वादों से मुकरना", "गपशप या दिखावे में समय व्यर्थ न करें"]
+          : ["Scattered focus across too many frivolous projects; squandering capital on luxury", "Superficial flattery or overpromising deliverables you cannot fulfill"];
+      case 4:
+        return isHi
+          ? ["मानसिक तनाव, अत्यधिक कठोरता अथवा स्वास्थ्य की उपेक्षा", "परिवर्तन का अनावश्यक विरोध न करें"]
+          : ["Mental rigidity, stubborn resistance to modern tweaks, or physical exhaustion", "Risk of feeling emotionally restricted or bogged down by mundane routines"];
+      case 5:
+        return isHi
+          ? ["अधीरता, अनियंत्रित व्यसन, अचानक जोखिम भरे सट्टे या सौदे", "स्थिर प्रतिबद्धताओं को बीच में न छोड़ें"]
+          : ["Restless impulsiveness, gambling on speculative bets, or reckless escapism", "Abandoning viable commitments halfway due to shiny-object distraction"];
+      case 6:
+        return isHi
+          ? ["पारिवारिक मामलों में अत्यधिक हस्तक्षेप या दूसरों की गलतियों का बोझ अपने सिर लेना", "वैवाहिक मामलों में हठधर्मिता से बचें"]
+          : ["Martyrdom syndrome: burning out by carrying domestic burdens that belong to others", "Perfectionist expectations causing friction in marital intimacies"];
+      case 7:
+        return isHi
+          ? ["अत्यधिक अलगाव, अवसाद, अथवा साझेदारी के कार्यों में संशय", "व्यावसायिक सौदों में अंधविश्वास से बचें"]
+          : ["Overthinking paralysis, melancholy, or excessive cynicism towards close allies", "Neglecting practical fiscal realities in pursuit of intellectual idealism"];
+      case 8:
+        return isHi
+          ? ["अनैतिक वित्तीय प्रलोभन, कर्मचारियों से दुर्व्यवहार या अहंकार", "अत्यधिक तनाव से रक्तचाप व स्वास्थ्य का ध्यान रखें"]
+          : ["Temptations of ruthless shortcuts, arrogance with subordinates, or legal carelessness", "Workaholism leading to vascular strain or emotional detachment"];
+      case 9:
+      default:
+        return isHi
+          ? ["अतीत के पछतावे में उलझना, जबरन रिश्तों को खींचना", "बड़े नए दीर्घकालिक व्यापारिक समझौते इस वर्ष शुरू न करें"]
+          : ["Clinging to fading friendships or toxic jobs out of sentimentality", "Commencing massive 10-year speculative debt burdens before completing current obligations"];
+    }
+  };
+
+  const getYearRemedies = () => {
+    switch (pYear) {
+      case 1:
+        return isHi
+          ? ["प्रतिदिन प्रातः सूर्य देव को तांबे के लोटे से अर्घ्य दें एवं 'ॐ घृणिः सूर्याय नमः' का जाप करें।", "रविवार को गेहूं अथवा तांबे का दान करें।", "महत्वपूर्ण कार्यों में केसरिया व सुनहरे रंग का प्रयोग करें।"]
+          : ["Offer early morning water to the Sun with 'Om Ghrinih Suryaya Namaha' to amplify vitality.", "Donate whole wheat or copper vessels on Sunday mornings.", "Wear warm amber or gold tones for crucial negotiations."];
+      case 2:
+        return isHi
+          ? ["सोमवार को शिवलिंग पर कच्चा दूध व जल अर्पित करें, 'ॐ नमः शिवाय' का १०८ बार जाप करें।", "पूर्णिमा के दिन चंद्र दर्शन व चांदी के पात्र से जल पिएं।", "श्वेत व हल्के क्रीम रंगों का उपयोग मानसिक शांति देगा।"]
+          : ["Offer milk and sacred water to Shiva on Mondays; recite 'Om Namah Shivaya'.", "Drink water from a silver cup to balance emotional mercurial rhythms.", "Adopt off-white, pearl, and soft pastel shades to calm nervous tension."];
+      case 3:
+        return isHi
+          ? ["गुरुवार को भगवान विष्णु की आराधना करें एवं 'ॐ नमो भगवते वासुदेवाय' का पाठ करें।", "विद्यार्थियों को पुस्तकें या पीली दाल दान करें।", "हल्दी का तिलक लगाएं व पीले वस्त्रों को प्राथमिकता दें।"]
+          : ["Honor Lord Vishnu on Thursdays with 'Om Namo Bhagavate Vasudevaya' for wisdom.", "Gift books or stationery to students and donate yellow lentils on Thursdays.", "Wear yellow or saffron hues to magnetically draw auspicious mentors."];
+      case 4:
+        return isHi
+          ? ["शनिवार को पीपल के वृक्ष पर सरसों के तेल का दीपक जलाएं एवं 'ॐ शं शनैश्चराय नमः' जपें।", "श्रमजीवियों व जरूरतमंदों को भोजन या कंबल भेंट करें।", "नीले व भूरे रंगों का संतुलित प्रयोग करें।"]
+          : ["Light a mustard oil lamp beneath a Peepal tree on Saturdays with 'Om Sham Shanaishcharaya Namaha'.", "Distribute wholesome meals or warm blankets to hardworking blue-collar workers.", "Incorporate grounding slate blue and earthy brown tones in your workspace."];
+      case 5:
+        return isHi
+          ? ["बुधवार को हरी मूंग की दाल पक्षियों को डालें एवं 'ॐ बुं बुधाय नमः' का जप करें।", "तुलसी के पौधे में नित्य जल दें।", "हरे व पन्ना रंगों का प्रयोग संचार व व्यापार में तीव्र लाभ देगा।"]
+          : ["Feed green mung beans to birds on Wednesdays; chant 'Om Bum Budhaya Namaha'.", "Water a sacred Tulsi plant daily to keep neurological focus sharp.", "Incorporate emerald and mint greens to unlock dynamic commerce."];
+      case 6:
+        return isHi
+          ? ["शुक्रवार को मां लक्ष्मी को खीर का भोग लगाएं एवं 'ॐ शुं शुक्राय नमः' का जप करें।", "गौमाता को हरा चारा या गुड़ खिलाएं।", "गुलाबी, श्वेत व चमकदार रेशमी परिधान धारण करें।"]
+          : ["Offer sweet rice kheer to Goddess Lakshmi on Fridays with 'Om Shum Shukraya Namaha'.", "Feed cows fresh green grass or jaggery on Friday mornings.", "Wear rose, iridescent white, or pastel silk tones to magnetize romance."];
+      case 7:
+        return isHi
+          ? ["प्रतिदिन १०-१५ मिनट मौन ध्यान व ओंकार ध्वनि का अभ्यास करें।", "शनिवार/मंगलवार को 'ॐ कें केतवे नमः' का जप करें व आवारा कुत्तों को रोटी खिलाएं।", "धूसर (Grey) व स्मोकी क्वार्ट्ज रंगों का उपयोग करें।"]
+          : ["Commit to 15 minutes of silent pranayama and Om chanting before dawn.", "Feed stray animals on Saturdays; recite 'Om Kem Ketave Namaha'.", "Surround your study area with slate grey or smoky quartz."];
+      case 8:
+        return isHi
+          ? ["शनिवार को हनुमान चालीसा का २१ बार पाठ करें व सुंदरकांड पढ़ें।", "काले तिल, लोहे के बर्तन या तेल का दान करें।", "गहरे नीले व काले रंग का संयमित प्रयोग अनुशासन देगा।"]
+          : ["Chant Hanuman Chalisa and perform Sundarkand readings on Saturdays.", "Donate black sesame seeds, ironware, or mustard oil to monastic ascetics.", "Wear midnight blue and charcoal tones to maintain executive poise."];
+      case 9:
+      default:
+        return isHi
+          ? ["मंगलवार को हनुमान जी को सिंदूर व चमेली का तेल चढ़ाएं, 'ॐ अं अंगारकाय नमः' जपें।", "रक्तदान करें अथवा अनाथालय में भोजन दान करें।", "लाल व मेहरून रंगों का आत्मविश्वास हेतु प्रयोग करें।"]
+          : ["Offer vermilion and jasmine oil to Lord Hanuman on Tuesdays; chant 'Om Angarakaya Namaha'.", "Donate blood or support orphanages to clear karmic ledger debts.", "Wear crimson and deep maroon to kindle purposeful resolve."];
+    }
+  };
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {result && (
         <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
           <div style={{ color: "#34D399", fontWeight: 800, fontSize: 12, marginBottom: 6 }}>
@@ -2349,10 +3225,26 @@ function PersonalYearTool({ userData, isHi }) {
             {isHi ? result.yearTheme.descHi || result.yearTheme.descEn : result.yearTheme.descEn}
           </p>
           <div style={{ fontSize: 12.5, color: "#FDE68A", fontWeight: 700 }}>
-            • {isHi ? `चालू माह का अंक: ${result.personalMonth}` : `Current Month Vibration: Personal Month ${result.personalMonth}`}
+            • {isHi ? `चालू माह का अंक कंपन: व्यक्तिगत माह ${result.personalMonth}` : `Current Month Vibration: Personal Month ${result.personalMonth}`}
           </div>
         </div>
       )}
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? `व्यक्तिगत वर्ष ${pYear} भविष्यवाणी` : `Personal Year ${pYear} Guidance`}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, आपकी जन्म तिथि (${userData?.dob}) के अनुसार वर्ष ${result?.targetYear || 2026} आपके लिए व्यक्तिगत वर्ष ${pYear} के प्रभाव में है। यह वर्ष आपके ९-वर्षीय जीवन चक्र में विशिष्ट कर्मिक ऊर्जा और प्राथमिकताओं को सक्रिय कर रहा है।`
+            : `${userData?.name || "Seeker"}, based on your birth date (${userData?.dob}), year ${result?.targetYear || 2026} vibrates at Personal Year ${pYear}. This sets the foundational frequency for what cosmic energies are unlocked and which areas require focus.`
+        }
+        goodPoints={getYearStrengths()}
+        cautionPoints={getYearCautions()}
+        remedyPoints={getYearRemedies()}
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2362,8 +3254,8 @@ function NumberCompatibilityTool({ userData, partnerDobInput, setPartnerDobInput
   const result = calculateNumberCompatibility(userData.dob, partnerDobInput);
 
   return (
-    <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
         <div>
           <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
             {isHi ? "आपकी जन्म तिथि:" : "Your Birth Date:"}
@@ -2401,6 +3293,60 @@ function NumberCompatibilityTool({ userData, partnerDobInput, setPartnerDobInput
           • <b>{isHi ? "शत्रु अंक (Challenging Numbers):" : "Challenging Numbers:"}</b> {result.enemyNumbers.join(", ")}
         </div>
       </div>
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? "संख्या मिलान एवं दांपत्य सामंजस्य" : "Numerical Synastry & Compatibility Guidance"}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, आपका मूलांक ${result.moolank} है तथा आपके साथी (जन्मतिथि: ${partnerDobInput}) का मूलांक ${result.partnerResult?.partnerMoolank || "—"} है। दोनों के बीच संख्या सामंजस्य ${result.partnerResult?.compatibilityScore || 70}% है। यह विश्लेषण आपके संबंधों के स्वभाव और तालमेल को प्रकट करता है।`
+            : `${userData?.name || "Seeker"}, your Birth Root Number is ${result.moolank} and your companion's Root Number is ${result.partnerResult?.partnerMoolank || "—"}, resulting in a baseline synastry score of ${result.partnerResult?.compatibilityScore || 70}%. Here is how your combined vibrations interact.`
+        }
+        goodPoints={
+          isHi
+            ? [
+                `मूलांक ${result.moolank} और ${result.partnerResult?.partnerMoolank || "—"} का संयोजन बौद्धिक व व्यावहारिक पूरकता का सृजन करता है।`,
+                result.partnerResult?.isHarmonious
+                  ? "प्राकृतिक मैत्री होने के कारण दोनों में बिना कहे बात समझने का गहरा सामंजस्य है।"
+                  : "दोनों के अलग दृष्टिकोण एक-दूसरे के व्यक्तित्व की कमियों को संतुलित करने में सहायक हैं।",
+                "दीर्घकालिक साझा लक्ष्यों, वित्तीय सुरक्षा एवं परिवार निर्माण में एकनिष्ठ सहयोग।"
+              ]
+            : [
+                `Combination of Moolank ${result.moolank} and ${result.partnerResult?.partnerMoolank || "—"} creates complementary emotional and intellectual dynamics.`,
+                result.partnerResult?.isHarmonious
+                  ? "Natural harmonic resonance yields intuitive empathy and mutual respect during stress."
+                  : "Divergent viewpoints, when respected, protect against blind spots and balance collective decision-making.",
+                "Strong cooperative foundation for shared financial investments, home-building, and mutual life milestones."
+              ]
+        }
+        cautionPoints={
+          isHi
+            ? [
+                "अहंकार टकराव एवं मतभेदों के समय बातचीत बंद करने (Cold War) की प्रवृत्ति से बचें।",
+                "वित्तीय प्राथमिकताओं अथवा घरेलू निर्णयों में बिना सहमति के एकाधिकार न चलाएं।"
+              ]
+            : [
+                "Vulnerability to passive-aggressive communication or silent treatment during conflicting viewpoints.",
+                "Avoid unilateral dominance over joint expenditures, lifestyle decisions, or family dynamics."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "गुरुवार को किसी मंदिर या जरूरतमंद को पीले फल अथवा चने की दाल का संयुक्त दान करें।",
+                "अपने शयनकक्ष के दक्षिण-पश्चिम (नैऋत्य) कोण में स्फटिक या गुलाब क्वार्ट्ज रखें ताकि प्रेम ऊर्जा प्रगाढ़ हो।",
+                "पूर्णिमा के दिन दोनों मिलकर भगवान सत्यनारायण अथवा शिव-पार्वती की आरती करें।"
+              ]
+            : [
+                "Jointly donate yellow fruits or split chickpeas on Thursdays to cultivate planetary grace and auspicious fellowship.",
+                "Place a natural Rose Quartz crystal in the Southwest sector of your bedroom to nurture tender intimacy.",
+                "Chant 'Om Uma Maheshwarabhyam Namaha' on Monday evenings or full moon nights to bless your matrimonial union."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -2552,7 +3498,7 @@ function DailyTransitHoroscopeTool({ userData, corePlanets, isHi }) {
   const moonNak = getNakshatraInfo(moonLon);
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
           <span style={{ color: "#34D399", fontWeight: 800, fontSize: 12 }}>
@@ -2582,17 +3528,67 @@ function DailyTransitHoroscopeTool({ userData, corePlanets, isHi }) {
           </div>
         </div>
       </div>
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? "दैनिक गोचर व्यक्तिगत मार्गदर्शन" : "Daily Planetary Transit Advisory"}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, आपकी जन्म चंद्र राशि ${moonNak.rashi} (नक्षत्र: ${moonNak.name}) के अनुसार वर्तमान गोचरीय ग्रह स्थिति आपके मन, कर्मक्षेत्र और वित्तीय प्रवाह पर प्रभाव डाल रही है।`
+            : `${userData?.name || "Seeker"}, transits referenced from your natal Moon in ${moonNak.rashi} (${moonNak.name} Nakshatra) indicate energetic momentum across intellectual pursuits alongside reminders for emotional grounding.`
+        }
+        goodPoints={
+          isHi
+            ? [
+                `चंद्र राशि ${moonNak.rashi} के लिए आज का दिन शोध, परामर्श, रणनीति निर्माण एवं नए संपर्कों के लिए अत्यंत अनुकूल है।`,
+                "वरिष्ठ सहयोगियों व शुभचिंतकों से सहयोग और प्रोत्साहन मिलने की प्रबल संभावना।",
+                "आत्म-सम्मान व निर्णय लेने की क्षमता में सकारात्मक ऊर्जा का संचार।"
+              ]
+            : [
+                `Current planetary alignment over ${moonNak.rashi} stimulates creative clarity and productive strategic negotiations.`,
+                "Favorable window for enlisting cooperation from seasoned peers and mentors.",
+                "Mental resilience and purposeful drive help bypass minor workplace distractions."
+              ]
+        }
+        cautionPoints={
+          isHi
+            ? [
+                "दोपहर के समय क्षणिक उत्तेजना या जल्दबाजी में किसी कटु विवाद में न पड़ें।",
+                "दिखावे या अनपेक्षित विलासिता के सामान पर फिजूलखर्ची से बचें।"
+              ]
+            : [
+                "Watch for brief midday irritability; refrain from reactionary arguments or impulsive rebuttals.",
+                "Avoid speculative emotional expenditures or hasty financial commitments."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "प्रातःकाल तांबे के लोटे से सूर्य देव को अर्घ्य दें और 'ॐ घृणिः सूर्याय नमः' का ११ बार जप करें।",
+                "दिन में पर्याप्त जल पिएं और श्वेत अथवा हल्के नीले वस्त्रों को प्राथमिकता दें।",
+                "सायंकाल घर के पूजा स्थल पर घी का दीपक जलाकर मन को शांत रखें।"
+              ]
+            : [
+                "Offer pure water to the morning Sun while reciting 'Om Ghrinih Suryaya Namaha' 11 times.",
+                "Stay well-hydrated throughout the day and wear peaceful shades of white, pearl, or light sky blue.",
+                "Light a pure cow-ghee lamp at twilight to anchor calm and dissolve stress."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
 /** 18. PRASHNA QUICK ORACLE TOOL **/
-function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, isHi }) {
+function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, userData, isHi }) {
   const oracle = getPrashnaQuickOracle({ question: prashnaQuestionInput });
 
   return (
-    <div>
-      <div style={{ marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
         <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
           {isHi ? "अपना प्रश्न दर्ज करें (उदा. क्या मैं यह कार्य करूं?):" : "Ask Your Immediate Decision Question:"}
         </label>
@@ -2622,19 +3618,71 @@ function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, isHi
           {isHi ? oracle.guidanceHi : oracle.guidanceEn}
         </p>
       </div>
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? "प्रश्न ज्योतिष होरा निर्णय" : "Horary Prashna Decision Verdict"}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, प्रश्न काल में सक्रिय ग्रह ${oracle.horaLord} की होरा आपके प्रश्न "${prashnaQuestionInput || "कार्य निर्णय"}" के लिए ${oracle.isBeneficHora ? "शुभ व फलदायी संकेत" : "धैर्य व सावधानी का संकेत"} दे रही है।`
+            : `${userData?.name || "Seeker"}, the celestial Hora lord at this query moment is ${oracle.horaLord}, indicating a ${oracle.isBeneficHora ? "supportive, auspicious cosmic window" : "deliberate fact-checking interval"} for your question.`
+        }
+        goodPoints={
+          isHi
+            ? [
+                oracle.isBeneficHora
+                  ? "शुभ होरा के प्रभाव से प्राकृतिक ऊर्जाएं आपके पक्ष में हैं; कदम आगे बढ़ाने पर सफलता की उच्च संभावना है।"
+                  : "यह क्षण आपको जल्दबाजी से बचाकर आंतरिक आत्म-मंथन व तथ्यों की निष्पक्ष जांच का अवसर दे रहा है।",
+                "प्रयासों में ईमानदारी और स्पष्ट संवाद रखने पर अप्रत्याशित सहयोग प्राप्त होगा।"
+              ]
+            : [
+                oracle.isBeneficHora
+                  ? "Benefic Hora influences support your objective; sincere efforts will likely yield favorable outcomes."
+                  : "The cosmic interval advises double-checking numbers, background context, and contractual terms.",
+                "Transparent dialogue with trusted associates reveals crucial unseen details."
+              ]
+        }
+        cautionPoints={
+          isHi
+            ? [
+                "भावुकता या बिना लिखित प्रमाण के किसी मौखिक वादे पर आंख मूंदकर भरोसा न करें।",
+                "राहुकाल अथवा भद्रा समय में अनुबंध हस्ताक्षर करने से बचें।"
+              ]
+            : [
+                "Do not rely solely on informal verbal pledges; verify contractual terms in writing.",
+                "Avoid sealing critical irrevocable commitments during Rahu Kaal or erratic transit hours."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "निर्णय लेने से पूर्व भगवान श्रीगणेश का ध्यान कर 'ॐ गं गणपतये नमः' का ११ बार स्मरण करें।",
+                "किसी बुजुर्ग अथवा गुरुजन का आशीर्वाद लेकर ही महत्वपूर्ण पत्र पर हस्ताक्षर करें।",
+                "पक्षियों को दाना या गाय को रोटी खिलाकर सकारात्मक संकल्प लें।"
+              ]
+            : [
+                "Recite 'Om Gam Ganapataye Namaha' 11 times before final execution to dissolve hidden obstacles.",
+                "Consult an experienced mentor or senior family figure for grounded perspective before proceeding.",
+                "Offer birdseed or wholesome food to animals to sanctify your karmic path."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
 /** 19. TARA BALA & CHANDRA BALA TOOL **/
-function TaraChandraBalaTool({ corePlanets, isHi }) {
+function TaraChandraBalaTool({ userData, corePlanets, isHi }) {
   const moonLon = corePlanets?.Moon || 116.5;
   const moonNak = getNakshatraInfo(moonLon);
   const tara = calculateTaraBala(moonNak.index, (moonNak.index + 5) % 27);
   const chandra = calculateChandraBala(Math.floor(moonLon / 30), (Math.floor(moonLon / 30) + 6) % 12);
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {/* Tara Bala */}
         <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(245, 158, 11, 0.4)", borderRadius: 16, padding: "20px" }}>
@@ -2668,18 +3716,76 @@ function TaraChandraBalaTool({ corePlanets, isHi }) {
           </div>
         </div>
       </div>
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? "तारा बल एवं चंद्र बल व्यक्तिगत विश्लेषण" : "Tara Bala & Chandra Bala Personal Guidance"}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, आपकी जन्म कुंडली के चंद्र नक्षत्र (${moonNak.name}) से वर्तमान नक्षत्र की दूरी ${isHi ? tara.nameHi : tara.nameEn} (गुणवत्ता: ${tara.quality}) का निर्माण कर रही है, तथा गोचर चंद्र आपकी राशि से ${chandra.houseFromMoon}वें भाव में संचरण कर रहे हैं।`
+            : `${userData?.name || "Seeker"}, calculated from your natal Moon constellation (${moonNak.name}), today's celestial star produces ${tara.nameEn} (${tara.quality}) while transit Moon occupies House ${chandra.houseFromMoon} from your Moon sign.`
+        }
+        goodPoints={
+          isHi
+            ? [
+                `तारा चक्र स्कोर (${tara.score}%) दर्शाता है कि दिन के कार्य आपके संकल्प और ऊर्जा के अनुकूल फल देंगे।`,
+                chandra.isAuspicious
+                  ? `चंद्रमा का ${chandra.houseFromMoon}वें भाव में गोचर मानसिक प्रसन्नता, विजय और सुखद संपर्कों का संकेत है।`
+                  : "दिन के मध्य में ध्यान और एकाग्रता से कार्य करने पर परिणाम संतोषजनक रहेंगे।",
+                "महत्वपूर्ण आध्यात्मिक व बौद्धिक कार्यों में आंतरिक संतोष की प्राप्ति।"
+              ]
+            : [
+                `Tara Bala score of ${tara.score}% affirms natural cosmic receptivity for deliberate, focused tasks.`,
+                chandra.isAuspicious
+                  ? `Moon's placement in House ${chandra.houseFromMoon} provides mental contentment, confidence, and friendly encounters.`
+                  : "Steady concentration during high-priority tasks keeps output consistent.",
+                "Auspicious window for meditative practices and analytical study."
+              ]
+        }
+        cautionPoints={
+          isHi
+            ? [
+                !chandra.isAuspicious
+                  ? "चंद्रमा का गोचर संवेदनशील भाव में होने से मानसिक तनाव या अत्यधिक भावुकता से बचें।"
+                  : "अहंकार या अति-उत्साह में किसी को अपमानित न करें।",
+                "विपत अथवा प्रत्यक तारा काल में नया जोखिम भरा कर्ज लेने से बचें।"
+              ]
+            : [
+                !chandra.isAuspicious
+                  ? "Moon in a sensitive natal house suggests monitoring emotional reactivity and sleep quality."
+                  : "Guard against complacency or over-committing your available time.",
+                "Postpone taking on large speculative loans during inauspicious tara phases."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "सोमवार अथवा प्रतिदिन 'ॐ नमः शिवाय' अथवा 'ॐ सों सोमाय नमः' का १०८ बार जाप करें।",
+                "चांदी के गिलास में जल पीना अथवा चांदी का छल्ला धारण करना चंद्र बल को सशक्त करता है।",
+                "माता का चरण स्पर्श कर उनका आशीर्वाद लें; यह मानसिक शांति का सर्वोत्तम उपाय है।"
+              ]
+            : [
+                "Chant 'Om Namah Shivaya' or 'Om Som Somaya Namaha' 108 times to fortify the Moon's soothing nectar.",
+                "Drink water from a silver vessel or wear a smooth silver ring to stabilize mental clarity.",
+                "Seek the blessings of your mother or matriarchal elders to dissolve inner anxiety."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
 /** 20. PANCHA PAKSHI TOOL **/
-function PanchaPakshiTool({ corePlanets, isHi }) {
+function PanchaPakshiTool({ userData, corePlanets, isHi }) {
   const moonLon = corePlanets?.Moon || 116.5;
   const moonNak = getNakshatraInfo(moonLon);
   const birdData = calculatePanchaPakshi(moonNak.index);
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
           <span style={{ fontSize: 44 }}>{birdData.rulingBird.symbol}</span>
@@ -2706,6 +3812,56 @@ function PanchaPakshiTool({ corePlanets, isHi }) {
           {birdData.systemNote}
         </div>
       </div>
+
+      {/* Personalized Vedic Advisory */}
+      <PersonalizedVedicAdvisory
+        userName={userData?.name || "Seeker"}
+        userDob={userData?.dob}
+        toolName={isHi ? "पंच पक्षी व्यक्तिगत बायो-रिदम मार्गदर्शन" : "Pancha Pakshi Biorhythm Advisory"}
+        userSummary={
+          isHi
+            ? `${userData?.name || "जातक"}, आपके जन्म चंद्र नक्षत्र (${moonNak.name}) के अनुसार आपका वैदिक पंच-पक्षी '${birdData.rulingBird.nameHi}' (${birdData.rulingBird.nameEn}) है। वर्तमान मुहूर्त में आपका पक्षी '${birdData.currentState.stateHi}' की अवस्था में है।`
+            : `${userData?.name || "Seeker"}, based on your birth constellation (${moonNak.name}), your Tamil Vedic ruling bird is '${birdData.rulingBird.nameEn}' (${birdData.rulingBird.symbol}), currently operating in the state of '${birdData.currentState.stateEn}'.`
+        }
+        goodPoints={
+          isHi
+            ? [
+                `जब आपका पक्षी 'राज्य' (Ruling) अथवा 'भोजन' (Eating) की अवस्था में हो, तब सभी महत्वपूर्ण निर्णय, साक्षात्कार व अनुबंध अत्यंत सफल होते हैं।`,
+                `पक्षी ${birdData.rulingBird.nameHi} आपको प्राकृतिक रूप से सतर्क दृष्टि, तीव्र गति और त्वरित समाधान खोजने की क्षमता प्रदान करता है।`,
+                "नियमित दिनचर्या में अनुकूल समय का उपयोग करने पर श्रम का शत-प्रतिशत प्रतिफल मिलता है।"
+              ]
+            : [
+                `When your ruling bird (${birdData.rulingBird.nameEn}) operates in 'Ruling' (Arasu) or 'Eating' (Oon) states, your charisma, negotiation power, and timing are peak.`,
+                `Bird ${birdData.rulingBird.nameEn} grants inherent instinctual agility, keen tactical observation, and swift problem-solving.`,
+                "Aligning major public presentations or client pitches with your bird's ruling hours maximizes success probability."
+              ]
+        }
+        cautionPoints={
+          isHi
+            ? [
+                "जब पक्षी 'शयन' (Sleeping) अथवा 'मरण' (Dying) की अवस्था में हो, तब बड़े वित्तीय निवेश, सर्जरी, अथवा विवाद में पड़ने से बचें।",
+                "थकावट या नींद की कमी में महत्वपूर्ण कानूनी या पारिवारिक निर्णय न लें।"
+              ]
+            : [
+                "During 'Sleeping' (Thuyil) or 'Dying' (Chavu) sub-periods, avoid high-stakes surgery, aggressive litigation, or large speculative trades.",
+                "Do not make irreversible life commitments when feeling physically depleted."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "प्रातःकाल अपने घर की छत या बालकनी में पक्षियों के लिए पीने का साफ पानी व दाना रखें।",
+                "प्रतिदिन गायत्री मंत्र का ११ बार जप करें ताकि आपके जैविक पंच-तत्व संतुलित रहें।",
+                "महत्वपूर्ण कार्यों को अपने पक्षी के 'राज्य' अथवा 'भोजन' समय में ही संपन्न करने का प्रयास करें।"
+              ]
+            : [
+                "Place clean fresh water and mixed grains on your terrace or balcony for wild birds each morning.",
+                "Chant the sacred Gayatri Mantra 11 times at sunrise to harmonize your five elemental biorhythms.",
+                "Structure your daily calendar around your bird's 'Ruling' or 'Eating' peak hourly slots."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
