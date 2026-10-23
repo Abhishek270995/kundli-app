@@ -14,6 +14,7 @@ export default defineConfig({
         festivals: resolve(__dirname, 'festivals/index.html'),
         daily: resolve(__dirname, 'daily/index.html'),
         matchmaking: resolve(__dirname, 'matchmaking/index.html'),
+        tools: resolve(__dirname, 'tools/index.html'),
       }
     }
   }

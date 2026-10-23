@@ -7,6 +7,7 @@
     { "source": "/festivals", "destination": "/festivals/index.html" },
     { "source": "/daily", "destination": "/daily/index.html" },
     { "source": "/matchmaking", "destination": "/matchmaking/index.html" },
+    { "source": "/tools", "destination": "/tools/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

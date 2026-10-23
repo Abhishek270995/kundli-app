@@ -25,6 +25,7 @@ import {
 } from "./planetaryAnalysisEngine";
 import { Icons } from "./components/Icons";
 import { Analytics } from "./analytics";
+import AstrologyToolsHub from "./components/AstrologyToolsHub";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -1377,6 +1378,13 @@ const SECTION_CONFIG = {
     titleHi: "कुंडली मिलान — ३६ गुण मिलान, मांगलिक दोष विचार एवं विवाह अनुकूलता | ज्योतिष परामर्श",
     descEn: "Complete Vedic Kundli Milan (Gun Milan) for prospective bride and groom. 36 Guna Ashta-Koota calculation, Nadi & Bhakoot dosha, and Manglik cancellation analysis.",
     descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मंगली दोष परिहार।"
+  },
+  tools: {
+    path: "/tools",
+    titleEn: "Astrology Tools Suite — Vedic, KP, Numerology & Cosmic Decision Suite | Jyotish Paramarsh",
+    titleHi: "ज्योतिषीय टूल्स एवं गणना केंद्र — वैदिक, केपी, अंक ज्योतिष व निर्णय टूल्स | ज्योतिष परामर्श",
+    descEn: "21 precision astrology tools across 5 categories: Vedic Astrology, KP Astrology, Numerology, Daily Astrology, and Personal Decision Tools.",
+    descHi: "५ श्रेणियों में २१ प्रामाणिक ज्योतिषीय टूल्स: वैदिक, केपी सब-लॉर्ड, होरारी १-२४९, अंक ज्योतिष, चौघड़िया एवं कॉस्मिक निर्णय टूल्स।"
   }
 };
 
@@ -1388,10 +1396,11 @@ const getInitialSection = () => {
     if (path.includes("festivals") || path.includes("festival")) return "festivals";
     if (path.includes("daily") || path.includes("horoscope") || path.includes("rashifal")) return "daily";
     if (path.includes("matchmaking") || path.includes("milan")) return "matchmaking";
+    if (path.includes("tool") || path.includes("tools")) return "tools";
 
     const params = new URLSearchParams(window.location.search);
     const sec = params.get("section");
-    if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking"].includes(sec.toLowerCase())) {
+    if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools"].includes(sec.toLowerCase())) {
       return sec.toLowerCase();
     }
   } catch (e) {}
@@ -2124,6 +2133,64 @@ export default function App() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {/* 0. Dedicated Astrology Tools Suite Card */}
+        <a
+          href="/tools"
+          onClick={(e) => navigateToSection("tools", e)}
+          style={{
+            display: "block",
+            textDecoration: "none",
+            color: "inherit",
+            background: "linear-gradient(135deg, rgba(30, 20, 55, 0.95), rgba(18, 12, 34, 0.95))",
+            border: "1.5px solid rgba(245, 158, 11, 0.6)",
+            borderRadius: 16,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 6px 24px rgba(245, 158, 11, 0.25)",
+            transition: "transform 0.2s ease, border-color 0.2s ease"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#F59E0B"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.6)"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          <div style={{ height: 125, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #1f1138, #3b1954)" }}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, opacity: 0.85 }}>
+              🛠️ 🔯 🔮
+            </div>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(18, 12, 34, 0.98) 10%, rgba(18, 12, 34, 0.2) 60%, transparent 100%)" }} />
+            <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 6 }}>
+              <span style={{ fontSize: 10.5, color: "#0F0A1E", fontWeight: 800, background: "#F59E0B", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "२१ टूल्स" : "21 Tools"}
+              </span>
+              <span style={{ fontSize: 10.5, color: "#34D399", fontWeight: 700, background: "rgba(0,0,0,0.7)", border: "1px solid rgba(52,211,153,0.4)", padding: "2px 8px", borderRadius: 8 }}>
+                {hi ? "५ श्रेणियां" : "5 Categories"}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ padding: "14px 18px 18px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+              <span style={{ fontSize: 16 }}>🛠️</span>
+              <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: 0 }}>
+                {hi ? "ज्योतिषीय टूल्स एवं गणना केंद्र" : "Astrology Tools Suite"}
+              </h3>
+            </div>
+
+            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.85)", margin: "6px 0 10px" }}>
+              {hi ? "विंशोत्तरी दशा, केपी १-२४९, अंक ज्योतिष व चौघड़िया" : "Vedic Dasha, KP Sub-Lords, Numerology & Choghadiya"}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "#FDE68A", borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 8 }}>
+              <span>{hi ? "वैदिक + केपी + न्यूमरोलॉजी" : "Vedic + KP + Numerology"}</span>
+              <span style={{ color: "#34D399" }}>{hi ? "निःशुल्क उपयोग" : "100% Free"}</span>
+            </div>
+
+            <div style={{ marginTop: 10, color: "#F59E0B", fontSize: 12, fontWeight: 800, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
+              <span>{hi ? "सभी २१ टूल्स खोलें" : "Open 21 Tools Suite"}</span>
+              <Icons.ArrowRight size={13} color="#F59E0B" />
+            </div>
+          </div>
+        </a>
+
         {/* 1. Panchang Card */}
         <a
           href="/panchang"
@@ -4343,10 +4410,11 @@ export default function App() {
             </div>
           </div>
 
-          {/* Master 6-Tool Navigation Pills */}
+          {/* Master 7-Tool Navigation Pills */}
           <nav className="header-nav-strip" role="navigation" aria-label="Main features">
             {[
               { id: "kundli", path: "/", icon: "🔯", label: hi ? "जन्म कुंडली" : "Kundli" },
+              { id: "tools", path: "/tools", icon: "🛠️", label: hi ? "ज्योतिष टूल्स" : "Astro Tools" },
               { id: "matchmaking", path: "/matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
               { id: "panchang", path: "/panchang", icon: "🕉️", label: hi ? "पंचांग" : "Panchang" },
               { id: "muhurat", path: "/muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Muhurat" },
@@ -4361,7 +4429,7 @@ export default function App() {
                   onClick={(e) => {
                     e.preventDefault();
                     navigateToSection(feat.id);
-                    if (result && ["chart", "panchang", "muhurat", "festivals", "daily", "matchmaking"].includes(feat.id)) {
+                    if (result && ["chart", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools"].includes(feat.id)) {
                       setTab(feat.id === "kundli" ? "chart" : feat.id);
                     }
                   }}
@@ -4677,6 +4745,29 @@ export default function App() {
               </a>
             </div>
             {renderDailyHoroscopeContent()}
+          </div>
+        )}
+
+        {/* ── STANDALONE ASTROLOGY TOOLS VIEW ── */}
+        {mainSection === "tools" && (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <a
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection("kundli");
+                }}
+                style={{ background: "transparent", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12.5, cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+              >
+                ← {hi ? "जन्म कुंडली फॉर्म पर लौटें" : "Back to Kundli Generator"}
+              </a>
+            </div>
+            <AstrologyToolsHub
+              initialUserBirth={result ? { ...form, chartData: result.chartData, planetaryAnalysis: result.planetaryAnalysis } : (form.dob ? form : null)}
+              lang={lang}
+              onBackToHome={() => navigateToSection("kundli")}
+            />
           </div>
         )}
 
@@ -9422,6 +9513,19 @@ export default function App() {
                     style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
                   >
                     ✦ {hi ? "वैदिक कुंडली मिलान (३६ गुण)" : "Ashtakoot Gun Milan (36 Pts)"}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/tools"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigateToSection("tools");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    style={{ color: "#FDE68A", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block", fontWeight: 700 }}
+                  >
+                    ✦ {hi ? "ज्योतिषीय टूल्स एवं गणना केंद्र (२१ टूल्स)" : "Astrology Tools Suite (21 Precision Tools)"}
                   </a>
                 </li>
               </ul>
