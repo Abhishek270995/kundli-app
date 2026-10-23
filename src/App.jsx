@@ -1380,12 +1380,24 @@ const SECTION_CONFIG = {
     descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मंगली दोष परिहार।"
   },
   tools: {
-    path: "/tools",
-    titleEn: "Astrology Tools Suite — Vedic, KP, Numerology & Cosmic Decision Suite | Jyotish Paramarsh",
-    titleHi: "ज्योतिषीय टूल्स एवं गणना केंद्र — वैदिक, केपी, अंक ज्योतिष व निर्णय टूल्स | ज्योतिष परामर्श",
-    descEn: "21 precision astrology tools across 5 categories: Vedic Astrology, KP Astrology, Numerology, Daily Astrology, and Personal Decision Tools.",
-    descHi: "५ श्रेणियों में २१ प्रामाणिक ज्योतिषीय टूल्स: वैदिक, केपी सब-लॉर्ड, होरारी १-२४९, अंक ज्योतिष, चौघड़िया एवं कॉस्मिक निर्णय टूल्स।"
+    path: "/astrology-tools",
+    titleEn: "Astrology Tools for Every Question — Vedic, KP, Numerology & Timings | Jyotish Paramarsh",
+    titleHi: "हर प्रश्न के लिए ज्योतिषीय टूल्स — वैदिक, केपी, अंक ज्योतिष एवं शुभ मुहूर्त | ज्योतिष परामर्श",
+    descEn: "Explore your birth chart, discover numerology, and calculate auspicious timings. 21 dedicated calculators across Vedic, KP, Numerology, Daily & Decision tools.",
+    descHi: "अपनी जन्म कुंडली जानें, अंकशास्त्र को समझें एवं शुभ समय की गणना करें। ५ श्रेणियों में २१ प्रामाणिक ज्योतिषीय टूल्स।"
   }
+};
+
+export const getAstrologyToolSlugFromPath = () => {
+  try {
+    const rawPath = (window.location.pathname || "").toLowerCase();
+    const m = rawPath.match(/(?:astrology-tools|tools)\/([a-z0-9_-]+)/i);
+    if (m && m[1]) return m[1].toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("tool");
+    if (t) return t.toLowerCase();
+  } catch (e) {}
+  return null;
 };
 
 const getInitialSection = () => {
@@ -1396,12 +1408,12 @@ const getInitialSection = () => {
     if (path.includes("festivals") || path.includes("festival")) return "festivals";
     if (path.includes("daily") || path.includes("horoscope") || path.includes("rashifal")) return "daily";
     if (path.includes("matchmaking") || path.includes("milan")) return "matchmaking";
-    if (path.includes("tool") || path.includes("tools")) return "tools";
+    if (path.includes("astrology-tool") || path.includes("tool") || path.includes("tools")) return "tools";
 
     const params = new URLSearchParams(window.location.search);
     const sec = params.get("section");
-    if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools"].includes(sec.toLowerCase())) {
-      return sec.toLowerCase();
+    if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools", "astrology-tools"].includes(sec.toLowerCase())) {
+      return sec.toLowerCase() === "astrology-tools" ? "tools" : sec.toLowerCase();
     }
   } catch (e) {}
   return "kundli";
@@ -1892,7 +1904,7 @@ export default function App() {
       e.preventDefault();
     }
     setMainSection(sectionId);
-    const targetPath = sectionId === "kundli" ? "/" : `/${sectionId}`;
+    const targetPath = sectionId === "kundli" ? "/" : (sectionId === "tools" ? "/astrology-tools" : `/${sectionId}`);
     try {
       if (window.location.pathname !== targetPath) {
         window.history.pushState({ section: sectionId }, "", targetPath);

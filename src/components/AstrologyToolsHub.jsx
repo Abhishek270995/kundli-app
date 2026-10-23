@@ -37,7 +37,8 @@ import {
 } from "../vedicComprehensiveEngine.js";
 
 // ── TOOL DEFINITIONS (5 CATEGORIES, 21 TOOLS) ───────────────────────────
-const TOOL_CATEGORIES = [
+// ── CATEGORY METADATA (5 CATEGORIES) ────────────────────────────────────
+export const TOOL_CATEGORIES = [
   { id: "all", labelEn: "All Tools (21)", labelHi: "समस्त टूल्स (२१)", icon: "✦" },
   { id: "vedic", labelEn: "Vedic Astrology (5)", labelHi: "वैदिक ज्योतिष (५)", icon: "🔯" },
   { id: "kp", labelEn: "KP Astrology (4)", labelHi: "केपी ज्योतिष (४)", icon: "🧭" },
@@ -46,10 +47,92 @@ const TOOL_CATEGORIES = [
   { id: "decision", labelEn: "Personal Decisions (4)", labelHi: "निर्णय मार्गदर्शक (४)", icon: "🎯" }
 ];
 
-const TOOLS_CATALOG = [
+export const CATEGORY_CARDS = [
+  {
+    id: "vedic",
+    titleEn: "Vedic Astrology",
+    titleHi: "वैदिक ज्योतिष",
+    subtitleEn: "Kundali, Dasha, Transits",
+    subtitleHi: "कुंडली, विंशोत्तरी दशा, गोचर",
+    count: 5,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 3a9 9 0 0 1 9 9" />
+        <circle cx="12" cy="12" r="3" />
+        <circle cx="19" cy="8" r="1.5" fill="#D4AF37" />
+      </svg>
+    )
+  },
+  {
+    id: "kp",
+    titleEn: "KP Astrology",
+    titleHi: "केपी ज्योतिष",
+    subtitleEn: "Sub-lords, Horary, Significators",
+    subtitleHi: "उप-स्वामी, होरारी, भाव कारक",
+    count: 4,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="6" />
+        <circle cx="12" cy="12" r="2" />
+      </svg>
+    )
+  },
+  {
+    id: "numerology",
+    titleEn: "Numerology",
+    titleHi: "अंकशास्त्र",
+    subtitleEn: "Life Path, Name Numbers",
+    subtitleHi: "मूलांक, भाग्यांक, नामांक",
+    count: 4,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="4" y1="9" x2="20" y2="9" />
+        <line x1="4" y1="15" x2="20" y2="15" />
+        <line x1="10" y1="3" x2="8" y2="21" />
+        <line x1="16" y1="3" x2="14" y2="21" />
+      </svg>
+    )
+  },
+  {
+    id: "daily",
+    titleEn: "Daily Astrology",
+    titleHi: "दैनिक ज्योतिष",
+    subtitleEn: "Panchang, Muhurat, Choghadiya",
+    subtitleHi: "पंचांग, शुभ मुहूर्त, चौघड़िया",
+    count: 4,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="3" ry="3" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <circle cx="12" cy="15" r="2" />
+      </svg>
+    )
+  },
+  {
+    id: "decision",
+    titleEn: "Personal Decision Tools",
+    titleHi: "निर्णय मार्गदर्शक टूल्स",
+    subtitleEn: "Prashna, Tara Bala, Hora Compass",
+    subtitleHi: "प्रश्न ओरेकल, तारा बल, ग्रह होरा",
+    count: 4,
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="rgba(212,175,55,0.2)" />
+      </svg>
+    )
+  }
+];
+
+export const TOOLS_CATALOG = [
   // ── 1. VEDIC ASTROLOGY TOOLS ──
   {
     id: "vimshottari",
+    slug: "vimshottari-dasha",
     category: "vedic",
     priority: "HIGH PRIORITY",
     icon: "⏳",
@@ -61,6 +144,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "divisional",
+    slug: "divisional-charts",
     category: "vedic",
     priority: "ADVANCED",
     icon: "📊",
@@ -72,6 +156,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "ashtakavarga",
+    slug: "ashtakavarga-calculator",
     category: "vedic",
     priority: "ADVANCED",
     icon: "⚖️",
@@ -83,6 +168,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "gochar",
+    slug: "gochar-transit-calculator",
     category: "vedic",
     priority: "POPULAR",
     icon: "🪐",
@@ -94,6 +180,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "shadbala",
+    slug: "planetary-strength-calculator",
     category: "vedic",
     priority: "TECHNICAL",
     icon: "💪",
@@ -107,6 +194,7 @@ const TOOLS_CATALOG = [
   // ── 2. KP ASTROLOGY TOOLS ──
   {
     id: "kp_chart",
+    slug: "kp-chart-calculator",
     category: "kp",
     priority: "VERY HIGH",
     icon: "🧭",
@@ -118,6 +206,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "kp_significators",
+    slug: "kp-house-significator",
     category: "kp",
     priority: "KP CORE",
     icon: "🎯",
@@ -129,6 +218,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "kp_horary",
+    slug: "kp-horary-calculator",
     category: "kp",
     priority: "HIGH PRIORITY",
     icon: "🔮",
@@ -140,6 +230,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "kp_ruling",
+    slug: "kp-ruling-planets",
     category: "kp",
     priority: "PRACTITIONER",
     icon: "👑",
@@ -153,6 +244,7 @@ const TOOLS_CATALOG = [
   // ── 3. NUMEROLOGY TOOLS ──
   {
     id: "lifepath",
+    slug: "life-path-number",
     category: "numerology",
     priority: "POPULAR",
     icon: "🌟",
@@ -164,6 +256,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "name_numerology",
+    slug: "name-numerology",
     category: "numerology",
     priority: "RECOMMENDED",
     icon: "🔤",
@@ -175,6 +268,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "personal_year",
+    slug: "personal-year-month",
     category: "numerology",
     priority: "TIMING",
     icon: "📅",
@@ -186,6 +280,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "compatibility",
+    slug: "lucky-number-compatibility",
     category: "numerology",
     priority: "POPULAR",
     icon: "❤️",
@@ -199,6 +294,7 @@ const TOOLS_CATALOG = [
   // ── 4. DAILY ASTROLOGY & PRACTICAL TOOLS ──
   {
     id: "choghadiya",
+    slug: "choghadiya-calculator",
     category: "daily",
     priority: "DAILY USE",
     icon: "🕉️",
@@ -210,6 +306,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "rahu_kaal",
+    slug: "rahu-kaal-calculator",
     category: "daily",
     priority: "ESSENTIAL",
     icon: "⏱️",
@@ -221,6 +318,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "muhurat_finder",
+    slug: "personalized-muhurat-finder",
     category: "daily",
     priority: "HIGH VALUE",
     icon: "✨",
@@ -232,6 +330,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "daily_transit",
+    slug: "daily-transit-horoscope",
     category: "daily",
     priority: "REPEAT VISIT",
     icon: "🌅",
@@ -245,6 +344,7 @@ const TOOLS_CATALOG = [
   // ── 5. PERSONAL DECISION TOOLS ──
   {
     id: "prashna_oracle",
+    slug: "prashna-quick-oracle",
     category: "decision",
     priority: "INSTANT",
     icon: "🧭",
@@ -256,6 +356,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "tara_chandra",
+    slug: "tarabala-chandrabala",
     category: "decision",
     priority: "CLASSICAL",
     icon: "⭐",
@@ -267,6 +368,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "pancha_pakshi",
+    slug: "pancha-pakshi-calculator",
     category: "decision",
     priority: "ESOTERIC",
     icon: "🦚",
@@ -278,6 +380,7 @@ const TOOLS_CATALOG = [
   },
   {
     id: "cosmic_compass",
+    slug: "cosmic-decision-compass",
     category: "decision",
     priority: "PRACTICAL",
     icon: "🧭",
@@ -289,6 +392,26 @@ const TOOLS_CATALOG = [
   }
 ];
 
+// Helper to extract active tool from current window location path
+export const getToolFromPath = () => {
+  try {
+    const rawPath = (window.location.pathname || "").replace(/^\/+|\/+$/g, '').toLowerCase();
+    const parts = rawPath.split('/');
+    if (parts.length >= 2 && (parts[0] === "astrology-tools" || parts[0] === "tools")) {
+      const slug = parts[1];
+      const match = TOOLS_CATALOG.find(t => t.slug === slug || t.id === slug);
+      if (match) return match;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const toolParam = params.get("tool");
+    if (toolParam) {
+      const match = TOOLS_CATALOG.find(t => t.slug === toolParam.toLowerCase() || t.id === toolParam.toLowerCase());
+      if (match) return match;
+    }
+  } catch (e) {}
+  return null;
+};
+
 export default function AstrologyToolsHub({
   initialUserBirth = null,
   lang = "en",
@@ -297,10 +420,15 @@ export default function AstrologyToolsHub({
 }) {
   const isHi = lang === "hi";
 
-  // State
+  // Active Tool State (null = Landing Hub View, string = Dedicated Tool View)
+  const [activeToolId, setActiveToolId] = useState(() => {
+    const fromPath = getToolFromPath();
+    return fromPath ? fromPath.id : null;
+  });
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeToolId, setActiveToolId] = useState("vimshottari");
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   // User form / inherited Kundli birth data
   const [userData, setUserData] = useState(() => {
@@ -335,20 +463,25 @@ export default function AstrologyToolsHub({
   const [selectedTargetDate, setSelectedTargetDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedCity, setSelectedCity] = useState(MAJOR_INDIAN_CITIES[0]);
 
-  // Handle URL deep linking (e.g. ?tool=choghadiya or ?cat=kp)
+  // Sync state with browser URL & popstate (Back/Forward navigation)
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const toolParam = params.get("tool");
-      const catParam = params.get("cat") || params.get("category");
-      if (toolParam && TOOLS_CATALOG.some(t => t.id === toolParam)) {
-        setActiveToolId(toolParam);
+    const syncFromUrl = () => {
+      const tool = getToolFromPath();
+      if (tool) {
+        setActiveToolId(tool.id);
+        document.title = `${isHi ? tool.titleHi : tool.titleEn} — Jyotish Paramarsh`;
+      } else {
+        setActiveToolId(null);
+        document.title = isHi
+          ? "हर प्रश्न के लिए ज्योतिषीय टूल्स | ज्योतिष परामर्श"
+          : "Astrology Tools for Every Question | Jyotish Paramarsh";
       }
-      if (catParam && TOOL_CATEGORIES.some(c => c.id === catParam)) {
-        setSelectedCategory(catParam);
-      }
-    } catch (e) {}
-  }, []);
+    };
+
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, [isHi]);
 
   // Filtered tools
   const filteredTools = useMemo(() => {
@@ -361,6 +494,7 @@ export default function AstrologyToolsHub({
         tool.titleHi.toLowerCase().includes(q) ||
         tool.descEn.toLowerCase().includes(q) ||
         tool.descHi.toLowerCase().includes(q) ||
+        tool.slug.toLowerCase().includes(q) ||
         tool.badge.toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
@@ -368,8 +502,15 @@ export default function AstrologyToolsHub({
 
   // Active Tool Object
   const activeTool = useMemo(() => {
-    return TOOLS_CATALOG.find(t => t.id === activeToolId) || TOOLS_CATALOG[0];
+    if (!activeToolId) return null;
+    return TOOLS_CATALOG.find(t => t.id === activeToolId) || null;
   }, [activeToolId]);
+
+  // Related tools in same category
+  const relatedTools = useMemo(() => {
+    if (!activeTool) return [];
+    return TOOLS_CATALOG.filter(t => t.category === activeTool.category && t.id !== activeTool.id);
+  }, [activeTool]);
 
   // Calculated Core Vedic & Planetary Data for the User
   const corePlanets = useMemo(() => {
@@ -405,13 +546,53 @@ export default function AstrologyToolsHub({
     }
   }, [selectedTargetDate, selectedCity, lang, isHi]);
 
-  // Scroll to workspace on tool select
-  const handleSelectTool = (id) => {
-    setActiveToolId(id);
-    const el = document.getElementById("active-tool-workspace");
+  // Navigation handlers
+  const handleSelectTool = (toolOrId, e = null) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const tool = typeof toolOrId === "string"
+      ? TOOLS_CATALOG.find(t => t.id === toolOrId || t.slug === toolOrId)
+      : toolOrId;
+    if (!tool) return;
+    setActiveToolId(tool.id);
+    const targetUrl = `/astrology-tools/${tool.slug}`;
+    try {
+      if (window.location.pathname !== targetUrl) {
+        window.history.pushState({ tool: tool.slug }, "", targetUrl);
+      }
+    } catch (err) {}
+    document.title = `${isHi ? tool.titleHi : tool.titleEn} — Jyotish Paramarsh`;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackToHub = (e = null) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setActiveToolId(null);
+    try {
+      if (window.location.pathname !== "/astrology-tools") {
+        window.history.pushState({ tool: null }, "", "/astrology-tools");
+      }
+    } catch (err) {}
+    document.title = isHi
+      ? "हर प्रश्न के लिए ज्योतिषीय टूल्स | ज्योतिष परामर्श"
+      : "Astrology Tools for Every Question | Jyotish Paramarsh";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCategoryCardClick = (catId) => {
+    setSelectedCategory(catId);
+    const el = document.getElementById("astrology-tools-directory");
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handleCopyToolUrl = (slug) => {
+    try {
+      const fullUrl = `https://www.jyotishparamash.com/astrology-tools/${slug}`;
+      navigator.clipboard.writeText(fullUrl);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2500);
+    } catch (e) {}
   };
 
   // Quick preset data loader
@@ -439,9 +620,235 @@ export default function AstrologyToolsHub({
     }
   };
 
+  // ═════════════════════════════════════════════════════════════════════════
+  // VIEW A: DEDICATED TOOL CALCULATION WORKSPACE (When a tool is selected)
+  // ═════════════════════════════════════════════════════════════════════════
+  if (activeTool) {
+    const categoryMeta = TOOL_CATEGORIES.find(c => c.id === activeTool.category) || TOOL_CATEGORIES[0];
+    const dedicatedUrl = `https://www.jyotishparamash.com/astrology-tools/${activeTool.slug}`;
+
+    return (
+      <div className="astrology-tool-page" style={{ minHeight: "100vh", color: "rgba(241, 231, 208, 0.95)" }}>
+        {/* Breadcrumb Navigation Bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(241, 231, 208, 0.8)", flexWrap: "wrap" }}>
+            <a
+              href="/"
+              onClick={(e) => { e.preventDefault(); onBackToHome(); }}
+              style={{ color: "#FDE68A", textDecoration: "none" }}
+            >
+              {isHi ? "होम" : "Home"}
+            </a>
+            <span>/</span>
+            <a
+              href="/astrology-tools"
+              onClick={handleBackToHub}
+              style={{ color: "#FDE68A", textDecoration: "none" }}
+            >
+              {isHi ? "ज्योतिषीय टूल्स" : "Astrology Tools"}
+            </a>
+            <span>/</span>
+            <span style={{ color: "#F59E0B", fontWeight: 700 }}>
+              {isHi ? categoryMeta.labelHi : categoryMeta.labelEn}
+            </span>
+            <span>/</span>
+            <span style={{ color: "#FFFFFF", fontWeight: 700 }}>
+              {isHi ? activeTool.titleHi : activeTool.titleEn}
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button
+              onClick={handleBackToHub}
+              style={{
+                background: "rgba(22, 15, 42, 0.85)",
+                border: "1px solid rgba(212, 175, 55, 0.35)",
+                color: "#FDE68A",
+                padding: "7px 16px",
+                borderRadius: 20,
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                transition: "all 0.2s ease"
+              }}
+            >
+              ← {isHi ? "सभी टूल्स देखें" : "All Astrology Tools"}
+            </button>
+          </div>
+        </div>
+
+        {/* Dedicated Tool Workspace Card */}
+        <div
+          id="active-tool-workspace"
+          className="glass-card"
+          style={{
+            background: "linear-gradient(135deg, rgba(26, 16, 48, 0.96), rgba(14, 9, 30, 0.99))",
+            border: "2px solid rgba(245, 158, 11, 0.6)",
+            borderRadius: 22,
+            padding: "30px 26px",
+            marginBottom: 32,
+            boxShadow: "0 14px 44px rgba(0, 0, 0, 0.6)"
+          }}
+        >
+          {/* Active Tool Header with Dedicated URL */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14, marginBottom: 22, borderBottom: "1px solid rgba(212, 175, 55, 0.25)", paddingBottom: 18 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={{ fontSize: 36 }}>{activeTool.icon}</span>
+              <div>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
+                  <span>✦</span> {activeTool.badge} · {activeTool.category.toUpperCase()}
+                </div>
+                <h1 style={{ color: "#F3D37A", fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 900, margin: "4px 0 4px", fontFamily: "'Cinzel', serif" }}>
+                  {isHi ? activeTool.titleHi : activeTool.titleEn}
+                </h1>
+                <div style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13.5, maxWidth: 800 }}>
+                  {isHi ? activeTool.descHi : activeTool.descEn}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => handleCopyToolUrl(activeTool.slug)}
+                style={{
+                  background: copiedUrl ? "rgba(52, 211, 153, 0.2)" : "rgba(255, 255, 255, 0.08)",
+                  border: copiedUrl ? "1px solid #34D399" : "1px solid rgba(212, 175, 55, 0.3)",
+                  color: copiedUrl ? "#34D399" : "#FDE68A",
+                  padding: "6px 14px",
+                  borderRadius: 16,
+                  fontSize: 12,
+                  cursor: "pointer",
+                  fontWeight: 700,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5
+                }}
+              >
+                <span>{copiedUrl ? "✓" : "🔗"}</span>
+                <span>{copiedUrl ? (isHi ? "लिंक कॉपी हो गया!" : "URL Copied!") : (isHi ? "टूल लिंक शेयर करें" : "Copy Tool URL")}</span>
+              </button>
+              <button
+                onClick={() => window.print()}
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12, cursor: "pointer", fontWeight: 700 }}
+              >
+                🖨️ {isHi ? "प्रिंट / PDF" : "Print Tool Result"}
+              </button>
+            </div>
+          </div>
+
+          {/* Canonical Slug Pill */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 12, padding: "4px 12px", fontSize: 11.5, color: "#94A3B8", marginBottom: 20 }}>
+            <span>🌐 Direct URL:</span>
+            <code style={{ color: "#FDE68A", fontFamily: "monospace" }}>/astrology-tools/{activeTool.slug}</code>
+          </div>
+
+          {/* ── TOOL RENDER DISPATCHER ── */}
+          {renderActiveToolComponent({
+            activeToolId,
+            userData,
+            setUserData,
+            corePlanets,
+            ascendantDegree,
+            dailyPanchangData,
+            selectedDivisionalChart,
+            setSelectedDivisionalChart,
+            horaryNumberInput,
+            setHoraryNumberInput,
+            horaryQueryTopic,
+            setHoraryQueryTopic,
+            nameNumerologyInput,
+            setNameNumerologyInput,
+            partnerDobInput,
+            setPartnerDobInput,
+            selectedMuhuratEvent,
+            setSelectedMuhuratEvent,
+            prashnaQuestionInput,
+            setPrashnaQuestionInput,
+            selectedTargetDate,
+            setSelectedTargetDate,
+            selectedCity,
+            setSelectedCity,
+            lang,
+            isHi,
+            onSelectTab
+          })}
+        </div>
+
+        {/* ── RELATED TOOLS IN SAME CATEGORY ── */}
+        {relatedTools.length > 0 && (
+          <div style={{ marginTop: 36, marginBottom: 40 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+              <div>
+                <div style={{ color: "#F59E0B", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
+                  ✦ {isHi ? "संबंधित ज्योतिषीय टूल्स" : `More ${categoryMeta.labelEn} Tools`}
+                </div>
+                <h3 style={{ color: "#F8FAFC", fontSize: 18, fontWeight: 800, margin: "2px 0 0" }}>
+                  {isHi ? "इसी श्रेणी के अन्य प्रमुख कैलकुलेटर" : "Explore Related Specialized Engines"}
+                </h3>
+              </div>
+              <button
+                onClick={handleBackToHub}
+                style={{ background: "none", border: "none", color: "#D4AF37", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+              >
+                {isHi ? "सभी २१ टूल्स देखें →" : "View All 21 Astrology Tools →"}
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
+              {relatedTools.map(t => (
+                <a
+                  key={t.id}
+                  href={`/astrology-tools/${t.slug}`}
+                  onClick={(e) => handleSelectTool(t, e)}
+                  style={{
+                    display: "block",
+                    textDecoration: "none",
+                    color: "inherit",
+                    background: "rgba(18, 12, 36, 0.88)",
+                    border: "1px solid rgba(212, 175, 55, 0.25)",
+                    borderRadius: 14,
+                    padding: "16px 18px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = "#F59E0B";
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.25)";
+                    e.currentTarget.style.transform = "none";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 22 }}>{t.icon}</span>
+                    <h4 style={{ color: "#F3D37A", fontSize: 15, fontWeight: 800, margin: 0 }}>
+                      {isHi ? t.titleHi : t.titleEn}
+                    </h4>
+                  </div>
+                  <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12, margin: "0 0 10px", lineHeight: 1.4 }}>
+                    {isHi ? t.descHi : t.descEn}
+                  </p>
+                  <div style={{ color: "#F59E0B", fontSize: 12, fontWeight: 700, textAlign: "right" }}>
+                    {isHi ? "कैलकुलेटर खोलें →" : "Open Tool →"}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // VIEW B: DEDICATED LANDING HUB EXPERIENCE (Matches Layout Illustration)
+  // ═════════════════════════════════════════════════════════════════════════
   return (
     <div className="astrology-tools-hub" style={{ minHeight: "100vh", color: "rgba(241, 231, 208, 0.95)" }}>
-      {/* ── TOP BREADCRUMB & RETURN ACTION ── */}
+      {/* Top Header Breadcrumb Action */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 10 }}>
         <a
           href="/"
@@ -469,166 +876,228 @@ export default function AstrologyToolsHub({
         </a>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "rgba(243, 211, 122, 0.8)" }}>
-          <span>🔯 21 Vedic & KP Calculators</span>
+          <span>🔯 21 Specialized Calculators</span>
           <span>•</span>
-          <span style={{ color: "#34D399", fontWeight: 700 }}>100% Client-Side Private</span>
+          <span style={{ color: "#34D399", fontWeight: 700 }}>5 Categories</span>
+          <span>•</span>
+          <span style={{ color: "#34D399", fontWeight: 700 }}>100% Free Engine</span>
         </div>
       </div>
 
-      {/* ── HERO BANNER: DEDICATED TOOLS LANDING ── */}
+      {/* ── HERO BANNER: EXACT VISUAL REPLICA OF THE BRAND LAYOUT ── */}
       <div
-        className="glass-card"
         style={{
-          background: "linear-gradient(135deg, rgba(32, 18, 58, 0.94), rgba(16, 10, 34, 0.98))",
-          border: "1.5px solid rgba(245, 158, 11, 0.45)",
+          background: "linear-gradient(180deg, #0d1630 0%, #090e1f 100%)",
+          border: "1px solid rgba(212, 175, 55, 0.22)",
           borderRadius: 22,
-          padding: "32px 28px",
-          marginBottom: 28,
-          boxShadow: "0 10px 36px rgba(0, 0, 0, 0.6)",
+          padding: "36px 32px 30px",
+          marginBottom: 32,
+          boxShadow: "0 14px 40px rgba(0, 0, 0, 0.55)",
           position: "relative",
           overflow: "hidden"
         }}
       >
-        <div style={{ position: "absolute", top: -40, right: -40, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
-        
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", borderRadius: 20, padding: "3px 12px", color: "#FDE68A", fontSize: 11.5, fontWeight: 800, marginBottom: 12 }}>
-          <span>✦</span> {isHi ? "संपूर्ण ज्योतिष व खगोल विज्ञान टूलकिट" : "AUTHENTIC ASTROLOGICAL & NUMERICAL SUITE"}
+        <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        {/* Brand Tag */}
+        <div style={{ color: "#D4AF37", fontSize: 11.5, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>
+          JYOTISH PARAMARSH
         </div>
 
-        <h1 style={{ color: "#F3D37A", fontSize: "clamp(22px, 3.2vw, 32px)", fontWeight: 900, margin: "0 0 10px", letterSpacing: 0.8, fontFamily: "'Cinzel', serif" }}>
-          {isHi ? "वैदिक एवं केपी ज्योतिष, अंकशास्त्र व निर्णय टूल्स" : "Vedic, KP Astrology, Numerology & Cosmic Decision Suite"}
+        {/* Main Heading */}
+        <h1 style={{ color: "#F8FAFC", fontSize: "clamp(24px, 3.6vw, 36px)", fontWeight: 800, margin: "0 0 10px", lineHeight: 1.25 }}>
+          {isHi ? "हर प्रश्न के लिए ज्योतिषीय टूल्स" : "Astrology Tools for Every Question"}
         </h1>
 
-        <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 14.5, maxWidth: 820, margin: "0 0 20px", lineHeight: 1.6 }}>
+        {/* Subtitle */}
+        <p style={{ color: "#94A3B8", fontSize: "15px", maxWidth: 780, margin: "0 0 24px", lineHeight: 1.6 }}>
           {isHi
-            ? "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र, प्रोफेसर के.एस. कृष्णमूर्ति विरचित कृष्णमूर्ति पद्धति (KP) एवं प्राचीन काल्डियन-पाइथागोरियन सूत्रों पर आधारित २१ प्रामाणिक गणना उपकरण।"
-            : "Explore 21 computational tools spanning classical Parashari principles, Krishnamurti Paddhati (KP) stellar sub-lords, Pythagorean/Chaldean vibrational numerology, and daily decision engines."}
+            ? "अपनी जन्म कुंडली जानें, अंकशास्त्र को समझें एवं शुभ समय की गणना करें।"
+            : "Explore your birth chart, discover numerology, and calculate auspicious timings."}
         </p>
 
-        {/* Quick Search & Filter Input */}
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ position: "relative", flex: "1 1 280px", minWidth: 260 }}>
-            <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 15, color: "#F59E0B" }}>🔍</span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder={isHi ? "टूल खोजें... (उदा. दशा, केपी, नाम अंकशास्त्र, चौघड़िया, तारा बल)" : "Search tools by name, topic or system (e.g. Dasha, KP, Choghadiya, Life Path)..."}
-              style={{
-                width: "100%",
-                background: "rgba(10, 6, 22, 0.85)",
-                border: "1px solid rgba(212, 175, 55, 0.35)",
-                borderRadius: 24,
-                padding: "11px 18px 11px 40px",
-                color: "#FDE68A",
-                fontSize: 13.5,
-                outline: "none",
-                boxSizing: "border-box"
-              }}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#FDE68A", cursor: "pointer", fontSize: 12 }}
-              >
-                ✕
-              </button>
-            )}
-          </div>
+        {/* Search Bar matching screenshot */}
+        <div style={{ position: "relative", marginBottom: 28 }}>
+          <span style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#94A3B8" }}>🔍</span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => {
+              setSearchQuery(e.target.value);
+              if (selectedCategory !== "all") setSelectedCategory("all");
+            }}
+            placeholder={isHi ? "ज्योतिषीय टूल्स खोजें... (उदा. विंशोत्तरी, केपी, नाम अंकशास्त्र, चौघड़िया)" : "Search astrology tools..."}
+            style={{
+              width: "100%",
+              background: "rgba(255, 255, 255, 0.05)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              borderRadius: 12,
+              padding: "14px 18px 14px 46px",
+              color: "#F8FAFC",
+              fontSize: 15,
+              outline: "none",
+              boxSizing: "border-box",
+              transition: "border-color 0.2s ease"
+            }}
+            onFocus={e => e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.6)"}
+            onBlur={e => e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)"}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 13 }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
 
-          {/* Quick Sample Presets */}
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.75)", fontWeight: 600 }}>
-              {isHi ? "नमूना डेटा:" : "Quick Demo:"}
-            </span>
-            <button
-              onClick={() => handleLoadSample("rahul")}
-              style={{ background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(212, 175, 55, 0.25)", color: "#FDE68A", padding: "6px 12px", borderRadius: 16, fontSize: 12, cursor: "pointer", fontWeight: 600 }}
-            >
-              👤 {isHi ? "राहुल (1995)" : "Rahul (1995)"}
-            </button>
-            <button
-              onClick={() => handleLoadSample("priya")}
-              style={{ background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(212, 175, 55, 0.25)", color: "#FDE68A", padding: "6px 12px", borderRadius: 16, fontSize: 12, cursor: "pointer", fontWeight: 600 }}
-            >
-              👩 {isHi ? "प्रिया (1998)" : "Priya (1998)"}
-            </button>
-          </div>
+        {/* Category Cards Grid matching screenshot */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 14 }}>
+          {CATEGORY_CARDS.map(cat => {
+            const isCatActive = selectedCategory === cat.id;
+            return (
+              <div
+                key={cat.id}
+                onClick={() => handleCategoryCardClick(cat.id)}
+                style={{
+                  background: isCatActive ? "rgba(245, 158, 11, 0.08)" : "rgba(255, 255, 255, 0.03)",
+                  border: isCatActive ? "1.5px solid #F59E0B" : "1px solid rgba(255, 255, 255, 0.08)",
+                  borderRadius: 14,
+                  padding: "22px 22px 18px",
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  minHeight: 130,
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.5)";
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = isCatActive ? "#F59E0B" : "rgba(255, 255, 255, 0.08)";
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.background = isCatActive ? "rgba(245, 158, 11, 0.08)" : "rgba(255, 255, 255, 0.03)";
+                }}
+              >
+                <div>
+                  <div style={{ marginBottom: 12 }}>
+                    {cat.icon}
+                  </div>
+                  <h3 style={{ color: "#F8FAFC", fontSize: 18, fontWeight: 700, margin: "0 0 6px" }}>
+                    {isHi ? cat.titleHi : cat.titleEn}
+                  </h3>
+                  <p style={{ color: "#94A3B8", fontSize: 13.5, margin: 0, lineHeight: 1.4 }}>
+                    {isHi ? cat.subtitleHi : cat.subtitleEn}
+                  </p>
+                </div>
+
+                <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 6, color: "#D4AF37", fontSize: 13, fontWeight: 600 }}>
+                  <span>{isHi ? "टूल्स देखें" : "Explore tools"}</span>
+                  <span>→</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Concept Preview Caption */}
+        <div style={{ color: "rgba(148, 163, 184, 0.65)", fontSize: 11.5, fontStyle: "italic", textAlign: "left", marginTop: 12 }}>
+          {isHi
+            ? "वैदिक ज्योतिष एवं कृष्णमूर्ति पद्धति (KP) के प्रामाणिक सिद्धांतों पर आधारित गणनाएं।"
+            : "Concept preview for your existing midnight-blue and antique-gold brand direction. Certified Vedic calculations."}
         </div>
       </div>
 
-      {/* ── 5 CATEGORY SELECTOR PILLS ── */}
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 14, marginBottom: 22, scrollbarWidth: "none" }}>
-        {TOOL_CATEGORIES.map(cat => {
-          const isSelected = selectedCategory === cat.id;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              style={{
-                background: isSelected
-                  ? "linear-gradient(135deg, #F59E0B, #D97706)"
-                  : "rgba(22, 15, 42, 0.85)",
-                color: isSelected ? "#0F0A1E" : "#FDE68A",
-                border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.28)",
-                borderRadius: 22,
-                padding: "8px 16px",
-                fontSize: 13,
-                fontWeight: isSelected ? 800 : 600,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                boxShadow: isSelected ? "0 4px 14px rgba(245, 158, 11, 0.4)" : "none",
-                transition: "all 0.2s ease"
-              }}
-            >
-              <span>{cat.icon}</span>
-              <span>{isHi ? cat.labelHi : cat.labelEn}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* ── 21 TOOLS DIRECTORY SECTION ── */}
+      <div id="astrology-tools-directory" style={{ marginBottom: 40 }}>
+        {/* Category Pills & Quick Filter Bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, scrollbarWidth: "none" }}>
+            {TOOL_CATEGORIES.map(cat => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  style={{
+                    background: isSelected
+                      ? "linear-gradient(135deg, #F59E0B, #D97706)"
+                      : "rgba(22, 15, 42, 0.85)",
+                    color: isSelected ? "#0F0A1E" : "#FDE68A",
+                    border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.28)",
+                    borderRadius: 22,
+                    padding: "7px 15px",
+                    fontSize: 12.5,
+                    fontWeight: isSelected ? 800 : 600,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    boxShadow: isSelected ? "0 4px 14px rgba(245, 158, 11, 0.35)" : "none",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  <span>{isHi ? cat.labelHi : cat.labelEn}</span>
+                </button>
+              );
+            })}
+          </div>
 
-      {/* ── 21 TOOLS SHOWCASE GRID ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16, marginBottom: 36 }}>
-        {filteredTools.map(tool => {
-          const isActive = tool.id === activeToolId;
-          return (
-            <div
+          <div style={{ fontSize: 12, color: "#94A3B8" }}>
+            {isHi ? `${filteredTools.length} टूल्स उपलब्ध` : `Showing ${filteredTools.length} of 21 tools`}
+          </div>
+        </div>
+
+        {/* Tools Showcase Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+          {filteredTools.map(tool => (
+            <a
               key={tool.id}
-              onClick={() => handleSelectTool(tool.id)}
+              href={`/astrology-tools/${tool.slug}`}
+              onClick={(e) => handleSelectTool(tool, e)}
               style={{
-                background: isActive
-                  ? "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(24, 14, 48, 0.98))"
-                  : "rgba(18, 12, 36, 0.88)",
-                border: isActive
-                  ? "2px solid #F59E0B"
-                  : "1px solid rgba(212, 175, 55, 0.25)",
-                borderRadius: 16,
-                padding: "18px 20px",
-                cursor: "pointer",
-                position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
-                boxShadow: isActive ? "0 6px 24px rgba(245, 158, 11, 0.3)" : "0 4px 16px rgba(0,0,0,0.35)",
-                transition: "all 0.2s ease",
-                transform: isActive ? "translateY(-3px)" : "none"
+                textDecoration: "none",
+                color: "inherit",
+                background: "rgba(18, 12, 36, 0.88)",
+                border: "1px solid rgba(212, 175, 55, 0.25)",
+                borderRadius: 16,
+                padding: "20px 20px 16px",
+                cursor: "pointer",
+                position: "relative",
+                boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+                transition: "all 0.2s ease"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "#F59E0B";
+                e.currentTarget.style.transform = "translateY(-3px)";
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.25)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.25)";
+                e.currentTarget.style.transform = "none";
+                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.35)";
               }}
             >
               <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-                  <span style={{ fontSize: 28 }}>{tool.icon}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                  <span style={{ fontSize: 30 }}>{tool.icon}</span>
                   <span
                     style={{
                       fontSize: 10,
                       fontWeight: 800,
                       padding: "3px 8px",
                       borderRadius: 10,
-                      background: isActive ? "rgba(245, 158, 11, 0.25)" : "rgba(255, 255, 255, 0.08)",
-                      color: isActive ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      color: "rgba(241, 231, 208, 0.8)",
                       border: "1px solid rgba(212, 175, 55, 0.3)"
                     }}
                   >
@@ -636,98 +1105,32 @@ export default function AstrologyToolsHub({
                   </span>
                 </div>
 
-                <h3 style={{ color: isActive ? "#FDE68A" : "#F3D37A", fontSize: 16, fontWeight: 800, margin: "0 0 6px", lineHeight: 1.3 }}>
+                <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.3 }}>
                   {isHi ? tool.titleHi : tool.titleEn}
                 </h3>
 
-                <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 12.5, lineHeight: 1.5, margin: "0 0 14px" }}>
+                <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13, lineHeight: 1.5, margin: "0 0 14px" }}>
                   {isHi ? tool.descHi : tool.descEn}
                 </p>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(212, 175, 55, 0.15)", paddingTop: 10 }}>
-                <span style={{ fontSize: 11, color: "#34D399", fontWeight: 700 }}>
-                  ✓ {isHi ? "सक्रिय व निःशुल्क" : "Free Engine"}
-                </span>
-                <span style={{ color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  {isActive ? (isHi ? "✓ दृश्यमान" : "Active") : (isHi ? "खोलें ➔" : "Launch ➔")}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              <div>
+                <div style={{ fontSize: 11, color: "rgba(148, 163, 184, 0.85)", fontFamily: "monospace", marginBottom: 10 }}>
+                  🔗 /astrology-tools/{tool.slug}
+                </div>
 
-      {/* ── LIVE INTERACTIVE TOOL WORKSPACE ── */}
-      <div
-        id="active-tool-workspace"
-        className="glass-card"
-        style={{
-          background: "linear-gradient(135deg, rgba(26, 16, 48, 0.96), rgba(14, 9, 30, 0.99))",
-          border: "2px solid rgba(245, 158, 11, 0.6)",
-          borderRadius: 22,
-          padding: "30px 26px",
-          marginBottom: 40,
-          boxShadow: "0 14px 44px rgba(0, 0, 0, 0.6)"
-        }}
-      >
-        {/* Active Tool Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14, marginBottom: 24, borderBottom: "1px solid rgba(212, 175, 55, 0.25)", paddingBottom: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <span style={{ fontSize: 36 }}>{activeTool.icon}</span>
-            <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#F59E0B", fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1 }}>
-                <span>✦</span> {activeTool.badge} · {activeTool.category.toUpperCase()}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(212, 175, 55, 0.15)", paddingTop: 10 }}>
+                  <span style={{ fontSize: 11, color: "#34D399", fontWeight: 700 }}>
+                    ✓ {isHi ? "निःशुल्क उपयोग" : "Free Engine"}
+                  </span>
+                  <span style={{ color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    {isHi ? "कैलकुलेटर खोलें →" : "Open Calculator →"}
+                  </span>
+                </div>
               </div>
-              <h2 style={{ color: "#F3D37A", fontSize: 22, fontWeight: 900, margin: "3px 0 4px", fontFamily: "'Cinzel', serif" }}>
-                {isHi ? activeTool.titleHi : activeTool.titleEn}
-              </h2>
-              <div style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13 }}>
-                {isHi ? activeTool.descHi : activeTool.descEn}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button
-              onClick={() => window.print()}
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(212,175,55,0.3)", color: "#FDE68A", padding: "6px 14px", borderRadius: 16, fontSize: 12, cursor: "pointer", fontWeight: 700 }}
-            >
-              🖨️ {isHi ? "प्रिंट / PDF" : "Print Tool Result"}
-            </button>
-          </div>
+            </a>
+          ))}
         </div>
-
-        {/* ── TOOL RENDER DISPATCHER ── */}
-        {renderActiveToolComponent({
-          activeToolId,
-          userData,
-          setUserData,
-          corePlanets,
-          ascendantDegree,
-          dailyPanchangData,
-          selectedDivisionalChart,
-          setSelectedDivisionalChart,
-          horaryNumberInput,
-          setHoraryNumberInput,
-          horaryQueryTopic,
-          setHoraryQueryTopic,
-          nameNumerologyInput,
-          setNameNumerologyInput,
-          partnerDobInput,
-          setPartnerDobInput,
-          selectedMuhuratEvent,
-          setSelectedMuhuratEvent,
-          prashnaQuestionInput,
-          setPrashnaQuestionInput,
-          selectedTargetDate,
-          setSelectedTargetDate,
-          selectedCity,
-          setSelectedCity,
-          lang,
-          isHi,
-          onSelectTab
-        })}
       </div>
     </div>
   );

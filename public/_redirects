@@ -4,4 +4,7 @@
 /daily /daily/index.html 200
 /matchmaking /matchmaking/index.html 200
 /tools /tools/index.html 200
+/tools/* /tools/index.html 200
+/astrology-tools /tools/index.html 200
+/astrology-tools/* /tools/index.html 200
 /* /index.html 200

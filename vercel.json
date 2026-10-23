@@ -8,6 +8,9 @@
     { "source": "/daily", "destination": "/daily/index.html" },
     { "source": "/matchmaking", "destination": "/matchmaking/index.html" },
     { "source": "/tools", "destination": "/tools/index.html" },
+    { "source": "/tools/:path*", "destination": "/tools/index.html" },
+    { "source": "/astrology-tools", "destination": "/tools/index.html" },
+    { "source": "/astrology-tools/:path*", "destination": "/tools/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
