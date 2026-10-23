@@ -26,6 +26,13 @@ import {
 import { Icons } from "./components/Icons";
 import { Analytics } from "./analytics";
 import AstrologyToolsHub from "./components/AstrologyToolsHub";
+import AppHeader from "./components/layout/AppHeader";
+import DailySubNavigation from "./components/layout/DailySubNavigation";
+import Footer from "./components/layout/Footer";
+import BirthDetailsForm from "./components/kundli/BirthDetailsForm";
+import ChartSummary from "./components/kundli/ChartSummary";
+import KeyInsights from "./components/kundli/KeyInsights";
+import TopicNavigation from "./components/kundli/TopicNavigation";
 
 const ZODIAC_SIGNS = [
   { name: "Aries", symbol: "♈", sanskrit: "Mesh", num: 1, element: "Fire" },
@@ -4399,186 +4406,28 @@ export default function App() {
       )}
 
       {/* Unified Master Header */}
-      <header className="top-header-bar no-print">
-        <div className="header-container">
-          {/* Logo & Brand */}
-          <div
-            onClick={handleSecretTrigger}
-            style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none", flexShrink: 0 }}
-            title="Click 3 times to open Admin VIP access portal"
-          >
-            <img
-              src="/logo.webp"
-              alt="Jyotish Paramarsh Logo"
-              width="34"
-              height="34"
-              style={{ width: 34, height: 34, borderRadius: "50%", border: "1.5px solid rgba(245,158,11,0.7)", boxShadow: "0 0 10px rgba(245,158,11,0.4)", objectFit: "cover" }}
-            />
-            <div>
-              <div className="header-brand-title" style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.2, lineHeight: 1.1 }}>JYOTISH PARAMARSH</div>
-              <div style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.75)", letterSpacing: 0.3, fontWeight: 500 }} className="desktop-only-tagline">
-                {hi ? "वैदिक ज्योतिष एवं संपूर्ण समाधान" : "Vedic Astrology & Planetary Insights"}
-              </div>
-            </div>
-          </div>
+      <AppHeader
+        currentSection={mainSection}
+        onNavigate={navigateToSection}
+        lang={lang}
+        onToggleLang={handleLangToggle}
+        currency={currency}
+        onSetCurrency={handleSetCurrency}
+        currencies={CURRENCIES}
+        isAdmin={isAdmin}
+        onOpenAdmin={() => setShowAdminPinModal(true)}
+        handleSecretTrigger={handleSecretTrigger}
+        hasResult={Boolean(result)}
+      />
 
-          {/* Master 7-Tool Navigation Pills */}
-          <nav className="header-nav-strip" role="navigation" aria-label="Main features">
-            {[
-              { id: "kundli", path: "/", icon: "🔯", label: hi ? "जन्म कुंडली" : "Kundli" },
-              { id: "tools", path: "/tools", icon: "🛠️", label: hi ? "ज्योतिष टूल्स" : "Astro Tools" },
-              { id: "matchmaking", path: "/matchmaking", icon: "💍", label: hi ? "कुंडली मिलान" : "Kundli Milan" },
-              { id: "panchang", path: "/panchang", icon: "🕉️", label: hi ? "पंचांग" : "Panchang" },
-              { id: "muhurat", path: "/muhurat", icon: "⏳", label: hi ? "शुभ मुहूर्त" : "Muhurat" },
-              { id: "daily", path: "/daily", icon: "☀️", label: hi ? "राशिफल" : "Horoscope" },
-              { id: "festivals", path: "/festivals", icon: "🪔", label: hi ? "त्यौहार" : "Festivals" }
-            ].map(feat => {
-              const isSelected = mainSection === feat.id;
-              return (
-                <a
-                  key={feat.id}
-                  href={feat.path}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navigateToSection(feat.id);
-                    if (result && ["chart", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools"].includes(feat.id)) {
-                      setTab(feat.id === "kundli" ? "chart" : feat.id);
-                    }
-                  }}
-                  className={`header-nav-pill ${isSelected ? "active" : ""}`}
-                  style={{
-                    background: isSelected
-                      ? "linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.55))"
-                      : "rgba(22, 15, 42, 0.85)",
-                    border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
-                    color: isSelected ? "#FDE68A" : "rgba(241, 231, 208, 0.92)",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>{feat.icon}</span>
-                  <span>{feat.label}</span>
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Right Utilities */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            {isAdmin && (
-              <div
-                onClick={() => setShowAdminPinModal(true)}
-                style={{
-                  background: "linear-gradient(135deg, #F59E0B, #D97706)",
-                  color: "#0B0819",
-                  padding: "5px 10px",
-                  borderRadius: 20,
-                  fontSize: 11.5,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4
-                }}
-                title="Admin VIP Mode is Active - Click to Manage"
-              >
-                <span>👑</span> VIP
-              </div>
-            )}
-
-            {/* Currency Selector */}
-            <select
-              id="header-currency-select"
-              aria-label={t.currencyLabel}
-              value={currency}
-              onChange={e => handleSetCurrency(e.target.value)}
-              className="custom-select-arrow"
-              style={{
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                appearance: "none",
-                background: "rgba(26,18,48,0.95)",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "calc(100% - 10px) center",
-                backgroundSize: "11px 11px",
-                border: "1px solid rgba(212,175,55,0.35)",
-                borderRadius: 18,
-                padding: "6px 28px 6px 11px",
-                color: "#FDE68A",
-                fontSize: 12.5,
-                fontWeight: 700,
-                cursor: "pointer",
-                outline: "none",
-                boxSizing: "border-box",
-                lineHeight: 1.2
-              }}
-            >
-              {Object.values(CURRENCIES).map(c => (
-                <option key={c.code} value={c.code} style={{ background: "#0D0A1C", color: "#FFF" }}>
-                  {c.flag} {c.code} ({c.symbol.trim()})
-                </option>
-              ))}
-            </select>
-
-            {/* Language Toggle (Dual Segmented EN | HI Pill) */}
-            <div
-              onClick={handleLangToggle}
-              role="button"
-              tabIndex={0}
-              aria-label="Switch Language (English / हिन्दी)"
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleLangToggle(); }}
-              style={{
-                background: "rgba(22, 15, 42, 0.95)",
-                border: "1px solid rgba(212, 175, 55, 0.4)",
-                borderRadius: 20,
-                padding: "3px 6px",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 4,
-                userSelect: "none"
-              }}
-            >
-              <span
-                style={{
-                  padding: "3px 8px",
-                  borderRadius: 14,
-                  fontSize: 12,
-                  fontWeight: !hi ? 800 : 500,
-                  background: !hi ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
-                  color: !hi ? "#0F0A1E" : "rgba(241, 231, 208, 0.75)"
-                }}
-              >
-                EN
-              </span>
-              <span
-                style={{
-                  padding: "3px 8px",
-                  borderRadius: 14,
-                  fontSize: 12,
-                  fontWeight: hi ? 800 : 500,
-                  background: hi ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
-                  color: hi ? "#0F0A1E" : "rgba(241, 231, 208, 0.75)"
-                }}
-              >
-                हिन्दी
-              </span>
-            </div>
-
-            {result && (
-              <button
-                onClick={() => handlePrintReport("all")}
-                style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "6px 14px", borderRadius: 18, fontSize: 12.5, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, boxShadow: "0 2px 10px rgba(245,158,11,0.35)" }}
-              >
-                <span>📥</span> {t.printBtn}
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Secondary Daily Subnavigation when on daily/panchang/muhurat/festivals */}
+      {["daily", "panchang", "muhurat", "festivals"].includes(mainSection) && (
+        <DailySubNavigation
+          currentSection={mainSection}
+          onNavigate={navigateToSection}
+          lang={lang}
+        />
+      )}
 
       {/* Main Container */}
       <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "24px 20px 80px" }}>
@@ -4786,285 +4635,49 @@ export default function App() {
         {/* ── KUNDLI GENERATOR SECTION ── */}
         {mainSection === "kundli" && (
           <>
-            {/* Direct Header & Computational Badge above Form */}
-            <div className="no-print" style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "4px 14px", marginBottom: 10 }}>
-                <Icons.Sparkle size={13} color="#F59E0B" />
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: "#FDE68A", letterSpacing: 1.2, textTransform: "uppercase" }}>
-                  {hi ? "ऋषि पाराशर विरचित सिद्धांती गणना · 16 षोडशवर्ग" : "PARASHARI SIDEREAL COMPUTATIONAL CORE · 16 SHODASHVARGAS"}
-                </span>
-              </div>
-              <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(22px, 3.8vw, 34px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 2, fontWeight: 900, margin: "0 0 6px" }}>
-                {t.title}
+            {/* Focused Hero Promise */}
+            <div className="no-print" style={{ textAlign: "center", marginBottom: "var(--space-6)" }}>
+              <h1
+                style={{
+                  fontSize: "clamp(1.75rem, 3.8vw, var(--text-3xl))",
+                  fontWeight: 900,
+                  color: "var(--brand)",
+                  margin: "0 0 var(--space-2) 0",
+                  lineHeight: 1.2,
+                }}
+              >
+                {hi ? "वैदिक जन्म कुंडली एवं जीवन फलकथन" : "Vedic Birth Chart & Cosmic Life Reading"}
               </h1>
-              <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13.5, fontStyle: "italic", margin: "0 auto", maxWidth: 640 }}>
-                {t.tagline}
+              <p
+                style={{
+                  color: "var(--ink-secondary)",
+                  fontSize: "var(--text-base)",
+                  maxWidth: 640,
+                  margin: "0 auto",
+                  lineHeight: "var(--leading-normal)",
+                }}
+              >
+                {hi
+                  ? "ऋषि पाराशर विरचित सिद्धांती गणना पर आधारित संपूर्ण जीवन विश्लेषण, १६ षोडशवर्ग चक्र व सटीक उपाय।"
+                  : "Authentic Parashari sidereal calculations, 16 divisional charts, Vimshottari dasha, and personalized life guidance."}
               </p>
             </div>
 
-            {/* Input Form Card */}
-            <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
-              <div style={{ marginBottom: 20, textAlign: "center" }}>
-                <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
-                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5, marginBottom: 12 }}>{t.formSub}</p>
-
-                {/* 1-Click Sample Profile Fill */}
-                <button
-                  type="button"
-                  onClick={handleFillSample}
-                  style={{
-                    background: "rgba(245, 158, 11, 0.15)",
-                    border: "1px solid rgba(245, 158, 11, 0.4)",
-                    color: "#FDE68A",
-                    padding: "6px 16px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    fontWeight: 800,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    transition: "all 0.2s ease"
-                  }}
-                  title="Auto-fill sample data to test the Kundli engine instantly"
-                >
-                  <span>⚡</span> {hi ? "नमूना विवरण भरें (1-Click Sample Chart)" : "Fill Sample Data (1-Click Demo)"}
-                </button>
-              </div>
-
-              <div className="birth-form-grid">
-                <div className="birth-form-full-col">
-                  <div className="birth-form-label-row">
-                    <label htmlFor="birth-name">
-                      <Icons.User size={15} color="#F59E0B" /> {t.fName} <span style={{ color: "#F59E0B" }}>*</span>
-                    </label>
-                  </div>
-                  <input
-                    id="birth-name"
-                    name="name"
-                    type="text"
-                    required
-                    aria-required="true"
-                    aria-label={t.fName}
-                    value={form.name}
-                    onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
-                    placeholder={t.phName}
-                    className="birth-form-input"
-                  />
-                </div>
-
-                <div>
-                  <div className="birth-form-label-row">
-                    <label htmlFor="birth-dob">
-                      <Icons.Calendar size={15} color="#F59E0B" /> {t.fDob} <span style={{ color: "#F59E0B" }}>*</span>
-                    </label>
-                  </div>
-                  <input
-                    id="birth-dob"
-                    name="dob"
-                    type="date"
-                    required
-                    aria-required="true"
-                    aria-label={t.fDob}
-                    value={form.dob}
-                    onChange={e => { setForm({ ...form, dob: e.target.value }); if (err) setErr(""); }}
-                    className="birth-form-input"
-                  />
-                </div>
-
-                <div>
-                  <div className="birth-form-label-row">
-                    <label htmlFor="birth-tob">
-                      <Icons.Clock size={15} color="#F59E0B" /> {t.fTob} <span style={{ color: "#F59E0B" }}>*</span>
-                    </label>
-                    <span style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.75)", fontWeight: 500, whiteSpace: "nowrap" }} title="Vedic astrology defaults to solar noon (12:00 PM) if time is unknown">
-                      {hi ? "अज्ञात? 12:00 PM" : "12:00 PM if unsure"}
-                    </span>
-                  </div>
-                  <input
-                    id="birth-tob"
-                    name="tob"
-                    type="time"
-                    aria-label={t.fTob}
-                    value={form.tob}
-                    onChange={e => setForm({ ...form, tob: e.target.value })}
-                    className="birth-form-input"
-                  />
-                </div>
-
-                <div>
-                  <div className="birth-form-label-row">
-                    <span id="birth-gender-label" className="birth-form-label-text">
-                      <Icons.Gender size={15} color="#F59E0B" /> {t.fGender} <span style={{ color: "#F59E0B" }}>*</span>
-                    </span>
-                  </div>
-                  <div
-                    role="radiogroup"
-                    aria-labelledby="birth-gender-label"
-                    className="birth-form-gender-group"
-                  >
-                    {[
-                      { val: "male", label: t.genderMale, icon: "♂" },
-                      { val: "female", label: t.genderFemale, icon: "♀" },
-                      { val: "other", label: t.genderOther, icon: "⚧" }
-                    ].map(g => {
-                      const active = (form.gender || "male") === g.val;
-                      return (
-                        <button
-                          key={g.val}
-                          type="button"
-                          role="radio"
-                          aria-checked={active}
-                          onClick={() => { setForm({ ...form, gender: g.val }); if (err) setErr(""); }}
-                          className="birth-form-gender-btn"
-                          style={{
-                            background: active
-                              ? "linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.25))"
-                              : "rgba(11, 8, 25, 0.65)",
-                            border: active ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.3)",
-                            color: active ? "#FDE68A" : "rgba(241, 231, 208, 0.75)",
-                            fontWeight: active ? 800 : 600,
-                            boxShadow: active ? "0 0 14px rgba(245, 158, 11, 0.3)" : "none"
-                          }}
-                        >
-                          <span style={{ fontSize: 15, color: active ? "#F59E0B" : "rgba(243, 211, 122, 0.7)" }}>{g.icon}</span>
-                          <span style={{ whiteSpace: "nowrap" }}>{g.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="birth-form-full-col">
-                  <div className="birth-form-label-row">
-                    <label htmlFor="birth-pob">
-                      <Icons.Location size={15} color="#F59E0B" /> {t.fPob} <span style={{ color: "#F59E0B" }}>*</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleDetectLocation}
-                      disabled={isLocating}
-                      style={{
-                        background: "rgba(52, 211, 153, 0.15)",
-                        border: "1px solid rgba(52, 211, 153, 0.4)",
-                        color: "#34D399",
-                        padding: "3px 10px",
-                        borderRadius: 12,
-                        fontSize: 11.5,
-                        fontWeight: 700,
-                        cursor: isLocating ? "wait" : "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4
-                      }}
-                    >
-                      <span>📍</span> {isLocating ? (hi ? "स्थान खोज रहे हैं..." : "Detecting...") : (hi ? "वर्तमान स्थान का उपयोग करें" : "Use Current Location")}
-                    </button>
-                  </div>
-                  <input
-                    id="birth-pob"
-                    name="pob"
-                    type="text"
-                    required
-                    aria-required="true"
-                    aria-label={t.fPob}
-                    value={form.pob}
-                    onChange={e => { setForm({ ...form, pob: e.target.value }); if (err) setErr(""); }}
-                    placeholder={t.phPob}
-                    className="birth-form-input"
-                  />
-
-                  {/* Quick Global City Chips */}
-                  <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.8)", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                      <span>⚡</span> {hi ? "त्वरित चयन:" : "Popular Cities:"}
-                    </span>
-                    {[
-                      { label: "🇮🇳 New Delhi", val: "New Delhi, India" },
-                      { label: "🇮🇳 Mumbai", val: "Mumbai, India" },
-                      { label: "🇮🇳 Bengaluru", val: "Bengaluru, India" },
-                      { label: "🇮🇳 Varanasi", val: "Varanasi, India" },
-                      { label: "🇮🇳 Ayodhya", val: "Ayodhya, India" },
-                      { label: "🇮🇳 Kolkata", val: "Kolkata, India" },
-                      { label: "🇮🇳 Hyderabad", val: "Hyderabad, India" },
-                      { label: "🇮🇳 Pune", val: "Pune, India" },
-                      { label: "🇦🇪 Dubai", val: "Dubai, UAE" },
-                      { label: "🇬🇧 London", val: "London, UK" },
-                      { label: "🇺🇸 New York", val: "New York, USA" },
-                      { label: "🇨🇦 Toronto", val: "Toronto, Canada" },
-                    ].map(city => (
-                      <button
-                        key={city.val}
-                        type="button"
-                        className="city-chip"
-                        onClick={() => {
-                          setForm({ ...form, pob: city.val });
-                          if (err) setErr("");
-                        }}
-                        style={{
-                          background: form.pob === city.val ? "rgba(245, 158, 11, 0.28)" : "rgba(255, 255, 255, 0.05)",
-                          border: form.pob === city.val ? "1px solid rgba(245, 158, 11, 0.8)" : "1px solid rgba(212, 175, 55, 0.2)",
-                          borderRadius: 14,
-                          padding: "4px 10px",
-                          fontSize: 12,
-                          color: form.pob === city.val ? "#FDE68A" : "rgba(241, 231, 208, 0.9)",
-                          cursor: "pointer",
-                          backdropFilter: "blur(6px)",
-                          fontWeight: form.pob === city.val ? 700 : 500,
-                          boxShadow: form.pob === city.val ? "0 0 10px rgba(245, 158, 11, 0.3)" : "none"
-                        }}
-                      >
-                        {city.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {err && (
-                <div style={{ background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.35)", borderRadius: 8, padding: "12px 16px", color: "#FCA5A5", fontSize: 13.5, textAlign: "center", marginTop: 18 }}>
-                  ⚠️ {err}
-                </div>
-              )}
-
-              <button onClick={run} disabled={step > 0} className="gold-cta-btn" style={{ marginTop: 24, fontSize: 16 }}>
-                {step > 0 ? t.btnWait : t.btnGo}
-              </button>
-
-              {/* Quick Daily Horoscope Access */}
-              {!result && (
-                <div style={{ marginTop: 20, textAlign: "center", borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 16 }}>
-                  <span style={{ fontSize: 13.5, color: "rgba(241,231,208,0.85)" }}>
-                    {hi ? "या आज का दैनिक राशिफल व ईमेल अलर्ट्स देखें:" : "Or check Today's Daily Vedic Horoscope & Email Alerts:"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMainSection("daily");
-                    }}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      background: "rgba(245,158,11,0.18)",
-                      border: "1px solid rgba(245,158,11,0.4)",
-                      borderRadius: 20,
-                      padding: "7px 18px",
-                      color: "#FDE68A",
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      marginLeft: 10,
-                      marginTop: 6
-                    }}
-                  >
-                    <span>☀️</span> {hi ? "दैनिक राशिफल (Daily Horoscope)" : "Daily Horoscope"} →
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* ── 3-PILLAR CREDIBILITY & VEDIC INTEGRITY STRIP ── */}
+            {/* Focused Accessible Birth Form */}
+            <BirthDetailsForm
+              form={form}
+              setForm={setForm}
+              onSubmit={run}
+              isCalculating={step > 0}
+              step={step}
+              lang={lang}
+              err={err}
+              setErr={setErr}
+              onFillSample={handleFillSample}
+              isLocating={isLocating}
+              onDetectLocation={handleDetectLocation}
+            />
+{/* ── 3-PILLAR CREDIBILITY & VEDIC INTEGRITY STRIP ── */}
             {!result && (
               <div className="no-print" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, marginBottom: 22 }}>
                 {[
@@ -5260,414 +4873,30 @@ export default function App() {
           <div ref={resultRef} className="screen-only-tabs" style={{ animation: "fadeInCard 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}>
 
             {/* Profile Overview Header Card */}
-            <div className="glass-card" style={{ position: "relative", overflow: "hidden", padding: "28px 30px", marginBottom: 28, textAlign: "center" }}>
-              <div style={{ position: "absolute", top: 0, right: 0, width: 320, height: "100%", opacity: 0.18, pointerEvents: "none", overflow: "hidden", maskImage: "linear-gradient(to left, black, transparent)", WebkitMaskImage: "linear-gradient(to left, black, transparent)" }}>
-                <img src="/images/feature_kundli.jpg" alt="Vedic Horoscope Parchment" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#F59E0B", fontWeight: 700, letterSpacing: 1.2, marginBottom: 6 }}>
-                <Icons.Sparkle size={14} color="#F59E0B" /> {hi ? "वैदिक जन्म विवरण" : "NATAL PROFILE"}
-              </div>
-              <h2 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", color: "#F3D37A", fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 800, marginBottom: 6 }}>
-                {form.name.toUpperCase()}
-              </h2>
-              <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13.5, letterSpacing: 0.5, fontWeight: 500 }}>
-                {form.dob} · {form.pob} {form.tob ? `· ${form.tob}` : ""} · {form.gender === "female" ? (hi ? "महिला (Female)" : "Female") : form.gender === "other" ? (hi ? "अन्य (Other)" : "Other") : (hi ? "पुरुष (Male)" : "Male")}
-              </p>
+            <ChartSummary
+              form={form}
+              result={result}
+              lang={lang}
+              onResetDetails={() => setResult(null)}
+              onPrintReport={() => handlePrintReport("all")}
+            />
 
-              {/* Core Panchang Pills */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: 18 }}>
-                {[
-                  { label: t.pills.lagna, val: result.lagna, icon: "👑" },
-                  { label: t.pills.rashi, val: result.rashi, icon: "🌙" },
-                  { label: t.pills.nakshatra, val: result.nakshatra, icon: "⭐" },
-                  { label: t.pills.tithi, val: result.tithi, icon: "🌕" },
-                  { label: t.pills.yoga, val: result.yoga, icon: "⚡" },
-                ].map((item, i) => (
-                  <div key={i} style={{ background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 12, padding: "10px 16px", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 18 }}>{item.icon}</span>
-                    <div style={{ textAlign: "left" }}>
-                      <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 600 }}>{item.label}</div>
-                      <div style={{ fontSize: 15, color: "#FDE68A", fontWeight: 800 }}>{item.val}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Top 3 Plain-Language Executive Key Insights */}
+            <KeyInsights
+              result={result}
+              lang={lang}
+              onSelectTopic={handleSelectTab}
+            />
 
-            {/* ── AT-A-GLANCE EXECUTIVE COSMIC SUMMARY (Progressive Disclosure) ── */}
-            <div
-              className="glass-card no-print"
-              style={{
-                padding: "26px 28px",
-                marginBottom: 24,
-                background: "linear-gradient(135deg, rgba(32, 19, 58, 0.95), rgba(15, 10, 32, 0.98))",
-                border: "1.5px solid rgba(245, 158, 11, 0.5)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.5)"
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 18, borderBottom: "1px solid rgba(245, 158, 11, 0.2)", paddingBottom: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 24 }}>⚡</span>
-                  <div>
-                    <h3 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, margin: 0 }}>
-                      {hi ? "सिंहावलोकन व प्रमुख जीवन सूत्र (At-a-Glance Cosmic Snapshot)" : "At-a-Glance Executive Cosmic Snapshot"}
-                    </h3>
-                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 13, margin: "2px 0 0" }}>
-                      {hi ? "आपके संपूर्ण जीवन, सक्रिय दशा व मुख्य सामर्थ्य का त्वरित सार" : "Executive takeaways of your soul blueprint, active planetary era & primary life strengths"}
-                    </p>
-                  </div>
-                </div>
-                <span style={{ fontSize: 12, padding: "4px 12px", borderRadius: 20, background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", fontWeight: 700 }}>
-                  {hi ? "त्वरित मार्गदर्शन" : "Instant Summary"}
-                </span>
-              </div>
+            {/* Unified 4-Group Topic Navigation */}
+            <TopicNavigation
+              activeTab={tab}
+              onSelectTab={handleSelectTab}
+              lang={lang}
+            />
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-                {/* Card 1: Core Identity & Temperament */}
-                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontSize: 20 }}>👑</span>
-                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
-                        {hi ? "आत्मबल व स्वभाव" : "Soul Nature & Temperament"}
-                      </span>
-                    </div>
-                    <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                      {hi
-                        ? `आपका लग्न ${result.lagna} एवं चंद्र राशि ${result.rashi} है। नक्षत्र ${result.nakshatra} आपको गहन अंतर्दृष्टि और स्वभाव में दृढ़ संकल्प प्रदान करता है।`
-                        : `Ascendant in ${result.lagna} with Moon in ${result.rashi}. ${result.nakshatra} Nakshatra confers strategic intuition, dignified perseverance, and enduring resolve.`}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleSelectTab("chart")}
-                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
-                  >
-                    <span>{hi ? "लग्न चक्र देखें" : "Explore Birth Chart"}</span> →
-                  </button>
-                </div>
-
-                {/* Card 2: Current Active Planetary Phase */}
-                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontSize: 20 }}>⏳</span>
-                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
-                        {hi ? "सक्रिय महादशा काल" : "Current Active Era"}
-                      </span>
-                    </div>
-                    <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
-                      {(() => {
-                        const activeMaha = result.detailedDashas?.activeMahadasha || result.dashaDetails?.activeMahadasha;
-                        const activeAntar = result.detailedDashas?.currentActiveAntardasha || result.dashaDetails?.currentActiveAntardasha;
-                        if (activeMaha && activeMaha.lord) {
-                          return hi
-                            ? `वर्तमान में ${activeMaha.lord} की महादशा (${activeMaha.startYear}–${activeMaha.endYear}) चल रही है${activeAntar ? ` (अंतर्दशा: ${activeAntar.antardashaLord})` : ""}। यह काल आपके कर्म व आत्मोन्नति को दिशा दे रहा है।`
-                            : `Currently navigating ${activeMaha.lord} Mahadasha (${activeMaha.startYear}–${activeMaha.endYear})${activeAntar ? ` with ${activeAntar.antardashaLord} Antardasha` : ""}, catalyzing transformative personal and professional milestones.`;
-                        }
-                        return hi
-                          ? `आपकी विंशोत्तरी दशा का वर्तमान चरण महत्वपूर्ण जीवन परिवर्तनों का संकेत दे रहा है।`
-                          : `Your active Vimshottari planetary era is driving key personal breakthroughs.`;
-                      })()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleSelectTab("predictions")}
-                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
-                  >
-                    <span>{hi ? "दशा समय-सारिणी देखें" : "View Dasha Timeline"}</span> →
-                  </button>
-                </div>
-
-                {/* Card 3: Top Planetary Yogas */}
-                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                      <span style={{ fontSize: 20 }}>🌟</span>
-                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
-                        {hi ? "प्रमुख शुभ योग" : "Key Auspicious Formations"}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "6px 0 8px" }}>
-                      {(result.detectedYogas || ["Gajakesari Yoga", "Raj Yoga", "Budhaditya Yoga"]).slice(0, 2).map((y, yIdx) => {
-                        const yName = typeof y === "string" ? y.split(":")[0].replace(/[🌟⚡✨💰🔥]/g, "").trim() : "Raj Yoga";
-                        return (
-                          <span key={yIdx} style={{ fontSize: 11.5, background: "rgba(245, 158, 11, 0.18)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "3px 8px", borderRadius: 8, fontWeight: 700 }}>
-                            ✨ {yName}
-                          </span>
-                        );
-                      })}
-                    </div>
-                    <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12.5, lineHeight: 1.5, margin: 0 }}>
-                      {hi ? "कुंडली में केंद्र व त्रिकोण के शुभ संबंध निरंतर सम्मान व आर्थिक सुरक्षा प्रदान करते हैं।" : "Fortunate Kendra-Trikona harmonies protect reputation and foster steady prosperity."}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleSelectTab("doshas")}
-                    style={{ marginTop: 12, background: "transparent", border: "none", color: "#F59E0B", fontSize: 12.5, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4, padding: 0 }}
-                  >
-                    <span>{hi ? "योग व दोष विश्लेषण" : "Explore All Yogas"}</span> →
-                  </button>
-                </div>
-
-                {/* Card 4: Recommended Focus Areas */}
-                <div style={{ background: "rgba(11, 8, 25, 0.75)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontSize: 20 }}>🧭</span>
-                      <span style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
-                        {hi ? "अनुशंसित प्राथमिकताएं" : "Recommended Focus"}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      <button
-                        onClick={() => handleSelectTab("careerTiming")}
-                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                      >
-                        <span>💼 {hi ? "करियर व पदोन्नति खिड़की" : "Career & Job Promotion"}</span>
-                        <span style={{ color: "#F59E0B" }}>→</span>
-                      </button>
-                      <button
-                        onClick={() => handleSelectTab("marriageTiming")}
-                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                      >
-                        <span>💍 {hi ? "विवाह काल व जीवनसाथी" : "Marriage & Soulmate Window"}</span>
-                        <span style={{ color: "#F59E0B" }}>→</span>
-                      </button>
-                      <button
-                        onClick={() => handleSelectTab("lifeProblems")}
-                        style={{ textAlign: "left", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(212, 175, 55, 0.2)", borderRadius: 8, padding: "6px 10px", color: "rgba(241,231,208,0.9)", fontSize: 12.5, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                      >
-                        <span>🛡️ {hi ? "वैदिक उपाय व रत्न सुझाव" : "Remedies & Gemstones"}</span>
-                        <span style={{ color: "#F59E0B" }}>→</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Dedicated Grand Emotional Dakshina Card (Highest Visibility) */}
-            {renderDakshinaCard(false)}
-
-            {/* 50-Page Deluxe Report Banner — 100% Free */}
-            <div className="glass-card" style={{ padding: "22px 28px", marginBottom: 24, background: "linear-gradient(135deg, rgba(35,22,65,0.95), rgba(18,12,38,0.98))", border: "1.5px solid rgba(245,158,11,0.5)", borderRadius: 14, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
-              <div>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(16,185,129,0.18)", border: "1px solid rgba(16,185,129,0.45)", borderRadius: 12, padding: "4px 12px", color: "#34D399", fontSize: 12, fontWeight: 800, marginBottom: 6 }}>
-                  <span>✓</span> {hi ? "100% निःशुल्क महा-रिपोर्ट अनलॉक" : "100% FREE DELUXE REPORT UNLOCKED"}
-                </div>
-                <h4 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800 }}>
-                  {hi ? "सम्पूर्ण 50+ पृष्ठ महा-कुंडली व जीवन दर्शन PDF (निःशुल्क डाउनलोड)" : "Complete 50+ Page Deluxe Kundli Dossier PDF (100% Free)"}
-                </h4>
-                <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, margin: "4px 0 0" }}>
-                  {hi ? "दशा चक्र, साढ़ेसाती काल, करियर प्रोमोशन, विवाह योग एवं सम्पूर्ण लाल किताब उपाय।" : "Full planetary dasha timelines, Sade Sati phases, career windows & remedial shields."}
-                </p>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <button
-                  onClick={() => handlePrintReport("all")}
-                  className="gold-cta-btn"
-                  style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", border: "none", color: "#0F0A1E", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(245,158,11,0.4)", display: "inline-flex", alignItems: "center", gap: 8 }}
-                >
-                  <span>📥</span> {hi ? "50-पेज PDF डाउनलोड करें (निःशुल्क)" : "Download Complete 50-Page PDF (FREE)"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveCheckout({
-                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                    priceKey: "dakshina",
-                    price: PRODUCT_PRICES.dakshina[currency],
-                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                    icon: "🪷",
-                    isDakshina: true
-                  })}
-                  style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "11px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
-                >
-                  <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
-                </button>
-              </div>
-            </div>
-
-            {/* ── STREAMLINED 4-PILLAR ASTROLOGICAL NAVIGATION (Prevents Overwhelm) ── */}
-            <div className="tab-bar-nav no-print" style={{ marginBottom: 28 }}>
-              
-              {/* Category Pillar Selector Cards */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-                gap: 12,
-                marginBottom: 20
-              }}>
-                {TAB_PILLARS.map(pillar => {
-                  const isPillarActive = tabCategoryFilter === pillar.id;
-                  const containsCurrentTab = pillar.tabIds.includes(tab);
-                  return (
-                    <button
-                      key={pillar.id}
-                      type="button"
-                      onClick={() => {
-                        setTabCategoryFilter(pillar.id);
-                        if (pillar.id !== "all" && !pillar.tabIds.includes(tab)) {
-                          handleSelectTab(pillar.tabIds[0]);
-                        }
-                      }}
-                      style={{
-                        padding: "14px 16px",
-                        borderRadius: 16,
-                        cursor: "pointer",
-                        textAlign: "left",
-                        background: isPillarActive
-                          ? "linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(180, 83, 9, 0.16))"
-                          : containsCurrentTab
-                          ? "rgba(245, 158, 11, 0.08)"
-                          : "rgba(22, 15, 42, 0.65)",
-                        border: isPillarActive
-                          ? "2px solid #F59E0B"
-                          : containsCurrentTab
-                          ? "1px solid rgba(245, 158, 11, 0.4)"
-                          : "1px solid rgba(212, 175, 55, 0.2)",
-                        boxShadow: isPillarActive
-                          ? "0 6px 20px rgba(245, 158, 11, 0.25)"
-                          : "0 2px 8px rgba(0, 0, 0, 0.2)",
-                        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                        position: "relative",
-                        overflow: "hidden"
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                        <span style={{ fontSize: 22 }}>{pillar.icon}</span>
-                        <span style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          padding: "2px 8px",
-                          borderRadius: 10,
-                          background: isPillarActive ? "rgba(245, 158, 11, 0.3)" : "rgba(255, 255, 255, 0.08)",
-                          color: isPillarActive ? "#FDE68A" : "rgba(241, 231, 208, 0.7)",
-                          border: isPillarActive ? "1px solid rgba(245, 158, 11, 0.5)" : "1px solid rgba(255, 255, 255, 0.05)"
-                        }}>
-                          {pillar.tabIds.length} {hi ? "अनुभाग" : "Sections"}
-                        </span>
-                      </div>
-                      <div style={{
-                        fontSize: 14.5,
-                        fontWeight: 800,
-                        color: isPillarActive ? "#FDE68A" : "#FFFFFF",
-                        letterSpacing: 0.3,
-                        marginBottom: 3
-                      }}>
-                        {hi ? pillar.labelHi : pillar.labelEn}
-                      </div>
-                      <div style={{
-                        fontSize: 12,
-                        color: isPillarActive ? "rgba(253, 230, 138, 0.85)" : "rgba(241, 231, 208, 0.6)",
-                        lineHeight: 1.35,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis"
-                      }}>
-                        {hi ? pillar.descHi : pillar.descEn}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Active Pillar's Focused Tab Selector Container */}
-              {(() => {
-                const currentPillar = TAB_PILLARS.find(p => p.id === tabCategoryFilter) || TAB_PILLARS[0];
-                const displayedTabIds = currentPillar.tabIds;
-                return (
-                  <div
-                    style={{
-                      background: "rgba(18, 12, 36, 0.85)",
-                      border: "1.5px solid rgba(245, 158, 11, 0.35)",
-                      borderRadius: 18,
-                      padding: "16px 20px",
-                      boxShadow: "0 8px 30px rgba(0,0,0,0.4)"
-                    }}
-                  >
-                    <div style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      gap: 10,
-                      marginBottom: 14,
-                      paddingBottom: 10,
-                      borderBottom: "1px solid rgba(245, 158, 11, 0.2)"
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontSize: 20 }}>{currentPillar.icon}</span>
-                        <div>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: "#FDE68A", letterSpacing: 0.5 }}>
-                            {hi ? currentPillar.labelHi : currentPillar.labelEn}
-                          </span>
-                          <span style={{ fontSize: 13, color: "rgba(241, 231, 208, 0.7)", marginLeft: 8 }}>
-                            • {hi ? currentPillar.descHi : currentPillar.descEn}
-                          </span>
-                        </div>
-                      </div>
-                      <span style={{
-                        fontSize: 12,
-                        padding: "4px 12px",
-                        borderRadius: 14,
-                        background: "rgba(245, 158, 11, 0.18)",
-                        border: "1px solid rgba(245, 158, 11, 0.4)",
-                        color: "#FDE68A",
-                        fontWeight: 700
-                      }}>
-                        {hi ? `प्रदर्शित: ${displayedTabIds.length} अनुभाग` : `Showing: ${displayedTabIds.length} Tools`}
-                      </span>
-                    </div>
-
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-start" }}>
-                      {displayedTabIds.map(tabId => {
-                        const tabItem = TABS.find(t => t.id === tabId);
-                        if (!tabItem) return null;
-                        const isActive = tab === tabItem.id;
-                        return (
-                          <button
-                            key={tabItem.id}
-                            type="button"
-                            onClick={() => handleSelectTab(tabItem.id)}
-                            className={`tab-btn ${isActive ? "active" : ""}`}
-                            style={{
-                              fontSize: 14,
-                              padding: "10px 18px",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 8,
-                              borderRadius: 12,
-                              transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                              background: isActive
-                                ? "linear-gradient(135deg, #F59E0B, #D97706)"
-                                : "rgba(26, 18, 48, 0.75)",
-                              color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.95)",
-                              border: isActive ? "1.5px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.28)",
-                              fontWeight: isActive ? 800 : 600,
-                              boxShadow: isActive ? "0 4px 16px rgba(245, 158, 11, 0.45)" : "none",
-                              cursor: "pointer"
-                            }}
-                          >
-                            <span style={{ display: "inline-flex", alignItems: "center" }}>
-                              {(() => {
-                                const TabIcon = Icons[tabItem.iconName];
-                                return TabIcon ? <TabIcon size={16} color={isActive ? "#0F0A1E" : "#FDE68A"} /> : tabItem.icon;
-                              })()}
-                            </span>
-                            <span>{hi ? tabItem.labelHi : tabItem.labelEn}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-
-            </div>
-            
             <div id="active-tab-viewport" style={{ scrollMarginTop: 100 }}></div>
-
-            {/* ── TAB 1: CHART & SHODASHVARGA DIVISIONAL CHARTS ── */}
+{/* ── TAB 1: CHART & SHODASHVARGA DIVISIONAL CHARTS ── */}
             {tab === "chart" && (() => {
               const activeDivisionalList = result.shodashvargaList || [
                 { id: "D1", nameEn: "D1 Rashi", nameHi: "डी-१ लग्न कुंडली", descEn: "Physical body, vitality, and primary life destiny", descHi: "शारीरिक ऊर्जा, व्यक्तित्व व संपूर्ण जीवन की दिशा" },
@@ -8791,84 +8020,7 @@ export default function App() {
               );
             })()}
 
-            {/* ── STICKY QUICK-JUMP FLOATING DOCK (With Auto-Hide on Scroll & Minimize Toggle) ── */}
-            {isJumpBarCollapsed ? (
-              <button
-                type="button"
-                onClick={() => setIsJumpBarCollapsed(false)}
-                className="sticky-jump-collapsed-trigger no-print"
-                title={hi ? "त्वरित नेविगेशन खोलें" : "Open quick jump navigation"}
-                aria-label="Open quick jump navigation"
-              >
-                <span>🧭</span>
-                <span>{hi ? "नेविगेशन" : "Jump"}</span>
-              </button>
-            ) : (
-              <div
-                className={`sticky-jump-bar no-print ${isScrollingDown ? "hidden-on-scroll" : ""}`}
-                role="navigation"
-                aria-label="Quick jump"
-              >
-                <span style={{ fontSize: 11, fontWeight: 800, color: "#F59E0B", padding: "0 6px", textTransform: "uppercase", letterSpacing: 0.5, borderRight: "1px solid rgba(245, 158, 11, 0.3)" }}>
-                  {hi ? "त्वरित" : "Jump"}
-                </span>
-                {TAB_PILLARS.filter(p => p.id !== "all").map(p => {
-                  const isActive = tabCategoryFilter === p.id || p.tabIds.includes(tab);
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => {
-                        setTabCategoryFilter(p.id);
-                        if (!p.tabIds.includes(tab)) {
-                          handleSelectTab(p.tabIds[0]);
-                        } else {
-                          const el = document.getElementById("active-tab-viewport");
-                          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }
-                      }}
-                      className="sticky-jump-btn"
-                      style={{
-                        background: isActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "transparent",
-                        color: isActive ? "#0F0A1E" : "rgba(241, 231, 208, 0.9)",
-                        fontWeight: isActive ? 800 : 600,
-                        boxShadow: isActive ? "0 2px 10px rgba(245, 158, 11, 0.4)" : "none"
-                      }}
-                    >
-                      <span>{p.icon}</span>
-                      <span>{hi ? p.labelHi.split(" ")[0] : p.labelEn.split(" ")[0]}</span>
-                    </button>
-                  );
-                })}
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="sticky-jump-btn"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.08)",
-                    color: "#FDE68A",
-                    border: "1px solid rgba(245, 158, 11, 0.3)"
-                  }}
-                  title={hi ? "ऊपर जाएं" : "Back to Top"}
-                >
-                  <span>⬆</span>
-                  <span>{hi ? "शीर्ष" : "Top"}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsJumpBarCollapsed(true)}
-                  className="sticky-jump-toggle-btn"
-                  title={hi ? "नेविगेशन डॉक छुपाएं" : "Minimize navigation"}
-                  aria-label="Minimize navigation"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-
-          </div>
+            </div>
         )}
 
         {/* ══════════════════════════════════════════════════════════════════════
@@ -9394,257 +8546,13 @@ export default function App() {
         {/* Vedic Knowledge & FAQ Accordion for Screen Results */}
         {result && renderFaqSection()}
 
-        {/* ── INSTITUTIONAL MULTI-COLUMN LUXURY FOOTER ── */}
-        <footer
-          className="no-print"
-          style={{
-            marginTop: 56,
-            background: "linear-gradient(180deg, rgba(18, 11, 38, 0.85) 0%, rgba(10, 6, 22, 0.98) 100%)",
-            border: "1px solid rgba(212, 175, 55, 0.25)",
-            borderRadius: 20,
-            padding: "40px 32px 28px",
-            boxShadow: "0 12px 40px rgba(0, 0, 0, 0.5)",
-            color: "rgba(241, 231, 208, 0.85)"
-          }}
-        >
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32, marginBottom: 36, textAlign: "left" }}>
-            
-            {/* Column 1: Brand & Sacred Heritage */}
-            <div>
-              <div
-                onClick={handleSecretTrigger}
-                style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", userSelect: "none", marginBottom: 14 }}
-                title="Click 3 times for Admin VIP Portal"
-              >
-                <img
-                  src="/logo.webp"
-                  alt="Jyotish Paramarsh Logo"
-                  width="44"
-                  height="44"
-                  style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid rgba(245,158,11,0.7)", boxShadow: "0 0 14px rgba(245,158,11,0.3)" }}
-                />
-                <div>
-                  <div style={{ fontFamily: "'Cinzel', serif", fontSize: 16, fontWeight: 800, color: "#F3D37A", letterSpacing: 1.5 }}>
-                    JYOTISH PARAMARSH
-                  </div>
-                  <div style={{ fontSize: 11, color: "rgba(243, 211, 122, 0.85)", letterSpacing: 0.5, fontWeight: 600 }}>
-                    {hi ? "प्रामाणिक वैदिक ज्योतिष संस्थान" : "AUTHENTIC PARASHARI VEDIC PLATFORM"}
-                  </div>
-                </div>
-              </div>
-              <p style={{ fontSize: 12.5, lineHeight: 1.7, color: "rgba(241, 231, 208, 0.75)", margin: "0 0 14px" }}>
-                {hi
-                  ? "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र के सिद्धांती सूत्रों एवं आधुनिक खगोलीय सूक्ष्म अयनांश पर आधारित संपूर्ण जीवन मार्गदर्शन।"
-                  : "Dedicated to the pure computational heritage of Maharishi Parashara, delivering arc-second astronomical accuracy and life clarity for every seeker."}
-              </p>
-              <div style={{ fontSize: 12, fontWeight: 800, color: "#F59E0B", letterSpacing: 1 }}>
-                ✦ {t.footer1} ✦
-              </div>
-            </div>
-
-            {/* Column 2: Vedic Engines & Calculators */}
-            <div>
-              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-                {hi ? "वैदिक गणना उपकरण" : "Calculators & Ephemeris"}
-              </h4>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9, fontSize: 12.5 }}>
-                <li>
-                  <a
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("kundli");
-                      if (result) setTab("chart");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "लग्न एवं १६ षोडशवर्ग कुंडलियां" : "Lagna & 16 Shodashvargas"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/panchang"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("panchang");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "दैनिक वैदिक पंचांग एवं चौघड़िया" : "Daily Sidereal Panchang"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/muhurat"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("muhurat");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "सर्व शुभ मुहूर्त डायरेक्टरी (2026–2027)" : "Shubh Muhurat Timings"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/festivals"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("festivals");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "सनातन धर्म के पावन पर्व एवं व्रत" : "Hindu Festivals & Vrats"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/daily"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("daily");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "दैनिक राशिफल (१२ राशियां)" : "Daily Zodiac Horoscope"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/matchmaking"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("matchmaking");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "rgba(241,231,208,0.85)", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block" }}
-                  >
-                    ✦ {hi ? "वैदिक कुंडली मिलान (३६ गुण)" : "Ashtakoot Gun Milan (36 Pts)"}
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/tools"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigateToSection("tools");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    style={{ color: "#FDE68A", textDecoration: "none", fontSize: "inherit", textAlign: "left", display: "inline-block", fontWeight: 700 }}
-                  >
-                    ✦ {hi ? "ज्योतिषीय टूल्स एवं गणना केंद्र (२१ टूल्स)" : "Astrology Tools Suite (21 Precision Tools)"}
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3: Dossiers & Astrologer Guidance */}
-            <div>
-              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-                {hi ? "दस्तावेज़ एवं परामर्श" : "Dossiers & Guidance"}
-              </h4>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 9, fontSize: 12.5 }}>
-                <li>
-                  <span style={{ color: "#34D399", fontWeight: 700 }}>✓</span>{" "}
-                  <span style={{ color: "#FDE68A", fontWeight: 700 }}>
-                    {hi ? "50-पेज महा-कुंडली रिपोर्ट (100% FREE)" : "50-Page Deluxe Dossier (FREE)"}
-                  </span>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setMainSection("kundli"); setTab("consult"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
-                  >
-                    ✦ {hi ? "१-ऑन-१ ज्योतिषी परामर्श प्रतीक्षा सूची" : "1-on-1 Astrologer Priority Desk"}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setMainSection("kundli"); setTab("store"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
-                  >
-                    ✦ {hi ? "निर्धारित रत्न एवं रुद्राक्ष स्टोर" : "Certified Gemstones & Remedies"}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => { setMainSection("kundli"); setTab("predictions"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
-                  >
-                    ✦ {hi ? "विंशोत्तरी महादशा एवं साढ़ेसाती" : "Vimshottari Dasha & Sade Sati"}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setActiveCheckout({
-                      title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                      priceKey: "dakshina",
-                      price: PRODUCT_PRICES.dakshina[currency],
-                      desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                      icon: "🪷",
-                      isDakshina: true
-                    })}
-                    style={{ background: "none", border: "none", color: "#F59E0B", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left", fontWeight: 700 }}
-                  >
-                    🪷 {hi ? "श्रद्धा दक्षिणा अर्पित करें (Seva)" : "Offer Shraddha Dakshina"}
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 4: Trust, Security & Help Desk */}
-            <div>
-              <h4 style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 14, borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 6 }}>
-                {hi ? "सुरक्षा एवं संपर्क" : "Trust & Support"}
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399" }}>
-                  <span>🔒</span>
-                  <span>{hi ? "२५६-बिट बैंक-ग्रेड एन्क्रिप्शन" : "256-Bit Bank Grade SSL Encrypted"}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#34D399" }}>
-                  <span>🛡️</span>
-                  <span>{hi ? "१००% पूर्ण गोपनीयता गारंटी" : "100% Client-Side Privacy Guaranteed"}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#FDE68A" }}>
-                  <span>🏛️</span>
-                  <span>{hi ? "सूर्य सिद्धांत एवं पाराशरी प्रमाणित" : "Surya Siddhanta Astronomical Precision"}</span>
-                </div>
-                
-                <div style={{ borderTop: "1px solid rgba(212,175,55,0.15)", paddingTop: 10, marginTop: 4 }}>
-                  <div style={{ color: "#FDE68A", fontWeight: 700, marginBottom: 4 }}>
-                    {hi ? "आधिकारिक सहायता एवं परामर्श डेस्क:" : "Official Astrologer Help Desk:"}
-                  </div>
-                  <a
-                    href="mailto:teamjyotishparamarsh@gmail.com"
-                    style={{ color: "#F59E0B", textDecoration: "underline", fontWeight: 700, fontSize: 12.5 }}
-                  >
-                    teamjyotishparamarsh@gmail.com
-                  </a>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Bottom Copyright & Sacred Astrological Disclaimer */}
-          <div style={{ borderTop: "1px solid rgba(212,175,55,0.2)", paddingTop: 20, textAlign: "center", fontSize: 11.5, color: "rgba(241, 231, 208, 0.65)", lineHeight: 1.6 }}>
-            <div style={{ color: "rgba(243, 211, 122, 0.85)", fontWeight: 600, marginBottom: 6 }}>
-              {t.footer2}
-            </div>
-            <div>
-              {hi
-                ? "वैदिक ज्योतिष एक प्राचीन आध्यात्मिक एवं खगोलीय विद्या है। गणनाएं शास्त्रीय सूत्रों पर आधारित हैं एवं इनका उद्देश्य आत्म-जागरूकता व शुभ मार्गदर्शन प्रदान करना है। © 2026 Jyotish Paramarsh. All Rights Reserved."
-                : "Vedic astrology is an ancient metaphysical science. All algorithmic calculations are provided for spiritual enrichment and life guidance. © 2026 Jyotish Paramarsh. All Rights Reserved."}
-            </div>
-          </div>
-        </footer>
+        {/* Unified Accessible Footer */}
+        <Footer
+          lang={lang}
+          onNavigate={navigateToSection}
+          hasResult={Boolean(result)}
+          onSecretTrigger={handleSecretTrigger}
+        />
 
         {/* Floating Admin Switcher Widget (When in Admin Mode) */}
         {isAdmin && (

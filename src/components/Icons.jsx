@@ -1,6 +1,6 @@
 import React from "react";
 
-export function SvgIcon({ path, size = 16, color = "currentColor", style = {} }) {
+export function SvgIcon({ path, size = 16, color = "currentColor", style = {}, "aria-hidden": ariaHidden = true, ...props }) {
   return (
     <svg
       width={size}
@@ -11,7 +11,10 @@ export function SvgIcon({ path, size = 16, color = "currentColor", style = {} })
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden={ariaHidden}
+      focusable="false"
       style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+      {...props}
     >
       {path}
     </svg>

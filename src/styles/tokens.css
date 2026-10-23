@@ -1,0 +1,136 @@
+:root {
+  /* Core Color Palette - Warm, editorial, celestial */
+  --page: #F7F5F0;
+  --page-alt: #EFECE4;
+  --surface: #FFFFFF;
+  --surface-muted: #F3EFE8;
+  --surface-raised: #FFFFFF;
+  --ink: #25231F;
+  --ink-secondary: #524E48;
+  --ink-muted: #6B675F;
+  --ink-faint: #9E988E;
+  
+  /* Brand & Accent */
+  --brand: #6B3F25;
+  --brand-dark: #4A2B19;
+  --brand-light: #F7EFE9;
+  --accent: #B8752A;
+  --accent-hover: #9C6120;
+  --accent-light: #FDF6EE;
+  --accent-subtle: rgba(184, 117, 42, 0.12);
+  
+  /* Status */
+  --border: #E5DED2;
+  --border-strong: #CDC4B5;
+  --border-focus: #B8752A;
+  --success: #287A55;
+  --success-bg: #EAF6F0;
+  --success-border: #A3D8C0;
+  --danger: #B5473C;
+  --danger-bg: #FDF1F0;
+  --danger-border: #F1B8B3;
+  --warning: #C07018;
+  --warning-bg: #FEF7EC;
+  --warning-border: #F8D9A8;
+  --info: #2B6CB0;
+  --info-bg: #EDF5FD;
+  --info-border: #B7D7FA;
+
+  /* Typography */
+  --font-sans: 'Outfit', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Cinzel', 'Noto Serif Devanagari', Georgia, 'Times New Roman', serif;
+  
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.84375rem;  /* 13.5px */
+  --text-base: 0.96875rem;/* 15.5px */
+  --text-md: 1.0625rem;   /* 17px */
+  --text-lg: 1.25rem;     /* 20px */
+  --text-xl: 1.5rem;      /* 24px */
+  --text-2xl: 1.875rem;   /* 30px */
+  --text-3xl: 2.25rem;    /* 36px */
+  --text-4xl: 2.75rem;    /* 44px */
+
+  --leading-tight: 1.25;
+  --leading-snug: 1.4;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  /* Spacing (4px / 8px scale) */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(37, 35, 31, 0.04);
+  --shadow-sm: 0 2px 6px rgba(37, 35, 31, 0.06);
+  --shadow-md: 0 6px 18px rgba(37, 35, 31, 0.08);
+  --shadow-lg: 0 12px 32px rgba(37, 35, 31, 0.12);
+  --shadow-focus: 0 0 0 3px rgba(184, 117, 42, 0.25);
+
+  /* Layout Widths */
+  --width-container: 1140px;
+  --width-narrow: 760px;
+  --width-form: 680px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Restrained Dark Mode Theme if active */
+[data-theme="dark"] {
+  --page: #0F0C1B;
+  --page-alt: #161228;
+  --surface: #19142C;
+  --surface-muted: #201A38;
+  --surface-raised: #251F3F;
+  --ink: #F5EFE6;
+  --ink-secondary: #D4CBBD;
+  --ink-muted: #A89E90;
+  --ink-faint: #736B60;
+  
+  --brand: #E0A65A;
+  --brand-dark: #C68E46;
+  --brand-light: #2D2318;
+  --accent: #E5A344;
+  --accent-hover: #F2B55E;
+  --accent-light: #2C2114;
+  --accent-subtle: rgba(229, 163, 68, 0.18);
+  
+  --border: #2D2447;
+  --border-strong: #3D335E;
+  --border-focus: #E5A344;
+  --success: #34A873;
+  --success-bg: #12281D;
+  --success-border: #1E4F37;
+  --danger: #E06355;
+  --danger-bg: #2C1615;
+  --danger-border: #562724;
+  --warning: #E29938;
+  --warning-bg: #2B1D0E;
+  --warning-border: #563919;
+  --info: #4C94DE;
+  --info-bg: #112236;
+  --info-border: #1D436B;
+  
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
+  --shadow-focus: 0 0 0 3px rgba(229, 163, 68, 0.35);
+}

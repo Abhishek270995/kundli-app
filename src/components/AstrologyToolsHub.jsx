@@ -36,6 +36,14 @@ import {
   DASHA_ORDER
 } from "../vedicComprehensiveEngine.js";
 
+import ToolSearch from "./tools/ToolSearch";
+import ToolCategoryFilter from "./tools/ToolCategoryFilter";
+import ToolCard from "./tools/ToolCard";
+import PopularTools from "./tools/PopularTools";
+import ToolDetailHeader from "./tools/ToolDetailHeader";
+import EmptyState from "./ui/EmptyState";
+import Button from "./ui/Button";
+
 // ── TOOL DEFINITIONS (5 CATEGORIES, 21 TOOLS) ───────────────────────────
 // ── CATEGORY METADATA (5 CATEGORIES) ────────────────────────────────────
 export const TOOL_CATEGORIES = [
@@ -628,57 +636,15 @@ export default function AstrologyToolsHub({
     const dedicatedUrl = `https://www.jyotishparamash.com/astrology-tools/${activeTool.slug}`;
 
     return (
-      <div className="astrology-tool-page" style={{ minHeight: "100vh", color: "rgba(241, 231, 208, 0.95)" }}>
-        {/* Breadcrumb Navigation Bar */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(241, 231, 208, 0.8)", flexWrap: "wrap" }}>
-            <a
-              href="/"
-              onClick={(e) => { e.preventDefault(); onBackToHome(); }}
-              style={{ color: "#FDE68A", textDecoration: "none" }}
-            >
-              {isHi ? "होम" : "Home"}
-            </a>
-            <span>/</span>
-            <a
-              href="/astrology-tools"
-              onClick={handleBackToHub}
-              style={{ color: "#FDE68A", textDecoration: "none" }}
-            >
-              {isHi ? "ज्योतिषीय टूल्स" : "Astrology Tools"}
-            </a>
-            <span>/</span>
-            <span style={{ color: "#F59E0B", fontWeight: 700 }}>
-              {isHi ? categoryMeta.labelHi : categoryMeta.labelEn}
-            </span>
-            <span>/</span>
-            <span style={{ color: "#FFFFFF", fontWeight: 700 }}>
-              {isHi ? activeTool.titleHi : activeTool.titleEn}
-            </span>
-          </div>
-
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button
-              onClick={handleBackToHub}
-              style={{
-                background: "rgba(22, 15, 42, 0.85)",
-                border: "1px solid rgba(212, 175, 55, 0.35)",
-                color: "#FDE68A",
-                padding: "7px 16px",
-                borderRadius: 20,
-                fontSize: 12.5,
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                transition: "all 0.2s ease"
-              }}
-            >
-              ← {isHi ? "सभी टूल्स देखें" : "All Astrology Tools"}
-            </button>
-          </div>
-        </div>
+      <div className="astrology-tool-page" style={{ minHeight: "100vh", color: "var(--ink)" }}>
+        {/* Modern Accessible Tool Detail Header */}
+        <ToolDetailHeader
+          tool={activeTool}
+          isHi={isHi}
+          onBack={handleBackToHub}
+          onCopyUrl={() => handleCopyToolUrl(activeTool.slug)}
+          hasCopied={copiedUrl}
+        />
 
         {/* Dedicated Tool Workspace Card */}
         <div
@@ -884,253 +850,97 @@ export default function AstrologyToolsHub({
         </div>
       </div>
 
-      {/* ── HERO BANNER: EXACT VISUAL REPLICA OF THE BRAND LAYOUT ── */}
+      {/* ── HERO BANNER & SEARCH SECTION ── */}
       <div
         style={{
-          background: "linear-gradient(180deg, #0d1630 0%, #090e1f 100%)",
-          border: "1px solid rgba(212, 175, 55, 0.22)",
-          borderRadius: 22,
-          padding: "36px 32px 30px",
-          marginBottom: 32,
-          boxShadow: "0 14px 40px rgba(0, 0, 0, 0.55)",
-          position: "relative",
-          overflow: "hidden"
+          backgroundColor: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "var(--space-8) var(--space-6)",
+          marginBottom: "var(--space-8)",
+          boxShadow: "var(--shadow-sm)"
         }}
       >
-        <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-
-        {/* Brand Tag */}
-        <div style={{ color: "#D4AF37", fontSize: 11.5, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>
+        <div style={{ color: "var(--accent)", fontSize: "var(--text-xs)", fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", marginBottom: "var(--space-2)" }}>
           JYOTISH PARAMARSH
         </div>
 
-        {/* Main Heading */}
-        <h1 style={{ color: "#F8FAFC", fontSize: "clamp(24px, 3.6vw, 36px)", fontWeight: 800, margin: "0 0 10px", lineHeight: 1.25 }}>
+        <h1 style={{ color: "var(--ink)", fontSize: "clamp(1.75rem, 3.6vw, var(--text-3xl))", fontWeight: 800, margin: "0 0 var(--space-2) 0", lineHeight: 1.25 }}>
           {isHi ? "हर प्रश्न के लिए ज्योतिषीय टूल्स" : "Astrology Tools for Every Question"}
         </h1>
 
-        {/* Subtitle */}
-        <p style={{ color: "#94A3B8", fontSize: "15px", maxWidth: 780, margin: "0 0 24px", lineHeight: 1.6 }}>
+        <p style={{ color: "var(--ink-secondary)", fontSize: "var(--text-base)", maxWidth: 780, margin: "0 0 var(--space-6) 0", lineHeight: 1.6 }}>
           {isHi
             ? "अपनी जन्म कुंडली जानें, अंकशास्त्र को समझें एवं शुभ समय की गणना करें।"
-            : "Explore your birth chart, discover numerology, and calculate auspicious timings."}
+            : "Explore your birth chart, discover numerology, and calculate auspicious timings across 21 specialized calculators."}
         </p>
 
-        {/* Search Bar matching screenshot */}
-        <div style={{ position: "relative", marginBottom: 28 }}>
-          <span style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#94A3B8" }}>🔍</span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => {
-              setSearchQuery(e.target.value);
-              if (selectedCategory !== "all") setSelectedCategory("all");
-            }}
-            placeholder={isHi ? "ज्योतिषीय टूल्स खोजें... (उदा. विंशोत्तरी, केपी, नाम अंकशास्त्र, चौघड़िया)" : "Search astrology tools..."}
-            style={{
-              width: "100%",
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.12)",
-              borderRadius: 12,
-              padding: "14px 18px 14px 46px",
-              color: "#F8FAFC",
-              fontSize: 15,
-              outline: "none",
-              boxSizing: "border-box",
-              transition: "border-color 0.2s ease"
-            }}
-            onFocus={e => e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.6)"}
-            onBlur={e => e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.12)"}
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 13 }}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Category Cards Grid matching screenshot */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 14 }}>
-          {CATEGORY_CARDS.map(cat => {
-            const isCatActive = selectedCategory === cat.id;
-            return (
-              <div
-                key={cat.id}
-                onClick={() => handleCategoryCardClick(cat.id)}
-                style={{
-                  background: isCatActive ? "rgba(245, 158, 11, 0.08)" : "rgba(255, 255, 255, 0.03)",
-                  border: isCatActive ? "1.5px solid #F59E0B" : "1px solid rgba(255, 255, 255, 0.08)",
-                  borderRadius: 14,
-                  padding: "22px 22px 18px",
-                  cursor: "pointer",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  minHeight: 130,
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.5)";
-                  e.currentTarget.style.transform = "translateY(-3px)";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = isCatActive ? "#F59E0B" : "rgba(255, 255, 255, 0.08)";
-                  e.currentTarget.style.transform = "none";
-                  e.currentTarget.style.background = isCatActive ? "rgba(245, 158, 11, 0.08)" : "rgba(255, 255, 255, 0.03)";
-                }}
-              >
-                <div>
-                  <div style={{ marginBottom: 12 }}>
-                    {cat.icon}
-                  </div>
-                  <h3 style={{ color: "#F8FAFC", fontSize: 18, fontWeight: 700, margin: "0 0 6px" }}>
-                    {isHi ? cat.titleHi : cat.titleEn}
-                  </h3>
-                  <p style={{ color: "#94A3B8", fontSize: 13.5, margin: 0, lineHeight: 1.4 }}>
-                    {isHi ? cat.subtitleHi : cat.subtitleEn}
-                  </p>
-                </div>
-
-                <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 6, color: "#D4AF37", fontSize: 13, fontWeight: 600 }}>
-                  <span>{isHi ? "टूल्स देखें" : "Explore tools"}</span>
-                  <span>→</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Concept Preview Caption */}
-        <div style={{ color: "rgba(148, 163, 184, 0.65)", fontSize: 11.5, fontStyle: "italic", textAlign: "left", marginTop: 12 }}>
-          {isHi
-            ? "वैदिक ज्योतिष एवं कृष्णमूर्ति पद्धति (KP) के प्रामाणिक सिद्धांतों पर आधारित गणनाएं।"
-            : "Concept preview for your existing midnight-blue and antique-gold brand direction. Certified Vedic calculations."}
-        </div>
+        {/* Visible Accessible Search Input */}
+        <ToolSearch
+          query={searchQuery}
+          onQueryChange={(val) => {
+            setSearchQuery(val);
+            if (selectedCategory !== "all") setSelectedCategory("all");
+          }}
+          isHi={isHi}
+        />
       </div>
 
+      {/* ── POPULAR SHORTCUTS (MAX 4 TOOLS) ── */}
+      {!searchQuery && selectedCategory === "all" && (
+        <PopularTools
+          tools={TOOLS_CATALOG}
+          isHi={isHi}
+          onSelect={handleSelectTool}
+        />
+      )}
+
       {/* ── 21 TOOLS DIRECTORY SECTION ── */}
-      <div id="astrology-tools-directory" style={{ marginBottom: 40 }}>
-        {/* Category Pills & Quick Filter Bar */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
-          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, scrollbarWidth: "none" }}>
-            {TOOL_CATEGORIES.map(cat => {
-              const isSelected = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  style={{
-                    background: isSelected
-                      ? "linear-gradient(135deg, #F59E0B, #D97706)"
-                      : "rgba(22, 15, 42, 0.85)",
-                    color: isSelected ? "#0F0A1E" : "#FDE68A",
-                    border: isSelected ? "1px solid #F59E0B" : "1px solid rgba(212, 175, 55, 0.28)",
-                    borderRadius: 22,
-                    padding: "7px 15px",
-                    fontSize: 12.5,
-                    fontWeight: isSelected ? 800 : 600,
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    boxShadow: isSelected ? "0 4px 14px rgba(245, 158, 11, 0.35)" : "none",
-                    transition: "all 0.2s ease"
-                  }}
-                >
-                  <span>{cat.icon}</span>
-                  <span>{isHi ? cat.labelHi : cat.labelEn}</span>
-                </button>
-              );
-            })}
+      <div id="astrology-tools-directory" style={{ marginBottom: "var(--space-10)" }}>
+        {/* Category Filter Pills & Matching Count */}
+        <ToolCategoryFilter
+          categories={TOOL_CATEGORIES}
+          selectedCategory={selectedCategory}
+          onSelectCategory={setSelectedCategory}
+          isHi={isHi}
+          totalMatching={filteredTools.length}
+        />
+
+        {/* Tools Showcase Grid or Honest Empty State */}
+        {filteredTools.length > 0 ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "var(--space-4)" }}>
+            {filteredTools.map(tool => (
+              <ToolCard
+                key={tool.id}
+                tool={tool}
+                isHi={isHi}
+                onSelect={handleSelectTool}
+              />
+            ))}
           </div>
-
-          <div style={{ fontSize: 12, color: "#94A3B8" }}>
-            {isHi ? `${filteredTools.length} टूल्स उपलब्ध` : `Showing ${filteredTools.length} of 21 tools`}
-          </div>
-        </div>
-
-        {/* Tools Showcase Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-          {filteredTools.map(tool => (
-            <a
-              key={tool.id}
-              href={`/astrology-tools/${tool.slug}`}
-              onClick={(e) => handleSelectTool(tool, e)}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                textDecoration: "none",
-                color: "inherit",
-                background: "rgba(18, 12, 36, 0.88)",
-                border: "1px solid rgba(212, 175, 55, 0.25)",
-                borderRadius: 16,
-                padding: "20px 20px 16px",
-                cursor: "pointer",
-                position: "relative",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
-                transition: "all 0.2s ease"
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "#F59E0B";
-                e.currentTarget.style.transform = "translateY(-3px)";
-                e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.25)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.25)";
-                e.currentTarget.style.transform = "none";
-                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.35)";
-              }}
-            >
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                  <span style={{ fontSize: 30 }}>{tool.icon}</span>
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 800,
-                      padding: "3px 8px",
-                      borderRadius: 10,
-                      background: "rgba(255, 255, 255, 0.08)",
-                      color: "rgba(241, 231, 208, 0.8)",
-                      border: "1px solid rgba(212, 175, 55, 0.3)"
-                    }}
-                  >
-                    {tool.badge}
-                  </span>
-                </div>
-
-                <h3 style={{ color: "#F3D37A", fontSize: 16.5, fontWeight: 800, margin: "0 0 8px", lineHeight: 1.3 }}>
-                  {isHi ? tool.titleHi : tool.titleEn}
-                </h3>
-
-                <p style={{ color: "rgba(241, 231, 208, 0.8)", fontSize: 13, lineHeight: 1.5, margin: "0 0 14px" }}>
-                  {isHi ? tool.descHi : tool.descEn}
-                </p>
-              </div>
-
-              <div>
-                <div style={{ fontSize: 11, color: "rgba(148, 163, 184, 0.85)", fontFamily: "monospace", marginBottom: 10 }}>
-                  🔗 /astrology-tools/{tool.slug}
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(212, 175, 55, 0.15)", paddingTop: 10 }}>
-                  <span style={{ fontSize: 11, color: "#34D399", fontWeight: 700 }}>
-                    ✓ {isHi ? "निःशुल्क उपयोग" : "Free Engine"}
-                  </span>
-                  <span style={{ color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    {isHi ? "कैलकुलेटर खोलें →" : "Open Calculator →"}
-                  </span>
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
+        ) : (
+          <EmptyState
+            icon="🔍"
+            title={isHi ? "कोई टूल नहीं मिला" : "No calculators found"}
+            description={
+              isHi
+                ? `"${searchQuery}" के लिए कोई टूल नहीं मिला। कृपया दूसरा शब्द खोजें या फ़िल्टर रीसेट करें।`
+                : `We couldn't find any tool matching "${searchQuery}". Try a different keyword or reset your filters.`
+            }
+            action={
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                }}
+              >
+                {isHi ? "सभी २१ टूल्स देखें (रीसेट करें)" : "Reset Filters & View All 21 Tools"}
+              </Button>
+            }
+          />
+        )}
       </div>
     </div>
   );
