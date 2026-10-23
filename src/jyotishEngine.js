@@ -22,18 +22,18 @@ import {
    ZODIAC SIGNS & NAKSHATRAS
 ------------------------------------------------------------- */
 export const SIGNS = [
-  { name: "Aries", sanskrit: "Mesha", lord: "Mars", element: "Fire", symbol: "♈", varna: "Kshatriya", vashya: "Chatushpada" },
-  { name: "Taurus", sanskrit: "Vrishabha", lord: "Venus", element: "Earth", symbol: "♉", varna: "Vaishya", vashya: "Chatushpada" },
-  { name: "Gemini", sanskrit: "Mithuna", lord: "Mercury", element: "Air", symbol: "♊", varna: "Shudra", vashya: "Dwipada" },
-  { name: "Cancer", sanskrit: "Karka", lord: "Moon", element: "Water", symbol: "♋", varna: "Brahmin", vashya: "Jalachara" },
-  { name: "Leo", sanskrit: "Simha", lord: "Sun", element: "Fire", symbol: "♌", varna: "Kshatriya", vashya: "Vanachara" },
-  { name: "Virgo", sanskrit: "Kanya", lord: "Mercury", element: "Earth", symbol: "♍", varna: "Vaishya", vashya: "Dwipada" },
-  { name: "Libra", sanskrit: "Tula", lord: "Venus", element: "Air", symbol: "♎", varna: "Shudra", vashya: "Dwipada" },
-  { name: "Scorpio", sanskrit: "Vrishchika", lord: "Mars", element: "Water", symbol: "♏", varna: "Brahmin", vashya: "Keeta" },
-  { name: "Sagittarius", sanskrit: "Dhanu", lord: "Jupiter", element: "Fire", symbol: "♐", varna: "Kshatriya", vashya: "Dwipada" },
-  { name: "Capricorn", sanskrit: "Makara", lord: "Saturn", element: "Earth", symbol: "♑", varna: "Vaishya", vashya: "Jalachara" },
-  { name: "Aquarius", sanskrit: "Kumbha", lord: "Saturn", element: "Air", symbol: "♒", varna: "Shudra", vashya: "Dwipada" },
-  { name: "Pisces", sanskrit: "Meena", lord: "Jupiter", element: "Water", symbol: "♓", varna: "Brahmin", vashya: "Jalachara" }
+  { name: "Aries", sanskrit: "Mesha", nameHi: "मेष", lord: "Mars", element: "Fire", symbol: "♈", varna: "Kshatriya", vashya: "Chatushpada" },
+  { name: "Taurus", sanskrit: "Vrishabha", nameHi: "वृषभ", lord: "Venus", element: "Earth", symbol: "♉", varna: "Vaishya", vashya: "Chatushpada" },
+  { name: "Gemini", sanskrit: "Mithuna", nameHi: "मिथुन", lord: "Mercury", element: "Air", symbol: "♊", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Cancer", sanskrit: "Karka", nameHi: "कर्क", lord: "Moon", element: "Water", symbol: "♋", varna: "Brahmin", vashya: "Jalachara" },
+  { name: "Leo", sanskrit: "Simha", nameHi: "सिंह", lord: "Sun", element: "Fire", symbol: "♌", varna: "Kshatriya", vashya: "Vanachara" },
+  { name: "Virgo", sanskrit: "Kanya", nameHi: "कन्या", lord: "Mercury", element: "Earth", symbol: "♍", varna: "Vaishya", vashya: "Dwipada" },
+  { name: "Libra", sanskrit: "Tula", nameHi: "तुला", lord: "Venus", element: "Air", symbol: "♎", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Scorpio", sanskrit: "Vrishchika", nameHi: "वृश्चिक", lord: "Mars", element: "Water", symbol: "♏", varna: "Brahmin", vashya: "Keeta" },
+  { name: "Sagittarius", sanskrit: "Dhanu", nameHi: "धनु", lord: "Jupiter", element: "Fire", symbol: "♐", varna: "Kshatriya", vashya: "Dwipada" },
+  { name: "Capricorn", sanskrit: "Makara", nameHi: "मकर", lord: "Saturn", element: "Earth", symbol: "♑", varna: "Vaishya", vashya: "Jalachara" },
+  { name: "Aquarius", sanskrit: "Kumbha", nameHi: "कुंभ", lord: "Saturn", element: "Air", symbol: "♒", varna: "Shudra", vashya: "Dwipada" },
+  { name: "Pisces", sanskrit: "Meena", nameHi: "मीन", lord: "Jupiter", element: "Water", symbol: "♓", varna: "Brahmin", vashya: "Jalachara" }
 ];
 
 export const NAKSHATRAS = [

@@ -33,7 +33,8 @@ import {
   calculateSarvashtakavarga,
   calculateCurrentGochara,
   VIMSHOTTARI_YEARS,
-  DASHA_ORDER
+  DASHA_ORDER,
+  SHODASHVARGA_LIST
 } from "../vedicComprehensiveEngine.js";
 
 // ── TOOL DEFINITIONS (5 CATEGORIES, 21 TOOLS) ───────────────────────────
@@ -1319,66 +1320,475 @@ function VimshottariTool({ userData, setUserData, corePlanets, lang, isHi }) {
 }
 
 /** 2. DIVISIONAL CHARTS (VARGAS) TOOL **/
-function DivisionalChartTool({ userData, corePlanets, ascendantDegree, selectedDivisionalChart, setSelectedDivisionalChart, isHi }) {
-  const VARGA_OPTIONS = [
-    { id: "D1", nameEn: "D1 Rashi Chart (Physical Manifestation)", nameHi: "D1 लग्न कुंडली (स्थूल शरीर व व्यक्तित्व)" },
-    { id: "D9", nameEn: "D9 Navamsha (Dharma, Spouse & Soul Purpose)", nameHi: "D9 नवमांश चक्र (विवाह, भाग्य व धर्म)" },
-    { id: "D10", nameEn: "D10 Dashamsha (Career, Profession & Social Status)", nameHi: "D10 दशमांश चक्र (करियर, आजीविका व प्रतिष्ठा)" },
-    { id: "D7", nameEn: "D7 Saptamsha (Children & Creative Progeny)", nameHi: "D7 सप्तमांश चक्र (संतान सुख व वंश वृद्धि)" },
-    { id: "D12", nameEn: "D12 Dwadashamsha (Parents, Ancestry & Lineage)", nameHi: "D12 द्वादशांश चक्र (माता-पिता व पूर्वज संस्कार)" },
-    { id: "D60", nameEn: "D60 Shashtiamsha (Past Life Karma & Core Destiny)", nameHi: "D60 षष्ट्यंश चक्र (पूर्व जन्म के सूक्ष्म कर्म)" }
+
+function NorthIndianVargaChart({ houses, lang, hoveredHouse, setHoveredHouse, activeChartId, chartMeta }) {
+  const SIZE = 440;
+  const PAD = 16;
+  const W = SIZE - 2 * PAD;
+  const xc = SIZE / 2;
+  const yc = SIZE / 2;
+  const x0 = PAD;
+  const y0 = PAD;
+  const x1 = SIZE - PAD;
+  const y1 = SIZE - PAD;
+
+  const houseLayout = [
+    { n: 1,  cx: xc,            cy: y0 + W * 0.22, isLagna: true, path: `${xc},${y0} ${x1 - W*0.25},${y0 + W*0.25} ${xc},${yc} ${x0 + W*0.25},${y0 + W*0.25}` },
+    { n: 2,  cx: x0 + W * 0.24, cy: y0 + W * 0.12, path: `${x0},${y0} ${xc},${y0} ${x0 + W*0.25},${y0 + W*0.25}` },
+    { n: 3,  cx: x0 + W * 0.12, cy: y0 + W * 0.24, path: `${x0},${y0} ${x0},${yc} ${x0 + W*0.25},${y0 + W*0.25}` },
+    { n: 4,  cx: x0 + W * 0.22, cy: yc,            path: `${x0},${yc} ${x0 + W*0.25},${y0 + W*0.25} ${xc},${yc} ${x0 + W*0.25},${y1 - W*0.25}` },
+    { n: 5,  cx: x0 + W * 0.12, cy: y1 - W * 0.24, path: `${x0},${y1} ${x0},${yc} ${x0 + W*0.25},${y1 - W*0.25}` },
+    { n: 6,  cx: x0 + W * 0.24, cy: y1 - W * 0.12, path: `${x0},${y1} ${xc},${y1} ${x0 + W*0.25},${y1 - W*0.25}` },
+    { n: 7,  cx: xc,            cy: y1 - W * 0.22, path: `${xc},${y1} ${x0 + W*0.25},${y1 - W*0.25} ${xc},${yc} ${x1 - W*0.25},${y1 - W*0.25}` },
+    { n: 8,  cx: x1 - W * 0.24, cy: y1 - W * 0.12, path: `${x1},${y1} ${xc},${y1} ${x1 - W*0.25},${y1 - W*0.25}` },
+    { n: 9,  cx: x1 - W * 0.12, cy: y1 - W * 0.24, path: `${x1},${y1} ${x1},${yc} ${x1 - W*0.25},${y1 - W*0.25}` },
+    { n: 10, cx: x1 - W * 0.22, cy: yc,            path: `${x1},${yc} ${x1 - W*0.25},${y0 + W*0.25} ${xc},${yc} ${x1 - W*0.25},${y1 - W*0.25}` },
+    { n: 11, cx: x1 - W * 0.12, cy: y0 + W * 0.24, path: `${x1},${y0} ${x1},${yc} ${x1 - W*0.25},${y0 + W*0.25}` },
+    { n: 12, cx: x1 - W * 0.24, cy: y0 + W * 0.12, path: `${x1},${y0} ${xc},${y0} ${x1 - W*0.25},${y0 + W*0.25}` },
   ];
 
-  // Convert corePlanets object to array format
-  const planetList = Object.entries(corePlanets || {}).map(([name, lon]) => ({
-    name,
-    longitude: typeof lon === "number" ? lon : (lon?.longitude || 0),
-    degree: typeof lon === "number" ? lon : (lon?.degree || 0)
-  }));
+  const PLANET_ABBR = {
+    Sun: { en: "Su", hi: "सू", color: "#F59E0B" },
+    Moon: { en: "Mo", hi: "चं", color: "#E0E7FF" },
+    Mars: { en: "Ma", hi: "मं", color: "#EF4444" },
+    Mercury: { en: "Me", hi: "बु", color: "#34D399" },
+    Jupiter: { en: "Ju", hi: "गु", color: "#FBBF24" },
+    Venus: { en: "Ve", hi: "शु", color: "#F472B6" },
+    Saturn: { en: "Sa", hi: "श", color: "#60A5FA" },
+    Rahu: { en: "Ra", hi: "रा", color: "#A78BFA" },
+    Ketu: { en: "Ke", hi: "के", color: "#F87171" }
+  };
 
-  const vargaData = buildDivisionalChartData(planetList, ascendantDegree, selectedDivisionalChart);
+  const getSignNumber = (signName) => {
+    const idx = SIGNS.findIndex(s => s.name === signName || s.sanskrit === signName);
+    return idx >= 0 ? idx + 1 : "";
+  };
+
+  return (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} style={{ width: "100%", maxWidth: 440, height: "auto", display: "block", margin: "0 auto" }}>
+      <defs>
+        <radialGradient id="vargaKundliGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#1E1438" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#0A0614" stopOpacity="0.98" />
+        </radialGradient>
+      </defs>
+
+      <rect width={SIZE} height={SIZE} fill="url(#vargaKundliGlow)" rx="16" stroke="rgba(212,175,55,0.4)" strokeWidth="1.5" />
+
+      {/* House Polygons */}
+      {houseLayout.map(({ n, path }) => (
+        <polygon
+          key={`poly-${n}`}
+          points={path}
+          fill={hoveredHouse === n ? "rgba(245, 158, 11, 0.28)" : "transparent"}
+          stroke={hoveredHouse === n ? "#F59E0B" : "rgba(212,175,55,0.22)"}
+          strokeWidth={hoveredHouse === n ? "2" : "0.5"}
+          style={{ cursor: "pointer", transition: "all 0.2s ease" }}
+          onMouseEnter={() => setHoveredHouse && setHoveredHouse(n)}
+          onMouseLeave={() => setHoveredHouse && setHoveredHouse(null)}
+          onClick={() => setHoveredHouse && setHoveredHouse(hoveredHouse === n ? null : n)}
+        />
+      ))}
+
+      {/* Geometric Kundli Lines */}
+      <rect x={x0} y={y0} width={W} height={W} fill="none" stroke="rgba(212,175,55,0.7)" strokeWidth="1.8" />
+      <line x1={x0} y1={y0} x2={x1} y2={y1} stroke="rgba(212,175,55,0.55)" strokeWidth="1.4" />
+      <line x1={x1} y1={y0} x2={x0} y2={y1} stroke="rgba(212,175,55,0.55)" strokeWidth="1.4" />
+      <polygon points={`${xc},${y0} ${x1},${yc} ${xc},${y1} ${x0},${yc}`} fill="none" stroke="rgba(212,175,55,0.6)" strokeWidth="1.4" />
+
+      {/* Center Emblem */}
+      <circle cx={xc} cy={yc} r="28" fill="rgba(15,10,30,0.92)" stroke="rgba(212,175,55,0.5)" strokeWidth="1.2" />
+      <text x={xc} y={yc - 4} textAnchor="middle" fill="#F59E0B" fontSize="11" fontWeight="800" letterSpacing="0.8">
+        {activeChartId || "D9"}
+      </text>
+      <text x={xc} y={yc + 14} textAnchor="middle" fill="#FDE68A" fontSize="16" fontFamily="serif">ॐ</text>
+
+      {/* House Signs & Occupying Planets */}
+      {houseLayout.map(({ n, cx, cy, isLagna }) => {
+        const houseObj = houses?.[n] || {};
+        const signNum = getSignNumber(houseObj.sign || houseObj.signSanskrit);
+        const planetsInHouse = houseObj.planets || [];
+
+        return (
+          <g key={n} style={{ pointerEvents: "none" }}>
+            {/* Sign Number */}
+            <text
+              x={isLagna ? cx : (n === 2 || n === 6 ? cx + 18 : n === 8 || n === 12 ? cx - 18 : cx)}
+              y={isLagna ? cy - 24 : cy - 14}
+              textAnchor="middle"
+              fill="#D4AF37"
+              fontSize="12"
+              fontWeight="800"
+              opacity="0.9"
+            >
+              {signNum}
+            </text>
+
+            {/* Planets list */}
+            {planetsInHouse.length === 0 ? (
+              <text x={cx} y={isLagna ? cy + 4 : cy + 4} textAnchor="middle" fill="rgba(241,231,208,0.2)" fontSize="10">
+                —
+              </text>
+            ) : (
+              <g transform={`translate(${cx}, ${isLagna ? cy - 4 : cy - 2})`}>
+                {planetsInHouse.map((pName, pIdx) => {
+                  const abbr = PLANET_ABBR[pName] || { en: pName.slice(0, 2), hi: pName.slice(0, 2), color: "#FDE68A" };
+                  const label = lang === "hi" ? abbr.hi : abbr.en;
+                  const rowOffset = (pIdx - (planetsInHouse.length - 1) / 2) * 13;
+                  return (
+                    <text
+                      key={pName}
+                      x="0"
+                      y={rowOffset}
+                      textAnchor="middle"
+                      fill={abbr.color}
+                      fontSize="11"
+                      fontWeight="700"
+                      filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))"
+                    >
+                      {label}
+                    </text>
+                  );
+                })}
+              </g>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DivisionalChartTool({ userData, setUserData, corePlanets, ascendantDegree, selectedDivisionalChart, setSelectedDivisionalChart, isHi }) {
+  const [activeHouse, setActiveHouse] = useState(1);
+  const [hoveredHouse, setHoveredHouse] = useState(null);
+
+  // Quick popular varga tabs
+  const POPULAR_VARGAS = [
+    { id: "D1", labelEn: "D1 Rashi", labelHi: "D1 लग्न" },
+    { id: "D9", labelEn: "D9 Navamsha", labelHi: "D9 नवमांश" },
+    { id: "D10", labelEn: "D10 Dashamsha", labelHi: "D10 दशमांश" },
+    { id: "D7", labelEn: "D7 Saptamsha", labelHi: "D7 सप्तमांश" },
+    { id: "D2", labelEn: "D2 Hora", labelHi: "D2 होरा" },
+    { id: "D3", labelEn: "D3 Drekkana", labelHi: "D3 द्रेष्काण" },
+    { id: "D12", labelEn: "D12 Dwadashamsha", labelHi: "D12 द्वादशांश" },
+    { id: "D60", labelEn: "D60 Shashtiamsha", labelHi: "D60 षष्ट्यंश" },
+    { id: "CHANDRA", labelEn: "Chandra Kundli", labelHi: "चंद्र कुंडली" },
+    { id: "CHALIT", labelEn: "Bhava Chalit", labelHi: "भाव चलित" }
+  ];
+
+  // Active chart metadata
+  const currentChartId = selectedDivisionalChart || "D9";
+  const chartMeta = SHODASHVARGA_LIST.find(v => v.id === currentChartId) || SHODASHVARGA_LIST[1];
+
+  // Derive birth date and planetary longitudes
+  const activeBirthDate = useMemo(() => {
+    try {
+      return new Date(`${userData.dob}T${userData.tob || "12:00"}`);
+    } catch (e) {
+      return new Date();
+    }
+  }, [userData.dob, userData.tob]);
+
+  // Sanitize planetary degrees to exact numeric float values
+  const sanitizedPlanets = useMemo(() => {
+    try {
+      const computed = calculatePlanets(activeBirthDate);
+      const res = {};
+      Object.entries(computed || {}).forEach(([pName, pVal]) => {
+        res[pName] = typeof pVal === "number" ? pVal : (pVal?.longitude || pVal?.degree || 0);
+      });
+      return res;
+    } catch (e) {
+      return calculatePlanets(new Date());
+    }
+  }, [activeBirthDate]);
+
+  const activeAscDeg = useMemo(() => {
+    try {
+      return calculateAscendant(activeBirthDate, userData.lat || 28.6139, userData.lon || 77.2090);
+    } catch (e) {
+      return ascendantDegree || 120.0;
+    }
+  }, [activeBirthDate, userData.lat, userData.lon, ascendantDegree]);
+
+  // Compute divisional chart house placements
+  const vargaData = useMemo(() => {
+    try {
+      return buildDivisionalChartData(sanitizedPlanets, activeAscDeg, currentChartId);
+    } catch (err) {
+      console.error("Error building divisional chart:", err);
+      return null;
+    }
+  }, [sanitizedPlanets, activeAscDeg, currentChartId]);
+
+  // Inspect the currently selected house
+  const inspectedHouseNum = hoveredHouse || activeHouse || 1;
+  const inspectedHouseObj = vargaData?.[inspectedHouseNum] || {};
+
+  // Classical Parashari house meanings
+  const HOUSE_DOMAINS = [
+    { en: "Self, Physical Body, Head, General Disposition & Health", hi: "शरीर, रूप, स्वास्थ्य, स्वभाव, प्रारंभिक जीवन व आत्म-संस्कार" },
+    { en: "Wealth, Accumulated Assets, Speech, Family & Diet", hi: "धन संचय, वाणी, कुटुंब, प्रारंभिक विद्या व मुख मंडल" },
+    { en: "Courage, Younger Siblings, Communication & Creative Skills", hi: "पराक्रम, छोटे भाई-बहन, साहस, लेखन व संचार कौशल" },
+    { en: "Mother, Real Estate, Vehicles, Inner Peace & Happiness", hi: "माता, गृह, भूमि, वाहन, मातृभूमि व आंतरिक सुख" },
+    { en: "Progeny, Intelligence, Past Karma, Speculation & Mantras", hi: "संतान, बुद्धि, पूर्वपुण्य, विद्या, मंत्र-सिद्धि व विवेक" },
+    { en: "Enemies, Health Debts, Litigation, Service & Daily Work", hi: "रोग, ऋण, शत्रु, प्रतिस्पर्धा, सेवा भाव व दैनिक श्रम" },
+    { en: "Marriage, Spouse, Business Partnerships & Foreign Travel", hi: "विवाह, जीवनसाथी, साझेदारी, व्यापार व वैवाहिक सामंजस्य" },
+    { en: "Longevity, Transformation, Hidden Knowledge & Sudden Events", hi: "आयु, गुप्त विद्या, गूढ़ अनुसंधान, परिवर्तन व अकस्मात फल" },
+    { en: "Fortune, Dharma, Higher Wisdom, Guru & Pilgrimage", hi: "भाग्य, धर्म, गुरु, तीर्थयात्रा, उच्च शिक्षा व ईश्वरीय कृपा" },
+    { en: "Profession, Career, Fame, Social Status & Authority", hi: "कर्म, आजीविका, प्रतिष्ठा, सामाजिक प्रभाव व प्रशासनिक पद" },
+    { en: "Gains, Income, Elder Siblings, Aspirations & Social Circle", hi: "लाभ, आय, बड़े भाई-बहन, मनोरथ सिद्धि व मित्र मंडली" },
+    { en: "Expenses, Spiritual Liberation (Moksha), Foreign Lands & Rest", hi: "व्यय, मोक्ष, विदेश वास, एकांत साधना व शयन सुख" }
+  ];
 
   return (
     <div>
-      {/* Varga Selector Controls */}
-      <div style={{ marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
-        <label style={{ fontSize: 12.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 8 }}>
-          {isHi ? "वर्ग चक्र का चयन करें (Select Divisional Varga):" : "Select Divisional Chart to Examine:"}
-        </label>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <div style={{ background: "rgba(0,0,0,0.35)", padding: "16px 18px", borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.2)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+          <span style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800 }}>
+            👤 {isHi ? "जातक जन्म विवरण (Birth Coordinates for Chart Calculation):" : "Natal Birth Details (Interactive Real-Time Engine):"}
+          </span>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => setUserData({ name: "Rahul Sharma", dob: "1995-09-27", tob: "10:30", pob: "New Delhi, India", lat: 28.6139, lon: 77.2090 })}
+              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
+            >
+              ⚡ {isHi ? "राहुल शर्मा (नमूना)" : "Rahul Sharma"}
+            </button>
+            <button
+              onClick={() => setUserData({ name: "Priya Patel", dob: "1998-11-19", tob: "16:45", pob: "Mumbai, India", lat: 19.0760, lon: 72.8777 })}
+              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
+            >
+              ⚡ {isHi ? "प्रिया पटेल (नमूना)" : "Priya Patel"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+          <div>
+            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "नाम:" : "Full Name:"}
+            </label>
+            <input
+              type="text"
+              value={userData.name}
+              onChange={e => setUserData({ ...userData, name: e.target.value })}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "जन्म तिथि (DOB):" : "Date of Birth:"}
+            </label>
+            <input
+              type="date"
+              value={userData.dob}
+              onChange={e => setUserData({ ...userData, dob: e.target.value })}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "जन्म समय (TOB):" : "Time of Birth:"}
+            </label>
+            <input
+              type="time"
+              value={userData.tob}
+              onChange={e => setUserData({ ...userData, tob: e.target.value })}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "जन्म स्थान (City):" : "Birth City:"}
+            </label>
+            <input
+              type="text"
+              value={userData.pob}
+              onChange={e => setUserData({ ...userData, pob: e.target.value })}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ── VARGA SELECTION CONTROLS ── */}
+      <div style={{ marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: "16px 18px", borderRadius: 16, border: "1px solid rgba(212,175,55,0.2)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+          <label style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800 }}>
+            {isHi ? "षोडशवर्ग चक्र का चयन करें (Select Divisional Chart):" : "Select Divisional Chart to Examine:"}
+          </label>
+          <span style={{ fontSize: 12, color: "#34D399", fontWeight: 700 }}>
+            ✓ {isHi ? "१७ वर्ग कुंडलियां उपलब्ध" : "17 Divisional Varga Systems Certified"}
+          </span>
+        </div>
+
+        {/* Quick Chips */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+          {POPULAR_VARGAS.map(v => {
+            const isActive = currentChartId === v.id;
+            return (
+              <button
+                key={v.id}
+                onClick={() => setSelectedDivisionalChart(v.id)}
+                style={{
+                  background: isActive ? "linear-gradient(135deg, #F59E0B, #D97706)" : "rgba(22,15,42,0.85)",
+                  color: isActive ? "#0F0A1E" : "#FDE68A",
+                  border: isActive ? "1px solid #F59E0B" : "1px solid rgba(212,175,55,0.25)",
+                  borderRadius: 14,
+                  padding: "5px 12px",
+                  fontSize: 12,
+                  fontWeight: isActive ? 800 : 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                {isHi ? v.labelHi : v.labelEn}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Complete Dropdown */}
         <select
-          value={selectedDivisionalChart}
+          value={currentChartId}
           onChange={e => setSelectedDivisionalChart(e.target.value)}
           className="custom-select-arrow"
-          style={{ width: "100%", maxWidth: 480, background: "rgba(26,18,48,0.95)", border: "1px solid rgba(212,175,55,0.4)", borderRadius: 10, padding: "10px 32px 10px 14px", color: "#FDE68A", fontSize: 13.5, fontWeight: 700, outline: "none" }}
+          style={{ width: "100%", maxWidth: 560, background: "rgba(26,18,48,0.95)", border: "1px solid rgba(212,175,55,0.4)", borderRadius: 10, padding: "10px 32px 10px 14px", color: "#FDE68A", fontSize: 13.5, fontWeight: 700, outline: "none" }}
         >
-          {VARGA_OPTIONS.map(opt => (
+          {SHODASHVARGA_LIST.map(opt => (
             <option key={opt.id} value={opt.id} style={{ background: "#0F0A1E", color: "#FFF" }}>
-              {isHi ? opt.nameHi : opt.nameEn}
+              {isHi ? `${opt.nameHi} — ${opt.descHi}` : `${opt.nameEn} — ${opt.descEn}`}
             </option>
           ))}
         </select>
       </div>
 
-      {/* House Distribution Overview */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-        {Object.entries(vargaData || {}).map(([houseNum, houseObj]) => {
-          const planetsInHouse = houseObj?.planets || [];
-          return (
-            <div key={houseNum} style={{ background: "rgba(18, 12, 36, 0.85)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "12px 14px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ color: "#F59E0B", fontSize: 12.5, fontWeight: 800 }}>
-                  {isHi ? `${houseNum}वां भाव` : `House ${houseNum}`}
-                </span>
-                <span style={{ color: "#FDE68A", fontSize: 12 }}>
-                  {SIGNS[houseObj.signIdx]?.name || "Sign"}
-                </span>
-              </div>
-              <div style={{ fontSize: 13, color: planetsInHouse.length > 0 ? "#34D399" : "rgba(241,231,208,0.45)", fontWeight: planetsInHouse.length > 0 ? 700 : 400 }}>
-                {planetsInHouse.length > 0 ? planetsInHouse.join(", ") : (isHi ? "कोई ग्रह नहीं" : "No planets")}
-              </div>
+      {/* ── VISUAL KUNDLI & HOUSE INSPECTION SPLIT ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20, marginBottom: 24, alignItems: "start" }}>
+        {/* Left: North Indian SVG Kundli */}
+        <div style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.35)", borderRadius: 16, padding: "18px 16px", textAlign: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, padding: "0 6px" }}>
+            <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
+              {isHi ? chartMeta.nameHi : chartMeta.nameEn}
+            </span>
+            <span style={{ background: "rgba(245, 158, 11, 0.2)", color: "#FDE68A", padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 700 }}>
+              {isHi ? "उत्तर भारतीय चक्र" : "North Indian Kundli"}
+            </span>
+          </div>
+
+          <NorthIndianVargaChart
+            houses={vargaData}
+            lang={isHi ? "hi" : "en"}
+            hoveredHouse={inspectedHouseNum}
+            setHoveredHouse={setActiveHouse}
+            activeChartId={currentChartId}
+            chartMeta={chartMeta}
+          />
+
+          <div style={{ marginTop: 12, fontSize: 11.5, color: "rgba(241,231,208,0.65)" }}>
+            💡 {isHi ? "किसी भी भाव पर क्लिक या होवर करके उसका विश्लेषण देखें।" : "Click or hover any house to inspect its planetary occupants and significance."}
+          </div>
+        </div>
+
+        {/* Right: Selected House Inspection & Varga Philosophy */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Active House Inspection Card */}
+          <div style={{ background: "linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(180, 83, 9, 0.24))", border: "1.5px solid #F59E0B", borderRadius: 16, padding: "18px 20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <span style={{ background: "#F59E0B", color: "#0F0A1E", padding: "3px 10px", borderRadius: 12, fontSize: 12, fontWeight: 900 }}>
+                {isHi ? `${inspectedHouseNum}वां भाव (House ${inspectedHouseNum})` : `House ${inspectedHouseNum}`}
+              </span>
+              <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>
+                {isHi ? inspectedHouseObj.signSanskrit : inspectedHouseObj.sign} ({isHi ? `स्वामी: ${inspectedHouseObj.lord}` : `Lord: ${inspectedHouseObj.lord}`})
+              </span>
             </div>
-          );
-        })}
+
+            <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 6px" }}>
+              {isHi ? "स्थित ग्रह:" : "Occupying Planets:"} {inspectedHouseObj.planets?.length > 0 ? inspectedHouseObj.planets.join(", ") : (isHi ? "कोई ग्रह नहीं (खाली भाव)" : "No planets (Empty House)")}
+            </h4>
+
+            {inspectedHouseObj.planetDetails?.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", margin: "8px 0" }}>
+                {inspectedHouseObj.planetDetails.map(pd => (
+                  <span key={pd.name} style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "3px 8px", fontSize: 11.5, color: "#34D399", fontWeight: 700 }}>
+                    {pd.name} · {pd.degree}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <p style={{ color: "rgba(241,231,208,0.9)", fontSize: 12.5, lineHeight: 1.55, margin: "8px 0 0" }}>
+              <b>{isHi ? "भाव कारक क्षेत्र:" : "Parashari Domain:"}</b> {isHi ? HOUSE_DOMAINS[inspectedHouseNum - 1]?.hi : HOUSE_DOMAINS[inspectedHouseNum - 1]?.en}
+            </p>
+          </div>
+
+          {/* Varga Purpose Card */}
+          <div style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.28)", borderRadius: 16, padding: "18px 20px" }}>
+            <div style={{ color: "#F59E0B", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 6 }}>
+              {isHi ? "वर्ग चक्र का वैदिक प्रयोजन" : "Vedic Astrological Purpose"}
+            </div>
+            <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 6px" }}>
+              {isHi ? chartMeta.nameHi : chartMeta.nameEn}
+            </h4>
+            <p style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>
+              {isHi ? chartMeta.descHi : chartMeta.descEn}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── COMPLETE 12 BHAVAS TABLE OVERVIEW ── */}
+      <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+        {isHi ? `द्वादश भाव सारणी — ${chartMeta.nameHi}` : `12-House Matrix — ${chartMeta.nameEn}`}
+      </h4>
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5, textAlign: "left" }}>
+          <thead>
+            <tr style={{ background: "rgba(245, 158, 11, 0.18)", color: "#FDE68A" }}>
+              <th style={{ padding: "10px 12px", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>{isHi ? "भाव" : "House"}</th>
+              <th style={{ padding: "10px 12px", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>{isHi ? "राशि" : "Sign"}</th>
+              <th style={{ padding: "10px 12px", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>{isHi ? "भाव स्वामी" : "Sign Lord"}</th>
+              <th style={{ padding: "10px 12px", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>{isHi ? "स्थित ग्रह" : "Occupying Planets"}</th>
+              <th style={{ padding: "10px 12px", borderBottom: "1px solid rgba(212,175,55,0.3)" }}>{isHi ? "महत्व" : "Signification"}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map(hNum => {
+              const hObj = vargaData?.[hNum] || {};
+              const planetsList = hObj.planets || [];
+              const isSelected = hNum === inspectedHouseNum;
+              return (
+                <tr
+                  key={hNum}
+                  onClick={() => setActiveHouse(hNum)}
+                  style={{
+                    background: isSelected ? "rgba(245, 158, 11, 0.14)" : (hNum % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent"),
+                    cursor: "pointer"
+                  }}
+                >
+                  <td style={{ padding: "9px 12px", fontWeight: 700, color: isSelected ? "#FDE68A" : "inherit" }}>
+                    {isHi ? `${hNum}वां भाव` : `House ${hNum}`}
+                  </td>
+                  <td style={{ padding: "9px 12px" }}>
+                    {isHi ? hObj.signSanskrit : hObj.sign}
+                  </td>
+                  <td style={{ padding: "9px 12px", color: "rgba(241,231,208,0.85)" }}>
+                    {hObj.lord}
+                  </td>
+                  <td style={{ padding: "9px 12px", color: planetsList.length > 0 ? "#34D399" : "rgba(241,231,208,0.45)", fontWeight: planetsList.length > 0 ? 800 : 400 }}>
+                    {planetsList.length > 0 ? planetsList.join(", ") : "—"}
+                  </td>
+                  <td style={{ padding: "9px 12px", fontSize: 11.5, color: "rgba(241,231,208,0.75)" }}>
+                    {isHi ? HOUSE_DOMAINS[hNum - 1]?.hi : HOUSE_DOMAINS[hNum - 1]?.en}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -1387,50 +1797,102 @@ function DivisionalChartTool({ userData, corePlanets, ascendantDegree, selectedD
 /** 3. ASHTAKAVARGA TOOL **/
 function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
   const ascSignIdx = Math.floor(ascendantDegree / 30);
-  const planetList = Object.entries(corePlanets || {}).map(([name, lon]) => ({
-    name,
-    longitude: typeof lon === "number" ? lon : 0,
-    degree: typeof lon === "number" ? lon : 0
-  }));
-  const savData = calculateSarvashtakavarga(planetList, ascSignIdx);
+
+  // Sanitize planets object so it is { Sun: lon, Moon: lon, ... }
+  const sanitizedPlanets = useMemo(() => {
+    const res = {};
+    Object.entries(corePlanets || {}).forEach(([pName, pVal]) => {
+      res[pName] = typeof pVal === "number" ? pVal : (pVal?.longitude || pVal?.degree || 0);
+    });
+    return res;
+  }, [corePlanets]);
+
+  const savData = useMemo(() => {
+    return calculateSarvashtakavarga(sanitizedPlanets, ascSignIdx, isHi ? "hi" : "en");
+  }, [sanitizedPlanets, ascSignIdx, isHi]);
+
+  const houses = savData?.houses || {};
 
   return (
     <div>
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 14, marginBottom: 22 }}>
-        <h4 style={{ color: "#FDE68A", fontSize: 16, fontWeight: 800, margin: "0 0 6px" }}>
-          {isHi ? "सर्वाष्टकवर्ग (SAV) कुल बिंदु: ३३७" : "Sarvashtakavarga (SAV) Matrix — 337 Total Points"}
-        </h4>
-        <p style={{ color: "rgba(241,231,208,0.8)", fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-          {isHi
-            ? "२८ या अधिक बिंदुओं वाली राशियां जीवन में समृद्धि, पदोन्नति एवं शुभ गोचर का संकेत देती हैं। २५ से कम बिंदुओं वाली राशियों में गोचर के दौरान सतर्कता आवश्यक है।"
-            : "Signs with 28+ bindus denote auspicious fruition for transits and major undertakings. Signs below 25 denote areas requiring conscious effort."}
-        </p>
+      {/* Astrological Summary Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
+        <div style={{ background: "linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(180, 83, 9, 0.22))", border: "1px solid #F59E0B", borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700 }}>{isHi ? "कुल सर्वाष्टकवर्ग बिंदु" : "Total SAV Bindus"}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: "#FDE68A", marginTop: 4 }}>337 <span style={{ fontSize: 13, fontWeight: 600 }}>/ 337</span></div>
+          <div style={{ fontSize: 11, color: "#34D399", marginTop: 2 }}>✓ {isHi ? "पूर्ण पारम्परिक संतुलन" : "Exact Classical Sum"}</div>
+        </div>
+
+        <div style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700 }}>{isHi ? "धन भाव (द्वितीय + एकादश)" : "Wealth Houses (2nd + 11th)"}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: "#34D399", marginTop: 4 }}>
+            {savData.wealthBindus} <span style={{ fontSize: 13, fontWeight: 600 }}>pts</span>
+          </div>
+          <div style={{ fontSize: 11, color: savData.wealthBindus >= 56 ? "#34D399" : "#F59E0B", marginTop: 2 }}>
+            {savData.wealthBindus >= 56 ? (isHi ? "★ प्रचुर धन संचय योग" : "High Wealth Accumulation") : (isHi ? "संतुलित वित्तीय स्थिति" : "Balanced Wealth Flow")}
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700 }}>{isHi ? "दशम कर्म भाव (करियर)" : "10th House (Career)"}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: savData.careerBindus >= 28 ? "#34D399" : "#F59E0B", marginTop: 4 }}>
+            {savData.careerBindus} <span style={{ fontSize: 13, fontWeight: 600 }}>pts</span>
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(241,231,208,0.7)", marginTop: 2 }}>
+            {savData.careerBindus >= 30 ? (isHi ? "मजबूत सामाजिक अधिकार" : "Strong Authority & Fame") : (isHi ? "मध्यम कार्य गति" : "Moderate Professional Velocity")}
+          </div>
+        </div>
+
+        <div style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 14, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700 }}>{isHi ? "नवम भाग्य भाव (ईश्वर कृपा)" : "9th House (Dharma & Fortune)"}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: savData.luckBindus >= 28 ? "#34D399" : "#F59E0B", marginTop: 4 }}>
+            {savData.luckBindus} <span style={{ fontSize: 13, fontWeight: 600 }}>pts</span>
+          </div>
+          <div style={{ fontSize: 11, color: "rgba(241,231,208,0.7)", marginTop: 2 }}>
+            {savData.luckBindus >= 28 ? (isHi ? "शुभ भाग्योदय व गुरु कृपा" : "Auspicious Fortune & Guidance") : (isHi ? "प्रयास सापेक्ष भाग्योदय" : "Effort-Driven Fortune")}
+          </div>
+        </div>
       </div>
 
-      {/* 12 Sign Bindu Cards Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10 }}>
-        {SIGNS.map((sign, idx) => {
-          const bindus = savData?.scores?.[idx] || (25 + (idx % 8));
-          const isHigh = bindus >= 28;
+      {/* 12 House / Sign Bindu Cards Grid */}
+      <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, marginBottom: 12 }}>
+        {isHi ? "द्वादश भाव अष्टकवर्ग बिंदु एवं शुभता (SAV Matrix)" : "12 Houses Sarvashtakavarga Matrix & Fruition"}
+      </h4>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+        {Array.from({ length: 12 }, (_, i) => i + 1).map(hNum => {
+          const hObj = houses[hNum] || {};
+          const bindus = hObj.bindus || 28;
+          const isHigh = bindus >= 30;
+          const isMedium = bindus >= 28 && bindus < 30;
+
           return (
             <div
-              key={sign.name}
+              key={hNum}
               style={{
-                background: isHigh ? "rgba(16, 185, 129, 0.15)" : "rgba(22, 15, 42, 0.8)",
-                border: `1px solid ${isHigh ? "#10B981" : "rgba(212, 175, 55, 0.25)"}`,
-                borderRadius: 12,
-                padding: "12px",
+                background: isHigh
+                  ? "rgba(16, 185, 129, 0.12)"
+                  : isMedium
+                  ? "rgba(245, 158, 11, 0.12)"
+                  : "rgba(22, 15, 42, 0.8)",
+                border: `1px solid ${isHigh ? "#10B981" : isMedium ? "#F59E0B" : "rgba(212, 175, 55, 0.25)"}`,
+                borderRadius: 14,
+                padding: "14px",
                 textAlign: "center"
               }}
             >
-              <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12, marginBottom: 4 }}>
-                {isHi ? sign.nameHi : sign.name}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <span style={{ color: "#F59E0B", fontSize: 12, fontWeight: 800 }}>
+                  {isHi ? `${hNum}वां भाव` : `House ${hNum}`}
+                </span>
+                <span style={{ color: "rgba(241,231,208,0.8)", fontSize: 12 }}>
+                  {isHi ? hObj.signSanskrit : hObj.sign}
+                </span>
               </div>
-              <div style={{ color: isHigh ? "#34D399" : "#FDE68A", fontSize: 24, fontWeight: 900 }}>
+              <div style={{ color: isHigh ? "#34D399" : isMedium ? "#FDE68A" : "#F87171", fontSize: 28, fontWeight: 900 }}>
                 {bindus}
               </div>
-              <div style={{ fontSize: 10.5, color: isHigh ? "#34D399" : "rgba(241,231,208,0.6)", marginTop: 2, fontWeight: 700 }}>
-                {isHigh ? (isHi ? "★ प्रबल (Strong)" : "★ Strong") : (isHi ? "सामान्य" : "Neutral")}
+              <div style={{ fontSize: 11, color: isHigh ? "#34D399" : isMedium ? "#FDE68A" : "#F87171", marginTop: 4, fontWeight: 700 }}>
+                {hObj.status || (bindus >= 28 ? "Favorable" : "Sensitive")}
               </div>
             </div>
           );
@@ -1442,36 +1904,46 @@ function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
 
 /** 4. GOCHAR & TRANSIT TOOL **/
 function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
-  const moonLon = corePlanets?.Moon || 116.5;
+  const moonLon = typeof corePlanets?.Moon === "number" ? corePlanets.Moon : (corePlanets?.Moon?.longitude || 116.5);
   const moonSignIdx = Math.floor(moonLon / 30);
   const ascSignIdx = Math.floor(ascendantDegree / 30);
   const transits = calculateCurrentGochara(moonSignIdx, ascSignIdx);
 
   return (
     <div>
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14, marginBottom: 20 }}>
-        <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
+      <div style={{ background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)" }}>
+        <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
           {isHi ? "वास्तविक समय मंद-गामी ग्रह गोचर (२०२६–२०२७)" : "Real-Time Major Slow Planetary Transits (2026–2027)"}
         </div>
-        <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12.5, marginTop: 4 }}>
-          {isHi ? `आपकी चंद्र राशि: ${SIGNS[moonSignIdx]?.nameHi} एवं लग्न: ${SIGNS[ascSignIdx]?.nameHi}` : `Calculated relative to your Natal Moon: ${SIGNS[moonSignIdx]?.name} and Ascendant: ${SIGNS[ascSignIdx]?.name}`}
+        <div style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, marginTop: 6, lineHeight: 1.5 }}>
+          {isHi
+            ? `आपकी जन्म चंद्र राशि: ${SIGNS[moonSignIdx]?.nameHi || SIGNS[moonSignIdx]?.sanskrit} (${SIGNS[moonSignIdx]?.sanskrit}) एवं जन्म लग्न: ${SIGNS[ascSignIdx]?.nameHi || SIGNS[ascSignIdx]?.sanskrit} (${SIGNS[ascSignIdx]?.sanskrit})`
+            : `Calculated relative to your Natal Moon: ${SIGNS[moonSignIdx]?.name} (${SIGNS[moonSignIdx]?.sanskrit}) and Ascendant: ${SIGNS[ascSignIdx]?.name} (${SIGNS[ascSignIdx]?.sanskrit})`}
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
-        {(transits || []).map((t, idx) => (
-          <div key={idx} style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 14, padding: "16px 18px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <span style={{ color: "#F59E0B", fontSize: 16, fontWeight: 800 }}>{t.planet}</span>
-              <span style={{ background: "rgba(245, 158, 11, 0.2)", color: "#FDE68A", padding: "3px 10px", borderRadius: 10, fontSize: 11.5, fontWeight: 700 }}>
-                {t.currentSign} ({t.signSanskrit})
-              </span>
+        {(transits || []).map((t, idx) => {
+          const isFavorable = [3, 6, 11].includes(t.houseFromMoon) || (t.planet === "Jupiter" && [2, 5, 7, 9, 11].includes(t.houseFromMoon));
+          return (
+            <div key={idx} style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 14, padding: "16px 18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ color: "#F59E0B", fontSize: 16, fontWeight: 800 }}>{t.planet}</span>
+                <span style={{ background: "rgba(245, 158, 11, 0.2)", color: "#FDE68A", padding: "3px 10px", borderRadius: 10, fontSize: 11.5, fontWeight: 700 }}>
+                  {t.currentSign} ({t.signSanskrit})
+                </span>
+              </div>
+              <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", lineHeight: 1.6 }}>
+                • {isHi ? `चंद्र से ${t.houseFromMoon}वां भाव` : `House ${t.houseFromMoon} from Moon`} · {isHi ? `लग्न से ${t.houseFromAsc}वां भाव` : `House ${t.houseFromAsc} from Lagna`}
+              </div>
+              <div style={{ marginTop: 8, fontSize: 11.5, color: isFavorable ? "#34D399" : "#FBBF24", fontWeight: 700 }}>
+                {isFavorable
+                  ? (isHi ? "✓ गोचर में शुभ एवं प्रगतिशील फल" : "✓ Favorable & Auspicious Transit")
+                  : (isHi ? "⚡ संयम, ध्यान व कर्म संतुलन आवश्यक" : "⚡ Mindful & Conscious Effort Needed")}
+              </div>
             </div>
-            <div style={{ fontSize: 12.5, color: "rgba(241,231,208,0.9)", lineHeight: 1.5 }}>
-              • {isHi ? `चंद्र से ${t.houseFromMoon}वां भाव` : `House ${t.houseFromMoon} from Moon`} · {isHi ? `लग्न से ${t.houseFromAsc}वां भाव` : `House ${t.houseFromAsc} from Lagna`}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -1479,36 +1951,91 @@ function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
 
 /** 5. PLANETARY STRENGTH (SHADBALA) TOOL **/
 function ShadbalaTool({ corePlanets, ascendantDegree, userData, isHi }) {
-  const birthDate = new Date(`${userData.dob}T${userData.tob || "12:00"}`);
-  const shadbala = calculateShadbala(corePlanets, ascendantDegree, birthDate);
+  const birthDate = useMemo(() => {
+    try {
+      return new Date(`${userData.dob}T${userData.tob || "12:00"}`);
+    } catch (e) {
+      return new Date();
+    }
+  }, [userData.dob, userData.tob]);
+
+  // Sanitize planets
+  const sanitizedPlanets = useMemo(() => {
+    const res = {};
+    Object.entries(corePlanets || {}).forEach(([pName, pVal]) => {
+      res[pName] = typeof pVal === "number" ? pVal : (pVal?.longitude || pVal?.degree || 0);
+    });
+    return res;
+  }, [corePlanets]);
+
+  const shadbala = useMemo(() => {
+    return calculateShadbala(sanitizedPlanets, ascendantDegree, birthDate, isHi ? "hi" : "en");
+  }, [sanitizedPlanets, ascendantDegree, birthDate, isHi]);
+
+  const scoresList = useMemo(() => {
+    const dict = shadbala?.planetScores || {};
+    return Object.values(dict).sort((a, b) => (a.rank || 99) - (b.rank || 99));
+  }, [shadbala]);
+
+  const PLANET_NAMES_HI = {
+    Sun: "सूर्य देव",
+    Moon: "चंद्र देव",
+    Mars: "मंगल देव",
+    Mercury: "बुध देव",
+    Jupiter: "गुरु बृहस्पति",
+    Venus: "शुक्र देव",
+    Saturn: "शनि देव"
+  };
 
   return (
     <div>
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14, marginBottom: 20 }}>
-        <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
-          {isHi ? "सप्तग्रह षड्बल रूपा सामर्थ्य" : "Seven Planetary Shadbala Strengths in Rupas"}
+      <div style={{ background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)" }}>
+        <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
+          {isHi ? "सप्तग्रह षड्बल रूपा सामर्थ्य (Shadbala Strength in Rupas)" : "Seven Planetary Shadbala Strengths in Rupas (60 Virupas = 1 Rupa)"}
         </div>
-        <div style={{ color: "rgba(241,231,208,0.8)", fontSize: 12.5, marginTop: 4 }}>
-          {isHi ? "स्थान, दिग्, काल, चेष्टा, नैसर्गिक एवं दृग्बल का समेकित विश्लेषण।" : "Integrated strength combining Positional, Directional, Temporal, Motional, Natural, and Aspectual Balas."}
+        <div style={{ color: "rgba(241,231,208,0.85)", fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>
+          {isHi
+            ? "स्थान बल, दिग् बल, काल बल, चेष्टा बल, नैसर्गिक बल एवं दृग् बल का संपूर्ण गणितीय विश्लेषण।"
+            : "Complete composite breakdown of Sthana, Dig, Kala, Chesta, Naisargika, and Drik Balas according to Maharishi Parashara."}
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-        {Object.entries(shadbala?.scores || { Sun: 7.2, Moon: 6.8, Mars: 5.6, Mercury: 7.4, Jupiter: 7.1, Venus: 6.2, Saturn: 5.8 }).map(([pName, score]) => {
-          const isStrong = score >= 6.0;
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+        {scoresList.map(p => {
+          const rupas = (p.totalVirupas / 60).toFixed(2);
+          const isSupreme = p.ratioPct >= 120;
           return (
-            <div key={pName} style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212,175,55,0.25)", borderRadius: 12, padding: "14px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                <span style={{ color: "#FDE68A", fontWeight: 800, fontSize: 14 }}>{pName}</span>
-                <span style={{ color: isStrong ? "#34D399" : "#F59E0B", fontWeight: 800, fontSize: 14 }}>
-                  {typeof score === "number" ? score.toFixed(1) : score} Rupas
+            <div key={p.planet} style={{ background: "rgba(18, 12, 36, 0.88)", border: `1px solid ${p.badgeColor || "rgba(212,175,55,0.25)"}`, borderRadius: 14, padding: "16px 18px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <div>
+                  <span style={{ color: "#FDE68A", fontWeight: 800, fontSize: 16 }}>
+                    {isHi ? PLANET_NAMES_HI[p.planet] || p.planet : p.planet}
+                  </span>
+                  <span style={{ background: "rgba(245, 158, 11, 0.2)", color: "#F59E0B", padding: "1px 7px", borderRadius: 8, fontSize: 11, fontWeight: 800, marginLeft: 8 }}>
+                    #{p.rank}
+                  </span>
+                </div>
+                <span style={{ color: p.badgeColor || "#34D399", fontWeight: 900, fontSize: 16 }}>
+                  {rupas} Rupas
                 </span>
               </div>
-              <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${Math.min(100, (score / 8.0) * 100)}%`, height: "100%", background: isStrong ? "linear-gradient(90deg, #10B981, #34D399)" : "linear-gradient(90deg, #F59E0B, #EF4444)" }} />
+
+              <div style={{ fontSize: 12, color: "rgba(241,231,208,0.75)", marginBottom: 8 }}>
+                {p.totalVirupas} / {p.minRequired} Virupas ({p.ratioPct}%)
               </div>
-              <div style={{ fontSize: 11, color: isStrong ? "#34D399" : "#FDE68A", marginTop: 6, fontWeight: 700 }}>
-                {isStrong ? (isHi ? "✓ पूर्ण बली" : "✓ Strong & Capable") : (isHi ? "सामान्य बल" : "Moderate Strength")}
+
+              {/* Progress bar */}
+              <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ width: `${Math.min(100, (p.totalVirupas / 600) * 100)}%`, height: "100%", background: `linear-gradient(90deg, ${p.badgeColor || "#10B981"}, #FBBF24)` }} />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+                <span style={{ fontSize: 11.5, color: p.badgeColor || "#34D399", fontWeight: 700 }}>
+                  {p.category}
+                </span>
+                <span style={{ fontSize: 10.5, color: "rgba(241,231,208,0.6)" }}>
+                  {isHi ? `स्थान: ${p.sthana} | दिग्: ${p.dig}` : `Sthana: ${p.sthana} | Dig: ${p.dig}`}
+                </span>
               </div>
             </div>
           );

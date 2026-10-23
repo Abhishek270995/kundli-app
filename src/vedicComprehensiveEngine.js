@@ -658,7 +658,7 @@ export const SHODASHVARGA_LIST = [
   { id: "D16", nameEn: "D16 Shodashamsha", nameHi: "डी-१६ षोडशांश कुंडली", descEn: "Vehicles, luxury, worldly pleasures, and comforts", descHi: "वाहन सुख, वैभव, भौतिक सुख-सुविधाएं व प्रसन्नता" },
   { id: "D20", nameEn: "D20 Vimshamsha", nameHi: "डी-२० विंशांश कुंडली", descEn: "Spiritual practice, mantra siddhi, and devotion", descHi: "अध्यात्म, साधना, मंत्र सिद्धि व ईश्वर कृपा" },
   { id: "D24", nameEn: "D24 Siddhamsa", nameHi: "डी-२४ चतुर्विंशांश कुंडली", descEn: "Higher learning, scholarship, intellect, and memory", descHi: "उच्च शिक्षा, विद्या, बौद्धिक प्रज्ञा व अनुसंधान" },
-  { id: "D27", nameEn: "D27 Bhamsa", nameHi: "डी-२७ भrequestांश कुंडली", descEn: "Innate strengths, endurance, and psychological fortitude", descHi: "आंतरिक बल, सहनशीलता व चारित्रिक सामर्थ्य" },
+  { id: "D27", nameEn: "D27 Bhamsa", nameHi: "डी-२७ भांश / सप्तविंशांश कुंडली", descEn: "Innate strengths, endurance, and psychological fortitude", descHi: "आंतरिक बल, सहनशीलता व चारित्रिक सामर्थ्य" },
   { id: "D30", nameEn: "D30 Trimshamsha", nameHi: "डी-३० त्रिंशांश कुंडली", descEn: "Karmic evils, misfortunes, and remedial tests", descHi: "अरिष्ट, जीवन की बाधाएं, दोष व रोग निवारण" },
   { id: "D60", nameEn: "D60 Shashtiamsha", nameHi: "डी-६० षष्ट्यंश कुंडली", descEn: "Supreme past-life karmic blueprint and fine destiny", descHi: "सर्वोच्च पूर्वजन्म कर्म चक्र व सूक्ष्म प्रारब्ध" },
   { id: "CHANDRA", nameEn: "Chandra Kundli", nameHi: "चंद्र कुंडली (लग्न = चंद्रमा)", descEn: "Mental perception, emotional rhythm, and public reception", descHi: "मनोवैज्ञानिक दृष्टिकोण, मानसिक शांति व समाज में छवि" },
