@@ -396,14 +396,17 @@ export const TOOLS_CATALOG = [
 // Helper to extract active tool from current window location path
 export const getToolFromPath = () => {
   try {
-    const rawPath = (window.location.pathname || "").replace(/^\/+|\/+$/g, '').toLowerCase();
-    const parts = rawPath.split('/');
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get("p");
+    const pathCandidate = (p ? decodeURIComponent(p) : window.location.pathname || "")
+      .replace(/^\/+|\/+$/g, '')
+      .toLowerCase();
+    const parts = pathCandidate.split('/');
     if (parts.length >= 2 && (parts[0] === "astrology-tools" || parts[0] === "tools")) {
       const slug = parts[1];
       const match = TOOLS_CATALOG.find(t => t.slug === slug || t.id === slug);
       if (match) return match;
     }
-    const params = new URLSearchParams(window.location.search);
     const toolParam = params.get("tool");
     if (toolParam) {
       const match = TOOLS_CATALOG.find(t => t.slug === toolParam.toLowerCase() || t.id === toolParam.toLowerCase());
@@ -470,7 +473,7 @@ export default function AstrologyToolsHub({
       const tool = getToolFromPath();
       if (tool) {
         setActiveToolId(tool.id);
-        document.title = `${isHi ? tool.titleHi : tool.titleEn} — Jyotish Paramarsh`;
+        document.title = `${isHi ? tool.titleHi : tool.titleEn} \u2014 Jyotish Paramarsh`;
       } else {
         setActiveToolId(null);
         document.title = isHi
@@ -561,7 +564,7 @@ export default function AstrologyToolsHub({
         window.history.pushState({ tool: tool.slug }, "", targetUrl);
       }
     } catch (err) {}
-    document.title = `${isHi ? tool.titleHi : tool.titleEn} — Jyotish Paramarsh`;
+    document.title = `${isHi ? tool.titleHi : tool.titleEn} \u2014 Jyotish Paramarsh`;
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

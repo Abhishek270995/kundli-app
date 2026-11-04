@@ -1,177 +1,562 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- ==================== HOMEPAGE (EN & HI) ==================== -->
   <url>
     <loc>https://www.jyotishparamash.com/</loc>
-    <lastmod>2026-10-15</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/panchang</loc>
-    <lastmod>2026-10-15</lastmod>
+    <loc>https://www.jyotishparamash.com/?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/" />
   </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/muhurat</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/festivals</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/daily</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/matchmaking</loc>
-    <lastmod>2026-10-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
+
+  <!-- ==================== MAIN SECTIONS (EN & HI) ==================== -->
   <url>
     <loc>https://www.jyotishparamash.com/astrology-tools</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://www.jyotishparamash.com/astrology-tools?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools" />
+  </url>
+
+  <url>
+    <loc>https://www.jyotishparamash.com/matchmaking</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/matchmaking" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/matchmaking?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/matchmaking" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/matchmaking?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/matchmaking" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/matchmaking?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/matchmaking" />
   </url>
+
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/divisional-charts</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/kp-house-significator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/life-path-number</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/name-numerology</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/personal-year-month</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/panchang</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/panchang" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/panchang?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/panchang" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/panchang?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/panchang" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/panchang?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/panchang" />
+  </url>
+
+  <url>
+    <loc>https://www.jyotishparamash.com/muhurat</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/muhurat" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/muhurat?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/muhurat" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/muhurat?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/muhurat" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/muhurat?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/muhurat" />
   </url>
+
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/daily</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/daily" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/daily?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/daily" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/daily?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/daily" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/daily?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/daily" />
   </url>
+
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://www.jyotishparamash.com/festivals</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/festivals" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/festivals?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/festivals" />
   </url>
   <url>
-    <loc>https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass</loc>
-    <lastmod>2026-10-23</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://www.jyotishparamash.com/tools</loc>
-    <lastmod>2026-10-23</lastmod>
+    <loc>https://www.jyotishparamash.com/festivals?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/festivals" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/festivals?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/festivals" />
   </url>
+
+  <!-- ==================== 21 VEDIC ASTROLOGY TOOLS (EN & HI) ==================== -->
+
+  <!-- 1. Vimshottari Dasha -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/vimshottari-dasha" />
+  </url>
+
+  <!-- 2. Divisional Charts -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/divisional-charts</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/divisional-charts?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/divisional-charts" />
+  </url>
+
+  <!-- 3. Ashtakavarga Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/ashtakavarga-calculator" />
+  </url>
+
+  <!-- 4. Gochar Transit Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/gochar-transit-calculator" />
+  </url>
+
+  <!-- 5. Planetary Strength Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/planetary-strength-calculator" />
+  </url>
+
+  <!-- 6. KP Chart Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-chart-calculator" />
+  </url>
+
+  <!-- 7. KP House Significator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-house-significator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-house-significator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-house-significator" />
+  </url>
+
+  <!-- 8. KP Horary Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-horary-calculator" />
+  </url>
+
+  <!-- 9. KP Ruling Planets -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/kp-ruling-planets" />
+  </url>
+
+  <!-- 10. Life Path Number -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/life-path-number</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/life-path-number" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/life-path-number?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/life-path-number" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/life-path-number?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/life-path-number" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/life-path-number?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/life-path-number" />
+  </url>
+
+  <!-- 11. Name Numerology -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/name-numerology</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/name-numerology" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/name-numerology?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/name-numerology" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/name-numerology?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/name-numerology" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/name-numerology?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/name-numerology" />
+  </url>
+
+  <!-- 12. Personal Year & Month -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/personal-year-month</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/personal-year-month?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/personal-year-month" />
+  </url>
+
+  <!-- 13. Lucky Number Compatibility -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/lucky-number-compatibility" />
+  </url>
+
+  <!-- 14. Choghadiya Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/choghadiya-calculator" />
+  </url>
+
+  <!-- 15. Rahu Kaal Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/rahu-kaal-calculator" />
+  </url>
+
+  <!-- 16. Personalized Muhurat Finder -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/personalized-muhurat-finder" />
+  </url>
+
+  <!-- 17. Daily Transit Horoscope -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/daily-transit-horoscope" />
+  </url>
+
+  <!-- 18. Prashna Quick Oracle -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/prashna-quick-oracle" />
+  </url>
+
+  <!-- 19. Tarabala & Chandrabala -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/tarabala-chandrabala" />
+  </url>
+
+  <!-- 20. Pancha Pakshi Calculator -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/pancha-pakshi-calculator" />
+  </url>
+
+  <!-- 21. Cosmic Decision Compass -->
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass" />
+  </url>
+  <url>
+    <loc>https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass?lang=hi</loc>
+    <lastmod>2026-11-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass" />
+    <xhtml:link rel="alternate" hreflang="hi" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass?lang=hi" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.jyotishparamash.com/astrology-tools/cosmic-decision-compass" />
+  </url>
+
 </urlset>

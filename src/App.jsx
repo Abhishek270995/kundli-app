@@ -1339,48 +1339,48 @@ const CheckoutModal = ({ item, onClose, onPaid, lang, currency = "USD", setCurre
 const SECTION_CONFIG = {
   kundli: {
     path: "/",
-    titleEn: "Free Janam Kundli Online — Vedic Birth Chart & Life Reading | Jyotish Paramarsh",
-    titleHi: "निःशुल्क जन्म पत्रिका — प्रामाणिक वैदिक जन्म कुंडली एवं जीवन दर्पण | ज्योतिष परामर्श",
+    titleEn: "Free Janam Kundli Online \u2014 Vedic Birth Chart & Life Reading | Jyotish Paramarsh",
+    titleHi: "निःशुल्क जन्म पत्रिका \u2014 प्रामाणिक वैदिक जन्म कुंडली एवं जीवन दर्पण | ज्योतिष परामर्श",
     descEn: "Generate free authentic Vedic Janam Kundli with 16 Shodashvarga divisional charts, Vimshottari Mahadasha, planetary analysis, and life predictions according to Maharishi Parashara.",
     descHi: "महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र पर आधारित निःशुल्क एवं सटीक जन्म कुंडली, १६ वर्ग चक्र, विंशोत्तरी दशा व सम्पूर्ण जीवन मार्गदर्शन।"
   },
   panchang: {
     path: "/panchang",
-    titleEn: "Aaj Ka Panchang — Today's Vedic Panchang, Tithi, Nakshatra, Rahu Kaal & Choghadiya | Jyotish Paramarsh",
-    titleHi: "आज का पंचांग — दैनिक वैदिक पंचांग, तिथि, नक्षत्र, राहुकाल एवं चौघड़िया मुहूर्त | ज्योतिष परामर्श",
+    titleEn: "Aaj Ka Panchang \u2014 Today's Vedic Panchang, Tithi, Nakshatra, Rahu Kaal & Choghadiya | Jyotish Paramarsh",
+    titleHi: "आज का पंचांग \u2014 दैनिक वैदिक पंचांग, तिथि, नक्षत्र, राहुकाल एवं चौघड़िया मुहूर्त | ज्योतिष परामर्श",
     descEn: "Accurate real-time Hindu Panchang: today's Tithi, Nakshatra, Yoga, Karana, Rahu Kaal, Abhijit Muhurat, sunrise, sunset, and Choghadiya timings.",
     descHi: "सटीक दैनिक वैदिक पंचांग: आज की तिथि, नक्षत्र, योग, करण, राहुकाल, अभिजीत मुहूर्त एवं दिन-रात का चौघड़िया मुहूर्त।"
   },
   muhurat: {
     path: "/muhurat",
-    titleEn: "Shubh Muhurat Today — Vivah, Griha Pravesh, Vehicle & Choghadiya Muhurat | Jyotish Paramarsh",
-    titleHi: "शुभ मुहूर्त — आज का शुभ समय, चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन मुहूर्त | ज्योतिष परामर्श",
+    titleEn: "Shubh Muhurat Today \u2014 Vivah, Griha Pravesh, Vehicle & Choghadiya Muhurat | Jyotish Paramarsh",
+    titleHi: "शुभ मुहूर्त \u2014 आज का शुभ समय, चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन मुहूर्त | ज्योतिष परामर्श",
     descEn: "Find daily auspicious Shubh Muhurats, Day & Night Choghadiya, Vivah (wedding) Muhurat, Griha Pravesh, and vehicle purchase timings.",
     descHi: "दैनिक शुभ मुहूर्त, दिन व रात्रि चौघड़िया, विवाह, गृह प्रवेश एवं संपत्ति-वाहन क्रय के श्रेष्ठ शास्त्रीय मुहूर्त।"
   },
   festivals: {
     path: "/festivals",
-    titleEn: "Hindu Festivals & Vrat Calendar 2026–2027 — Ekadashi, Pradosh & Tyohar Dates | Jyotish Paramarsh",
-    titleHi: "सनातन व्रत एवं त्यौहार कैलेंडर — एकादशी, प्रदोष, पूर्णिमा एवं प्रमुख व्रत-पर्व तिथियां | ज्योतिष परामर्श",
+    titleEn: "Hindu Festivals & Vrat Calendar 2026\u20132027 \u2014 Ekadashi, Pradosh & Tyohar Dates | Jyotish Paramarsh",
+    titleHi: "सनातन व्रत एवं त्यौहार कैलेंडर \u2014 एकादशी, प्रदोष, पूर्णिमा एवं प्रमुख व्रत-पर्व तिथियां | ज्योतिष परामर्श",
     descEn: "Comprehensive calendar of upcoming Hindu festivals, Ekadashi, Pradosh, Shivratri, Navratri, Purnima, Amavasya with authentic Vedic puja timings.",
     descHi: "आगामी हिंदू त्यौहार, एकादशी, प्रदोष, नवरात्रि, पूर्णिमा, अमावस्या व प्रमुख व्रतों की सटीक तिथियां, पूजा विधि एवं धार्मिक महत्व।"
   },
   daily: {
     path: "/daily",
-    titleEn: "Dainik Rashifal — Today's Daily Vedic Horoscope for All 12 Moon Signs | Jyotish Paramarsh",
-    titleHi: "दैनिक राशिफल — आज का वैदिक भविष्यफल सभी १२ चंद्र राशियों के लिए | ज्योतिष परामर्श",
+    titleEn: "Dainik Rashifal \u2014 Today's Daily Vedic Horoscope for All 12 Moon Signs | Jyotish Paramarsh",
+    titleHi: "दैनिक राशिफल \u2014 आज का वैदिक भविष्यफल सभी १२ चंद्र राशियों के लिए | ज्योतिष परामर्श",
     descEn: "Accurate Vedic daily horoscope (Dainik Rashifal) for all 12 Rashi signs covering career, finance, romance, health, lucky numbers and colors.",
     descHi: "सभी १२ चंद्र राशियों (मेष से मीन) का दैनिक वैदिक राशिफल: करियर, धन, स्वास्थ्य, प्रेम एवं शुभ अंक व रंग।"
   },
   matchmaking: {
     path: "/matchmaking",
-    titleEn: "Kundli Milan — Free Ashtakoot 36 Guna Horoscope Matching for Marriage | Jyotish Paramarsh",
-    titleHi: "कुंडली मिलान — वर-वधू का अष्टकूट ३६ गुण मिलान एवं मांगलिक दोष विचार | ज्योतिष परामर्श",
+    titleEn: "Kundli Milan \u2014 Free Ashtakoot 36 Guna Horoscope Matching for Marriage | Jyotish Paramarsh",
+    titleHi: "कुंडली मिलान \u2014 वर-वधू का अष्टकूट ३६ गुण मिलान एवं मांगलिक दोष विचार | ज्योतिष परामर्श",
     descEn: "Complete Vedic Kundli Milan (Gun Milan) for prospective bride and groom. 36 Guna Ashta-Koota calculation, Nadi & Bhakoot dosha, and Manglik cancellation analysis.",
     descHi: "वर-वधु हेतु प्रामाणिक ३६ गुण अष्टकूट मिलान, नाड़ी-भकूट दोष विचार एवं मांगलिक दोष परिहार विश्लेषण।"
   },
   tools: {
-    path: "/astrology-tools",
+    path: "/tools",
     titleEn: "Vedic Astrology Calculators & Divine Jyotish Instruments | Jyotish Paramarsh",
     titleHi: "वैदिक ज्योतिष गणना केंद्र एवं दिव्य साधन (२१ शास्त्रीय उपकरण) | ज्योतिष परामर्श",
     descEn: "21 authentic Vedic astrological calculators: Vimshottari Dasha, Shodashvargas, KP Horary (1-249), Chaldean Numerology, Choghadiya and Prashna Oracle.",
@@ -1402,7 +1402,16 @@ export const getAstrologyToolSlugFromPath = () => {
 
 const getInitialSection = () => {
   try {
-    const path = (window.location.pathname || "").replace(/^\/+|\/+$/g, '').toLowerCase();
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get("p");
+    if (p) {
+      const decodedP = decodeURIComponent(p);
+      try {
+        window.history.replaceState(null, "", decodedP);
+      } catch (err) {}
+    }
+
+    const path = ((p ? decodeURIComponent(p) : window.location.pathname) || "").replace(/^\/+|\/+$/g, '').toLowerCase();
     if (path.includes("panchang")) return "panchang";
     if (path.includes("muhurat")) return "muhurat";
     if (path.includes("festivals") || path.includes("festival")) return "festivals";
@@ -1410,7 +1419,6 @@ const getInitialSection = () => {
     if (path.includes("matchmaking") || path.includes("milan")) return "matchmaking";
     if (path.includes("astrology-tool") || path.includes("tool") || path.includes("tools")) return "tools";
 
-    const params = new URLSearchParams(window.location.search);
     const sec = params.get("section");
     if (sec && ["kundli", "panchang", "muhurat", "festivals", "daily", "matchmaking", "tools", "astrology-tools"].includes(sec.toLowerCase())) {
       return sec.toLowerCase() === "astrology-tools" ? "tools" : sec.toLowerCase();
@@ -1480,6 +1488,9 @@ export default function App() {
   const [err, setErr] = useState("");
   const [lang, setLang] = useState(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      const urlLang = params.get("lang");
+      if (urlLang === "hi" || urlLang === "en") return urlLang;
       const saved = localStorage.getItem("jyotish_user_lang");
       if (saved === "en" || saved === "hi") return saved;
     } catch (e) {}
