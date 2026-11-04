@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node generate_tool_pages.js",
     "build": "vite build",
     "preview": "vite preview"
   },
