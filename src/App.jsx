@@ -24,7 +24,7 @@ import {
   HOUSE_TITLES
 } from "./planetaryAnalysisEngine";
 import { Icons } from "./components/Icons";
-import { Analytics } from "./analytics";
+import { Analytics, trackJyotishEvent } from "./analytics";
 import AstrologyToolsHub from "./components/AstrologyToolsHub";
 
 const ZODIAC_SIGNS = [
@@ -1559,10 +1559,17 @@ export default function App() {
       pob: "New Delhi, India"
     });
     setErr("");
-    Analytics.generateKundli(true);
+    trackJyotishEvent("sample_kundli_clicked", {
+      language: lang,
+      button_location: "hero_link"
+    });
   };
 
   const handlePreviewSampleKundli = async () => {
+    trackJyotishEvent("sample_kundli_clicked", {
+      language: lang,
+      button_location: "hero_preview_button"
+    });
     const sampleData = {
       name: hi ? "राहुल शर्मा" : "Rahul Sharma",
       gender: "male",
@@ -1596,7 +1603,15 @@ export default function App() {
       });
 
       setResult(resData);
-      Analytics.generateKundli(true);
+      trackJyotishEvent("kundli_generated", {
+        language: lang,
+        used_sample_city: true,
+        has_custom_name: false
+      });
+      trackJyotishEvent("tool_calculated", {
+        tool_name: "janam_kundli_sample",
+        language: lang
+      });
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
     } catch (e) {
       console.error(e);
@@ -1622,6 +1637,23 @@ export default function App() {
 
   // Monetization Modal State
   const [activeCheckout, setActiveCheckout] = useState(null);
+
+  const handleOpenDakshina = (customAmount = null) => {
+    const isINR = currency === "INR";
+    const amount = customAmount || PRODUCT_PRICES.dakshina[currency] || (isINR ? "₹101" : "$1.99");
+    trackJyotishEvent("dakshina_initiated", {
+      region_tab: currency,
+      amount: String(amount)
+    });
+    setActiveCheckout({
+      title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
+      priceKey: "dakshina",
+      price: amount,
+      desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
+      icon: "🪷",
+      isDakshina: true
+    });
+  };
   const [unlockedProReport, setUnlockedProReport] = useState(false);
   const [unlockedMarriageReport, setUnlockedMarriageReport] = useState(() => {
     try {
@@ -1693,7 +1725,10 @@ export default function App() {
 
   const handlePrintReport = (reportType = "all") => {
     setActivePrintReport(reportType);
-    Analytics.printReport(reportType);
+    trackJyotishEvent("dossier_downloaded", {
+      language: lang,
+      report_type: reportType
+    });
     setTimeout(() => {
       window.print();
     }, 120);
@@ -1758,14 +1793,7 @@ export default function App() {
         ];
 
     const openDakshina = (customPrice = null) => {
-      setActiveCheckout({
-        title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-        priceKey: "dakshina",
-        price: customPrice || PRODUCT_PRICES.dakshina[currency],
-        desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-        icon: "🪷",
-        isDakshina: true
-      });
+      handleOpenDakshina(customPrice);
     };
 
     return (
@@ -2070,7 +2098,13 @@ export default function App() {
   // Track Tool Switching & Views in Google Analytics
   useEffect(() => {
     Analytics.toolSwitch(mainSection);
-  }, [mainSection]);
+    if (mainSection && mainSection !== "kundli") {
+      trackJyotishEvent("tool_calculated", {
+        tool_name: mainSection,
+        language: lang
+      });
+    }
+  }, [mainSection, lang]);
 
   // Listen to browser back/forward buttons (popstate)
   useEffect(() => {
@@ -2133,7 +2167,20 @@ export default function App() {
       });
 
       setResult(resData);
-      Analytics.generateKundli(false);
+      const hasCustomName = Boolean(form.name && form.name.trim().length > 0 && form.name.trim() !== fallbackName);
+      const sampleCities = ["new delhi", "mumbai", "bengaluru", "patna", "gurugram", "varanasi", "ayodhya", "kolkata", "hyderabad", "pune", "dubai", "london", "new york", "toronto"];
+      const pobLower = (form.pob || "").toLowerCase();
+      const usedSampleCity = sampleCities.some(city => pobLower.includes(city));
+
+      trackJyotishEvent("kundli_generated", {
+        language: lang,
+        used_sample_city: usedSampleCity,
+        has_custom_name: hasCustomName
+      });
+      trackJyotishEvent("tool_calculated", {
+        tool_name: "janam_kundli",
+        language: lang
+      });
       setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
     } catch (e) {
       console.error(e);
@@ -2155,6 +2202,10 @@ export default function App() {
         partner2: partnerForm
       });
       setMilanResult(res);
+      trackJyotishEvent("tool_calculated", {
+        tool_name: "kundli_milan",
+        language: lang
+      });
     } catch (e) {
       console.error("Gun Milan calculation error:", e);
       alert(hi ? "गुण मिलान गणना में त्रुटि हुई। कृपया जन्म तिथि व समय की पुनः जांच करें।" : "Error calculating Gun Milan compatibility. Please check the birth dates and time.");
@@ -5334,14 +5385,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => setActiveCheckout({
-                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                    priceKey: "dakshina",
-                    price: PRODUCT_PRICES.dakshina[currency],
-                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                    icon: "🪷",
-                    isDakshina: true
-                  })}
+                  onClick={() => handleOpenDakshina()}
                   style={{
                     background: "linear-gradient(90deg, #F59E0B, #D97706)",
                     border: "none",
@@ -5605,14 +5649,7 @@ export default function App() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveCheckout({
-                    title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                    priceKey: "dakshina",
-                    price: PRODUCT_PRICES.dakshina[currency],
-                    desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                    icon: "🪷",
-                    isDakshina: true
-                  })}
+                  onClick={() => handleOpenDakshina()}
                   style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "11px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                 >
                   <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
@@ -6501,14 +6538,7 @@ export default function App() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setActiveCheckout({
-                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                              priceKey: "dakshina",
-                              price: PRODUCT_PRICES.dakshina[currency],
-                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                              icon: "🪷",
-                              isDakshina: true
-                            })}
+                            onClick={() => handleOpenDakshina()}
                             style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                           >
                             <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
@@ -6723,14 +6753,7 @@ export default function App() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setActiveCheckout({
-                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                              priceKey: "dakshina",
-                              price: PRODUCT_PRICES.dakshina[currency],
-                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                              icon: "🪷",
-                              isDakshina: true
-                            })}
+                            onClick={() => handleOpenDakshina()}
                             style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                           >
                             <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
@@ -7067,14 +7090,7 @@ export default function App() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setActiveCheckout({
-                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                              priceKey: "dakshina",
-                              price: PRODUCT_PRICES.dakshina[currency],
-                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                              icon: "🪷",
-                              isDakshina: true
-                            })}
+                            onClick={() => handleOpenDakshina()}
                             style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                           >
                             <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
@@ -7199,14 +7215,7 @@ export default function App() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setActiveCheckout({
-                              title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                              priceKey: "dakshina",
-                              price: PRODUCT_PRICES.dakshina[currency],
-                              desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                              icon: "🪷",
-                              isDakshina: true
-                            })}
+                            onClick={() => handleOpenDakshina()}
                             style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "10px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                           >
                             <span>🪷</span> {hi ? "श्रद्धा दक्षिणा दें" : "Offer Dakshina"}
@@ -7527,6 +7536,7 @@ export default function App() {
                     href={`mailto:teamjyotishparamarsh@gmail.com?subject=${encodeURIComponent("Priority Waitlist for 1-on-1 Vedic Astrologer Consultation")}&body=${encodeURIComponent("Namaste Team Jyotish Paramarsh,\n\nI would like to join the Priority Waitlist for 1-on-1 Vedic Astrologer Consultation on Jyotish Paramarsh.\n\nPlease notify me when booking slots open.\n\nThank you!")}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackJyotishEvent("dakshina_initiated", { region_tab: "consultation_waitlist", amount: "email_waitlist" })}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -9690,7 +9700,12 @@ export default function App() {
                 </li>
                 <li>
                   <button
-                    onClick={() => { setMainSection("kundli"); setTab("consult"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    onClick={() => {
+                      trackJyotishEvent("dakshina_initiated", { region_tab: "consultation_waitlist", amount: "priority_desk" });
+                      setMainSection("kundli");
+                      setTab("consult");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                     style={{ background: "none", border: "none", color: "rgba(241,231,208,0.85)", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left" }}
                   >
                     ✦ {hi ? "१-ऑन-१ ज्योतिषी परामर्श प्रतीक्षा सूची" : "1-on-1 Astrologer Priority Desk"}
@@ -9715,14 +9730,7 @@ export default function App() {
                 <li>
                   <button
                     type="button"
-                    onClick={() => setActiveCheckout({
-                      title: hi ? "श्रद्धा दक्षिणा (Seva Bhent)" : "Offer Dakshina (Sacred Offering)",
-                      priceKey: "dakshina",
-                      price: PRODUCT_PRICES.dakshina[currency],
-                      desc: hi ? "वैदिक ज्योतिष अनुसंधान एवं निःशुल्क सर्वर सेवा हेतु स्वैच्छिक दक्षिणा" : "Voluntary offering to maintain free Vedic compute servers and support seekers worldwide",
-                      icon: "🪷",
-                      isDakshina: true
-                    })}
+                    onClick={() => handleOpenDakshina()}
                     style={{ background: "none", border: "none", color: "#F59E0B", cursor: "pointer", padding: 0, fontSize: "inherit", textAlign: "left", fontWeight: 700 }}
                   >
                     🪷 {hi ? "श्रद्धा दक्षिणा अर्पित करें (Seva)" : "Offer Shraddha Dakshina"}

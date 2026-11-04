@@ -37,6 +37,8 @@ import {
   SHODASHVARGA_LIST
 } from "../vedicComprehensiveEngine.js";
 
+import { trackJyotishEvent } from "../analytics.js";
+
 // ── TOOL DEFINITIONS (5 CATEGORIES, 21 TOOLS) ───────────────────────────
 // ── CATEGORY METADATA (5 CATEGORIES) ────────────────────────────────────
 export const TOOL_CATEGORIES = [
@@ -486,6 +488,16 @@ export default function AstrologyToolsHub({
     window.addEventListener("popstate", syncFromUrl);
     return () => window.removeEventListener("popstate", syncFromUrl);
   }, [isHi]);
+
+  // Track tool calculation event in GA4 whenever an active tool is engaged
+  useEffect(() => {
+    if (activeToolId) {
+      trackJyotishEvent('tool_calculated', {
+        tool_name: activeToolId,
+        language: isHi ? 'hi' : 'en'
+      });
+    }
+  }, [activeToolId, isHi]);
 
   // Filtered tools
   const filteredTools = useMemo(() => {
