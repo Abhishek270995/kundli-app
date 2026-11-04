@@ -2009,6 +2009,294 @@ export default function App() {
     updatePageMeta(sectionId, lang);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleShareWhatsApp = (type = "kundli") => {
+    let shareUrl = "https://www.jyotishparamash.com/?utm_source=whatsapp_share&utm_medium=social";
+    let text = "";
+    if (type === "milan" && milanResult) {
+      shareUrl = "https://www.jyotishparamash.com/matchmaking?utm_source=whatsapp_share&utm_medium=social";
+      text = hi
+        ? `नमस्ते! हमने ज्योतिष परामर्श पर अपना ३६-गुण वैदिक मिलान देखा (स्कोर: ${milanResult.totalGunas}/36 - ${milanResult.verdictHi || milanResult.verdict})। आप भी वर-वधु की निःशुल्क प्रामाणिक कुंडली मिलान यहां देख सकते हैं:\n${shareUrl}`
+        : `Namaste! We just checked our authentic 36-Guna Vedic Horoscope Matchmaking on Jyotish Paramarsh (Score: ${milanResult.totalGunas}/36 - ${milanResult.verdict}). Generate your free Kundli Match here:\n${shareUrl}`;
+    } else {
+      const rashiName = result ? (hi ? (result.rashiSignHi || result.rashi) : result.rashi) : "";
+      text = hi
+        ? `नमस्ते! मैंने ज्योतिष परामर्श से अपनी सम्पूर्ण ५०-पेज वैदिक जन्म कुंडली${rashiName ? ` (राशि: ${rashiName})` : ""} १००% निःशुल्क प्राप्त की। विंशोत्तरी दशा, साढ़ेसाती व जीवन मार्गदर्शन हेतु अपनी भी निःशुल्क कुंडली यहां बनाएं:\n${shareUrl}`
+        : `Namaste! I just generated my detailed 50-Page Vedic Janam Kundli${rashiName ? ` (Moon Sign: ${rashiName})` : ""} 100% free on Jyotish Paramarsh. Generate your free Kundli & Dasha report here:\n${shareUrl}`;
+    }
+    trackJyotishEvent("share_clicked", { platform: "whatsapp", share_type: type });
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const openNextStepMilan = () => {
+    trackJyotishEvent("next_step_clicked", { step: "kundli_milan", language: lang });
+    navigateToSection("matchmaking");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openNextStepDivisional = () => {
+    trackJyotishEvent("next_step_clicked", { step: "divisional_charts", language: lang });
+    navigateToSection("tools");
+    try {
+      window.history.pushState({ tool: "divisional-charts" }, "", "/astrology-tools/divisional-charts");
+    } catch (e) {}
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openNextStepMuhurat = () => {
+    trackJyotishEvent("next_step_clicked", { step: "shubh_muhurat", language: lang });
+    navigateToSection("muhurat");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openNextStepAstrologer = () => {
+    trackJyotishEvent("next_step_clicked", { step: "astrologer_priority_desk", language: lang });
+    trackJyotishEvent("dakshina_initiated", { region_tab: "consultation_waitlist", amount: "priority_desk" });
+    const mailtoUrl = `mailto:teamjyotishparamarsh@gmail.com?subject=${encodeURIComponent("Priority Consultation Request for Natal Kundli (" + (form.name || "Native") + ")")}&body=${encodeURIComponent("Namaste Team Jyotish Paramarsh,\n\nI generated my Janam Kundli on Jyotish Paramarsh and would like to request a 1-on-1 consultation regarding my chart.\n\nNative Details:\nName: " + (form.name || "N/A") + "\nDOB: " + (form.dob || "N/A") + "\nTOB: " + (form.tob || "N/A") + "\nPOB: " + (form.pob || "N/A") + "\n\nPlease notify me with available astrologer slots.\n\nDhanyawad!")}`;
+    window.open(mailtoUrl, "_blank");
+  };
+
+  const renderRecommendedNextSteps = () => {
+    return (
+      <div
+        className="glass-card no-print"
+        style={{
+          marginTop: 32,
+          marginBottom: 32,
+          padding: "28px 24px",
+          background: "linear-gradient(135deg, rgba(28, 17, 52, 0.96), rgba(16, 10, 32, 0.98))",
+          border: "1.5px solid rgba(245, 158, 11, 0.5)",
+          borderRadius: 16,
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.45), 0 0 20px rgba(245, 158, 11, 0.15)"
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 14, padding: "4px 14px", color: "#FDE68A", fontSize: 12, fontWeight: 800, marginBottom: 8 }}>
+            <span>🧭</span> {hi ? "कुंडली उपरांत मार्गदर्शिका" : "POST-CHART GUIDANCE"}
+          </div>
+          <h3 style={{ color: "#F3D37A", fontSize: 20, fontWeight: 800, margin: "0 0 6px 0" }}>
+            {hi ? "आपकी जन्म कुंडली के लिए अनुशंसित अगले कदम" : "Recommended Next Steps for Your Chart"}
+          </h3>
+          <p style={{ color: "rgba(241, 231, 208, 0.82)", fontSize: 13.5, margin: "0 auto", maxWidth: 650 }}>
+            {hi
+              ? "जन्म पत्रिका निर्माण के पश्चात अपने जीवन के इन महत्वपूर्ण क्षेत्रों का सूक्ष्म शास्त्रीय अन्वेषण करें:"
+              : "Now that your natal blueprint is generated, explore these specialized Vedic tools tailored for your destiny:"}
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 20 }}>
+          {/* Card 1: Kundli Milan */}
+          <div
+            onClick={openNextStepMilan}
+            style={{
+              background: "rgba(11, 8, 25, 0.75)",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              borderRadius: 12,
+              padding: "18px 18px",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.8)";
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.2)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>💍</div>
+              <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, margin: "0 0 6px" }}>
+                {hi ? "३६ गुण मिलान एवं मांगलिक विचार" : "36-Guna Kundli Milan"}
+              </h4>
+              <p style={{ color: "rgba(241, 231, 208, 0.78)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
+                {hi
+                  ? "अपनी जन्म कुंडली के साथ जीवनसाथी का अष्टकूट मिलान, नाड़ी-भकूट दोष व मांगलिक सामंजस्य जांचें।"
+                  : "Evaluate marriage compatibility, 36-guna score, Nadi-Bhakoot dosha, and Manglik cancellation."}
+              </p>
+            </div>
+            <div style={{ marginTop: 14, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 5 }}>
+              <span>{hi ? "गुण मिलान खोलें" : "Open 36-Guna Milan"}</span> <span>→</span>
+            </div>
+          </div>
+
+          {/* Card 2: 16 Divisional Charts */}
+          <div
+            onClick={openNextStepDivisional}
+            style={{
+              background: "rgba(11, 8, 25, 0.75)",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              borderRadius: 12,
+              padding: "18px 18px",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.8)";
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.2)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>📊</div>
+              <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, margin: "0 0 6px" }}>
+                {hi ? "१६ षोडशवर्ग वर्ग कुंडलियां" : "16 Shodashvarga Charts"}
+              </h4>
+              <p style={{ color: "rgba(241, 231, 208, 0.78)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
+                {hi
+                  ? "विवाह व आत्मबल हेतु D9 नवमांश और करियर व सामाजिक प्रतिष्ठा हेतु D10 दशमांश का विस्तृत चक्र।"
+                  : "Analyze D9 Navamsha (marriage & dharma) and D10 Dashamsha (career leadership & fame)."}
+              </p>
+            </div>
+            <div style={{ marginTop: 14, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 5 }}>
+              <span>{hi ? "षोडशवर्ग चक्र देखें" : "View Divisional Charts"}</span> <span>→</span>
+            </div>
+          </div>
+
+          {/* Card 3: Today's Muhurat & Rahu Kaal */}
+          <div
+            onClick={openNextStepMuhurat}
+            style={{
+              background: "rgba(11, 8, 25, 0.75)",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              borderRadius: 12,
+              padding: "18px 18px",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.8)";
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.2)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
+              <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, margin: "0 0 6px" }}>
+                {hi ? "आज का शुभ मुहूर्त व राहुकाल" : "Today's Rahu Kaal & Muhurat"}
+              </h4>
+              <p style={{ color: "rgba(241, 231, 208, 0.78)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
+                {hi
+                  ? "नवीन कार्य, निवेश व यात्रा हेतु आज के अमृत व शुभ चौघड़िया तथा त्याज्य राहुकाल समय सारिणी।"
+                  : "Find today's auspicious Choghadiya slots and protect key decisions from daily Rahu Kaal windows."}
+              </p>
+            </div>
+            <div style={{ marginTop: 14, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 5 }}>
+              <span>{hi ? "शुभ मुहूर्त जांचें" : "Check Daily Muhurat"}</span> <span>→</span>
+            </div>
+          </div>
+
+          {/* Card 4: Astrologer Priority Desk */}
+          <div
+            onClick={openNextStepAstrologer}
+            style={{
+              background: "rgba(11, 8, 25, 0.75)",
+              border: "1px solid rgba(212, 175, 55, 0.3)",
+              borderRadius: 12,
+              padding: "18px 18px",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "rgba(245, 158, 11, 0.8)";
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(245, 158, 11, 0.2)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "rgba(212, 175, 55, 0.3)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🧙‍♂️</div>
+              <h4 style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800, margin: "0 0 6px" }}>
+                {hi ? "१-ऑन-१ ज्योतिषी परामर्श डेस्क" : "1-on-1 Astrologer Priority"}
+              </h4>
+              <p style={{ color: "rgba(241, 231, 208, 0.78)", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
+                {hi
+                  ? "विशिष्ट जीवन उलझनों, विवाह व करियर दिशा पर वरिष्ठ वैदिक विद्वानों से प्रत्यक्ष मार्गदर्शन पाएं।"
+                  : "Request private email guidance with senior certified Parashari scholars for complex life choices."}
+              </p>
+            </div>
+            <div style={{ marginTop: 14, color: "#F59E0B", fontSize: 12.5, fontWeight: 800, display: "flex", alignItems: "center", gap: 5 }}>
+              <span>{hi ? "परामर्श प्रतीक्षा सूची" : "Join Priority Desk"}</span> <span>→</span>
+            </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Share Strip at Bottom of Next Steps */}
+        <div style={{
+          background: "rgba(37, 211, 102, 0.08)",
+          border: "1px solid rgba(37, 211, 102, 0.3)",
+          borderRadius: 12,
+          padding: "14px 20px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 12
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 24 }}>📤</span>
+            <div>
+              <div style={{ color: "#A7F3D0", fontSize: 13.5, fontWeight: 800 }}>
+                {hi ? "अपने परिवार व मित्रों के साथ यह कुंडली रिपोर्ट साझा करें" : "Share this Kundli Report with Family & Astrologers"}
+              </div>
+              <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12 }}>
+                {hi ? "व्हाट्सएप पर एक क्लिक में निःशुल्क जन्म पत्रिका एवं विंशोत्तरी दशा लिंक भेजें" : "Send your complete Vedic chart and Dasha timeline via WhatsApp in 1-click"}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleShareWhatsApp("kundli")}
+            style={{
+              background: "linear-gradient(90deg, #25D366, #128C7E)",
+              border: "none",
+              color: "#FFFFFF",
+              padding: "10px 20px",
+              borderRadius: 8,
+              fontSize: 13.5,
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 3px 12px rgba(37,211,102,0.3)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6
+            }}
+          >
+            <span>💬</span> {hi ? "व्हाट्सएप पर शेयर करें" : "Share on WhatsApp"}
+          </button>
+        </div>
+      </div>
+    );
+  };
   const [panchangDate, setPanchangDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [panchangCity, setPanchangCity] = useState(MAJOR_INDIAN_CITIES[0]);
   const [choghadiyaPeriod, setChoghadiyaPeriod] = useState("day");
@@ -5649,6 +5937,13 @@ export default function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => handleShareWhatsApp("kundli")}
+                  style={{ background: "linear-gradient(90deg, #25D366, #128C7E)", border: "none", color: "#FFFFFF", padding: "12px 20px", borderRadius: 10, fontSize: 14, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 14px rgba(37,211,102,0.35)", display: "inline-flex", alignItems: "center", gap: 7 }}
+                >
+                  <span>💬</span> {hi ? "व्हाट्सएप पर शेयर करें" : "Share on WhatsApp"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleOpenDakshina()}
                   style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "11px 18px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}
                 >
@@ -7495,6 +7790,42 @@ export default function App() {
                         </div>
                       </div>
                     )}
+
+                    {/* Milan Share & Branded Attribution Banner */}
+                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(212,175,55,0.25)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                      <button
+                        type="button"
+                        onClick={() => handleShareWhatsApp("milan")}
+                        style={{
+                          background: "linear-gradient(90deg, #25D366, #128C7E)",
+                          border: "none",
+                          color: "#FFFFFF",
+                          padding: "10px 20px",
+                          borderRadius: 8,
+                          fontSize: 13.5,
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          boxShadow: "0 3px 12px rgba(37,211,102,0.3)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 7
+                        }}
+                      >
+                        <span>💬</span> {hi ? "व्हाट्सएप पर मिलान साझा करें" : "Share Match on WhatsApp"}
+                      </button>
+
+                      <div style={{ fontSize: 11.5, color: "rgba(243,211,122,0.95)" }}>
+                        Generated 100% Free at{" "}
+                        <a
+                          href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+                        >
+                          Jyotish Paramarsh (www.jyotishparamash.com)
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -9246,6 +9577,20 @@ export default function App() {
                       ✦ OM SHANTI SHANTI SHANTI ✦ — JYOTISH KUNDLI CERTIFIED DOSSIER
                     </div>
                   </div>
+
+                  {/* Sub-report Branded Attribution Banner */}
+                  <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1.5px solid rgba(212,175,55,0.35)", textAlign: "center", fontSize: 11, color: "rgba(243,211,122,0.95)" }}>
+                    Generated 100% Free at{" "}
+                    <a
+                      href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+                    >
+                      Jyotish Paramarsh (www.jyotishparamash.com)
+                    </a>
+                    {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
+                  </div>
                 </div>
               )}
 
@@ -9319,6 +9664,20 @@ export default function App() {
                     <div style={{ color: "rgba(243,211,122,0.75)", fontSize: 12, letterSpacing: 1.5, fontWeight: 600 }}>
                       ✦ SARVA MANOKAMNA SIDDHI ✦ — JYOTISH KUNDLI VEDIC DOSSIER
                     </div>
+                  </div>
+
+                  {/* Sub-report Branded Attribution Banner */}
+                  <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1.5px solid rgba(212,175,55,0.35)", textAlign: "center", fontSize: 11, color: "rgba(243,211,122,0.95)" }}>
+                    Generated 100% Free at{" "}
+                    <a
+                      href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+                    >
+                      Jyotish Paramarsh (www.jyotishparamash.com)
+                    </a>
+                    {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
                   </div>
                 </div>
               )}
@@ -9423,6 +9782,20 @@ export default function App() {
                       {mp.remedies}
                     </div>
                   </div>
+
+                  {/* Sub-report Branded Attribution Banner */}
+                  <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1.5px solid rgba(212,175,55,0.35)", textAlign: "center", fontSize: 11, color: "rgba(243,211,122,0.95)" }}>
+                    Generated 100% Free at{" "}
+                    <a
+                      href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+                    >
+                      Jyotish Paramarsh (www.jyotishparamash.com)
+                    </a>
+                    {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
+                  </div>
                 </div>
               )}
 
@@ -9504,6 +9877,20 @@ export default function App() {
                       {result.remedies || result.overview}
                     </div>
                   </div>
+
+                  {/* Sub-report Branded Attribution Banner */}
+                  <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1.5px solid rgba(212,175,55,0.35)", textAlign: "center", fontSize: 11, color: "rgba(243,211,122,0.95)" }}>
+                    Generated 100% Free at{" "}
+                    <a
+                      href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+                    >
+                      Jyotish Paramarsh (www.jyotishparamash.com)
+                    </a>
+                    {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
+                  </div>
                 </div>
               )}
 
@@ -9530,6 +9917,9 @@ export default function App() {
             </div>
           );
         })()}
+
+        {/* Recommended Next Steps for Your Chart (Contextual Cross-Tool Retention) */}
+        {result && renderRecommendedNextSteps()}
 
         {/* Dedicated Emotional Dakshina Card at Bottom of Page */}
         {renderDakshinaCard(false)}

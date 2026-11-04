@@ -73,10 +73,24 @@ export default function DeluxeLifeReportDossier({
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
         {children}
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1.5px solid rgba(212,175,55,0.35)", paddingTop: 6, marginTop: 12, fontSize: 9.5, color: "rgba(241,231,208,0.7)", letterSpacing: 0.8 }}>
-        <span>✦ OM TAT SAT · AUTHENTIC PARASHARI VEDIC COMPUTATIONS ✦</span>
-        <span>CONFIDENTIAL · JYOTISHPARAMASH.COM</span>
-        <span style={{ color: "#FDE68A", fontWeight: 800 }}>PAGE {pageNum} OF 45</span>
+      <div style={{ display: "flex", flexDirection: "column", borderTop: "1.5px solid rgba(212,175,55,0.35)", paddingTop: 5, marginTop: 10, fontSize: 9.5, color: "rgba(241,231,208,0.75)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
+          <span>✦ OM TAT SAT · AUTHENTIC PARASHARI VEDIC COMPUTATIONS ✦</span>
+          <span>CONFIDENTIAL · JYOTISHPARAMASH.COM</span>
+          <span style={{ color: "#FDE68A", fontWeight: 800 }}>PAGE {pageNum} OF 45</span>
+        </div>
+        <div style={{ textAlign: "center", fontSize: 9, color: "rgba(243,211,122,0.95)", letterSpacing: 0.2 }}>
+          Generated 100% Free at{" "}
+          <a
+            href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+          >
+            Jyotish Paramarsh (www.jyotishparamash.com)
+          </a>
+          {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
+        </div>
       </div>
     </div>
   );
@@ -125,8 +139,20 @@ export default function DeluxeLifeReportDossier({
             This sacred horoscope is meticulously computed following Maharishi Parashara's classical Brihat Parashara Hora Shastra and certified by Jyotish Paramarsh Vedic Scholars.
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(212,175,55,0.3)", paddingTop: 12, fontSize: 11, color: "#F3D37A", letterSpacing: 1.5, textTransform: "uppercase" }}>
+          <div style={{ borderTop: "1px solid rgba(212,175,55,0.3)", paddingTop: 10, fontSize: 11, color: "#F3D37A", letterSpacing: 1.5, textTransform: "uppercase" }}>
             ✦ STRICTLY CONFIDENTIAL · PERSONAL KARMIC DOSSIER ✦
+          </div>
+          <div style={{ marginTop: 12, background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.35)", borderRadius: 8, padding: "8px 14px", fontSize: 10, color: "#FDE68A", textAlign: "center" }}>
+            Generated 100% Free at{" "}
+            <a
+              href="https://www.jyotishparamash.com/?utm_source=dossier_pdf&utm_medium=referral&utm_campaign=kundli_share"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#F59E0B", fontWeight: 800, textDecoration: "underline" }}
+            >
+              Jyotish Paramarsh (www.jyotishparamash.com)
+            </a>
+            {" "}— Generate Your Free 50-Page Vedic Kundli & 36-Guna Match
           </div>
         </div>
       </PageShell>
