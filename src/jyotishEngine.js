@@ -2189,6 +2189,7 @@ export const MAJOR_INDIAN_CITIES = [
   { name: "Kolkata", nameHi: "कोलकाता", lat: 22.5726, lon: 88.3639, tz: 5.5 },
   { name: "Jaipur", nameHi: "जयपुर", lat: 26.9124, lon: 75.7873, tz: 5.5 },
   { name: "Patna", nameHi: "पटना", lat: 25.5941, lon: 85.1376, tz: 5.5 },
+  { name: "Gurugram", nameHi: "गुरुग्राम", lat: 28.4595, lon: 77.0266, tz: 5.5 },
   { name: "Lucknow", nameHi: "लखनऊ", lat: 26.8467, lon: 80.9462, tz: 5.5 },
   { name: "Hyderabad", nameHi: "हैदराबाद", lat: 17.3850, lon: 78.4867, tz: 5.5 },
   { name: "Chennai", nameHi: "चेन्नई", lat: 13.0827, lon: 80.2707, tz: 5.5 },

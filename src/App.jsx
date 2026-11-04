@@ -136,12 +136,12 @@ const UI = {
     tagline: '"गुह्याद् गुह्यतरं चेदं ज्योतिष्मती परा विद्या — The divine science of light illuminating the karmic path of the soul"',
     formTitle: "Enter Birth Details for Janam Kundli",
     formSub: "Precise planetary coordinates and Lagna computed according to Maharishi Parashara's classical Brihat Parashara Hora Shastra",
-    fName: "Full Name", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth (City / State)",
+    fName: "Name or Nickname (Optional)", fDob: "Date of Birth", fTob: "Time of Birth", fPob: "Place of Birth (City / State)",
     fGender: "Gender", genderMale: "Male", genderFemale: "Female", genderOther: "Other",
     fTobHelp: "(12:00 PM if unsure)",
-    phName: "Enter your full name", phPob: "Enter birth city, state / country",
+    phName: "Enter name or leave blank for 'Seeker'", phPob: "Enter birth city, state / country",
     btnGo: "Generate Free Janam Kundli ✦", btnWait: "Calculating Planetary Coordinates & Lagna...",
-    errFields: "Please enter your Name, Date of Birth, and Place of Birth to generate your Kundli.",
+    errFields: "Please enter your Date of Birth and Place of Birth to generate your Kundli.",
     errPartnerFields: "Please enter partner's name and date of birth for Ashtakoot Milan.",
     errApi: "Unable to calculate Kundli. Please verify your birth details and try again.",
     s1: "Calculating exact planetary coordinates (Graha Sphuta) & Ascendant (Lagna)...",
@@ -204,12 +204,12 @@ const UI = {
     tagline: '"नक्षत्रमाला भुवि दीप्यमाना — नवग्रह आपके जीवन, प्रारब्ध एवं कर्म के पथप्रदर्शक हैं"',
     formTitle: "जन्म कुंडली हेतु अपना जन्म विवरण दर्ज करें",
     formSub: "महर्षि पराशर प्रणीत बृहत्पाराशर होराशास्त्र के सिद्धांतानुसार सटीक ग्रह स्पष्ट एवं लग्न गणना",
-    fName: "पूरा नाम", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान (शहर, राज्य / देश)",
+    fName: "नाम या उपनाम (वैकल्पिक)", fDob: "जन्म तिथि", fTob: "जन्म समय", fPob: "जन्म स्थान (शहर, राज्य / देश)",
     fGender: "लिंग (Gender)", genderMale: "पुरुष", genderFemale: "महिला", genderOther: "अन्य",
     fTobHelp: "(यदि निश्चित न हो तो दोपहर 12:00 रहने दें)",
-    phName: "अपना पूरा नाम दर्ज करें", phPob: "जन्म का शहर, राज्य / देश दर्ज करें",
+    phName: "अपना नाम या उपनाम दर्ज करें (वैकल्पिक)", phPob: "जन्म का शहर, राज्य / देश दर्ज करें",
     btnGo: "निःशुल्क जन्म कुंडली बनाएं ✦", btnWait: "नवग्रह स्थिति, अंश व लग्न की सूक्ष्म गणना जारी है...",
-    errFields: "कृपया जन्म कुंडली निर्माण हेतु अपना पूरा नाम, जन्म तिथि और जन्म स्थान भरें।",
+    errFields: "कृपया जन्म कुंडली निर्माण हेतु जन्म तिथि और जन्म स्थान भरें।",
     errPartnerFields: "कृपया अष्टकूट गुण मिलान हेतु जीवनसाथी का नाम और जन्म तिथि दर्ज करें।",
     errApi: "कुंडली गणना में त्रुटि हुई। कृपया जन्म विवरण पुनः जांचें।",
     s1: "ग्रह स्पष्ट (Graha Sphuta) एवं लग्न की सूक्ष्म खगोलीय गणना...",
@@ -1551,6 +1551,50 @@ export default function App() {
     Analytics.generateKundli(true);
   };
 
+  const handlePreviewSampleKundli = async () => {
+    const sampleData = {
+      name: hi ? "राहुल शर्मा" : "Rahul Sharma",
+      gender: "male",
+      dob: "1995-05-15",
+      tob: "10:30",
+      pob: "New Delhi, India"
+    };
+    setForm(sampleData);
+    setErr("");
+    setStep(1);
+    setResult(null);
+
+    try {
+      const lat = 28.6139;
+      const lon = 77.2090;
+      setLastCoords({ lat, lon });
+
+      await new Promise(r => setTimeout(r, 350));
+      setStep(2);
+
+      await new Promise(r => setTimeout(r, 400));
+      const resData = generateVedicKundliData({
+        name: sampleData.name,
+        gender: sampleData.gender,
+        dob: sampleData.dob,
+        tob: sampleData.tob,
+        pob: sampleData.pob,
+        lat,
+        lon,
+        lang
+      });
+
+      setResult(resData);
+      Analytics.generateKundli(true);
+      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
+    } catch (e) {
+      console.error(e);
+      setErr(t.errApi);
+    } finally {
+      setStep(0);
+    }
+  };
+
   // Daily Horoscope State
   const [dailySign, setDailySign] = useState("Aries");
   const [dailyChannel, setDailyChannel] = useState("email");
@@ -1777,14 +1821,14 @@ export default function App() {
           </p>
         </div>
 
-        {/* Voluntary Dakshina Amount Selector Pills & Fast Region Toggle */}
+        {/* Voluntary Dakshina Amount Selector Pills & Currency Selector */}
         <div style={{ marginBottom: 18, position: "relative", zIndex: 2 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
             <div style={{ fontSize: 12, color: "rgba(243, 211, 122, 0.85)", fontWeight: 700, letterSpacing: 0.5 }}>
-              {hi ? "अपनी स्वेच्छानुसार दक्षिणा राशि चुनें:" : "SELECT A VOLUNTARY DAKSHINA AMOUNT:"}
+              {hi ? "अपनी स्वेच्छानुसार दक्षिणा राशि व मुद्रा चुनें:" : "SELECT A VOLUNTARY DAKSHINA AMOUNT & CURRENCY:"}
             </div>
-            {/* Quick Country / Payment Region Switcher */}
-            <div style={{ display: "inline-flex", background: "rgba(0,0,0,0.5)", borderRadius: 16, padding: 3, border: "1px solid rgba(212,175,55,0.35)" }}>
+            {/* Quick Country / Payment Region & 7-Currency Selector */}
+            <div style={{ display: "inline-flex", background: "rgba(0,0,0,0.5)", borderRadius: 16, padding: "3px 6px", border: "1px solid rgba(212,175,55,0.35)", alignItems: "center", gap: 6 }}>
               <button
                 type="button"
                 onClick={() => handleSetCurrency("INR")}
@@ -1806,27 +1850,40 @@ export default function App() {
               >
                 <span>🇮🇳</span> भारत (₹ UPI)
               </button>
-              <button
-                type="button"
-                onClick={() => handleSetCurrency(currency === "INR" ? "USD" : currency)}
+
+              <select
+                id="dakshina-currency-select"
+                aria-label={t.currencyLabel}
+                value={currency}
+                onChange={e => handleSetCurrency(e.target.value)}
+                className="custom-select-arrow"
                 style={{
-                  background: !isINR ? "linear-gradient(90deg, #0284C7, #0369A1)" : "transparent",
-                  color: !isINR ? "#FFF" : "rgba(241,231,208,0.7)",
-                  border: "none",
-                  borderRadius: 13,
-                  padding: "4px 11px",
+                  WebkitAppearance: "none",
+                  MozAppearance: "none",
+                  appearance: "none",
+                  background: !isINR ? "linear-gradient(90deg, #0284C7, #0369A1)" : "rgba(26,18,48,0.9)",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "calc(100% - 10px) center",
+                  backgroundSize: "11px 11px",
+                  border: !isINR ? "1px solid #38BDF8" : "1px solid rgba(212,175,55,0.35)",
+                  borderRadius: 14,
+                  padding: "4px 28px 4px 10px",
+                  color: !isINR ? "#FFF" : "#FDE68A",
                   fontSize: 11.5,
                   fontWeight: 700,
                   cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  boxShadow: !isINR ? "0 2px 8px rgba(2,132,199,0.35)" : "none",
-                  transition: "all 0.2s ease"
+                  outline: "none",
+                  boxSizing: "border-box",
+                  lineHeight: 1.2
                 }}
               >
-                <span>🌍</span> Overseas ($/€/£)
-              </button>
+                {Object.values(CURRENCIES).map(c => (
+                  <option key={c.code} value={c.code} style={{ background: "#0D0A1C", color: "#FFF" }}>
+                    {c.flag} {c.code} ({c.symbol.trim()})
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -2021,9 +2078,14 @@ export default function App() {
   }, [mainSection, lang]);
 
   const run = async () => {
-    if (!form.name.trim() || !form.dob || !form.pob.trim()) {
+    if (!form.dob || !form.pob.trim()) {
       setErr(t.errFields);
       return;
+    }
+    const fallbackName = hi ? "जिज्ञासु जातक" : "Seeker";
+    const resolvedName = (form.name && form.name.trim()) ? form.name.trim() : fallbackName;
+    if (!form.name || !form.name.trim()) {
+      setForm(prev => ({ ...prev, name: resolvedName }));
     }
     setErr("");
     setStep(1);
@@ -2049,7 +2111,7 @@ export default function App() {
 
       await new Promise(r => setTimeout(r, 450));
       const resData = generateVedicKundliData({
-        name: form.name,
+        name: resolvedName,
         gender: form.gender || "male",
         dob: form.dob,
         tob: form.tob,
@@ -3873,7 +3935,7 @@ export default function App() {
 
         /* ── CUSTOM DROPDOWN SELECT ARROW STYLING ── */
         select.custom-select-arrow,
-        #header-currency-select,
+        #dakshina-currency-select,
         #panchang-city-select,
         #daily-time-select {
           -webkit-appearance: none !important;
@@ -3996,6 +4058,53 @@ export default function App() {
           }
         }
 
+        .mobile-only-shloka {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          .hero-shloka-tagline {
+            display: none !important;
+          }
+          .mobile-only-shloka {
+            display: block !important;
+          }
+          .hero-header-wrap {
+            margin-bottom: 10px !important;
+          }
+          .hero-computational-badge {
+            margin-bottom: 6px !important;
+            padding: 3px 10px !important;
+          }
+          .hero-computational-badge span {
+            font-size: 10px !important;
+            letter-spacing: 0.8px !important;
+          }
+          .hero-title-h1 {
+            font-size: 22px !important;
+            margin-bottom: 4px !important;
+            letter-spacing: 0.5px !important;
+          }
+          .form-section-card {
+            padding: 18px 14px !important;
+            margin-bottom: 20px !important;
+          }
+          .form-section-card h2 {
+            font-size: 16px !important;
+            margin-bottom: 3px !important;
+          }
+          .form-section-card p {
+            font-size: 12px !important;
+            margin-bottom: 8px !important;
+          }
+          .birth-form-grid {
+            gap: 14px !important;
+          }
+          .birth-form-label-row {
+            margin-bottom: 4px !important;
+          }
+        }
+
         /* ── SMARTPHONE & MOBILE DEVICE OPTIMIZATIONS (iPhone & Android) ── */
         @media (max-width: 600px) {
           main {
@@ -4077,11 +4186,15 @@ export default function App() {
             font-size: 14px !important;
             letter-spacing: 0.6px !important;
           }
-          #header-currency-select {
-            padding: 5px 22px 5px 8px !important;
-            font-size: 11.5px !important;
+          #dakshina-currency-select {
+            padding: 4px 22px 4px 8px !important;
+            font-size: 11px !important;
             background-position: calc(100% - 7px) center !important;
             background-size: 10px 10px !important;
+          }
+          .header-trust-strip {
+            padding: 3px 7px !important;
+            font-size: 10px !important;
           }
           .header-nav-pill {
             padding: 5px 10px !important;
@@ -4488,40 +4601,28 @@ export default function App() {
               </div>
             )}
 
-            {/* Currency Selector */}
-            <select
-              id="header-currency-select"
-              aria-label={t.currencyLabel}
-              value={currency}
-              onChange={e => handleSetCurrency(e.target.value)}
-              className="custom-select-arrow"
+            {/* Compact Trust Strip */}
+            <div
+              className="header-trust-strip"
               style={{
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                appearance: "none",
-                background: "rgba(26,18,48,0.95)",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23F59E0B' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "calc(100% - 10px) center",
-                backgroundSize: "11px 11px",
-                border: "1px solid rgba(212,175,55,0.35)",
-                borderRadius: 18,
-                padding: "6px 28px 6px 11px",
-                color: "#FDE68A",
-                fontSize: 12.5,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                background: "rgba(16, 185, 129, 0.14)",
+                border: "1px solid rgba(16, 185, 129, 0.4)",
+                borderRadius: 20,
+                padding: "5px 12px",
+                color: "#A7F3D0",
+                fontSize: 11.5,
                 fontWeight: 700,
-                cursor: "pointer",
-                outline: "none",
-                boxSizing: "border-box",
-                lineHeight: 1.2
+                letterSpacing: 0.2,
+                whiteSpace: "nowrap"
               }}
+              title={hi ? "१००% निःशुल्क वैदिक सेवा · आपके डिवाइस पर पूर्ण गोपनीयता · बिना लॉगिन" : "100% Free · Client-Side Privacy · No Login Required"}
             >
-              {Object.values(CURRENCIES).map(c => (
-                <option key={c.code} value={c.code} style={{ background: "#0D0A1C", color: "#FFF" }}>
-                  {c.flag} {c.code} ({c.symbol.trim()})
-                </option>
-              ))}
-            </select>
+              <span style={{ color: "#34D399", fontWeight: 900 }}>✓</span>
+              <span>{hi ? "१००% निःशुल्क · पूर्ण गोपनीयता · बिना लॉगिन" : "100% Free · Client-Side Privacy · No Login"}</span>
+            </div>
 
             {/* Language Toggle (Dual Segmented EN | HI Pill) */}
             <div
@@ -4787,17 +4888,17 @@ export default function App() {
         {mainSection === "kundli" && (
           <>
             {/* Direct Header & Computational Badge above Form */}
-            <div className="no-print" style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "4px 14px", marginBottom: 10 }}>
+            <div className="no-print hero-header-wrap" style={{ textAlign: "center", marginBottom: 20 }}>
+              <div className="hero-computational-badge" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "4px 14px", marginBottom: 10 }}>
                 <Icons.Sparkle size={13} color="#F59E0B" />
                 <span style={{ fontSize: 11.5, fontWeight: 800, color: "#FDE68A", letterSpacing: 1.2, textTransform: "uppercase" }}>
                   {hi ? "ऋषि पाराशर विरचित सिद्धांती गणना · 16 षोडशवर्ग" : "PARASHARI SIDEREAL COMPUTATIONAL CORE · 16 SHODASHVARGAS"}
                 </span>
               </div>
-              <h1 style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(22px, 3.8vw, 34px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 2, fontWeight: 900, margin: "0 0 6px" }}>
+              <h1 className="hero-title-h1" style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(22px, 3.8vw, 34px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 2, fontWeight: 900, margin: "0 0 6px" }}>
                 {t.title}
               </h1>
-              <p style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13.5, fontStyle: "italic", margin: "0 auto", maxWidth: 640 }}>
+              <p className="hero-shloka-tagline" style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13.5, fontStyle: "italic", margin: "0 auto", maxWidth: 640 }}>
                 {t.tagline}
               </p>
             </div>
@@ -4806,45 +4907,20 @@ export default function App() {
             <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
               <div style={{ marginBottom: 20, textAlign: "center" }}>
                 <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
-                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5, marginBottom: 12 }}>{t.formSub}</p>
-
-                {/* 1-Click Sample Profile Fill */}
-                <button
-                  type="button"
-                  onClick={handleFillSample}
-                  style={{
-                    background: "rgba(245, 158, 11, 0.15)",
-                    border: "1px solid rgba(245, 158, 11, 0.4)",
-                    color: "#FDE68A",
-                    padding: "6px 16px",
-                    borderRadius: 20,
-                    fontSize: 12,
-                    fontWeight: 800,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    transition: "all 0.2s ease"
-                  }}
-                  title="Auto-fill sample data to test the Kundli engine instantly"
-                >
-                  <span>⚡</span> {hi ? "⚡ आदर्श जन्म कुंडली का नमूना देखें (१-क्लिक)" : "⚡ View Sample Kundli (1-Click Demo)"}
-                </button>
+                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5, margin: 0 }}>{t.formSub}</p>
               </div>
 
               <div className="birth-form-grid">
                 <div className="birth-form-full-col">
                   <div className="birth-form-label-row">
                     <label htmlFor="birth-name">
-                      <Icons.User size={15} color="#F59E0B" /> {t.fName} <span style={{ color: "#F59E0B" }}>*</span>
+                      <Icons.User size={15} color="#F59E0B" /> {t.fName}
                     </label>
                   </div>
                   <input
                     id="birth-name"
                     name="name"
                     type="text"
-                    required
-                    aria-required="true"
                     aria-label={t.fName}
                     value={form.name}
                     onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
@@ -4980,18 +5056,20 @@ export default function App() {
                       <span>⚡</span> {hi ? "त्वरित चयन:" : "Popular Cities:"}
                     </span>
                     {[
-                      { label: "🇮🇳 New Delhi", val: "New Delhi, India" },
-                      { label: "🇮🇳 Mumbai", val: "Mumbai, India" },
-                      { label: "🇮🇳 Bengaluru", val: "Bengaluru, India" },
-                      { label: "🇮🇳 Varanasi", val: "Varanasi, India" },
-                      { label: "🇮🇳 Ayodhya", val: "Ayodhya, India" },
-                      { label: "🇮🇳 Kolkata", val: "Kolkata, India" },
-                      { label: "🇮🇳 Hyderabad", val: "Hyderabad, India" },
-                      { label: "🇮🇳 Pune", val: "Pune, India" },
-                      { label: "🇦🇪 Dubai", val: "Dubai, UAE" },
-                      { label: "🇬🇧 London", val: "London, UK" },
-                      { label: "🇺🇸 New York", val: "New York, USA" },
-                      { label: "🇨🇦 Toronto", val: "Toronto, Canada" },
+                      { label: "🇮🇳 New Delhi", val: "New Delhi, India", lat: 28.6139, lon: 77.2090 },
+                      { label: "🇮🇳 Mumbai", val: "Mumbai, India", lat: 19.0760, lon: 72.8777 },
+                      { label: "🇮🇳 Bengaluru", val: "Bengaluru, India", lat: 12.9716, lon: 77.5946 },
+                      { label: "🇮🇳 Patna", val: "Patna, India", lat: 25.5941, lon: 85.1376 },
+                      { label: "🇮🇳 Gurugram", val: "Gurugram, India", lat: 28.4595, lon: 77.0266 },
+                      { label: "🇮🇳 Varanasi", val: "Varanasi, India", lat: 25.3176, lon: 82.9739 },
+                      { label: "🇮🇳 Ayodhya", val: "Ayodhya, India", lat: 26.7922, lon: 82.1998 },
+                      { label: "🇮🇳 Kolkata", val: "Kolkata, India", lat: 22.5726, lon: 88.3639 },
+                      { label: "🇮🇳 Hyderabad", val: "Hyderabad, India", lat: 17.3850, lon: 78.4867 },
+                      { label: "🇮🇳 Pune", val: "Pune, India", lat: 18.5204, lon: 73.8567 },
+                      { label: "🇦🇪 Dubai", val: "Dubai, UAE", lat: 25.2048, lon: 55.2708 },
+                      { label: "🇬🇧 London", val: "London, UK", lat: 51.5074, lon: -0.1278 },
+                      { label: "🇺🇸 New York", val: "New York, USA", lat: 40.7128, lon: -74.0060 },
+                      { label: "🇨🇦 Toronto", val: "Toronto, Canada", lat: 43.6532, lon: -79.3832 },
                     ].map(city => (
                       <button
                         key={city.val}
@@ -4999,6 +5077,9 @@ export default function App() {
                         className="city-chip"
                         onClick={() => {
                           setForm({ ...form, pob: city.val });
+                          if (city.lat && city.lon) {
+                            setLastCoords({ lat: city.lat, lon: city.lon });
+                          }
                           if (err) setErr("");
                         }}
                         style={{
@@ -5027,9 +5108,43 @@ export default function App() {
                 </div>
               )}
 
-              <button onClick={run} disabled={step > 0} className="gold-cta-btn" style={{ marginTop: 24, fontSize: 16 }}>
-                {step > 0 ? t.btnWait : t.btnGo}
-              </button>
+              <div style={{ display: "flex", gap: 14, marginTop: 24, flexWrap: "wrap", alignItems: "stretch" }}>
+                <button
+                  type="button"
+                  onClick={run}
+                  disabled={step > 0}
+                  className="gold-cta-btn"
+                  style={{ flex: "1 1 280px", margin: 0, fontSize: 16 }}
+                >
+                  {step > 0 ? t.btnWait : t.btnGo}
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePreviewSampleKundli}
+                  disabled={step > 0}
+                  className="sample-preview-cta-btn"
+                  style={{
+                    flex: "1 1 260px",
+                    background: "linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.28))",
+                    border: "1.5px solid #F59E0B",
+                    color: "#FDE68A",
+                    padding: "13px 20px",
+                    borderRadius: 30,
+                    fontSize: 15,
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    boxShadow: "0 4px 16px rgba(245, 158, 11, 0.22)",
+                    transition: "all 0.2s ease"
+                  }}
+                  title={hi ? "बिना किसी व्यक्तिगत विवरण के तुरंत पूर्ण ५०-पृष्ठीय कुंडली की गणना व परिणाम देखें" : "Test and view the full 50-page Kundli calculation without typing any personal data"}
+                >
+                  <span>⚡</span> {hi ? "⚡ ५०-पृष्ठीय कुण्डली का नमूना देखें (१-क्लिक)" : "⚡ Preview Sample 50-Page Kundli (1-Click)"}
+                </button>
+              </div>
 
               {/* Quick Daily Horoscope Access */}
               {!result && (
@@ -5062,6 +5177,13 @@ export default function App() {
                   </button>
                 </div>
               )}
+            </div>
+
+            {/* Mobile-only Shloka Tagline below Form Card */}
+            <div className="mobile-only-shloka no-print" style={{ textAlign: "center", margin: "-18px auto 26px", maxWidth: 640, padding: "0 14px" }}>
+              <p style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12.5, fontStyle: "italic", margin: 0, lineHeight: 1.5 }}>
+                {t.tagline}
+              </p>
             </div>
 
             {/* ── 3-PILLAR CREDIBILITY & VEDIC INTEGRITY STRIP ── */}
