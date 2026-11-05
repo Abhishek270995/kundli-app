@@ -2428,15 +2428,31 @@ export default function App() {
       let lat = 26.8467;
       let lon = 80.9462;
 
-      try {
-        const coords = await getCoordinates(form.pob);
-        if (coords && coords.lat && coords.lon) {
-          lat = coords.lat;
-          lon = coords.lon;
-          setLastCoords({ lat, lon });
+      const pobLower = (form.pob || "").trim().toLowerCase();
+      const knownCity = MAJOR_INDIAN_CITIES.find(c =>
+        c.name.toLowerCase() === pobLower ||
+        pobLower.includes(c.name.toLowerCase()) ||
+        (c.nameHi && form.pob.includes(c.nameHi))
+      );
+
+      if (lastCoords && lastCoords.lat && lastCoords.lon) {
+        lat = lastCoords.lat;
+        lon = lastCoords.lon;
+      } else if (knownCity) {
+        lat = knownCity.lat;
+        lon = knownCity.lon;
+        setLastCoords({ lat, lon });
+      } else {
+        try {
+          const coords = await getCoordinates(form.pob);
+          if (coords && coords.lat && coords.lon) {
+            lat = coords.lat;
+            lon = coords.lon;
+            setLastCoords({ lat, lon });
+          }
+        } catch (geoErr) {
+          console.warn("Geocoding failed, using regional coordinates", geoErr);
         }
-      } catch (geoErr) {
-        console.warn("Geocoding failed, using regional coordinates", geoErr);
       }
 
       await new Promise(r => setTimeout(r, 400));
@@ -2457,7 +2473,6 @@ export default function App() {
       setResult(resData);
       const hasCustomName = Boolean(form.name && form.name.trim().length > 0 && form.name.trim() !== fallbackName);
       const sampleCities = ["new delhi", "mumbai", "bengaluru", "patna", "gurugram", "varanasi", "ayodhya", "kolkata", "hyderabad", "pune", "dubai", "london", "new york", "toronto"];
-      const pobLower = (form.pob || "").toLowerCase();
       const usedSampleCity = sampleCities.some(city => pobLower.includes(city));
 
       trackJyotishEvent("kundli_generated", {
@@ -4113,13 +4128,13 @@ export default function App() {
         .birth-form-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
+          gap: 14px;
           align-items: start;
         }
         @media (max-width: 860px) {
           .birth-form-grid {
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 12px;
           }
         }
         .birth-form-full-col {
@@ -4458,7 +4473,23 @@ export default function App() {
         /* ── SMARTPHONE & MOBILE DEVICE OPTIMIZATIONS (iPhone & Android) ── */
         @media (max-width: 600px) {
           main {
-            padding: 14px 12px 100px !important;
+            padding: 10px 10px 80px !important;
+          }
+
+          .hero-header-wrap {
+            margin-bottom: 10px !important;
+          }
+          .hero-computational-badge {
+            margin-bottom: 6px !important;
+            padding: 2px 10px !important;
+            font-size: 10px !important;
+          }
+          .hero-title-h1 {
+            font-size: 21px !important;
+            margin-bottom: 4px !important;
+          }
+          .hero-shloka-tagline {
+            font-size: 11.5px !important;
           }
 
           /* Prevent iOS Safari unwanted auto-zoom when tapping inputs (requires font-size >= 16px) */
@@ -4474,9 +4505,9 @@ export default function App() {
 
           /* Compact Form Card with optimal edge breathing room */
           .form-section-card {
-            padding: 20px 14px !important;
-            border-radius: 16px !important;
-            margin-bottom: 22px !important;
+            padding: 16px 12px !important;
+            border-radius: 14px !important;
+            margin-bottom: 18px !important;
           }
 
           /* Header bar mobile spacing */
@@ -5032,7 +5063,7 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "24px 20px 80px" }}>
+      <main style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "16px 20px 80px" }}>
 
         {/* ── LIVE REAL-TIME ASTRONOMICAL EPHEMERIS TICKER ── */}
         <aside
@@ -5238,8 +5269,8 @@ export default function App() {
         {mainSection === "kundli" && (
           <>
             {/* Direct Header & Computational Badge above Form */}
-            <div className="no-print hero-header-wrap" style={{ textAlign: "center", marginBottom: 20 }}>
-              <div className="hero-computational-badge" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "4px 14px", marginBottom: 10 }}>
+            <div className="no-print hero-header-wrap" style={{ textAlign: "center", marginBottom: 14 }}>
+              <div className="hero-computational-badge" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 30, padding: "4px 14px", marginBottom: 8 }}>
                 <Icons.Sparkle size={13} color="#F59E0B" />
                 <span style={{ fontSize: 11.5, fontWeight: 800, color: "#FDE68A", letterSpacing: 1.2, textTransform: "uppercase" }}>
                   {hi ? "ऋषि पाराशर विरचित सिद्धांती गणना · 16 षोडशवर्ग" : "PARASHARI SIDEREAL COMPUTATIONAL CORE · 16 SHODASHVARGAS"}
@@ -5248,16 +5279,16 @@ export default function App() {
               <h1 className="hero-title-h1" style={{ fontFamily: hi ? "'Noto Sans Devanagari', sans-serif" : "'Cinzel Decorative', serif", fontSize: "clamp(22px, 3.8vw, 34px)", background: "linear-gradient(90deg, #D4AF37 0%, #FDE68A 40%, #F59E0B 70%, #D4AF37 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: hi ? 1 : 2, fontWeight: 900, margin: "0 0 6px" }}>
                 {t.title}
               </h1>
-              <p className="hero-shloka-tagline" style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13.5, fontStyle: "italic", margin: "0 auto", maxWidth: 640 }}>
+              <p className="hero-shloka-tagline" style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 13, fontStyle: "italic", margin: "0 auto", maxWidth: 640 }}>
                 {t.tagline}
               </p>
             </div>
 
             {/* Input Form Card */}
-            <div className="glass-card form-section-card no-print" style={{ padding: "32px 34px", marginBottom: 36 }}>
-              <div style={{ marginBottom: 20, textAlign: "center" }}>
+            <div className="glass-card form-section-card no-print" style={{ padding: "24px 28px", marginBottom: 28 }}>
+              <div style={{ marginBottom: 16, textAlign: "center" }}>
                 <h2 style={{ color: "#F3D37A", fontSize: 18, fontWeight: 800, letterSpacing: 0.5, marginBottom: 4 }}>{t.formTitle}</h2>
-                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13.5, margin: 0 }}>{t.formSub}</p>
+                <p style={{ color: "rgba(243, 211, 122, 0.8)", fontSize: 13, margin: 0 }}>{t.formSub}</p>
               </div>
 
               <div className="birth-form-grid">
@@ -5458,7 +5489,7 @@ export default function App() {
                 </div>
               )}
 
-              <div style={{ display: "flex", gap: 14, marginTop: 24, flexWrap: "wrap", alignItems: "stretch" }}>
+              <div style={{ display: "flex", gap: 14, marginTop: 18, flexWrap: "wrap", alignItems: "stretch" }}>
                 <button
                   type="button"
                   onClick={run}
@@ -5608,7 +5639,7 @@ export default function App() {
                   alt="Ancient Vedic Astrology Armillary Sphere and Manuscripts"
                   width="960"
                   height="240"
-                  fetchPriority="high"
+                  fetchpriority="high"
                   style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }}
                 />
                 <div
