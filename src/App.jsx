@@ -1447,7 +1447,24 @@ const updatePageMeta = (sectionId, currentLang) => {
 
 // ── MAIN APP COMPONENT ───────────────────────────────────────────
 export default function App() {
-  const [form, setForm] = useState({ name: "", gender: "male", dob: "", pob: "", tob: "" });
+  const [form, setForm] = useState(() => {
+    try {
+      const saved = localStorage.getItem("jyotish_user_form");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object") {
+          return {
+            name: parsed.name || "",
+            gender: parsed.gender || "male",
+            dob: parsed.dob || "",
+            pob: parsed.pob || "",
+            tob: parsed.tob || ""
+          };
+        }
+      }
+    } catch (e) {}
+    return { name: "", gender: "male", dob: "", pob: "", tob: "" };
+  });
   const [step, setStep] = useState(0);
   const [result, setResult] = useState(null);
   const [tab, setTab] = useState("chart");
@@ -5269,7 +5286,13 @@ export default function App() {
                 ...(result ? { chartData: result.chartData, planetaryAnalysis: result.planetaryAnalysis } : {})
               }}
               onUpdateUserBirth={(updated) => {
-                setForm(prev => ({ ...prev, ...updated }));
+                setForm(prev => {
+                  const next = { ...prev, ...updated };
+                  try {
+                    localStorage.setItem("jyotish_user_form", JSON.stringify(next));
+                  } catch (e) {}
+                  return next;
+                });
               }}
               lang={lang}
               onBackToHome={() => navigateToSection("kundli")}
@@ -5316,7 +5339,17 @@ export default function App() {
                     type="text"
                     aria-label={t.fName}
                     value={form.name}
-                    onChange={e => { setForm({ ...form, name: e.target.value }); if (err) setErr(""); }}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setForm(prev => {
+                        const next = { ...prev, name: val };
+                        try {
+                          localStorage.setItem("jyotish_user_form", JSON.stringify(next));
+                        } catch (err) {}
+                        return next;
+                      });
+                      if (err) setErr("");
+                    }}
                     placeholder={t.phName}
                     className="birth-form-input"
                   />

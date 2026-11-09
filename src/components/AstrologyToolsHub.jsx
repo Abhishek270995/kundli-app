@@ -439,12 +439,30 @@ export default function AstrologyToolsHub({
 
   // User form / inherited Kundli birth data
   const [userData, setUserData] = useState(() => {
-    const inheritedName = (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim()) ? initialUserBirth.name.trim() : "";
-    const inheritedDob = (initialUserBirth && initialUserBirth.dob) ? initialUserBirth.dob : "1995-09-27";
-    const inheritedTob = (initialUserBirth && initialUserBirth.tob) ? initialUserBirth.tob : "10:30";
-    const inheritedPob = (initialUserBirth && initialUserBirth.pob) ? initialUserBirth.pob : "New Delhi, India";
-    const inheritedLat = (initialUserBirth && initialUserBirth.lat) ? initialUserBirth.lat : 28.6139;
-    const inheritedLon = (initialUserBirth && initialUserBirth.lon) ? initialUserBirth.lon : 77.2090;
+    let savedForm = null;
+    try {
+      const saved = localStorage.getItem("jyotish_user_form");
+      if (saved) savedForm = JSON.parse(saved);
+    } catch (e) {}
+
+    const inheritedName = (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim())
+      ? initialUserBirth.name.trim()
+      : (savedForm?.name ? savedForm.name.trim() : "");
+    const inheritedDob = (initialUserBirth && initialUserBirth.dob)
+      ? initialUserBirth.dob
+      : (savedForm?.dob || "1995-09-27");
+    const inheritedTob = (initialUserBirth && initialUserBirth.tob)
+      ? initialUserBirth.tob
+      : (savedForm?.tob || "10:30");
+    const inheritedPob = (initialUserBirth && initialUserBirth.pob)
+      ? initialUserBirth.pob
+      : (savedForm?.pob || "New Delhi, India");
+    const inheritedLat = (initialUserBirth && initialUserBirth.lat)
+      ? initialUserBirth.lat
+      : 28.6139;
+    const inheritedLon = (initialUserBirth && initialUserBirth.lon)
+      ? initialUserBirth.lon
+      : 77.2090;
 
     return {
       name: inheritedName,
@@ -461,7 +479,13 @@ export default function AstrologyToolsHub({
   const [horaryNumberInput, setHoraryNumberInput] = useState(72);
   const [horaryQueryTopic, setHoraryQueryTopic] = useState("career");
   const [nameNumerologyInput, setNameNumerologyInput] = useState(() => {
-    return (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim()) || "";
+    let savedForm = null;
+    try {
+      const saved = localStorage.getItem("jyotish_user_form");
+      if (saved) savedForm = JSON.parse(saved);
+    } catch (e) {}
+    return (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim())
+      || (savedForm?.name ? savedForm.name.trim() : "");
   });
   const [partnerDobInput, setPartnerDobInput] = useState("1996-05-14");
   const [selectedMuhuratEvent, setSelectedMuhuratEvent] = useState("vivah");
@@ -513,6 +537,14 @@ export default function AstrologyToolsHub({
   const handleUpdateUserData = (newOrFn) => {
     setUserData(prev => {
       const next = typeof newOrFn === "function" ? newOrFn(prev) : newOrFn;
+      try {
+        localStorage.setItem("jyotish_user_form", JSON.stringify({
+          name: next.name || "",
+          dob: next.dob || "",
+          tob: next.tob || "",
+          pob: next.pob || ""
+        }));
+      } catch (e) {}
       if (onUpdateUserBirth && next.name !== prev.name) {
         onUpdateUserBirth({ name: next.name });
       }
@@ -3479,8 +3511,8 @@ function NumberCompatibilityTool({ userData, setUserData, partnerDobInput, setPa
         toolName={isHi ? "संख्या मिलान एवं दांपत्य सामंजस्य" : "Numerical Synastry & Compatibility Guidance"}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, आपका मूलांक ${result.moolank} है तथा आपके साथी (जन्मतिथि: ${partnerDobInput}) का मूलांक ${result.partnerResult?.partnerMoolank || "—"} है। दोनों के बीच संख्या सामंजस्य ${result.partnerResult?.compatibilityScore || 70}% है। यह विश्लेषण आपके संबंधों के स्वभाव और तालमेल को प्रकट करता है।`
-            : `${userData?.name || "Seeker"}, your Birth Root Number is ${result.moolank} and your companion's Root Number is ${result.partnerResult?.partnerMoolank || "—"}, resulting in a baseline synastry score of ${result.partnerResult?.compatibilityScore || 70}%. Here is how your combined vibrations interact.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, आपका मूलांक ${result.moolank} है तथा आपके साथी (जन्मतिथि: ${partnerDobInput}) का मूलांक ${result.partnerResult?.partnerMoolank || "—"} है। दोनों के बीच संख्या सामंजस्य ${result.partnerResult?.compatibilityScore || 70}% है। यह विश्लेषण आपके संबंधों के स्वभाव और तालमेल को प्रकट करता है।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, your Birth Root Number is ${result.moolank} and your companion's Root Number is ${result.partnerResult?.partnerMoolank || "—"}, resulting in a baseline synastry score of ${result.partnerResult?.compatibilityScore || 70}%. Here is how your combined vibrations interact.`
         }
         goodPoints={
           isHi
