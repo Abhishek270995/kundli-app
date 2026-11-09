@@ -5258,7 +5258,19 @@ export default function App() {
               </a>
             </div>
             <AstrologyToolsHub
-              initialUserBirth={result ? { ...form, chartData: result.chartData, planetaryAnalysis: result.planetaryAnalysis } : (form.dob ? form : null)}
+              initialUserBirth={{
+                ...form,
+                name: (form.name && form.name.trim()) ? form.name.trim() : (result?.name || ""),
+                dob: form.dob || result?.dob || "",
+                tob: form.tob || result?.tob || "",
+                pob: form.pob || result?.pob || "",
+                lat: lastCoords?.lat || (result?.chartData?.ascendant ? result.chartData.ascendant.lat : null),
+                lon: lastCoords?.lon || (result?.chartData?.ascendant ? result.chartData.ascendant.lon : null),
+                ...(result ? { chartData: result.chartData, planetaryAnalysis: result.planetaryAnalysis } : {})
+              }}
+              onUpdateUserBirth={(updated) => {
+                setForm(prev => ({ ...prev, ...updated }));
+              }}
               lang={lang}
               onBackToHome={() => navigateToSection("kundli")}
             />

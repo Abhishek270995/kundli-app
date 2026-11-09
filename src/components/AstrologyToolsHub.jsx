@@ -420,6 +420,7 @@ export const getToolFromPath = () => {
 
 export default function AstrologyToolsHub({
   initialUserBirth = null,
+  onUpdateUserBirth = () => {},
   lang = "en",
   onBackToHome = () => {},
   onSelectTab = () => {}
@@ -438,23 +439,20 @@ export default function AstrologyToolsHub({
 
   // User form / inherited Kundli birth data
   const [userData, setUserData] = useState(() => {
-    if (initialUserBirth && initialUserBirth.dob) {
-      return {
-        name: initialUserBirth.name || "Seeker",
-        dob: initialUserBirth.dob || "1995-09-27",
-        tob: initialUserBirth.tob || "10:30",
-        pob: initialUserBirth.pob || "New Delhi, India",
-        lat: initialUserBirth.lat || 28.6139,
-        lon: initialUserBirth.lon || 77.2090
-      };
-    }
+    const inheritedName = (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim()) ? initialUserBirth.name.trim() : "";
+    const inheritedDob = (initialUserBirth && initialUserBirth.dob) ? initialUserBirth.dob : "1995-09-27";
+    const inheritedTob = (initialUserBirth && initialUserBirth.tob) ? initialUserBirth.tob : "10:30";
+    const inheritedPob = (initialUserBirth && initialUserBirth.pob) ? initialUserBirth.pob : "New Delhi, India";
+    const inheritedLat = (initialUserBirth && initialUserBirth.lat) ? initialUserBirth.lat : 28.6139;
+    const inheritedLon = (initialUserBirth && initialUserBirth.lon) ? initialUserBirth.lon : 77.2090;
+
     return {
-      name: "Rahul Sharma",
-      dob: "1995-09-27",
-      tob: "10:30",
-      pob: "New Delhi, India",
-      lat: 28.6139,
-      lon: 77.2090
+      name: inheritedName,
+      dob: inheritedDob,
+      tob: inheritedTob,
+      pob: inheritedPob,
+      lat: inheritedLat,
+      lon: inheritedLon
     };
   });
 
@@ -462,12 +460,68 @@ export default function AstrologyToolsHub({
   const [selectedDivisionalChart, setSelectedDivisionalChart] = useState("D9");
   const [horaryNumberInput, setHoraryNumberInput] = useState(72);
   const [horaryQueryTopic, setHoraryQueryTopic] = useState("career");
-  const [nameNumerologyInput, setNameNumerologyInput] = useState(userData.name || "Rahul Sharma");
+  const [nameNumerologyInput, setNameNumerologyInput] = useState(() => {
+    return (initialUserBirth && initialUserBirth.name && initialUserBirth.name.trim()) || "";
+  });
   const [partnerDobInput, setPartnerDobInput] = useState("1996-05-14");
   const [selectedMuhuratEvent, setSelectedMuhuratEvent] = useState("vivah");
   const [prashnaQuestionInput, setPrashnaQuestionInput] = useState(isHi ? "क्या मुझे इस प्रस्ताव को स्वीकार करना चाहिए?" : "Should I accept this career opportunity?");
   const [selectedTargetDate, setSelectedTargetDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedCity, setSelectedCity] = useState(MAJOR_INDIAN_CITIES[0]);
+
+  // Synchronize state whenever initialUserBirth updates from Kundli Generation
+  useEffect(() => {
+    if (initialUserBirth) {
+      setUserData(prev => {
+        const nextName = (initialUserBirth.name !== undefined && initialUserBirth.name !== null)
+          ? initialUserBirth.name.trim()
+          : prev.name;
+        const nextDob = initialUserBirth.dob || prev.dob;
+        const nextTob = initialUserBirth.tob || prev.tob;
+        const nextPob = initialUserBirth.pob || prev.pob;
+        const nextLat = initialUserBirth.lat || prev.lat;
+        const nextLon = initialUserBirth.lon || prev.lon;
+
+        if (
+          nextName === prev.name &&
+          nextDob === prev.dob &&
+          nextTob === prev.tob &&
+          nextPob === prev.pob &&
+          nextLat === prev.lat &&
+          nextLon === prev.lon
+        ) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          name: nextName,
+          dob: nextDob,
+          tob: nextTob,
+          pob: nextPob,
+          lat: nextLat,
+          lon: nextLon
+        };
+      });
+
+      if (initialUserBirth.name && initialUserBirth.name.trim()) {
+        setNameNumerologyInput(initialUserBirth.name.trim());
+      }
+    }
+  }, [initialUserBirth]);
+
+  const handleUpdateUserData = (newOrFn) => {
+    setUserData(prev => {
+      const next = typeof newOrFn === "function" ? newOrFn(prev) : newOrFn;
+      if (onUpdateUserBirth && next.name !== prev.name) {
+        onUpdateUserBirth({ name: next.name });
+      }
+      if (next.name !== undefined && next.name !== prev.name) {
+        setNameNumerologyInput(next.name);
+      }
+      return next;
+    });
+  };
 
   // Sync state with browser URL & popstate (Back/Forward navigation)
   useEffect(() => {
@@ -614,25 +668,25 @@ export default function AstrologyToolsHub({
   // Quick preset data loader
   const handleLoadSample = (sampleType = "rahul") => {
     if (sampleType === "rahul") {
-      setUserData({
-        name: "Rahul Sharma",
+      handleUpdateUserData({
+        name: isHi ? "राहुल शर्मा" : "Rahul Sharma",
         dob: "1995-09-27",
         tob: "10:30",
         pob: "New Delhi, India",
         lat: 28.6139,
         lon: 77.2090
       });
-      setNameNumerologyInput("Rahul Sharma");
+      setNameNumerologyInput(isHi ? "राहुल शर्मा" : "Rahul Sharma");
     } else {
-      setUserData({
-        name: "Priya Patel",
+      handleUpdateUserData({
+        name: isHi ? "प्रिया पटेल" : "Priya Patel",
         dob: "1998-11-19",
         tob: "16:45",
         pob: "Mumbai, India",
         lat: 19.0760,
         lon: 72.8777
       });
-      setNameNumerologyInput("Priya Patel");
+      setNameNumerologyInput(isHi ? "प्रिया पटेल" : "Priya Patel");
     }
   };
 
@@ -765,7 +819,7 @@ export default function AstrologyToolsHub({
           {renderActiveToolComponent({
             activeToolId,
             userData,
-            setUserData,
+            setUserData: handleUpdateUserData,
             corePlanets,
             ascendantDegree,
             dailyPanchangData,
@@ -1218,7 +1272,120 @@ function renderActiveToolComponent(props) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// INDIVIDUAL TOOL IMPLEMENTATIONS
+// REUSABLE BIRTH DETAILS & NAME INPUT BAR FOR ALL ASTROLOGICAL CALCULATORS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ToolBirthInputBar({
+  userData,
+  setUserData,
+  isHi,
+  showTob = true,
+  showPob = false,
+  title = null
+}) {
+  return (
+    <div style={{
+      background: "rgba(0,0,0,0.35)",
+      padding: "16px 18px",
+      borderRadius: 16,
+      marginBottom: 22,
+      border: "1px solid rgba(212,175,55,0.22)"
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+        <span style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800 }}>
+          👤 {title || (isHi ? "जातक जन्म विवरण (वैयक्तिक गणना व फलादेश हेतु):" : "Natal Profile & Birth Details (Interactive Real-Time Engine):")}
+        </span>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            type="button"
+            onClick={() => setUserData(prev => ({
+              ...prev,
+              name: isHi ? "राहुल शर्मा" : "Rahul Sharma",
+              dob: "1995-09-27",
+              tob: "10:30",
+              pob: "New Delhi, India",
+              lat: 28.6139,
+              lon: 77.2090
+            }))}
+            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
+            title={isHi ? "नमूना विवरण लोड करें" : "Load sample details"}
+          >
+            ⚡ {isHi ? "राहुल शर्मा (नमूना)" : "Rahul Sharma (Sample)"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setUserData(prev => ({
+              ...prev,
+              name: isHi ? "प्रिया पटेल" : "Priya Patel",
+              dob: "1998-11-19",
+              tob: "16:45",
+              pob: "Mumbai, India",
+              lat: 19.0760,
+              lon: 72.8777
+            }))}
+            style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
+            title={isHi ? "नमूना विवरण लोड करें" : "Load sample details"}
+          >
+            ⚡ {isHi ? "प्रिया पटेल (नमूना)" : "Priya Patel (Sample)"}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+        <div>
+          <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
+            {isHi ? "जातक का नाम:" : "Full Name:"}
+          </label>
+          <input
+            type="text"
+            value={userData?.name || ""}
+            onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder={isHi ? "अपना नाम दर्ज करें" : "Enter your full name"}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
+          />
+        </div>
+        <div>
+          <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
+            {isHi ? "जन्म तिथि (DOB):" : "Date of Birth:"}
+          </label>
+          <input
+            type="date"
+            value={userData?.dob || ""}
+            onChange={e => setUserData(prev => ({ ...prev, dob: e.target.value }))}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
+          />
+        </div>
+        {showTob && (
+          <div>
+            <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "जन्म समय (TOB):" : "Time of Birth:"}
+            </label>
+            <input
+              type="time"
+              value={userData?.tob || ""}
+              onChange={e => setUserData(prev => ({ ...prev, tob: e.target.value }))}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
+            />
+          </div>
+        )}
+        {showPob && (
+          <div>
+            <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
+              {isHi ? "जन्म स्थान (POB):" : "Place of Birth:"}
+            </label>
+            <input
+              type="text"
+              value={userData?.pob || ""}
+              onChange={e => setUserData(prev => ({ ...prev, pob: e.target.value }))}
+              placeholder={isHi ? "शहर, राज्य" : "City, Country"}
+              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PERSONALIZED VEDIC ADVISORY COMPONENT (व्यक्तिगत फलित मार्गदर्शन एवं उपाय)
@@ -1231,9 +1398,16 @@ function PersonalizedVedicAdvisory({
   goodPoints = [],
   cautionPoints = [],
   improvementPoints = [],
-  isHi
+  isHi,
+  userSummary,
+  toolName,
+  remedyPoints
 }) {
-  const displayName = userName || (isHi ? "जातक" : "Native");
+  const displayName = (userName && userName.trim()) || (isHi ? "जातक" : "Native");
+  const finalVerdict = coreVerdict || userSummary;
+  const finalBadge = toolBadge || toolName;
+  const finalCaution = cautionPoints?.length > 0 ? cautionPoints : [];
+  const finalImprovements = improvementPoints?.length > 0 ? improvementPoints : (remedyPoints || []);
 
   return (
     <div style={{
@@ -1271,7 +1445,7 @@ function PersonalizedVedicAdvisory({
             marginBottom: 6
           }}>
             <span>🎯</span>
-            <span>{toolBadge || (isHi ? "व्यक्तिगत ज्योतिषीय परामर्श" : "Personalized Astrological Guidance")}</span>
+            <span>{finalBadge || (isHi ? "व्यक्तिगत ज्योतिषीय परामर्श" : "Personalized Astrological Guidance")}</span>
           </div>
           <h3 style={{ color: "#FDE68A", fontSize: 18, fontWeight: 900, margin: 0 }}>
             {isHi ? `${displayName} हेतु व्यावहारिक फलकथन व दिशा-निर्देश` : `Personalized Life Guidance for ${displayName}`}
@@ -1291,7 +1465,7 @@ function PersonalizedVedicAdvisory({
       </div>
 
       {/* Core Verdict Narrative */}
-      {coreVerdict && (
+      {finalVerdict && (
         <div style={{
           background: "rgba(0,0,0,0.38)",
           borderRadius: 12,
@@ -1300,7 +1474,7 @@ function PersonalizedVedicAdvisory({
           borderLeft: "3.5px solid #F59E0B"
         }}>
           <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>
-            {coreVerdict}
+            {finalVerdict}
           </p>
         </div>
       )}
@@ -1357,7 +1531,7 @@ function PersonalizedVedicAdvisory({
             </div>
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
-            {cautionPoints.map((pt, idx) => (
+            {finalCaution.map((pt, idx) => (
               <li key={idx} style={{ marginBottom: 8 }}>
                 {typeof pt === "string" ? pt : (
                   <>
@@ -1388,7 +1562,7 @@ function PersonalizedVedicAdvisory({
             </div>
           </div>
           <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
-            {improvementPoints.map((pt, idx) => (
+            {finalImprovements.map((pt, idx) => (
               <li key={idx} style={{ marginBottom: 8 }}>
                 {typeof pt === "string" ? pt : (
                   <>
@@ -1416,41 +1590,13 @@ function VimshottariTool({ userData, setUserData, corePlanets, lang, isHi }) {
   return (
     <div>
       {/* Birth Input Controls */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 22, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
-        <div>
-          <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
-            {isHi ? "जातक का नाम:" : "Full Name:"}
-          </label>
-          <input
-            type="text"
-            value={userData.name}
-            onChange={e => setUserData({ ...userData, name: e.target.value })}
-            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
-          />
-        </div>
-        <div>
-          <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
-            {isHi ? "जन्म तिथि (DOB):" : "Date of Birth:"}
-          </label>
-          <input
-            type="date"
-            value={userData.dob}
-            onChange={e => setUserData({ ...userData, dob: e.target.value })}
-            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
-          />
-        </div>
-        <div>
-          <label style={{ fontSize: 11.5, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
-            {isHi ? "जन्म समय (TOB):" : "Time of Birth:"}
-          </label>
-          <input
-            type="time"
-            value={userData.tob}
-            onChange={e => setUserData({ ...userData, tob: e.target.value })}
-            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
-          />
-        </div>
-      </div>
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "विंशोत्तरी दशा हेतु जातक जन्म विवरण:" : "Natal Birth Details for Vimshottari Dasha:"}
+      />
 
       {/* Active Dasha Highlight Card */}
       <div style={{ background: "linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(180, 83, 9, 0.28))", border: "1.5px solid #F59E0B", borderRadius: 16, padding: "20px 22px", marginBottom: 24 }}>
@@ -1459,7 +1605,7 @@ function VimshottariTool({ userData, setUserData, corePlanets, lang, isHi }) {
             <span>●</span> {isHi ? "वर्तमान में सक्रिय महादशा" : "CURRENTLY ACTIVE PLANETARY ERA"}
           </div>
           <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
-            {userData.name} · {moonNak.name} ({moonNak.lord} Nakshatra Lord)
+            {(userData.name && userData.name.trim()) || (isHi ? "जातक" : "Native")} · {moonNak.name} ({moonNak.lord} Nakshatra Lord)
           </span>
         </div>
         
@@ -1817,74 +1963,13 @@ function DivisionalChartTool({ userData, setUserData, corePlanets, ascendantDegr
   return (
     <div>
       {/* ── BIRTH DETAILS INPUT BAR ── */}
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: "16px 18px", borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.2)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
-          <span style={{ fontSize: 13, color: "#FDE68A", fontWeight: 800 }}>
-            👤 {isHi ? "जातक जन्म विवरण (Birth Coordinates for Chart Calculation):" : "Natal Birth Details (Interactive Real-Time Engine):"}
-          </span>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={() => setUserData({ name: "Rahul Sharma", dob: "1995-09-27", tob: "10:30", pob: "New Delhi, India", lat: 28.6139, lon: 77.2090 })}
-              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
-            >
-              ⚡ {isHi ? "राहुल शर्मा (नमूना)" : "Rahul Sharma"}
-            </button>
-            <button
-              onClick={() => setUserData({ name: "Priya Patel", dob: "1998-11-19", tob: "16:45", pob: "Mumbai, India", lat: 19.0760, lon: 72.8777 })}
-              style={{ background: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.4)", color: "#FDE68A", padding: "4px 10px", borderRadius: 12, fontSize: 11.5, cursor: "pointer", fontWeight: 700 }}
-            >
-              ⚡ {isHi ? "प्रिया पटेल (नमूना)" : "Priya Patel"}
-            </button>
-          </div>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
-          <div>
-            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
-              {isHi ? "नाम:" : "Full Name:"}
-            </label>
-            <input
-              type="text"
-              value={userData.name}
-              onChange={e => setUserData({ ...userData, name: e.target.value })}
-              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
-              {isHi ? "जन्म तिथि (DOB):" : "Date of Birth:"}
-            </label>
-            <input
-              type="date"
-              value={userData.dob}
-              onChange={e => setUserData({ ...userData, dob: e.target.value })}
-              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
-              {isHi ? "जन्म समय (TOB):" : "Time of Birth:"}
-            </label>
-            <input
-              type="time"
-              value={userData.tob}
-              onChange={e => setUserData({ ...userData, tob: e.target.value })}
-              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box", colorScheme: "dark" }}
-            />
-          </div>
-          <div>
-            <label style={{ fontSize: 11.5, color: "rgba(241,231,208,0.8)", fontWeight: 700, display: "block", marginBottom: 4 }}>
-              {isHi ? "जन्म स्थान (City):" : "Birth City:"}
-            </label>
-            <input
-              type="text"
-              value={userData.pob}
-              onChange={e => setUserData({ ...userData, pob: e.target.value })}
-              style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
-            />
-          </div>
-        </div>
-      </div>
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={true}
+        title={isHi ? "षोडशवर्ग कुंडली हेतु जन्म विवरण:" : "Natal Birth Details for 16 Divisional Charts:"}
+      />
 
       {/* ── VARGA SELECTION CONTROLS ── */}
       <div style={{ marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: "16px 18px", borderRadius: 16, border: "1px solid rgba(212,175,55,0.2)" }}>
@@ -2149,7 +2234,7 @@ function DivisionalChartTool({ userData, setUserData, corePlanets, ascendantDegr
 }
 
 /** 3. ASHTAKAVARGA TOOL **/
-function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
+function AshtakavargaTool({ corePlanets, ascendantDegree, userData, setUserData, isHi }) {
   const ascSignIdx = Math.floor(ascendantDegree / 30);
 
   // Sanitize planets object so it is { Sun: lon, Moon: lon, ... }
@@ -2169,6 +2254,15 @@ function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
 
   return (
     <div>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "सर्वाष्टकवर्ग गणना हेतु जन्म विवरण:" : "Birth Coordinates for Sarvashtakavarga (SAV):"}
+      />
+
       {/* Astrological Summary Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 20 }}>
         <div style={{ background: "linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(180, 83, 9, 0.22))", border: "1px solid #F59E0B", borderRadius: 14, padding: "14px 16px" }}>
@@ -2329,7 +2423,7 @@ function AshtakavargaTool({ corePlanets, ascendantDegree, isHi }) {
 }
 
 /** 4. GOCHAR & TRANSIT TOOL **/
-function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
+function GocharTransitTool({ corePlanets, ascendantDegree, userData, setUserData, isHi }) {
   const moonLon = typeof corePlanets?.Moon === "number" ? corePlanets.Moon : (corePlanets?.Moon?.longitude || 116.5);
   const moonSignIdx = Math.floor(moonLon / 30);
   const ascSignIdx = Math.floor(ascendantDegree / 30);
@@ -2337,6 +2431,15 @@ function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
 
   return (
     <div>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "गोचर फलादेश हेतु जन्म विवरण:" : "Birth Coordinates for Planetary Transit Guidance:"}
+      />
+
       <div style={{ background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)" }}>
         <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
           {isHi ? "वास्तविक समय मंद-गामी ग्रह गोचर (२०२६–२०२७)" : "Real-Time Major Slow Planetary Transits (2026–2027)"}
@@ -2448,7 +2551,7 @@ function GocharTransitTool({ corePlanets, ascendantDegree, isHi }) {
 }
 
 /** 5. PLANETARY STRENGTH (SHADBALA) TOOL **/
-function ShadbalaTool({ corePlanets, ascendantDegree, userData, isHi }) {
+function ShadbalaTool({ corePlanets, ascendantDegree, userData, setUserData, isHi }) {
   const birthDate = useMemo(() => {
     try {
       return new Date(`${userData.dob}T${userData.tob || "12:00"}`);
@@ -2487,6 +2590,15 @@ function ShadbalaTool({ corePlanets, ascendantDegree, userData, isHi }) {
 
   return (
     <div>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "षड्बल गणना हेतु जन्म विवरण:" : "Birth Coordinates for Shadbala Planetary Strength:"}
+      />
+
       <div style={{ background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 16, marginBottom: 20, border: "1px solid rgba(212,175,55,0.25)" }}>
         <div style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
           {isHi ? "सप्तग्रह षड्बल रूपा सामर्थ्य (Shadbala Strength in Rupas)" : "Seven Planetary Shadbala Strengths in Rupas (60 Virupas = 1 Rupa)"}
@@ -2616,7 +2728,7 @@ function ShadbalaTool({ corePlanets, ascendantDegree, userData, isHi }) {
 }
 
 /** 6. KP CHART & SUB-LORDS TOOL **/
-function KpChartTool({ corePlanets, ascendantDegree, userData, isHi }) {
+function KpChartTool({ corePlanets, ascendantDegree, userData, setUserData, isHi }) {
   const kpChart = calculateKpChart({
     birthDate: new Date(`${userData.dob}T${userData.tob || "12:00"}`),
     lat: userData.lat,
@@ -2627,6 +2739,15 @@ function KpChartTool({ corePlanets, ascendantDegree, userData, isHi }) {
 
   return (
     <div>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={true}
+        title={isHi ? "केपी कुंडली हेतु जन्म विवरण:" : "Birth Coordinates for KP Cusp & Sub-Lord Chart:"}
+      />
+
       {/* KP Methodology Disclaimer Note */}
       <div style={{ background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.35)", borderRadius: 12, padding: "12px 16px", marginBottom: 18, fontSize: 12.5, color: "rgba(241,231,208,0.9)", lineHeight: 1.5 }}>
         ℹ️ <b>{isHi ? "केपी पद्धति सिद्धांत:" : "KP Principles Note:"}</b> {kpChart.description}
@@ -2746,13 +2867,26 @@ function KpSignificatorsTool({ isHi }) {
 }
 
 /** 8. KP HORARY 1-249 TOOL **/
-function KpHoraryTool({ horaryNumberInput, setHoraryNumberInput, horaryQueryTopic, setHoraryQueryTopic, isHi }) {
+function KpHoraryTool({ horaryNumberInput, setHoraryNumberInput, horaryQueryTopic, setHoraryQueryTopic, userData, setUserData, isHi }) {
   const result = calculateKpHorary({ horaryNumber: horaryNumberInput, queryTopic: horaryQueryTopic });
 
   return (
     <div>
       {/* Horary Input Controls */}
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center", marginBottom: 22, background: "rgba(0,0,0,0.35)", padding: 18, borderRadius: 14 }}>
+        <div style={{ flex: "1 1 200px" }}>
+          <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
+            {isHi ? "जातक का नाम:" : "Full Name:"}
+          </label>
+          <input
+            type="text"
+            value={userData?.name || ""}
+            onChange={e => setUserData && setUserData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder={isHi ? "उदा. जातक का नाम" : "e.g. Your Name"}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 14, boxSizing: "border-box" }}
+          />
+        </div>
+
         <div style={{ flex: "1 1 180px" }}>
           <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
             {isHi ? "प्रश्नावली संख्या (1 से 249):" : "Choose Horary Number (1 to 249):"}
@@ -2807,7 +2941,7 @@ function KpHoraryTool({ horaryNumberInput, setHoraryNumberInput, horaryQueryTopi
 
       {/* ── PERSONALIZED VEDIC ADVISORY FOR KP HORARY ── */}
       <PersonalizedVedicAdvisory
-        userName={null}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         toolBadge={isHi ? `केपी प्रश्न #${result.horaryNumber} विश्लेषण` : `KP Horary #${result.horaryNumber} Advisory`}
         coreVerdict={
           isHi
@@ -2881,17 +3015,14 @@ function LifePathTool({ userData, setUserData, isHi }) {
 
   return (
     <div>
-      <div style={{ marginBottom: 20, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
-        <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
-          {isHi ? "अपनी जन्म तिथि दर्ज करें:" : "Enter Birth Date for Life Path Calculation:"}
-        </label>
-        <input
-          type="date"
-          value={userData.dob}
-          onChange={e => setUserData({ ...userData, dob: e.target.value })}
-          style={{ width: "100%", maxWidth: 300, background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "8px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }}
-        />
-      </div>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showTob={false}
+        title={isHi ? "मूलांक अंकशास्त्र हेतु जन्म विवरण:" : "Life Path Calculation Birth Details:"}
+      />
 
       {lp && (
         <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "24px" }}>
@@ -2984,7 +3115,7 @@ function LifePathTool({ userData, setUserData, isHi }) {
 }
 
 /** 11. NAME NUMEROLOGY TOOL **/
-function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, isHi }) {
+function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, userData, setUserData, isHi }) {
   const result = calculateNameNumerology(nameNumerologyInput);
 
   return (
@@ -2996,8 +3127,14 @@ function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, isHi 
         <input
           type="text"
           value={nameNumerologyInput}
-          onChange={e => setNameNumerologyInput(e.target.value)}
-          placeholder="e.g. Rahul Sharma or TechVeda"
+          onChange={e => {
+            const val = e.target.value;
+            setNameNumerologyInput(val);
+            if (setUserData) {
+              setUserData(prev => ({ ...prev, name: val }));
+            }
+          }}
+          placeholder={isHi ? "उदा. अपना नाम, व्यापार या ब्रांड दर्ज करें" : "e.g. Enter full name, business, or brand"}
           style={{ width: "100%", maxWidth: 440, background: "rgba(22,15,42,0.9)", border: "1.5px solid #F59E0B", borderRadius: 8, padding: "10px 14px", color: "#FDE68A", fontSize: 15, fontWeight: 700, boxSizing: "border-box" }}
         />
       </div>
@@ -3096,7 +3233,7 @@ function NameNumerologyTool({ nameNumerologyInput, setNameNumerologyInput, isHi 
 }
 
 /** 12. PERSONAL YEAR TOOL **/
-function PersonalYearTool({ userData, isHi }) {
+function PersonalYearTool({ userData, setUserData, isHi }) {
   const result = calculatePersonalYearAndMonth(userData.dob);
   const pYear = result?.personalYear || 1;
 
@@ -3228,6 +3365,15 @@ function PersonalYearTool({ userData, isHi }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showTob={false}
+        title={isHi ? "व्यक्तिगत वर्ष व माह हेतु जन्म विवरण:" : "Personal Year & Epicycle Birth Details:"}
+      />
+
       {result && (
         <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
           <div style={{ color: "#34D399", fontWeight: 800, fontSize: 12, marginBottom: 6 }}>
@@ -3247,13 +3393,13 @@ function PersonalYearTool({ userData, isHi }) {
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? `व्यक्तिगत वर्ष ${pYear} भविष्यवाणी` : `Personal Year ${pYear} Guidance`}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, आपकी जन्म तिथि (${userData?.dob}) के अनुसार वर्ष ${result?.targetYear || 2026} आपके लिए व्यक्तिगत वर्ष ${pYear} के प्रभाव में है। यह वर्ष आपके ९-वर्षीय जीवन चक्र में विशिष्ट कर्मिक ऊर्जा और प्राथमिकताओं को सक्रिय कर रहा है।`
-            : `${userData?.name || "Seeker"}, based on your birth date (${userData?.dob}), year ${result?.targetYear || 2026} vibrates at Personal Year ${pYear}. This sets the foundational frequency for what cosmic energies are unlocked and which areas require focus.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, आपकी जन्म तिथि (${userData?.dob}) के अनुसार वर्ष ${result?.targetYear || 2026} आपके लिए व्यक्तिगत वर्ष ${pYear} के प्रभाव में है। यह वर्ष आपके ९-वर्षीय जीवन चक्र में विशिष्ट कर्मिक ऊर्जा और प्राथमिकताओं को सक्रिय कर रहा है।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, based on your birth date (${userData?.dob}), year ${result?.targetYear || 2026} vibrates at Personal Year ${pYear}. This sets the foundational frequency for what cosmic energies are unlocked and which areas require focus.`
         }
         goodPoints={getYearStrengths()}
         cautionPoints={getYearCautions()}
@@ -3265,17 +3411,34 @@ function PersonalYearTool({ userData, isHi }) {
 }
 
 /** 13. NUMBER COMPATIBILITY TOOL **/
-function NumberCompatibilityTool({ userData, partnerDobInput, setPartnerDobInput, isHi }) {
+function NumberCompatibilityTool({ userData, setUserData, partnerDobInput, setPartnerDobInput, isHi }) {
   const result = calculateNumberCompatibility(userData.dob, partnerDobInput);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
+        <div>
+          <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
+            {isHi ? "आपका नाम:" : "Your Name:"}
+          </label>
+          <input
+            type="text"
+            value={userData?.name || ""}
+            onChange={e => setUserData && setUserData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder={isHi ? "उदा. आपका नाम" : "e.g. Your Name"}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, boxSizing: "border-box" }}
+          />
+        </div>
         <div>
           <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
             {isHi ? "आपकी जन्म तिथि:" : "Your Birth Date:"}
           </label>
-          <div style={{ color: "#FFF", fontSize: 13, fontWeight: 700 }}>{userData.dob} (मूलांक {result.moolank})</div>
+          <input
+            type="date"
+            value={userData.dob}
+            onChange={e => setUserData && setUserData(prev => ({ ...prev, dob: e.target.value }))}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "7px 12px", color: "#FFF", fontSize: 13, colorScheme: "dark" }}
+          />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 4 }}>
@@ -3311,7 +3474,7 @@ function NumberCompatibilityTool({ userData, partnerDobInput, setPartnerDobInput
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? "संख्या मिलान एवं दांपत्य सामंजस्य" : "Numerical Synastry & Compatibility Guidance"}
         userSummary={
@@ -3508,12 +3671,21 @@ function MuhuratFinderTool({ selectedMuhuratEvent, setSelectedMuhuratEvent, isHi
 }
 
 /** 17. DAILY TRANSIT HOROSCOPE TOOL **/
-function DailyTransitHoroscopeTool({ userData, corePlanets, isHi }) {
+function DailyTransitHoroscopeTool({ userData, setUserData, corePlanets, isHi }) {
   const moonLon = corePlanets?.Moon || 116.5;
   const moonNak = getNakshatraInfo(moonLon);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "दैनिक गोचर फलादेश हेतु जन्म विवरण:" : "Birth Coordinates for Daily Transit Horizon:"}
+      />
+
       <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
           <span style={{ color: "#34D399", fontWeight: 800, fontSize: 12 }}>
@@ -3546,13 +3718,13 @@ function DailyTransitHoroscopeTool({ userData, corePlanets, isHi }) {
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? "दैनिक गोचर व्यक्तिगत मार्गदर्शन" : "Daily Planetary Transit Advisory"}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, आपकी जन्म चंद्र राशि ${moonNak.rashi} (नक्षत्र: ${moonNak.name}) के अनुसार वर्तमान गोचरीय ग्रह स्थिति आपके मन, कर्मक्षेत्र और वित्तीय प्रवाह पर प्रभाव डाल रही है।`
-            : `${userData?.name || "Seeker"}, transits referenced from your natal Moon in ${moonNak.rashi} (${moonNak.name} Nakshatra) indicate energetic momentum across intellectual pursuits alongside reminders for emotional grounding.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, आपकी जन्म चंद्र राशि ${moonNak.rashi} (नक्षत्र: ${moonNak.name}) के अनुसार वर्तमान गोचरीय ग्रह स्थिति आपके मन, कर्मक्षेत्र और वित्तीय प्रवाह पर प्रभाव डाल रही है।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, transits referenced from your natal Moon in ${moonNak.rashi} (${moonNak.name} Nakshatra) indicate energetic momentum across intellectual pursuits alongside reminders for emotional grounding.`
         }
         goodPoints={
           isHi
@@ -3598,21 +3770,35 @@ function DailyTransitHoroscopeTool({ userData, corePlanets, isHi }) {
 }
 
 /** 18. PRASHNA QUICK ORACLE TOOL **/
-function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, userData, isHi }) {
+function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, userData, setUserData, isHi }) {
   const oracle = getPrashnaQuickOracle({ question: prashnaQuestionInput });
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
-        <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
-          {isHi ? "अपना प्रश्न दर्ज करें (उदा. क्या मैं यह कार्य करूं?):" : "Ask Your Immediate Decision Question:"}
-        </label>
-        <input
-          type="text"
-          value={prashnaQuestionInput}
-          onChange={e => setPrashnaQuestionInput(e.target.value)}
-          style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1.5px solid #F59E0B", borderRadius: 8, padding: "10px 14px", color: "#FDE68A", fontSize: 14, fontWeight: 700, boxSizing: "border-box" }}
-        />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
+        <div>
+          <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
+            {isHi ? "जातक का नाम:" : "Your Name:"}
+          </label>
+          <input
+            type="text"
+            value={userData?.name || ""}
+            onChange={e => setUserData && setUserData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder={isHi ? "उदा. आपका नाम" : "e.g. Your Name"}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 8, padding: "10px 14px", color: "#FFF", fontSize: 14, boxSizing: "border-box" }}
+          />
+        </div>
+        <div>
+          <label style={{ fontSize: 12, color: "#FDE68A", fontWeight: 700, display: "block", marginBottom: 6 }}>
+            {isHi ? "अपना प्रश्न दर्ज करें (उदा. क्या मैं यह कार्य करूं?):" : "Ask Your Immediate Decision Question:"}
+          </label>
+          <input
+            type="text"
+            value={prashnaQuestionInput}
+            onChange={e => setPrashnaQuestionInput(e.target.value)}
+            style={{ width: "100%", background: "rgba(22,15,42,0.9)", border: "1.5px solid #F59E0B", borderRadius: 8, padding: "10px 14px", color: "#FDE68A", fontSize: 14, fontWeight: 700, boxSizing: "border-box" }}
+          />
+        </div>
       </div>
 
       <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "2px solid #F59E0B", borderRadius: 18, padding: "24px" }}>
@@ -3636,13 +3822,13 @@ function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, user
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? "प्रश्न ज्योतिष होरा निर्णय" : "Horary Prashna Decision Verdict"}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, प्रश्न काल में सक्रिय ग्रह ${oracle.horaLord} की होरा आपके प्रश्न "${prashnaQuestionInput || "कार्य निर्णय"}" के लिए ${oracle.isBeneficHora ? "शुभ व फलदायी संकेत" : "धैर्य व सावधानी का संकेत"} दे रही है।`
-            : `${userData?.name || "Seeker"}, the celestial Hora lord at this query moment is ${oracle.horaLord}, indicating a ${oracle.isBeneficHora ? "supportive, auspicious cosmic window" : "deliberate fact-checking interval"} for your question.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, प्रश्न काल में सक्रिय ग्रह ${oracle.horaLord} की होरा आपके प्रश्न "${prashnaQuestionInput || "कार्य निर्णय"}" के लिए ${oracle.isBeneficHora ? "शुभ व फलदायी संकेत" : "धैर्य व सावधानी का संकेत"} दे रही है।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, the celestial Hora lord at this query moment is ${oracle.horaLord}, indicating a ${oracle.isBeneficHora ? "supportive, auspicious cosmic window" : "deliberate fact-checking interval"} for your question.`
         }
         goodPoints={
           isHi
@@ -3690,7 +3876,7 @@ function PrashnaOracleTool({ prashnaQuestionInput, setPrashnaQuestionInput, user
 }
 
 /** 19. TARA BALA & CHANDRA BALA TOOL **/
-function TaraChandraBalaTool({ userData, corePlanets, isHi }) {
+function TaraChandraBalaTool({ userData, setUserData, corePlanets, isHi }) {
   const moonLon = corePlanets?.Moon || 116.5;
   const moonNak = getNakshatraInfo(moonLon);
   const tara = calculateTaraBala(moonNak.index, (moonNak.index + 5) % 27);
@@ -3698,6 +3884,15 @@ function TaraChandraBalaTool({ userData, corePlanets, isHi }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "तारा बल एवं चंद्र बल हेतु जन्म विवरण:" : "Birth Coordinates for Tara & Chandra Bala Matrix:"}
+      />
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {/* Tara Bala */}
         <div style={{ background: "rgba(18, 12, 36, 0.9)", border: "1.5px solid rgba(245, 158, 11, 0.4)", borderRadius: 16, padding: "20px" }}>
@@ -3734,13 +3929,13 @@ function TaraChandraBalaTool({ userData, corePlanets, isHi }) {
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? "तारा बल एवं चंद्र बल व्यक्तिगत विश्लेषण" : "Tara Bala & Chandra Bala Personal Guidance"}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, आपकी जन्म कुंडली के चंद्र नक्षत्र (${moonNak.name}) से वर्तमान नक्षत्र की दूरी ${isHi ? tara.nameHi : tara.nameEn} (गुणवत्ता: ${tara.quality}) का निर्माण कर रही है, तथा गोचर चंद्र आपकी राशि से ${chandra.houseFromMoon}वें भाव में संचरण कर रहे हैं।`
-            : `${userData?.name || "Seeker"}, calculated from your natal Moon constellation (${moonNak.name}), today's celestial star produces ${tara.nameEn} (${tara.quality}) while transit Moon occupies House ${chandra.houseFromMoon} from your Moon sign.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, आपकी जन्म कुंडली के चंद्र नक्षत्र (${moonNak.name}) से वर्तमान नक्षत्र की दूरी ${isHi ? tara.nameHi : tara.nameEn} (गुणवत्ता: ${tara.quality}) का निर्माण कर रही है, तथा गोचर चंद्र आपकी राशि से ${chandra.houseFromMoon}वें भाव में संचरण कर रहे हैं।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, calculated from your natal Moon constellation (${moonNak.name}), today's celestial star produces ${tara.nameEn} (${tara.quality}) while transit Moon occupies House ${chandra.houseFromMoon} from your Moon sign.`
         }
         goodPoints={
           isHi
@@ -3794,13 +3989,22 @@ function TaraChandraBalaTool({ userData, corePlanets, isHi }) {
 }
 
 /** 20. PANCHA PAKSHI TOOL **/
-function PanchaPakshiTool({ userData, corePlanets, isHi }) {
+function PanchaPakshiTool({ userData, setUserData, corePlanets, isHi }) {
   const moonLon = corePlanets?.Moon || 116.5;
   const moonNak = getNakshatraInfo(moonLon);
   const birdData = calculatePanchaPakshi(moonNak.index);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={false}
+        title={isHi ? "पंच पक्षी शास्त्र हेतु जन्म विवरण:" : "Birth Coordinates for Pancha Pakshi Shastra:"}
+      />
+
       <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "22px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
           <span style={{ fontSize: 44 }}>{birdData.rulingBird.symbol}</span>
@@ -3830,13 +4034,13 @@ function PanchaPakshiTool({ userData, corePlanets, isHi }) {
 
       {/* Personalized Vedic Advisory */}
       <PersonalizedVedicAdvisory
-        userName={userData?.name || "Seeker"}
+        userName={(userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native")}
         userDob={userData?.dob}
         toolName={isHi ? "पंच पक्षी व्यक्तिगत बायो-रिदम मार्गदर्शन" : "Pancha Pakshi Biorhythm Advisory"}
         userSummary={
           isHi
-            ? `${userData?.name || "जातक"}, आपके जन्म चंद्र नक्षत्र (${moonNak.name}) के अनुसार आपका वैदिक पंच-पक्षी '${birdData.rulingBird.nameHi}' (${birdData.rulingBird.nameEn}) है। वर्तमान मुहूर्त में आपका पक्षी '${birdData.currentState.stateHi}' की अवस्था में है।`
-            : `${userData?.name || "Seeker"}, based on your birth constellation (${moonNak.name}), your Tamil Vedic ruling bird is '${birdData.rulingBird.nameEn}' (${birdData.rulingBird.symbol}), currently operating in the state of '${birdData.currentState.stateEn}'.`
+            ? `${(userData?.name && userData.name.trim()) || "जातक"}, आपके जन्म चंद्र नक्षत्र (${moonNak.name}) के अनुसार आपका वैदिक पंच-पक्षी '${birdData.rulingBird.nameHi}' (${birdData.rulingBird.nameEn}) है। वर्तमान मुहूर्त में आपका पक्षी '${birdData.currentState.stateHi}' की अवस्था में है।`
+            : `${(userData?.name && userData.name.trim()) || "Native"}, based on your birth constellation (${moonNak.name}), your Tamil Vedic ruling bird is '${birdData.rulingBird.nameEn}' (${birdData.rulingBird.symbol}), currently operating in the state of '${birdData.currentState.stateEn}'.`
         }
         goodPoints={
           isHi
