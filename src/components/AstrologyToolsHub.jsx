@@ -1433,7 +1433,10 @@ function PersonalizedVedicAdvisory({
   isHi,
   userSummary,
   toolName,
-  remedyPoints
+  remedyPoints,
+  meaningTitle,
+  impactTitle,
+  impactPoints = []
 }) {
   const displayName = (userName && userName.trim()) || (isHi ? "जातक" : "Native");
   const finalVerdict = coreVerdict || userSummary;
@@ -1445,22 +1448,22 @@ function PersonalizedVedicAdvisory({
     <div style={{
       marginTop: 24,
       marginBottom: 16,
-      background: "linear-gradient(145deg, rgba(24, 16, 46, 0.96), rgba(12, 8, 26, 0.98))",
-      border: "1.5px solid rgba(212, 175, 55, 0.4)",
+      background: "linear-gradient(145deg, rgba(24, 16, 46, 0.98), rgba(12, 8, 26, 0.99))",
+      border: "1.5px solid rgba(212, 175, 55, 0.45)",
       borderRadius: 18,
-      padding: "22px 24px",
-      boxShadow: "0 12px 36px rgba(0,0,0,0.45)"
+      padding: "24px 26px",
+      boxShadow: "0 14px 40px rgba(0,0,0,0.5)"
     }}>
-      {/* Header Badge & Title */}
+      {/* ── HEADER BADGE & TITLE ── */}
       <div style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         flexWrap: "wrap",
         gap: 12,
-        borderBottom: "1px solid rgba(212, 175, 55, 0.2)",
-        paddingBottom: 14,
-        marginBottom: 16
+        borderBottom: "1px solid rgba(212, 175, 55, 0.25)",
+        paddingBottom: 16,
+        marginBottom: 20
       }}>
         <div>
           <div style={{
@@ -1479,7 +1482,7 @@ function PersonalizedVedicAdvisory({
             <span>🎯</span>
             <span>{finalBadge || (isHi ? "व्यक्तिगत ज्योतिषीय परामर्श" : "Personalized Astrological Guidance")}</span>
           </div>
-          <h3 style={{ color: "#FDE68A", fontSize: 18, fontWeight: 900, margin: 0 }}>
+          <h3 style={{ color: "#FDE68A", fontSize: 19, fontWeight: 900, margin: 0 }}>
             {isHi ? `${displayName} हेतु व्यावहारिक फलकथन व दिशा-निर्देश` : `Personalized Life Guidance for ${displayName}`}
           </h3>
         </div>
@@ -1489,122 +1492,167 @@ function PersonalizedVedicAdvisory({
           fontWeight: 700,
           background: "rgba(16, 185, 129, 0.15)",
           border: "1px solid rgba(16, 185, 129, 0.35)",
-          padding: "4px 12px",
+          padding: "5px 14px",
           borderRadius: 12
         }}>
           ✓ {isHi ? "सटीक जन्म विवरण आधारित" : "Certified Natal Synthesis"}
         </span>
       </div>
 
-      {/* Core Verdict Narrative */}
+      {/* ── PILLAR 1: व्यक्ति के लिए अर्थ (WHAT THIS MEANS FOR THE INDIVIDUAL) ── */}
       {finalVerdict && (
         <div style={{
-          background: "rgba(0,0,0,0.38)",
-          borderRadius: 12,
-          padding: "14px 18px",
-          marginBottom: 18,
-          borderLeft: "3.5px solid #F59E0B"
+          background: "rgba(0,0,0,0.42)",
+          borderRadius: 14,
+          padding: "18px 20px",
+          marginBottom: 20,
+          borderLeft: "4px solid #F59E0B",
+          border: "1px solid rgba(245, 158, 11, 0.25)"
         }}>
-          <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, lineHeight: 1.65, margin: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <span style={{ fontSize: 16 }}>📖</span>
+            <span style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {meaningTitle || (isHi ? "१. व्यक्ति के लिए अर्थ व मूल व्याख्या (What this Means for You)" : "1. What this Means for You (Core Identity & Purpose)")}
+            </span>
+          </div>
+          <p style={{ color: "rgba(241, 231, 208, 0.95)", fontSize: 13.5, lineHeight: 1.7, margin: 0 }}>
             {finalVerdict}
           </p>
         </div>
       )}
 
-      {/* 3 Structured Pillars */}
+      {/* ── PILLAR 2: व्यक्ति पर प्रभाव (IMPACT ON THE INDIVIDUAL ACROSS LIFE AREAS) ── */}
+      {impactPoints && impactPoints.length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 16 }}>⚡</span>
+            <span style={{ color: "#FDE68A", fontSize: 13.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {impactTitle || (isHi ? "२. व्यक्तिगत जीवन पर प्रभाव (Direct Impact on Your Life Areas)" : "2. Direct Impact on Your Life Areas")}
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14 }}>
+            {impactPoints.map((pt, idx) => (
+              <div key={idx} style={{
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(212, 175, 55, 0.25)",
+                borderRadius: 12,
+                padding: "14px 16px"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 16 }}>{pt.icon || "✦"}</span>
+                  <div style={{ color: "#FDE68A", fontSize: 13, fontWeight: 800 }}>
+                    {pt.title}
+                  </div>
+                </div>
+                <div style={{ color: "rgba(241, 231, 208, 0.85)", fontSize: 12, lineHeight: 1.6 }}>
+                  {pt.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── PILLARS: GOOD STRENGTHS, CAUTIONS & ACTIONABLE REMEDIES ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
-        {/* Pillar 1: The Good */}
-        <div style={{
-          background: "rgba(16, 185, 129, 0.08)",
-          border: "1px solid rgba(16, 185, 129, 0.35)",
-          borderRadius: 14,
-          padding: "16px 18px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: 18 }}>🌟</span>
-            <div>
-              <div style={{ color: "#34D399", fontSize: 14, fontWeight: 800 }}>
-                {isHi ? "शुभ प्रभाव व वरदान (What is Good)" : "Auspicious Strengths (What is Good)"}
-              </div>
-              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
-                {isHi ? "आपके पक्ष में अनुकूल ग्रह व शक्तियां" : "Favorable currents & innate advantages"}
+        {/* Auspicious Strengths (Rendered if goodPoints exist and impactPoints is empty or supplementary) */}
+        {goodPoints && goodPoints.length > 0 && (
+          <div style={{
+            background: "rgba(16, 185, 129, 0.08)",
+            border: "1px solid rgba(16, 185, 129, 0.35)",
+            borderRadius: 14,
+            padding: "16px 18px"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>🌟</span>
+              <div>
+                <div style={{ color: "#34D399", fontSize: 14, fontWeight: 800 }}>
+                  {isHi ? "शुभ प्रभाव व अनुकूल शक्तियां" : "Auspicious Strengths & Favorable Currents"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                  {isHi ? "आपके पक्ष में अनुकूल ग्रह व शक्तियां" : "Favorable currents & innate advantages"}
+                </div>
               </div>
             </div>
+            <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+              {goodPoints.map((pt, idx) => (
+                <li key={idx} style={{ marginBottom: 8 }}>
+                  {typeof pt === "string" ? pt : (
+                    <>
+                      <b style={{ color: "#A7F3D0" }}>{pt.title}:</b> {pt.desc}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
-            {goodPoints.map((pt, idx) => (
-              <li key={idx} style={{ marginBottom: 8 }}>
-                {typeof pt === "string" ? pt : (
-                  <>
-                    <b style={{ color: "#A7F3D0" }}>{pt.title}:</b> {pt.desc}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
 
-        {/* Pillar 2: The Caution */}
-        <div style={{
-          background: "rgba(245, 158, 11, 0.08)",
-          border: "1px solid rgba(245, 158, 11, 0.35)",
-          borderRadius: 14,
-          padding: "16px 18px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: 18 }}>⚠️</span>
-            <div>
-              <div style={{ color: "#FBBF24", fontSize: 14, fontWeight: 800 }}>
-                {isHi ? "सतर्कता व कमजोर पहलू (What is Challenging)" : "Cautionary Vulnerabilities (What to Watch Out For)"}
-              </div>
-              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
-                {isHi ? "संभावित चुनौतियां जहां सावधानी आवश्यक है" : "Pitfalls, blind spots & friction points"}
+        {/* Pillar 3: The Caution / Precautions */}
+        {finalCaution && finalCaution.length > 0 && (
+          <div style={{
+            background: "rgba(245, 158, 11, 0.08)",
+            border: "1px solid rgba(245, 158, 11, 0.35)",
+            borderRadius: 14,
+            padding: "16px 18px"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>⚠️</span>
+              <div>
+                <div style={{ color: "#FBBF24", fontSize: 14, fontWeight: 800 }}>
+                  {isHi ? "३. कमजोरियां व सावधानियां (क्या न करें)" : "3. Precautions & Vulnerabilities (What to Avoid)"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                  {isHi ? "संभावित चुनौतियां जहां सतर्कता आवश्यक है" : "Pitfalls, blind spots & friction points"}
+                </div>
               </div>
             </div>
+            <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+              {finalCaution.map((pt, idx) => (
+                <li key={idx} style={{ marginBottom: 8 }}>
+                  {typeof pt === "string" ? pt : (
+                    <>
+                      <b style={{ color: "#FDE68A" }}>{pt.title}:</b> {pt.desc}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
-            {finalCaution.map((pt, idx) => (
-              <li key={idx} style={{ marginBottom: 8 }}>
-                {typeof pt === "string" ? pt : (
-                  <>
-                    <b style={{ color: "#FDE68A" }}>{pt.title}:</b> {pt.desc}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
 
-        {/* Pillar 3: How to Improve */}
-        <div style={{
-          background: "rgba(168, 85, 247, 0.08)",
-          border: "1px solid rgba(168, 85, 247, 0.35)",
-          borderRadius: 14,
-          padding: "16px 18px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: 18 }}>🛡️</span>
-            <div>
-              <div style={{ color: "#C084FC", fontSize: 14, fontWeight: 800 }}>
-                {isHi ? "सुधार के सूत्र व सटीक उपाय (How to Improve)" : "Actionable Remedies (How to Improve)"}
-              </div>
-              <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
-                {isHi ? "दैनिक साधना, दान व व्यावहारिक कदम" : "Concrete daily actions, mantras & habits"}
+        {/* Pillar 4: How to Improve / Actionable Remedies */}
+        {finalImprovements && finalImprovements.length > 0 && (
+          <div style={{
+            background: "rgba(168, 85, 247, 0.08)",
+            border: "1px solid rgba(168, 85, 247, 0.35)",
+            borderRadius: 14,
+            padding: "16px 18px"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>🛡️</span>
+              <div>
+                <div style={{ color: "#C084FC", fontSize: 14, fontWeight: 800 }}>
+                  {isHi ? "४. अचूक वैदिक उपाय व सुधार के सूत्र" : "4. Actionable Remedies & Empowering Solutions"}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(241, 231, 208, 0.65)" }}>
+                  {isHi ? "दैनिक साधना, दान, मंत्र व व्यावहारिक कदम" : "Concrete daily actions, mantras & habits"}
+                </div>
               </div>
             </div>
+            <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
+              {finalImprovements.map((pt, idx) => (
+                <li key={idx} style={{ marginBottom: 8 }}>
+                  {typeof pt === "string" ? pt : (
+                    <>
+                      <b style={{ color: "#DDD6FE" }}>{pt.title}:</b> {pt.desc}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6 }}>
-            {finalImprovements.map((pt, idx) => (
-              <li key={idx} style={{ marginBottom: 8 }}>
-                {typeof pt === "string" ? pt : (
-                  <>
-                    <b style={{ color: "#DDD6FE" }}>{pt.title}:</b> {pt.desc}
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -2870,16 +2918,26 @@ function KpChartTool({ corePlanets, ascendantDegree, userData, setUserData, isHi
 }
 
 /** 7. KP SIGNIFICATORS TOOL **/
-function KpSignificatorsTool({ isHi }) {
+function KpSignificatorsTool({ userData, setUserData, isHi }) {
   const DOMAINS = [
     { id: "career", titleEn: "Career & Promotion (Houses 2, 6, 10, 11)", titleHi: "करियर व पदोन्नति (भाव २, ६, १०, ११)", favorable: [2, 6, 10, 11], planets: ["Sun", "Saturn", "Mercury", "Jupiter"] },
     { id: "marriage", titleEn: "Marriage & Partnership (Houses 2, 7, 11)", titleHi: "विवाह व दांपत्य (भाव २, ७, ११)", favorable: [2, 7, 11], planets: ["Venus", "Jupiter", "Moon"] },
     { id: "property", titleEn: "Property & Vehicle Purchase (Houses 4, 11, 12)", titleHi: "संपत्ति व वाहन क्रय (भाव ४, ११, १२)", favorable: [4, 11, 12], planets: ["Mars", "Venus", "Saturn"] },
     { id: "education", titleEn: "Higher Education & Knowledge (Houses 4, 9, 11)", titleHi: "उच्च शिक्षा व विद्या (भाव ४, ९, ११)", favorable: [4, 9, 11], planets: ["Mercury", "Jupiter"] }
   ];
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {/* ── BIRTH DETAILS INPUT BAR ── */}
+      <ToolBirthInputBar
+        userData={userData}
+        setUserData={setUserData}
+        isHi={isHi}
+        showPob={true}
+        title={isHi ? "केपी कार्येश (Significators) विश्लेषण हेतु जन्म विवरण:" : "KP Significator Birth Coordinates:"}
+      />
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
         {DOMAINS.map(d => (
           <div key={d.id} style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.3)", borderRadius: 14, padding: "18px 20px" }}>
@@ -2894,6 +2952,65 @@ function KpSignificatorsTool({ isHi }) {
           </div>
         ))}
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "केपी कार्येश (Significator) परामर्श" : "KP 4-Fold Significator Guidance"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व केपी ज्योतिषीय रहस्य" : "1. What this Means for You (KP 4-Fold Synthesis)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, कृष्णमूर्ति पद्धति (KP) के अनुसार कोई भी घटना केवल मुख्य भाव से नहीं, बल्कि सहायक भावों (Grouping of Houses) और नक्षत्र-स्वामी (Star Lord) के संयुक्त प्रभाव से घटित होती है। जब दशा-स्वामी ग्रह आपके अभीष्ट भावों के कार्येश बनते हैं, तो कार्य में अप्रत्याशित सफलता मिलती है।`
+            : `${displayName}, in KP Astrology, life events materialize through house groupings modulated by Star Lords and Sub-Lords. When operating dasha planets signify supportive houses, results manifest with mathematical certainty.`
+        }
+        impactTitle={isHi ? "२. प्रमुख जीवन क्षेत्रों पर कार्येश प्रभाव" : "2. Impact Across Core Life Areas"}
+        impactPoints={[
+          {
+            icon: "💼",
+            title: isHi ? "करियर व पदोन्नति (भाव २, ६, १०, ११)" : "Career & Elevation (Houses 2, 6, 10, 11)",
+            desc: isHi ? "दशम भाव पद व प्रतिष्ठा का, छठा भाव दैनिक सेवा व प्रतिस्पर्धा विजय का, और ग्यारहवां भाव लाभ का कारक है। इन भावों के कार्येश ग्रहों की दशा में पदोन्नति सुनिश्चित होती है।" : "10th denotes profession, 6th represents competitive victory, and 11th marks fulfillment of desires. Planetary periods activating this group bring major promotions."
+          },
+          {
+            icon: "💰",
+            title: isHi ? "धन व आर्थिक समृद्धि (भाव २ व ११)" : "Wealth Accumulation (Houses 2 & 11)",
+            desc: isHi ? "द्वितीय भाव संचित कोष व वाणी का तथा एकादश भाव वित्तीय विस्तार का है। इन दोनों भावों का संयोजन जातक को आर्थिक रूप से स्वावलंबी व समृद्ध बनाता है।" : "2nd governs liquid assets and accumulated capital; 11th brings incoming cash flow and massive financial gains."
+          },
+          {
+            icon: "❤️",
+            title: isHi ? "विवाह व दांपत्य (भाव २, ७ व ११)" : "Marriage & Union (Houses 2, 7 & 11)",
+            desc: isHi ? "सप्तम भाव जीवनसाथी का, द्वितीय भाव परिवार वृद्धि का और एकादश भाव स्थायी अनुबंध का है। इन भावों के कार्येश ग्रह दांपत्य सुख व प्रेम प्रगाढ़ करते हैं।" : "7th rules the spouse, 2nd adds family ties, and 11th establishes permanent marital bonding."
+          },
+          {
+            icon: "🌿",
+            title: isHi ? "रोग निवारण व स्वास्थ्य (भाव १ व ११)" : "Vitality & Recovery (Houses 1 & 11)",
+            desc: isHi ? "रोग के समय यदि एकादश भाव (उपशम व आरोग्य) और लग्न का संबंध सक्रिय हो, तो जातक शीघ्र रोगमुक्त होकर पूर्ण स्वास्थ्य लाभ प्राप्त करता है।" : "Active significators of the 1st (self) and 11th (cure/healing) overcome 6th/8th house ailments and restore vitality."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "जब कोई ग्रह भाव ६, ८ अथवा १२ का प्रबल कार्येश हो, तो उस अवधि में नए वित्तीय ऋण अथवा कानूनी मुकदमों से बचें।",
+                "विवाह चर्चा के समय यदि उप-स्वामी भाव १, ६ अथवा १० का संबंध दिखाए, तो जल्दबाजी में अंतिम फैसला न लें।"
+              ]
+            : [
+                "Avoid speculative debts, lawsuits, or risky surgeries when running planetary periods strongly signifying houses 6, 8, or 12.",
+                "Exercise extreme diligence if sub-lords indicate detrimental negation cusps (1, 6, 10) for relationship milestones."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "अपने कार्य-सिद्धि भावों के उप-स्वामी ग्रह (Sub-Lord) के बीज मंत्र का नित्य १०८ बार जप करें।",
+                "जिस कार्य में बाधा आ रही हो, उसके सकारात्मक भाव (जैसे करियर हेतु भाव १० व ११) के कारक ग्रह का दान अथवा सेवा करें।",
+                "प्रतिदिन प्रातः स्नान के पश्चात भगवान सूर्यनारायण को अर्घ्य देकर अपने लग्न को बलवान बनाएं।"
+              ]
+            : [
+                "Chant the primary seed mantra corresponding to the favorable sub-lord planet 108 times daily.",
+                "Engage in targeted charity aligned with the auspicious significator of your intended goal.",
+                "Strengthen your Ascendant cusp by offering morning prayers to the rising Sun to dissolve negative planetary friction."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -3011,12 +3128,13 @@ function KpHoraryTool({ horaryNumberInput, setHoraryNumberInput, horaryQueryTopi
 }
 
 /** 9. KP RULING PLANETS TOOL **/
-function KpRulingPlanetsTool({ isHi }) {
+function KpRulingPlanetsTool({ userData, setUserData, isHi }) {
   const rpData = calculateKpRulingPlanets({});
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
-    <div>
-      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14, marginBottom: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ background: "rgba(0,0,0,0.35)", padding: 16, borderRadius: 14 }}>
         <div style={{ color: "#FDE68A", fontSize: 14.5, fontWeight: 800 }}>
           {isHi ? "तात्कालिक सत्तारूढ़ ग्रह (Ruling Planets at This Moment)" : "Ruling Planets (RP) at This Moment"}
         </div>
@@ -3037,13 +3155,71 @@ function KpRulingPlanetsTool({ isHi }) {
           </div>
         ))}
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "केपी सत्तारूढ़ ग्रह (RP) फलकथन" : "KP Ruling Planets Moment Guidance"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व तात्कालिक ग्रह संकेत" : "1. What this Means for You (Cosmic Time Gateway)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, केपी ज्योतिष का यह सर्वोच्च नियम है कि जब भी आपके मन में कोई महत्वपूर्ण प्रश्न उठता है, उस क्षण आकाश में सत्तारूढ़ ग्रह (Lagna Lord, Star Lord, Moon Lord, Day Lord) सीधे आपके प्रश्न के परिणाम को दर्शाते हैं। यदि ये ग्रह बलवान व मार्गी हैं, तो आपका अभीष्ट कार्य शीघ्र सिद्ध होगा।`
+            : `${displayName}, in KP Astrology, the Ruling Planets (RP) at the precise moment a thought arises act as the cosmic key to the answer. These planets directly govern the unfolding outcome of your current venture or decision.`
+        }
+        impactTitle={isHi ? "२. तात्कालिक समय प्रभाव" : "2. Immediate Impact on Decisions"}
+        impactPoints={[
+          {
+            icon: "🎯",
+            title: isHi ? "कार्य सिद्धि की संभावना" : "Probability of Immediate Success",
+            desc: isHi ? "वर्तमान क्षण के सत्तारूढ़ ग्रहों में यदि शुभ ग्रह (बृहस्पति, शुक्र, बुध) प्रमुख पदों पर हैं, तो परिणाम आपके पक्ष में आने के प्रबल संकेत हैं।" : "When benefic planets dominate current RP positions, pending opportunities turn decisively in your favor."
+          },
+          {
+            icon: "⏳",
+            title: isHi ? "समय व विलंब का संकेत" : "Timing & Latency Indicators",
+            desc: isHi ? "यदि कोई सत्तारूढ़ ग्रह वक्री (Retrograde) हो अथवा राहु-केतु से दृष्ट हो, तो कार्य में कुछ समय का विलंब संभव है; धैर्य बनाए रखें।" : "A retrograde ruling planet signifies brief procedural pauses or revisions before final fruition."
+          },
+          {
+            icon: "💼",
+            title: isHi ? "व्यावसायिक निर्णय मार्गदर्शन" : "Strategic Execution Timing",
+            desc: isHi ? "दिन के स्वामी व लग्न नक्षत्र स्वामी के अनुकूल समय में किया गया पत्राचार या बैठक अत्यंत फलदायी सिद्ध होती है।" : "Scheduling critical client negotiations during hours governed by active RP lords magnifies negotiation power."
+          },
+          {
+            icon: "🌿",
+            title: isHi ? "मानसिक स्पष्टता व शांति" : "Mental Clarity & Intuition",
+            desc: isHi ? "वर्तमान क्षण के ग्रह संकेत मन के संशय को समाप्त कर सटीक दिशा में कदम बढ़ाने का आत्मबल प्रदान करते हैं।" : "Validating your inner impulse through cosmic ruling frequencies dissolves self-doubt and clarifies next steps."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "यदि तात्कालिक चंद्र या लग्न का नक्षत्र स्वामी वक्री ग्रह हो, तो अनुबंध पर तुरंत हस्ताक्षर करने से पहले नियम व शर्तें पुनः जांच लें।",
+                "आवेश या भ्रम की स्थिति में तुरंत कोई अपरिवर्तनीय निर्णय न लें।"
+              ]
+            : [
+                "Double-check legal fine print if the active Star Lord is currently retrograde before signing documents.",
+                "Avoid hasty, emotional declarations if the moment exhibits astrological volatility."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "वर्तमान दिन के स्वामी ग्रह (Day Lord) के नाम मंत्र का मन ही मन स्मरण कर किसी भी शुभ कार्य का आरंभ करें।",
+                "महत्वपूर्ण निर्णय लेते समय पूर्व अथवा उत्तर दिशा की ओर मुख करके बैठें।"
+              ]
+            : [
+                "Recite the seed mantra of today's Day Lord before commencing high-leverage initiatives.",
+                "Orient your workspace facing North or East during pivotal deliberations for enhanced cosmic resonance."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
-/** 10. LIFE PATH NUMBER TOOL **/
+/** 10. LIFE PATH NUMBER & MOOLANK/BHAGYANK TOOL **/
 function LifePathTool({ userData, setUserData, isHi }) {
   const lp = calculateLifePathNumber(userData.dob);
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
     <div>
@@ -3053,91 +3229,333 @@ function LifePathTool({ userData, setUserData, isHi }) {
         setUserData={setUserData}
         isHi={isHi}
         showTob={false}
-        title={isHi ? "मूलांक अंकशास्त्र हेतु जन्म विवरण:" : "Life Path Calculation Birth Details:"}
+        title={isHi ? "मूलांक व भाग्यांक अंकशास्त्र हेतु जन्म विवरण:" : "Root & Destiny Number Birth Coordinates:"}
       />
 
       {lp && (
-        <div style={{ background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))", border: "1.5px solid #F59E0B", borderRadius: 18, padding: "24px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-            <span style={{ color: "#34D399", fontWeight: 800, fontSize: 12 }}>
-              {lp.calculationSteps}
-            </span>
-            {lp.isMasterNumber && (
-              <span style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", color: "#0F0A1E", padding: "3px 10px", borderRadius: 12, fontSize: 11, fontWeight: 800 }}>
-                ★ {isHi ? "मास्टर नंबर (Master Number)" : "Master Number Vibrations"}
-              </span>
-            )}
-          </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* ── DUAL NUMBER HERO CARDS: MOOLANK (ROOT) & BHAGYANK (DESTINY) ── */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 18 }}>
+            {/* CARD 1: मूलांक (ROOT NUMBER) */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))",
+              border: "1.5px solid #F59E0B",
+              borderRadius: 18,
+              padding: "22px 24px",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <span style={{
+                  background: "rgba(239, 68, 68, 0.18)",
+                  border: "1px solid rgba(239, 68, 68, 0.4)",
+                  color: "#FCA5A5",
+                  padding: "4px 10px",
+                  borderRadius: 12,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: "uppercase"
+                }}>
+                  🌿 {isHi ? "मूलांक (Root Number) — मूल चेतना" : "Root Number (Moolank) — Core Self"}
+                </span>
+                <span style={{ color: "#34D399", fontWeight: 800, fontSize: 11.5 }}>
+                  {lp.moolankSteps}
+                </span>
+              </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 16 }}>
-            <div style={{ width: 64, height: 64, borderRadius: "50%", background: "linear-gradient(135deg, #F59E0B, #D97706)", color: "#0F0A1E", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, fontWeight: 900 }}>
-              {lp.lifePathNumber}
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
+                <div style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #EF4444, #F59E0B)",
+                  color: "#0F0A1E",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 34,
+                  fontWeight: 900,
+                  boxShadow: "0 6px 18px rgba(239, 68, 68, 0.45)",
+                  flexShrink: 0
+                }}>
+                  {lp.moolank}
+                </div>
+                <div>
+                  <h3 style={{ color: "#FDE68A", fontSize: 17, fontWeight: 900, margin: 0 }}>
+                    {isHi ? lp.moolankData.titleHi : lp.moolankData.titleEn}
+                  </h3>
+                  <div style={{ color: "#FBBF24", fontSize: 12.5, fontWeight: 700, marginTop: 4 }}>
+                    {isHi ? `स्वामी: ${lp.moolankData.rulerHi} · तत्व: ${lp.moolankData.elementHi}` : `Ruler: ${lp.moolankData.rulerEn} · Element: ${lp.moolankData.elementEn}`}
+                  </div>
+                </div>
+              </div>
+
+              <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>
+                <b>{isHi ? "मूल स्वभाव:" : "Innate Nature:"}</b> {isHi ? lp.moolankData.traitsHi : lp.moolankData.traitsEn}
+              </p>
+
+              <div style={{
+                background: "rgba(0,0,0,0.35)",
+                borderLeft: "3px solid #EF4444",
+                borderRadius: 8,
+                padding: "8px 12px",
+                fontSize: 11.5,
+                color: "rgba(241, 231, 208, 0.8)",
+                lineHeight: 1.5
+              }}>
+                {isHi
+                  ? "मूलांक जन्म के दिन से निर्धारित होता है। यह आपकी आंतरिक प्रकृति, स्वाभाविक प्रतिभा व आत्म-दृष्टिकोण का स्वामी है।"
+                  : "Derived solely from your birth day, Moolank governs your subconscious nature, innate talents, and self-identity."}
+              </div>
             </div>
-            <div>
-              <h3 style={{ color: "#FDE68A", fontSize: 18, fontWeight: 800, margin: 0 }}>
-                {isHi ? lp.archetype.titleHi : lp.archetype.titleEn}
-              </h3>
-              <div style={{ color: "rgba(241, 231, 208, 0.75)", fontSize: 12.5, marginTop: 3 }}>
-                {isHi ? `स्वामी ग्रह: ${lp.archetype.ruler}` : `Ruling Energy: ${lp.archetype.planet}`}
+
+            {/* CARD 2: भाग्यांक (DESTINY / LIFE PATH NUMBER) */}
+            <div style={{
+              background: "linear-gradient(135deg, rgba(38, 22, 68, 0.95), rgba(18, 11, 40, 0.98))",
+              border: "1.5px solid #F59E0B",
+              borderRadius: 18,
+              padding: "22px 24px",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.4)"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 6 }}>
+                <span style={{
+                  background: "rgba(245, 158, 11, 0.18)",
+                  border: "1px solid rgba(245, 158, 11, 0.4)",
+                  color: "#FDE68A",
+                  padding: "4px 10px",
+                  borderRadius: 12,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: "uppercase"
+                }}>
+                  ✨ {isHi ? "भाग्यांक (Destiny / Life Path) — कर्म पथ" : "Destiny Number (Bhagyank) — Life Calling"}
+                </span>
+                {lp.isMasterNumber ? (
+                  <span style={{ background: "linear-gradient(90deg, #F59E0B, #D97706)", color: "#0F0A1E", padding: "3px 10px", borderRadius: 12, fontSize: 11, fontWeight: 800 }}>
+                    ★ {isHi ? "मास्टर नंबर (Master Number)" : "Master Number"}
+                  </span>
+                ) : (
+                  <span style={{ color: "#34D399", fontWeight: 800, fontSize: 11.5 }}>
+                    {lp.bhagyankSteps}
+                  </span>
+                )}
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
+                <div style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #F59E0B, #D97706)",
+                  color: "#0F0A1E",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 34,
+                  fontWeight: 900,
+                  boxShadow: "0 6px 18px rgba(245, 158, 11, 0.45)",
+                  flexShrink: 0
+                }}>
+                  {lp.bhagyank}
+                </div>
+                <div>
+                  <h3 style={{ color: "#FDE68A", fontSize: 17, fontWeight: 900, margin: 0 }}>
+                    {isHi ? lp.bhagyankData.titleHi : lp.bhagyankData.titleEn}
+                  </h3>
+                  <div style={{ color: "#FBBF24", fontSize: 12.5, fontWeight: 700, marginTop: 4 }}>
+                    {isHi ? `स्वामी: ${lp.bhagyankData.rulerHi} · तत्व: ${lp.bhagyankData.elementHi}` : `Ruler: ${lp.bhagyankData.rulerEn} · Element: ${lp.bhagyankData.elementEn}`}
+                  </div>
+                </div>
+              </div>
+
+              <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 12.5, lineHeight: 1.6, margin: "0 0 10px" }}>
+                <b>{isHi ? "कर्म उद्देश्य:" : "Destiny Calling:"}</b> {isHi ? lp.bhagyankData.traitsHi : lp.bhagyankData.traitsEn}
+              </p>
+
+              <div style={{
+                background: "rgba(0,0,0,0.35)",
+                borderLeft: "3px solid #F59E0B",
+                borderRadius: 8,
+                padding: "8px 12px",
+                fontSize: 11.5,
+                color: "rgba(241, 231, 208, 0.8)",
+                lineHeight: 1.5
+              }}>
+                {isHi
+                  ? "भाग्यांक संपूर्ण जन्म तिथि के योग से बनता है। यह आपके जीवन उद्देश्य, सांसारिक अवसरों व कर्म पथ का मार्गदर्शक है।"
+                  : "Derived from the full DOB sum, Bhagyank dictates your life vocation, karmic trajectory, and outer opportunities."}
               </div>
             </div>
           </div>
 
-          <p style={{ color: "rgba(241, 231, 208, 0.9)", fontSize: 13.5, lineHeight: 1.6, margin: 0 }}>
-            {isHi ? lp.archetype.traitsHi : lp.archetype.traitsEn}
-          </p>
+          {/* ── CARD 3: MOOLANK & BHAGYANK SYNERGY ── */}
+          <div style={{
+            background: "linear-gradient(145deg, rgba(24, 16, 46, 0.95), rgba(14, 9, 30, 0.98))",
+            border: "1.5px solid rgba(212, 175, 55, 0.4)",
+            borderRadius: 16,
+            padding: "20px 24px"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 18 }}>🤝</span>
+                <span style={{ color: "#FDE68A", fontSize: 15, fontWeight: 800 }}>
+                  {isHi ? "मूलांक व भाग्यांक सामंजस्य विश्लेषण (Synergy)" : "Root & Destiny Number Synergy"}
+                </span>
+                <span style={{ color: "rgba(241, 231, 208, 0.65)", fontSize: 12 }}>
+                  ({isHi ? lp.synergy.rulerPairHi : lp.synergy.rulerPairEn})
+                </span>
+              </div>
+              <span style={{
+                background: "rgba(16, 185, 129, 0.18)",
+                border: "1px solid rgba(16, 185, 129, 0.4)",
+                color: "#34D399",
+                padding: "4px 12px",
+                borderRadius: 12,
+                fontSize: 12,
+                fontWeight: 800
+              }}>
+                ⚡ {lp.synergy.score}% {isHi ? "सामंजस्य" : "Harmony"}
+              </span>
+            </div>
 
-          {/* ── PERSONALIZED VEDIC ADVISORY FOR LIFE PATH ── */}
+            <div style={{ color: "#A7F3D0", fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
+              ✦ {isHi ? lp.synergy.statusHi : lp.synergy.statusEn}
+            </div>
+
+            <p style={{ color: "rgba(241, 231, 208, 0.92)", fontSize: 13, lineHeight: 1.65, margin: 0 }}>
+              {isHi ? lp.synergy.analysisHi : lp.synergy.analysisEn}
+            </p>
+          </div>
+
+          {/* ── CARD 4: AUSPICIOUS VIBRATIONS & LUCKY ELEMENTS MATRIX ── */}
+          <div style={{
+            background: "rgba(0,0,0,0.38)",
+            border: "1px solid rgba(212, 175, 55, 0.25)",
+            borderRadius: 16,
+            padding: "18px 20px"
+          }}>
+            <div style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+              <span>🔮</span>
+              <span>{isHi ? "शुभ कारक व अनुकूल अंकशास्त्रीय तत्व (Auspicious Elements Matrix)" : "Auspicious Elements & Vibrational Keys"}</span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  🔢 {isHi ? "शुभ अंक (Lucky Numbers)" : "Lucky Numbers"}
+                </span>
+                <span style={{ color: "#34D399", fontSize: 14, fontWeight: 800 }}>
+                  {lp.luckyElements.luckyNumbers.join(", ")}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  🤝 {isHi ? "मित्र अंक (Friendly Numbers)" : "Friendly Numbers"}
+                </span>
+                <span style={{ color: "#FDE68A", fontSize: 14, fontWeight: 800 }}>
+                  {lp.luckyElements.friendlyNumbers.join(", ")}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  ⚠️ {isHi ? "असहयोगी अंक (Challenging Numbers)" : "Challenging Numbers"}
+                </span>
+                <span style={{ color: "#FCA5A5", fontSize: 14, fontWeight: 800 }}>
+                  {lp.luckyElements.enemyNumbers.join(", ")}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  📅 {isHi ? "शुभ दिन (Lucky Days)" : "Lucky Days"}
+                </span>
+                <span style={{ color: "#A7F3D0", fontSize: 13, fontWeight: 700 }}>
+                  {isHi ? lp.luckyElements.luckyDaysHi : lp.luckyElements.luckyDaysEn}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  🎨 {isHi ? "शुभ रंग (Auspicious Colors)" : "Auspicious Colors"}
+                </span>
+                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                  {isHi ? lp.luckyElements.luckyColorsHi : lp.luckyElements.luckyColorsEn}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  💎 {isHi ? "शुभ रत्न व धातु (Gemstone & Metal)" : "Lucky Gem & Metal"}
+                </span>
+                <span style={{ color: "#DDD6FE", fontSize: 13, fontWeight: 700 }}>
+                  {isHi ? lp.luckyElements.luckyGemstoneHi : lp.luckyElements.luckyGemstoneEn}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  🧭 {isHi ? "शुभ दिशा (Lucky Direction)" : "Lucky Direction"}
+                </span>
+                <span style={{ color: "#FDE68A", fontSize: 13, fontWeight: 700 }}>
+                  {isHi ? lp.luckyElements.luckyDirectionHi : lp.luckyElements.luckyDirectionEn}
+                </span>
+              </div>
+
+              <div style={{ background: "rgba(255,255,255,0.03)", padding: "10px 14px", borderRadius: 10 }}>
+                <span style={{ color: "rgba(241,231,208,0.7)", fontSize: 11.5, display: "block" }}>
+                  🕉️ {isHi ? "इष्ट देव व बीज मंत्र (Deity & Mantra)" : "Deity & Beej Mantra"}
+                </span>
+                <span style={{ color: "#FDE68A", fontSize: 12.5, fontWeight: 700 }}>
+                  {isHi ? `${lp.luckyElements.deityHi} · ${lp.luckyElements.beejMantraHi}` : `${lp.luckyElements.deityEn} · ${lp.luckyElements.beejMantraEn}`}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── CARD 5: COMPREHENSIVE PERSONALIZED VEDIC ADVISORY (ALL 4 PILLARS) ── */}
           <PersonalizedVedicAdvisory
             userName={userData?.name}
-            toolBadge={isHi ? `मूलांक ${lp.lifePathNumber} व्यक्तिगत परामर्श` : `Life Path ${lp.lifePathNumber} Personal Guidance`}
+            toolBadge={isHi ? `मूलांक ${lp.moolank} व भाग्यांक ${lp.bhagyank} संपूर्ण फलकथन` : `Root ${lp.moolank} & Destiny ${lp.bhagyank} Personal Guidance`}
+            meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व अंकशास्त्रीय व्याख्या (What this Means for You)" : "1. What this Means for You (Core Identity & Purpose)"}
             coreVerdict={
               isHi
-                ? `${userData?.name || "जातक"} जी, आपकी जन्म तिथि का संपूर्ण योग मूलांक ${lp.lifePathNumber} बनाता है, जिसके स्वामी ग्रह ${lp.archetype.ruler} हैं। यह अंक आपकी आत्मा के मुख्य जीवन उद्देश्य (${lp.archetype.titleHi}) को प्रकट करता है। इस ऊर्जा के साथ तालमेल बिठाकर चलने पर आपको स्वाभाविक सफलता, आंतरिक शांति एवं दीर्घकालिक समृद्धि प्राप्त होगी।`
-                : `${userData?.name || "Native"}, your birth date reduces to sacred Life Path ${lp.lifePathNumber}, governed by ${lp.archetype.planet}. This vibration embodies '${lp.archetype.titleEn}', defining your core leadership instinct, creative strengths, and ideal career pathway.`
+                ? `${displayName} जी, आपकी जन्म तिथि का दिन मूलांक ${lp.moolank} (${lp.moolankData.rulerHi}) और संपूर्ण योग भाग्यांक ${lp.bhagyank} (${lp.bhagyankData.rulerHi}) बनाता है। मूलांक आपकी आंतरिक चेतना व मूल स्वभाव को प्रकट करता है, जबकि भाग्यांक आपके जीवन उद्देश्य व सांसारिक कर्म मार्ग को दर्शाता है। ${lp.moolankData.meaningHi} ${lp.bhagyankData.meaningHi}`
+                : `${displayName}, your birth date reveals Root Number ${lp.moolank} (${lp.moolankData.rulerEn}) and Destiny Number ${lp.bhagyank} (${lp.bhagyankData.rulerEn}). Your Root Number governs your innate consciousness and natural instincts, while your Destiny Number guides your external vocation and worldly opportunities. ${lp.moolankData.meaningEn} ${lp.bhagyankData.meaningEn}`
             }
-            goodPoints={[
+            impactTitle={isHi ? "२. व्यक्तिगत जीवन पर प्रभाव (Direct Impact on Your Life Areas)" : "2. Direct Impact on Your Life Areas"}
+            impactPoints={[
               {
-                title: isHi ? `मूलांक ${lp.lifePathNumber} की स्वाभाविक प्रतिभा` : `Innate Genius of Life Path ${lp.lifePathNumber}`,
-                desc: isHi
-                  ? `आप में ${lp.archetype.traitsHi} जैसे गुण जन्मजात हैं। यह ऊर्जा आपको विपरीत परिस्थितियों में भी लक्ष्य के प्रति अडिग रहने व स्वतंत्र निर्णय लेने की शक्ति देती है।`
-                  : `You are naturally gifted with ${lp.archetype.traitsEn}. This cosmic frequency grants you resilience, strategic focus, and the capacity to pioneer new solutions.`
+                icon: "💼",
+                title: isHi ? "करियर व आजीविका प्रभाव (Career & Ambition)" : "Career & Professional Trajectory",
+                desc: isHi ? lp.moolankData.impacts.career.descHi : lp.moolankData.impacts.career.descEn
               },
               {
-                title: isHi ? "आकर्षण एवं प्रभावशीलता" : "Natural Magnetism & Social Authority",
-                desc: isHi
-                  ? `जब आप अपने मूलांक के अनुकूल कार्यों में संलग्न होते हैं, तो लोग आपकी प्रामाणिकता व समर्पण का स्वतः सम्मान करते हैं।`
-                  : `Operating in alignment with your numerical destiny commands authentic respect, attracting loyal collaborators and supportive mentors.`
-              }
-            ]}
-            cautionPoints={[
-              {
-                title: isHi ? `मूलांक ${lp.lifePathNumber} के नकारात्मक पहलू (Shadow Traits)` : `Shadow Traps of Number ${lp.lifePathNumber}`,
-                desc: isHi
-                  ? "अति-आत्मविश्वास, जिद, अधीरता अथवा दूसरों की धीमी गति पर चिड़चिड़ाहट इस अंक के मुख्य दोष हैं। दूसरों के दृष्टिकोण को भी धैर्य से सुनना सीखें।"
-                  : "Watch out for rigidity, impatience with colleagues, or emotional burnout. Avoid taking on burdens that belong to others."
+                icon: "💰",
+                title: isHi ? "आर्थिक समृद्धि व धनार्जन (Wealth & Finance)" : "Wealth & Financial Growth",
+                desc: isHi ? lp.moolankData.impacts.wealth.descHi : lp.moolankData.impacts.wealth.descEn
               },
               {
-                title: isHi ? "भावनात्मक उतार-चढ़ाव व तनाव" : "Stress Triggers & Frustration",
-                desc: isHi
-                  ? "जब योजनाएं तुरंत फलीभूत नहीं होतीं, तो हताश होने के बजाय धैर्यपूर्वक प्रक्रिया पर भरोसा करें। अचानक बड़े फैसले न लें।"
-                  : "Resist the urge to force immediate outcomes when cycles demand patient incubation. Preserve energy for high-leverage moves."
-              }
-            ]}
-            improvementPoints={[
-              {
-                title: isHi ? `स्वामी ग्रह (${lp.archetype.ruler}) का मंत्र व दैनिक साधना` : `Ruling Planetary Alignment (${lp.archetype.ruler})`,
-                desc: isHi
-                  ? `अपने अंक स्वामी ${lp.archetype.ruler} के सम्मान में प्रतिदिन प्रातः ५ मिनट ध्यान करें। संबंधित इष्ट देव की आराधना जीवन में आ रहे अवरोधों को नष्ट करती है।`
-                  : `Dedicate 5 minutes each morning to grounding reflection aligned with ${lp.archetype.ruler}. Chanting sacred mantras aligns your subtle biorhythm.`
+                icon: "❤️",
+                title: isHi ? "प्रेम, संबंध व दांपत्य जीवन (Love & Marriage)" : "Love, Marriage & Relationships",
+                desc: isHi ? lp.moolankData.impacts.relationships.descHi : lp.moolankData.impacts.relationships.descEn
               },
               {
-                title: isHi ? "अनुकूल रंग व जीवनशैली संतुलन" : "Harmonious Colors & Environment",
-                desc: isHi
-                  ? "हल्के सुनहरे, पीले अथवा सफेद रंगों का प्रयोग करें। अपने कार्यक्षेत्र को व्यवस्थित व सुवासित रखें।"
-                  : "Incorporate luminous, grounding tones (gold, ivory, soft amber) into your wardrobe and workspace to amplify clarity."
+                icon: "🌿",
+                title: isHi ? "स्वास्थ्य व जीवन ऊर्जा संतुलन (Health & Vitality)" : "Health & Vitality Balance",
+                desc: isHi ? lp.moolankData.impacts.health.descHi : lp.moolankData.impacts.health.descEn
               }
             ]}
+            cautionPoints={
+              isHi
+                ? lp.moolankData.precautionsHi.map(p => ({ title: "सावधानी", desc: p }))
+                : lp.moolankData.precautionsEn.map(p => ({ title: "Precaution", desc: p }))
+            }
+            remedyPoints={
+              isHi
+                ? lp.moolankData.remediesHi.map(r => ({ title: "अचूक उपाय", desc: r }))
+                : lp.moolankData.remediesEn.map(r => ({ title: "Actionable Remedy", desc: r }))
+            }
             isHi={isHi}
           />
         </div>
@@ -3562,8 +3980,9 @@ function NumberCompatibilityTool({ userData, setUserData, partnerDobInput, setPa
 }
 
 /** 14. CHOGHADIYA TOOL **/
-function ChoghadiyaTool({ dailyPanchangData, isHi }) {
+function ChoghadiyaTool({ userData, dailyPanchangData, isHi }) {
   if (!dailyPanchangData) return null;
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
     <div>
@@ -3606,13 +4025,71 @@ function ChoghadiyaTool({ dailyPanchangData, isHi }) {
           </div>
         </div>
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "चौघड़िया मुहूर्त व्यक्तिगत मार्गदर्शन" : "Choghadiya Muhurat Daily Advisory"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व चौघड़िया कालखंड" : "1. What this Means for You (Vedic Time Segments)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, वैदिक चौघड़िया पद्धति सूर्योदय से सूर्यास्त एवं सूर्यास्त से सूर्योदय के समय को ८-८ कालखंडों में विभाजित करती है। 'अमृत', 'शुभ' व 'लाभ' चौघड़िया किसी भी नए कार्य, यात्रा, अनुबंध व धन संचय के लिए साक्षात अमृत समान फलदायी होते हैं, जबकि 'रोग', 'काल' व 'उद्वेग' में कार्य आरंभ करने से बचना चाहिए।`
+            : `${displayName}, Vedic Choghadiya divides day and night into dynamic 90-minute planetary intervals. Initiating key milestones during Amrit, Shubh, or Labh guarantees cosmic support, while avoiding Rog, Kaal, and Udveg prevents setbacks.`
+        }
+        impactTitle={isHi ? "२. जीवन क्षेत्रों पर चौघड़िया प्रभाव" : "2. Impact on Daily Undertakings"}
+        impactPoints={[
+          {
+            icon: "💼",
+            title: isHi ? "व्यापार, नौकरी व अनुबंध हस्ताक्षर" : "Commercial Deals & Agreements",
+            desc: isHi ? "'शुभ' व 'लाभ' चौघड़िया में किए गए व्यापारिक सौदे व पत्राचार दीर्घकालिक लाभ व स्थायित्व प्रदान करते हैं।" : "Conducting business negotiations and signing agreements during 'Shubh' or 'Labh' ensures long-term compounding and profit."
+          },
+          {
+            icon: "💰",
+            title: isHi ? "वित्तीय लेन-देन व निवेश" : "Wealth Investments & Banking",
+            desc: isHi ? "'अमृत' चौघड़िया में किए गए निवेश, स्वर्ण क्रय व बचत खाते का शुभारंभ अक्षय समृद्धि कारक होता है।" : "'Amrit' slots are optimal for purchasing gold, mutual funds, capital investments, and opening fresh accounts."
+          },
+          {
+            icon: "🚗",
+            title: isHi ? "यात्रा व वाहन परिचालन" : "Travel, Transit & Vehicles",
+            desc: isHi ? "'चल' चौघड़िया यात्रा, वाहन क्रय व स्थानांतरण के लिए श्रेष्ठ है; यात्रा निर्विघ्न संपन्न होती है।" : "'Char' (Movement) is best for commencing journeys, vehicle deliveries, and logistical transitions."
+          },
+          {
+            icon: "🌿",
+            title: isHi ? "स्वास्थ्य व औषधि आरंभ" : "Health Procedures & Medication",
+            desc: isHi ? "नई चिकित्सा या औषधि का सेवन 'अमृत' या 'शुभ' चौघड़िया में आरंभ करने से शीघ्र स्वास्थ्य लाभ होता है।" : "Initiating medical treatments or new wellness regimens during 'Amrit' accelerates healing and vitality."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "'काल' चौघड़िया में कोई भी नया कार्य आरंभ न करें; यह हानि व असफलता का कारक बन सकता है।",
+                "'उद्वेग' चौघड़िया (सूर्य का प्रभाव) में वाद-विवाद, कानूनी समझौते अथवा महत्वपूर्ण चर्चा से बचें।"
+              ]
+            : [
+                "Strictly avoid launching key projects or journeys during 'Kaal' (ruled by Saturn), which induces stagnation.",
+                "Avoid volatile family discussions or legal confrontations during 'Udveg' (ruled by Sun), which causes friction."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "यदि आपातकाल में 'रोग' या 'उद्वेग' के समय निकलना पड़े, तो थोड़ा मीठा दही अथवा गुड़-जल ग्रहण कर 'ॐ गं गणपतये नमः' का जप करें।",
+                "प्रतिदिन घर से निकलते समय भगवान सूर्यनारायण को नमन करें।"
+              ]
+            : [
+                "If forced to embark on an urgent journey during Rog or Udveg, consume a spoon of sweet curd or jaggery water while chanting Ganesha mantra.",
+                "Bow toward the Sun before leaving home each morning to align your subtle biorhythm with auspicious timing."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
 /** 15. RAHU KAAL TOOL **/
-function RahuKaalTool({ dailyPanchangData, isHi }) {
+function RahuKaalTool({ userData, dailyPanchangData, isHi }) {
   if (!dailyPanchangData) return null;
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
     <div>
@@ -3653,18 +4130,76 @@ function RahuKaalTool({ dailyPanchangData, isHi }) {
           </div>
         </div>
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "राहुकाल व यमगंड व्यक्तिगत सतर्कता" : "Rahu Kaal & Inauspicious Timing Advisory"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व राहुकाल का वैदिक प्रभाव" : "1. What this Means for You (Rahu Kaal Astrological Nature)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, दैनिक राहुकाल सूर्योदय और सूर्यास्त के मध्य का वह ९० मिनट का समय है जब छाया ग्रह राहु का प्रभाव अत्यधिक प्रबल होता है। इस समयावधि में नए शुभ कार्य, यात्रा, अनुबंध या संपत्ति क्रय करने पर भ्रम, विघ्न या अनावश्यक बाधाएं उत्पन्न होने की आशंका रहती है।`
+            : `${displayName}, daily Rahu Kaal represents a 90-minute window when the malefic frequency of North Node Rahu peaks. Initiating auspicious deeds or financial transactions during this phase invites unexpected friction or deceptive outcomes.`
+        }
+        impactTitle={isHi ? "२. दैनिक कार्यों पर राहुकाल का प्रभाव" : "2. Direct Impact on Everyday Activities"}
+        impactPoints={[
+          {
+            icon: "💼",
+            title: isHi ? "कार्यक्षेत्र व अनुबंध हस्ताक्षर" : "Professional Launches & Contracts",
+            desc: isHi ? "राहुकाल में नई नौकरी ज्वाइन करने, कंपनी पंजीकरण अथवा बड़े अनुबंध पर हस्ताक्षर करने से बचें; परिणाम में अनिश्चितता रह सकती है।" : "Avoid signing high-stakes commercial agreements, launching websites, or accepting job offers during active Rahu Kaal."
+          },
+          {
+            icon: "💰",
+            title: isHi ? "वित्तीय लेन-देन व स्वर्ण क्रय" : "Capital Transfers & Wealth",
+            desc: isHi ? "राहुकाल में बड़ा उधार देने, शेयर बाजार में आक्रामक खरीदारी अथवा आभूषण क्रय करने से आर्थिक नुकसान संभव है।" : "Refrain from executing large speculative investments, lending significant sums, or purchasing luxury jewelry."
+          },
+          {
+            icon: "🚗",
+            title: isHi ? "यात्रा व वाहन क्रय" : "Travel Departures & Transit",
+            desc: isHi ? "इस अवधि में लंबी यात्रा पर प्रस्थान करने से वाहन में खराबी, यात्रा में विलंब अथवा मानसिक तनाव की संभावना रहती है।" : "Departures during Rahu Kaal carry a higher frequency of transit delays, mechanical issues, and logistical confusion."
+          },
+          {
+            icon: "❤️",
+            title: isHi ? "पारिवारिक संबंध व बातचीत" : "Domestic Harmony & Negotiations",
+            desc: isHi ? "विवाह संबंध चर्चा, सगाई अथवा संवेदनशील पारिवारिक मामलों पर राहुकाल में बातचीत करने से कटुता आ सकती है।" : "Postpone delicate marital proposals or dispute resolutions; Rahu fosters misunderstanding and misinterpretation."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "राहुकाल के दौरान कभी भी नवीन प्रतिष्ठान, दुकान अथवा गृह प्रवेश का उद्घाटन न करें।",
+                "महत्वपूर्ण सरकारी अथवा कानूनी दस्तावेज प्रस्तुत करने से पहले राहुकाल समाप्त होने की प्रतीक्षा करें।"
+              ]
+            : [
+                "Never inaugurate a new residence, enterprise, or retail space during active Rahu Kaal.",
+                "Wait until Rahu Kaal concludes before submitting sensitive legal bids or governmental applications."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "यदि आपातकाल में राहुकाल के समय प्रस्थान करना अनिवार्य हो, तो थोड़ा गुड़ खाकर जल पिएं और 'ॐ नमः शिवाय' का ११ बार जप करें।",
+                "राहु की नकारात्मक ऊर्जा को निष्प्रभावी करने हेतु प्रतिदिन श्री हनुमान चालीसा अथवा भैरव कवच का पाठ करें।"
+              ]
+            : [
+                "If departure during Rahu Kaal is unavoidable, consume a pinch of jaggery with water and chant 'Om Namah Shivaya' 11 times.",
+                "Recite the Hanuman Chalisa daily to create an impenetrable energetic shield against planetary illusions."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
 
 /** 16. MUHURAT FINDER TOOL **/
-function MuhuratFinderTool({ selectedMuhuratEvent, setSelectedMuhuratEvent, isHi }) {
+function MuhuratFinderTool({ userData, selectedMuhuratEvent, setSelectedMuhuratEvent, isHi }) {
   const EVENTS = [
     { id: "vivah", nameEn: "💍 Vivah (Marriage / Engagement)", nameHi: "💍 विवाह एवं सगाई मुहूर्त" },
     { id: "griha", nameEn: "🏠 Griha Pravesh (House Warming)", nameHi: "🏠 गृह प्रवेश मुहूर्त" },
     { id: "vehicle", nameEn: "🚗 Vehicle Purchase", nameHi: "🚗 वाहन क्रय मुहूर्त" },
     { id: "business", nameEn: "💼 Business / Shop Opening", nameHi: "💼 नवीन व्यापार व प्रतिष्ठान आरंभ" }
   ];
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
     <div>
@@ -3698,6 +4233,63 @@ function MuhuratFinderTool({ selectedMuhuratEvent, setSelectedMuhuratEvent, isHi
           • <b>{isHi ? "वर्जित स्थितियां:" : "Cautionary Exclusions:"}</b> Avoid Rahu Kaal, Bhadra (Vishti Karana), and Krishna Chaturdashi.
         </div>
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "शुभ मुहूर्त व्यक्तिगत परामर्श" : "Auspicious Muhurat Custom Advisory"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व शुभ मुहूर्त का महत्व" : "1. What this Means for You (Vedic Muhurat Power)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, 'मुहूर्त' काल का वह विशिष्ट अंश है जब ब्रह्मांडीय ग्रह, नक्षत्र व तिथियां मिलकर सकारात्मक ऊर्जा का निर्माण करती हैं। सही मुहूर्त में किया गया कार्य प्राकृतिक रूप से दीर्घकालिक सफलता, स्थायित्व व समृद्धि की गारंटी देता है।`
+            : `${displayName}, a Vedic Muhurat is a sacred cosmic alignment where Tithi, Nakshatra, and planetary hours harmonize to supercharge human intention with lasting success and divine protection.`
+        }
+        impactTitle={isHi ? "२. चयनित संस्कार पर मुहूर्त का प्रभाव" : "2. Impact on Selected Ceremony"}
+        impactPoints={[
+          {
+            icon: "💍",
+            title: isHi ? "विवाह व दांपत्य संस्कार" : "Marriage & Betrothal Sanctity",
+            desc: isHi ? "शुभ लग्न व त्रिबल शुद्धि (सूर्य, चंद्र, गुरु) में विवाह संपन्न होने पर अखंड सौभाग्य, दांपत्य सामंजस्य व वंश वृद्धि होती है।" : "A certified wedding muhurat ensures lifelong harmony, mutual fidelity, and enduring domestic peace."
+          },
+          {
+            icon: "🏠",
+            title: isHi ? "गृह प्रवेश व वास्तु प्रतिष्ठा" : "House Warming & Sanctuary",
+            desc: isHi ? "सूर्य के उत्तरायण एवं स्थिर लग्न में गृह प्रवेश करने से भवन में सुख-शांति, आरोग्य, वास्तु दोष शमन व लक्ष्मी का स्थायी वास होता है।" : "Entering a newly constructed home during favorable solar and lunar transits anchors prosperity and health."
+          },
+          {
+            icon: "🚗",
+            title: isHi ? "वाहन क्रय व यात्रा सुरक्षा" : "Vehicle Acquisition & Road Safety",
+            desc: isHi ? "शुभ वार (बुधवार, गुरुवार, शुक्रवार) व चर नक्षत्र में वाहन लेने से यात्राएं निर्विघ्न, सुरक्षित व दुर्घटना रहित रहती हैं।" : "Purchasing a vehicle during movable constellations shields against mechanical breakdowns and ensures safe journeys."
+          },
+          {
+            icon: "💼",
+            title: isHi ? "नवीन व्यापार व प्रतिष्ठान शुभारंभ" : "Enterprise Inauguration & Profits",
+            desc: isHi ? "लाभ या अमृत चौघड़िया तथा स्थिर लग्न (वृषभ, सिंह) में दुकान या ऑफिस खोलने से व्यापार तेजी से फैलता है।" : "Inaugurating an enterprise during fixed signs (Taurus/Leo) anchors dependable customer loyalty and compounding profits."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "भद्रा (विष्टि करण), रिक्ता तिथियों (चतुर्थी, नवमी, चतुर्दशी) और अमावस्या के दिन कोई भी बड़ा मांगलिक कार्य न करें।",
+                "देवगुरु बृहस्पति अथवा शुक्र ग्रह के अस्त (combust) होने के काल में विवाह व गृह प्रवेश पूर्णतः वर्जित हैं।"
+              ]
+            : [
+                "Avoid auspicious milestones during Bhadra, Rikta Tithis (4th, 9th, 14th), and Amavasya (New Moon).",
+                "Major ceremonies like weddings and housewarmings are prohibited when Jupiter or Venus are combust."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "किसी भी बड़े कार्य के आरंभ से पूर्व प्रथम पूज्य भगवान श्री गणेश जी की विधिवत पूजा व संकल्प करें।",
+                "मुहूर्त से पूर्व गौमाता को गुड़ व हरा चारा खिलाएं और ब्राह्मणों को यथाशक्ति दक्षिणा व अन्न दान करें।"
+              ]
+            : [
+                "Always commence major life initiatives with sincere invocation and prayers to Lord Ganesha.",
+                "Feed green fodder and jaggery to cows prior to the muhurat hour to clear subtle energetic blockages."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
@@ -4118,7 +4710,7 @@ function PanchaPakshiTool({ userData, setUserData, corePlanets, isHi }) {
 }
 
 /** 21. COSMIC COMPASS (PLANETARY HORA) TOOL **/
-function CosmicCompassHoraTool({ isHi }) {
+function CosmicCompassHoraTool({ userData, isHi }) {
   const HORA_PLANETS = [
     { name: "Sun", planetHi: "सूर्य", benefitEn: "Leadership, Government meetings, Ambition", benefitHi: "राजकार्य, नेतृत्व, पिता व अधिकारियों से भेंट" },
     { name: "Venus", planetHi: "शुक्र", benefitEn: "Romance, Arts, Purchase of Gold & Luxury", benefitHi: "विवाह, आभूषण क्रय, सौंदर्य, कला व दांपत्य" },
@@ -4128,6 +4720,7 @@ function CosmicCompassHoraTool({ isHi }) {
     { name: "Jupiter", planetHi: "गुरु", benefitEn: "Spiritual rituals, Legal contracts, Wealth, Wisdom", benefitHi: "पूजा, धार्मिक कार्य, बैंक, शिक्षा व शुभ मुहूर्त" },
     { name: "Mars", planetHi: "मंगल", benefitEn: "Physical training, Surgery, Sports, Competitions", benefitHi: "साहस, खेलकूद, शल्य चिकित्सा, भूमि व प्रतिस्पर्धा" }
   ];
+  const displayName = (userData?.name && userData.name.trim()) || (isHi ? "जातक" : "Native");
 
   return (
     <div>
@@ -4140,7 +4733,7 @@ function CosmicCompassHoraTool({ isHi }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 20 }}>
         {HORA_PLANETS.map((h, idx) => (
           <div key={idx} style={{ background: "rgba(18, 12, 36, 0.88)", border: "1px solid rgba(212, 175, 55, 0.25)", borderRadius: 12, padding: "14px 16px" }}>
             <div style={{ color: "#F59E0B", fontWeight: 800, fontSize: 15, marginBottom: 4 }}>
@@ -4152,6 +4745,63 @@ function CosmicCompassHoraTool({ isHi }) {
           </div>
         ))}
       </div>
+
+      <PersonalizedVedicAdvisory
+        userName={userData?.name}
+        toolBadge={isHi ? "ग्रह होरा चक्र व्यक्तिगत परामर्श" : "Planetary Hora Action Alignment"}
+        meaningTitle={isHi ? "१. व्यक्ति के लिए अर्थ व ग्रह होरा चक्र" : "1. What this Means for You (Hourly Planetary Cycles)"}
+        coreVerdict={
+          isHi
+            ? `${displayName} जी, वैदिक होरा चक्र के अनुसार २४ घंटों में प्रत्येक ६० मिनट की अवधि एक विशिष्ट ग्रह के आधिपत्य में होती है। जब आप अपने महत्वपूर्ण कार्यों को उस कार्य से संबंधित ग्रह की होरा में आरंभ करते हैं, तो ग्रह की स्वाभाविक ऊर्जा आपके प्रयासों को सौ गुना फलदायी बना देती है।`
+            : `${displayName}, Planetary Horas divide each solar day into consecutive 1-hour ruling blocks. Aligning your strategic actions with favorable planetary frequencies ensures cosmic momentum and effortless success.`
+        }
+        impactTitle={isHi ? "२. जीवन क्षेत्रों पर होरा का प्रभाव" : "2. Impact on Core Undertakings"}
+        impactPoints={[
+          {
+            icon: "💼",
+            title: isHi ? "करियर, पदोन्नति व साक्षात्कार" : "Career Advancement & Pitches",
+            desc: isHi ? "सूर्य व गुरु की होरा में उच्चाधिकारियों से भेंट, इंटरव्यू अथवा पदोन्नति की चर्चा अत्यंत सफल रहती है।" : "Sun and Jupiter horas are ideal for executive interviews, government approvals, and leadership decisions."
+          },
+          {
+            icon: "💰",
+            title: isHi ? "धन, व्यापार व अनुबंध हस्ताक्षर" : "Wealth, Commerce & Contracts",
+            desc: isHi ? "बुध व शुक्र की होरा में व्यापारिक सौदे, बिलिंग, निवेश व नए बैंक खाते खोलना स्थायी धन लाभ देता है।" : "Mercury and Venus horas maximize financial liquidity, artistic trade, marketing, and investment signing."
+          },
+          {
+            icon: "❤️",
+            title: isHi ? "दांपत्य, प्रेम व विवाह चर्चा" : "Romance, Reconciliation & Marriage",
+            desc: isHi ? "शुक्र व चंद्र की होरा में प्रेम प्रस्ताव, जीवनसाथी से संवाद व विवाह संबंधी बातें अत्यंत मधुर फल देती हैं।" : "Venus and Moon horas cultivate emotional receptivity, romantic intimacy, and peaceful conflict resolution."
+          },
+          {
+            icon: "🌿",
+            title: isHi ? "स्वास्थ्य, ऊर्जा व चिकित्सा" : "Physical Energy & Treatment",
+            desc: isHi ? "मंगल की होरा शारीरिक शक्ति व व्यायाम हेतु उत्तम है; शनि होरा में कठिन श्रम व धैर्यपूर्ण कार्य श्रेष्ठ रहते हैं।" : "Mars hora fuels physical athletic vigor, while Saturn hora is suited for disciplined research and grounding labor."
+          }
+        ]}
+        cautionPoints={
+          isHi
+            ? [
+                "शनि की होरा में विवाह, प्रेम प्रस्ताव अथवा नए आभूषण क्रय करने से बचें; विलंब अथवा नीरसता आ सकती है।",
+                "मंगल की होरा में संवेदनशील समझौते या शांति वार्ता से बचें; क्रोध व विवाद भड़कने की आशंका रहती है।"
+              ]
+            : [
+                "Avoid romantic proposals, purchasing fine luxury items, or celebrations during Saturn hora.",
+                "Avoid sensitive diplomatic negotiations during Mars hora, as fiery impulses may trigger confrontations."
+              ]
+        }
+        remedyPoints={
+          isHi
+            ? [
+                "जिस कार्य में सफलता चाहिए, उस ग्रह की होरा में उस ग्रह के नाम अथवा बीज मंत्र का ११ बार मन में जप कर कार्य आरंभ करें।",
+                "प्रतिदिन प्रातः स्नान के उपरांत उस दिन के स्वामी ग्रह (जैसे रविवार को सूर्य, सोमवार को चंद्र) को नमन करें।"
+              ]
+            : [
+                "Recite the 11-fold seed mantra of the ruling planet during its active hora before commencing high-priority tasks.",
+                "Offer a silent morning salute to today's planetary day-lord to align your vitality with cosmic rhythms."
+              ]
+        }
+        isHi={isHi}
+      />
     </div>
   );
 }
